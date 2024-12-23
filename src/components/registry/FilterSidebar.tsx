@@ -98,7 +98,7 @@ export const FilterSidebar = ({
 		activeFilters.find((f) => f.type === type)?.value;
 
 	return (
-		<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-lg border-brg-border">
+		<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-lg border-brg-light">
 			<div>
 				<FilterHeader
 					title="Year"

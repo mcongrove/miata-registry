@@ -167,7 +167,7 @@ export const Header = () => {
 	}
 
 	return (
-		<header className="bg-white border-b border-brg-border">
+		<header className="bg-white">
 			<div className="container mx-auto py-4">
 				<div className="flex items-center">
 					<Link to="/" className="mr-12">

@@ -98,7 +98,7 @@ export const Registry = () => {
 			<Header />
 
 			<main className="flex-1 flex">
-				<div className="flex gap-8 flex-1 p-16">
+				<div className="flex gap-8 flex-1 container mx-auto pt-8 pb-16">
 					<FilterSidebar
 						activeFilters={activeFilters}
 						onFiltersChange={handleFiltersChange}
