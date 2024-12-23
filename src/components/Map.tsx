@@ -9,7 +9,12 @@
  */
 
 import { useEffect, useState } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import {
+	GoogleMap,
+	LoadScript,
+	Marker,
+	Polyline,
+} from '@react-google-maps/api';
 
 interface Location {
 	name: string;
@@ -45,9 +50,11 @@ export const Map = ({ locations }: MapProps) => {
 						const data = await response.json();
 
 						if (data.results?.[0]?.geometry?.location) {
+							const position = data.results[0].geometry.location;
+
 							return {
 								name: loc.name,
-								position: data.results[0].geometry.location,
+								position: position,
 							};
 						}
 					} catch (error) {
@@ -57,18 +64,15 @@ export const Map = ({ locations }: MapProps) => {
 				})
 			);
 
-			setMarkers(geocoded.filter((m): m is MarkerData => m !== null));
+			const validMarkers = geocoded.filter(
+				(m): m is MarkerData => m !== null
+			);
+
+			setMarkers(validMarkers);
 		};
 
-		if (locations.length > 0) {
-			geocodeLocations();
-		}
+		geocodeLocations();
 	}, [locations]);
-
-	const mapOptions = {
-		disableDefaultUI: true,
-		zoomControl: true,
-	};
 
 	return (
 		<div className="w-full h-[400px]">
@@ -77,30 +81,55 @@ export const Map = ({ locations }: MapProps) => {
 			>
 				<GoogleMap
 					mapContainerClassName="w-full h-full"
-					options={mapOptions}
+					options={{
+						disableDefaultUI: true,
+						zoomControl: true,
+						styles: [
+							{
+								stylers: [
+									{ saturation: -100 },
+									{ lightness: 10 },
+								],
+							},
+						],
+					}}
 					zoom={4}
 					center={
 						markers[markers.length - 1]?.position || {
-							lat: 35.6762,
-							lng: -139.6503,
+							lat: 39.8283,
+							lng: -98.5795,
 						}
-					}
+					} // US center
 				>
-					{markers.map((marker, index) => (
-						<Marker
-							key={index}
-							position={marker.position}
-							title={marker.name}
-							icon={{
-								path: google.maps.SymbolPath.CIRCLE,
-								fillColor: '#172E28',
-								fillOpacity: 1,
+					{markers.map((marker, index) => {
+						return (
+							<Marker
+								key={index}
+								position={marker.position}
+								title={marker.name}
+								icon={{
+									path: google.maps.SymbolPath.CIRCLE,
+									fillColor: '#172E28',
+									fillOpacity: 1,
+									strokeColor: '#FFFFFF',
+									strokeWeight: 2,
+									scale: index === markers.length - 1 ? 8 : 4,
+								}}
+							/>
+						);
+					})}
+
+					{markers.length > 1 && (
+						<Polyline
+							path={markers.map((marker) => marker.position)}
+							options={{
 								strokeColor: '#172E28',
-								strokeWeight: 1,
-								scale: 8,
+								strokeOpacity: 0.8,
+								strokeWeight: 2,
+								geodesic: true,
 							}}
 						/>
-					))}
+					)}
 				</GoogleMap>
 			</LoadScript>
 		</div>

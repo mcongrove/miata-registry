@@ -215,6 +215,14 @@ export const CarProfile = () => {
 												}
 											: null,
 										{
+											name: 'Miami, FL, US',
+											address: 'Miami, FL, US',
+										},
+										{
+											name: 'Seattle, WA, US',
+											address: 'Seattle, WA, US',
+										},
+										{
 											name: `${car.location?.city}, ${car.location?.state}`,
 											address: `${car.location?.city}, ${car.location?.state}, ${car.location?.country}`,
 										},
