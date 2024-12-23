@@ -215,12 +215,20 @@ export const CarProfile = () => {
 												}
 											: null,
 										{
-											name: 'Miami, FL, US',
-											address: 'Miami, FL, US',
+											name: 'Marin Mazda',
+											address: 'San Rafael, CA, US',
 										},
 										{
-											name: 'Seattle, WA, US',
-											address: 'Seattle, WA, US',
+											name: 'Edward Baker',
+											address: 'Oakland, CA, US',
+										},
+										{
+											name: 'Cherylann Marchese',
+											address: 'Henderson, NV, US',
+										},
+										{
+											name: 'Russel Hertzog',
+											address: 'Georgetown, TX, US',
 										},
 										{
 											name: `${car.location?.city}, ${car.location?.state}`,
@@ -276,22 +284,31 @@ export const CarProfile = () => {
 								{car.owner && (
 									<TimelineItem
 										name={car.owner.name || 'Unknown'}
-										dateRange="2022 – Present"
+										dateRange="2024 – Present"
 										location={`${car.location?.city}, ${car.location?.state}, ${car.location?.country}`}
 										isActive={true}
 									/>
 								)}
 								<TimelineItem
-									name="Jane Smith"
-									dateRange="2015 – 2022"
-									location="Seattle, WA, US"
+									name="Russel Hertzog"
+									dateRange="2022 – 2024"
+									location="Georgetown, TX, US"
 								/>
-								<TimelineItem name="Robert Johnson" />
 								<TimelineItem
-									dateRange="1992 – 1995"
-									location="Miami, FL, US"
+									name="Cherylann Marchese"
+									dateRange="2016 – 2022"
+									location="Henderson,NV, US"
 								/>
-
+								<TimelineItem
+									name="Edward Baker"
+									dateRange="February 5, 1991 – 2016"
+									location="Oakland, CA, US"
+								/>
+								<TimelineItem
+									name="Marin Mazda"
+									dateRange="1991"
+									location="San Rafael, CA, US"
+								/>
 								{car.shipping && (
 									<TimelineItem
 										name={`${car.shipping.vessel ? `Shipped via ${toTitleCase(car.shipping.vessel)}` : 'Shipped'}`}
