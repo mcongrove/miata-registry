@@ -50,7 +50,7 @@ export const RegistryTable = ({
 			<div className="overflow-auto min-h-96 max-h-[calc(100vh-320px)] relative">
 				<table className="min-w-full border-collapse">
 					<thead>
-						<tr className="bg-brg-light sticky top-0 z-50">
+						<tr className="bg-brg-light sticky top-0 z-10">
 							{columns.map(({ header, key }) => (
 								<th
 									key={header}
@@ -139,14 +139,14 @@ export const RegistryTable = ({
 									{car.owner ? (
 										<Link
 											to={`/owner/${car.owner.id}`}
-											className="hover:underline relative z-10"
+											className="hover:underline relative z-0"
 										>
 											{car.owner.name}
 										</Link>
 									) : (
 										<Link
 											to={`/claim/${car.id}`}
-											className="text-brg-border hover:text-brg hover:underline relative z-10"
+											className="text-brg-border hover:text-brg hover:underline relative z-0"
 										>
 											Claim
 										</Link>

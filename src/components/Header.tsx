@@ -30,7 +30,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	const location = useLocation();
 
 	return (
-		<div className="relative group z-50">
+		<div className="relative group z-[60]">
 			<button
 				className={`text-sm ${
 					isActive
@@ -168,7 +168,7 @@ export const Header = () => {
 
 	return (
 		<header className="fixed top-0 left-0 right-0 bg-white z-50">
-			<div className="container mx-auto py-4">
+			<div className="container mx-auto py-4 relative">
 				<div className="flex items-center">
 					<Link to="/" className="mr-12">
 						<Symbol className="w-16 h-auto text-brg" />
@@ -176,6 +176,7 @@ export const Header = () => {
 
 					<NavLinks />
 				</div>
+				<div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent translate-y-full pointer-events-none z-50"></div>
 			</div>
 		</header>
 	);
