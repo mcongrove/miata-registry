@@ -59,7 +59,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 						<Link
 							key={item.to}
 							to={item.to}
-							className={`block px-4 py-2 text-sm rounded-md transition-colors ${
+							className={`block px-3 py-2 text-sm rounded-md transition-colors ${
 								location.pathname === item.to
 									? 'text-brg font-medium'
 									: 'text-brg-mid hover:text-brg hover:bg-brg-light'
@@ -88,9 +88,9 @@ export const Header = () => {
 				<Dropdown
 					label="Registry"
 					items={[
-						{ label: 'All Cars', to: '/registry' },
-						{ label: 'Browse Models', to: '/models' },
-						{ label: 'Register Your Miata', to: '/register' },
+						{ label: 'Browse the cars', to: '/registry' },
+						{ label: 'Browse the models', to: '/models' },
+						{ label: 'Register your Miata', to: '/register' },
 					]}
 					isActive={isActive('/registry')}
 				/>
@@ -109,7 +109,7 @@ export const Header = () => {
 				<Dropdown
 					label="About"
 					items={[
-						{ label: 'About', to: '/about' },
+						{ label: 'About the Registry', to: '/about' },
 						{ label: 'News', to: '/news' },
 						{ label: 'Contributing', to: '/contributing' },
 						{ label: 'Partners', to: '/partners' },
@@ -120,7 +120,7 @@ export const Header = () => {
 				<Dropdown
 					label="Support"
 					items={[
-						{ label: 'Submit a Tip', to: '/tip' },
+						{ label: 'Submit a tip', to: '/tip' },
 						{ label: 'Contact', to: '/contact' },
 						{ label: 'FAQ', to: '/faq' },
 					]}

@@ -21,7 +21,7 @@ import { Link } from 'react-router-dom';
 
 export const Footer = () => {
 	return (
-		<footer className="bg-gradient-to-b from-brg-dark to-[#070E0C] pt-16 pb-8">
+		<footer className="bg-brg-dark pt-16 pb-8">
 			<div className="container mx-auto">
 				<div className="flex gap-24 mb-16">
 					<div className="w-1/4">
@@ -105,7 +105,15 @@ export const Footer = () => {
 										to="/register"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
-										Register Your Car
+										Register your Miata
+									</Link>
+								</li>
+								<li>
+									<Link
+										to="/tip"
+										className="text-brg-mid hover:text-brg-light transition-colors"
+									>
+										Register someone else's Miata
 									</Link>
 								</li>
 								<li>
