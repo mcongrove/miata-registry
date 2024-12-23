@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Link } from 'react-router-dom';
 import { Car } from '../../types/Car';
+import { colorMap } from '../../utils/colorMap';
 
 interface RegistryTableProps {
 	cars: Car[];
@@ -32,60 +34,114 @@ export const RegistryTable = ({
 	onSort,
 }: RegistryTableProps) => {
 	return (
-		<div className="bg-white rounded-md shadow overflow-hidden">
-			<table className="min-w-full divide-y divide-gray-200">
-				<thead className="bg-gray-50">
+		<div className="bg-white rounded-md overflow-hidden border border-brg-light text-brg">
+			<table className="min-w-full">
+				<thead className="bg-brg-light">
 					<tr>
 						{[
 							'Year',
-							'Model',
+							'Generation',
 							'Edition',
 							'Color',
-							'VIN',
+							'Sequence #',
 							'Owner',
+							'Country',
 						].map((header) => (
 							<th
 								key={header}
-								className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+								className="px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer"
 								onClick={() =>
-									onSort(header.toLowerCase() as keyof Car)
+									onSort(
+										header
+											.toLowerCase()
+											.replace('Sequence #', 'sequence')
+											.toLowerCase() as keyof Car
+									)
 								}
 							>
 								<div className="flex items-center">
 									{header}
-									{sortColumn === header.toLowerCase() && (
-										<span className="ml-1">
-											{sortDirection === 'asc'
-												? '↑'
-												: '↓'}
-										</span>
-									)}
+
+									<span
+										className={`ml-1 ${
+											sortColumn === header.toLowerCase()
+												? 'opacity-100'
+												: 'opacity-0'
+										}`}
+									>
+										{sortDirection === 'asc' ? '↑' : '↓'}
+									</span>
 								</div>
 							</th>
 						))}
 					</tr>
 				</thead>
 
-				<tbody className="bg-white divide-y divide-gray-200">
+				<tbody className="divide-y divide-brg-light text-xs">
 					{cars.map((car) => (
-						<tr key={car.id} className="hover:bg-gray-50">
-							<td className="px-6 py-4 whitespace-nowrap">
+						<tr
+							key={car.id}
+							className="bg-white hover:bg-brg-light/25 transition-colors"
+						>
+							<td className="px-4 py-3 whitespace-nowrap font-mono">
 								{car.year}
 							</td>
-							<td className="px-6 py-4 whitespace-nowrap">
-								{car.model}
+							<td className="px-4 py-3 whitespace-nowrap">
+								{car.generation}
 							</td>
-							<td className="px-6 py-4 whitespace-nowrap">
+							<td className="px-4 py-3 whitespace-nowrap">
 								{car.edition}
 							</td>
-							<td className="px-6 py-4 whitespace-nowrap">
-								{car.color}
+							<td className="px-4 py-3 whitespace-nowrap">
+								<div className="flex items-center gap-2">
+									<span
+										className="w-4 h-3 rounded-sm inline-block"
+										style={{
+											backgroundColor:
+												colorMap[
+													car.color.toLowerCase()
+												] || '#DDD',
+										}}
+									/>
+									{car.color}
+								</div>
 							</td>
-							<td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-								{car.vin}
+							<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
+								{car.sequence && (
+									<>
+										{car.sequence.toLocaleString()}
+										{car.totalProduced && (
+											<span className="text-brg-border">
+												of{' '}
+												{car.totalProduced.toLocaleString()}
+											</span>
+										)}
+									</>
+								)}
 							</td>
-							<td className="px-6 py-4 whitespace-nowrap">
-								{car.owner}
+							<td className="px-4 py-3 whitespace-nowrap">
+								{car.owner || (
+									<Link
+										to={`/claim/${car.id}`}
+										className="text-brg-border hover:text-brg hover:underline"
+									>
+										Claim
+									</Link>
+								)}
+							</td>
+							<td className="px-4 py-3 whitespace-nowrap">
+								{car.location && (
+									<span className="flex items-center gap-2">
+										<img
+											src={`https://flagcdn.com/16x12/${car.location.country.toLowerCase()}.png`}
+											alt={`${car.location.country} flag`}
+											className="w-4 h-3"
+										/>
+										{new Intl.DisplayNames(['en'], {
+											type: 'region',
+										}).of(car.location.country)}
+									</span>
+								)}
 							</td>
 						</tr>
 					))}

@@ -25,54 +25,7 @@ import { RegistryTable } from '../components/registry/RegistryTable';
 import { Car } from '../types/Car';
 import { FilterOption } from '../types/Filters';
 import { Chip } from '../components/common/Chip';
-
-const SAMPLE_CARS: Car[] = [
-	{
-		id: '1',
-		year: 1991,
-		model: 'NA',
-		edition: 'British Racing Green',
-		color: 'Green',
-		vin: 'JM1NA3512M1234567',
-		owner: 'John Doe',
-	},
-	{
-		id: '2',
-		year: 1993,
-		model: 'NA',
-		edition: 'LE Black & Red',
-		color: 'Black',
-		vin: 'JM1NA3512P1234568',
-		owner: 'Jane Smith',
-	},
-	{
-		id: '3',
-		year: 1999,
-		model: 'NB',
-		edition: '10th Anniversary',
-		color: 'Sapphire Blue',
-		vin: 'JM1NB3512X1234569',
-		owner: 'Bob Wilson',
-	},
-	{
-		id: '4',
-		year: 2004,
-		model: 'NB',
-		edition: 'Mazdaspeed',
-		color: 'Velocity Red',
-		vin: 'JM1NB3512Y1234570',
-		owner: 'Alice Brown',
-	},
-	{
-		id: '5',
-		year: 2005,
-		model: 'NC',
-		edition: 'PRHT Launch Edition',
-		color: 'Copper Red',
-		vin: 'JM1NC3512Z1234571',
-		owner: 'Charlie Davis',
-	},
-];
+import sampleCars from '../data/sampleCars.json';
 
 export const Registry = () => {
 	const [search, setSearch] = useState('');
@@ -110,7 +63,7 @@ export const Registry = () => {
 							<input
 								type="text"
 								placeholder="Search..."
-								className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-4 focus:outline-none placeholder:text-brg-mid/70 pr-8"
+								className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-3 focus:outline-none placeholder:text-brg-mid/70 pr-8"
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
 							/>
@@ -161,7 +114,7 @@ export const Registry = () => {
 
 						<div className="my-3">
 							<RegistryTable
-								cars={SAMPLE_CARS}
+								cars={sampleCars}
 								sortColumn={sortColumn}
 								sortDirection={sortDirection}
 								onSort={handleSort}

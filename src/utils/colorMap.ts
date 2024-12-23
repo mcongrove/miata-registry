@@ -16,19 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type Car = {
-	id: string;
-	year: number;
-	generation: string;
-	edition: string;
-	color: string;
-	vin?: string;
-	owner?: string;
-	sequence?: number;
-	totalProduced?: number;
-	location?: {
-		country: string;
-		state?: string;
-		city?: string;
-	};
+export const colorMap: Record<string, string> = {
+	black: '#000000',
+	'brilliant black': '#000000',
+	'british racing green': '#2C4C3B',
+	'classic red': '#E2231A',
+	'crystal blue': '#00B0CA',
+	'emerald mica': '#024930',
+	'evolution orange': '#F0A500',
+	'laguna blue': '#2A4BA0',
+	'mahogany mica': '#4B273D',
+	'marina green mica': '#1B4D3E',
+	'mariner blue': '#0055B8',
+	'merlot mica': '#641F34',
+	'midnight blue': '#2A1B57',
+	'montego blue': '#1B4B6D',
+	'sapphire blue': '#002B7F',
+	silver: '#C6C9CA',
+	'silver stone metallic': '#C7C9C7',
+	'starlight mica': '#2E2787',
+	'sunburst yellow': '#FFD700',
+	'twilight blue': '#1B365D',
+	white: '#FFFFFF',
 };

@@ -1,0 +1,81 @@
+[
+	{
+		"id": "1",
+		"year": 1991,
+		"generation": "NA",
+		"edition": "British Racing Green",
+		"color": "British Racing Green",
+		"vin": "JM1NA3512M1234567",
+		"owner": "John Doe",
+		"sequence": 326,
+		"totalProduced": 4000,
+		"location": {
+			"country": "US",
+			"state": "California",
+			"city": "Los Angeles"
+		}
+	},
+	{
+		"id": "2",
+		"year": 1993,
+		"generation": "NA",
+		"edition": "LE Black & Red",
+		"color": "Black",
+		"vin": "JM1NA3512P1234568",
+		"owner": "Jane Smith",
+		"sequence": 1205,
+		"totalProduced": 1500,
+		"location": {
+			"country": "US",
+			"state": "California",
+			"city": "Los Angeles"
+		}
+	},
+	{
+		"id": "3",
+		"year": 1999,
+		"generation": "NB",
+		"edition": "10th Anniversary",
+		"color": "Mariner Blue",
+		"vin": "JM1NB3512X1234569",
+		"owner": "Bob Wilson",
+		"sequence": 2,
+		"totalProduced": 7500,
+		"location": {
+			"country": "US",
+			"state": "California",
+			"city": "Los Angeles"
+		}
+	},
+	{
+		"id": "4",
+		"year": 2004,
+		"generation": "NB",
+		"edition": "Mazdaspeed",
+		"color": "Merlot Mica",
+		"vin": "JM1NB3512Y1234570",
+		"sequence": 782,
+		"totalProduced": 5428,
+		"location": {
+			"country": "US",
+			"state": "California",
+			"city": "Los Angeles"
+		}
+	},
+	{
+		"id": "5",
+		"year": 2005,
+		"generation": "NC",
+		"edition": "PRHT Launch Edition",
+		"color": "Sunburst Yellow",
+		"vin": "JM1NC3512Z1234571",
+		"owner": "Charlie Davis",
+		"sequence": 15,
+		"totalProduced": 400,
+		"location": {
+			"country": "US",
+			"state": "California",
+			"city": "Los Angeles"
+		}
+	}
+]
