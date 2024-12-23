@@ -16,58 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FilterOption } from '../../types/filters';
+import { FilterOption } from '../../types/Filters';
+import { Select } from '../Select';
+import { FilterRadioGroup } from './FilterRadioGroup';
+import { FilterSection } from './FilterSection';
+import { FilterHeader } from './FilterHeader';
 
 interface FilterSidebarProps {
 	activeFilters: FilterOption[];
 	onFiltersChange: (filters: FilterOption[]) => void;
 }
-
-const FilterLabel = ({
-	value,
-	type,
-	isSelected,
-	onChange,
-}: FilterOption & {
-	isSelected: boolean;
-	onChange: (option: FilterOption) => void;
-}) => (
-	<label className="flex items-center">
-		<input
-			type="radio"
-			className="mr-2 size-4"
-			checked={isSelected}
-			onChange={() => onChange({ type, value })}
-			name={type}
-		/>
-		<span>{value}</span>
-	</label>
-);
-
-interface FilterHeaderProps {
-	title: string;
-	onClear: () => void;
-	hasActiveFilter?: boolean;
-}
-
-const FilterHeader = ({
-	title,
-	onClear,
-	hasActiveFilter,
-}: FilterHeaderProps) => (
-	<div className="flex justify-between items-center p-4 pb-3">
-		<h3 className="text-sm">{title}</h3>
-
-		{hasActiveFilter && (
-			<button
-				onClick={onClear}
-				className="text-xs text-brg-mid hover:text-brg"
-			>
-				Clear
-			</button>
-		)}
-	</div>
-);
 
 export const FilterSidebar = ({
 	activeFilters,
@@ -78,6 +36,9 @@ export const FilterSidebar = ({
 		{ length: currentYear - 1989 + 1 },
 		(_, i) => currentYear - i
 	).reverse();
+
+	const getActiveValue = (type: FilterOption['type']) =>
+		activeFilters.find((f) => f.type === type)?.value;
 
 	const handleOptionChange = (newOption: FilterOption) => {
 		const otherTypeFilters = activeFilters.filter(
@@ -94,11 +55,12 @@ export const FilterSidebar = ({
 		onFiltersChange(activeFilters.filter((f) => f.type !== filterType));
 	};
 
-	const getActiveValue = (type: FilterOption['type']) =>
-		activeFilters.find((f) => f.type === type)?.value;
+	const handleSelectChange = (value: string, type: FilterOption['type']) => {
+		handleOptionChange({ type, value });
+	};
 
 	return (
-		<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-lg border-brg-light">
+		<FilterSection>
 			<div>
 				<FilterHeader
 					title="Year"
@@ -107,83 +69,69 @@ export const FilterSidebar = ({
 				/>
 
 				<div className="p-4 pt-0">
-					<div className="relative">
-						<select
-							className={`w-full p-2 text-xs bg-white border border-brg-border rounded-md focus:outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23666666%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px_16px] bg-[right_8px_center] bg-no-repeat ${getActiveValue('year') ? 'text-brg' : 'text-brg-border'}`}
-							onChange={(e) =>
-								handleOptionChange({
-									type: 'year',
-									value: e.target.value,
-								})
-							}
-							value={getActiveValue('year') || ''}
-						>
-							<option value="">Select year</option>
-							{years.map((year) => (
-								<option key={year} value={year}>
-									{year}
-								</option>
-							))}
-						</select>
-					</div>
+					<Select
+						value={getActiveValue('year') || ''}
+						onChange={(value: string) =>
+							handleSelectChange(value, 'year')
+						}
+						options={years.map((year) => ({
+							value: String(year),
+							label: String(year),
+						}))}
+						placeholder="Select year"
+					/>
 				</div>
 			</div>
+
+			<FilterRadioGroup
+				title="Generation"
+				type="generation"
+				options={['NA', 'NB', 'NC', 'ND']}
+				activeValue={getActiveValue('generation')}
+				onClear={handleClear}
+				onChange={handleOptionChange}
+			/>
+
+			<FilterRadioGroup
+				title="Edition"
+				type="edition"
+				options={[
+					'1991 British Racing Green',
+					'1992 Sunburst Yellow',
+					'1995 Mazdaspeed',
+					'1999 10th Anniversary',
+					'2001 Limited Edition',
+				]}
+				activeValue={getActiveValue('edition')}
+				onClear={handleClear}
+				onChange={handleOptionChange}
+			/>
 
 			<div>
 				<FilterHeader
-					title="Generation"
-					onClear={() => handleClear('generation')}
-					hasActiveFilter={!!getActiveValue('generation')}
+					title="Country"
+					onClear={() => handleClear('country')}
+					hasActiveFilter={!!getActiveValue('country')}
 				/>
 
-				<div className="space-y-2 max-h-56 overflow-y-auto p-4 pt-0 text-xs font-light">
-					{['NA', 'NB', 'NC', 'ND'].map((gen) => (
-						<FilterLabel
-							key={gen}
-							value={gen}
-							type="generation"
-							isSelected={getActiveValue('generation') === gen}
-							onChange={handleOptionChange}
-						/>
-					))}
+				<div className="p-4 pt-0">
+					<Select
+						value={getActiveValue('country') || ''}
+						onChange={(value: string) =>
+							handleSelectChange(value, 'country')
+						}
+						options={[
+							{ value: 'United States', label: 'United States' },
+							{ value: 'Japan', label: 'Japan' },
+							{
+								value: 'United Kingdom',
+								label: 'United Kingdom',
+							},
+						]}
+						placeholder="Select country"
+					/>
 				</div>
 			</div>
-
-			<div>
-				<FilterHeader
-					title="Edition"
-					onClear={() => handleClear('edition')}
-					hasActiveFilter={!!getActiveValue('edition')}
-				/>
-
-				<div className="space-y-2 max-h-60 overflow-y-auto p-4 pt-0 text-xs font-light">
-					{[
-						'British Racing Green',
-						'10th Anniversary',
-						'Mazdaspeed',
-						'British Racing Green',
-						'10th Anniversary',
-						'Mazdaspeed',
-						'British Racing Green',
-						'10th Anniversary',
-						'Mazdaspeed',
-						'British Racing Green',
-						'10th Anniversary',
-						'Mazdaspeed',
-						'British Racing Green',
-						'10th Anniversary',
-						'Mazdaspeed',
-					].map((edition) => (
-						<FilterLabel
-							key={edition}
-							value={edition}
-							type="edition"
-							isSelected={getActiveValue('edition') === edition}
-							onChange={handleOptionChange}
-						/>
-					))}
-				</div>
-			</div>
-		</div>
+		</FilterSection>
 	);
 };

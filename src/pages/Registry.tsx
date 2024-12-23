@@ -23,7 +23,7 @@ import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
 import { Car } from '../types/Car';
-import { FilterOption } from '../types/filters';
+import { FilterOption } from '../types/Filters';
 
 const SAMPLE_CARS: Car[] = [
 	{

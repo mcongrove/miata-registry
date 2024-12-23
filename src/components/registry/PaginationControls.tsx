@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Select } from '../Select';
+
 interface PaginationControlsProps {
 	currentPage: number;
 	totalPages: number;
@@ -34,38 +36,72 @@ export const PaginationControls = ({
 	const start = (currentPage - 1) * itemsPerPage + 1;
 	const end = Math.min(currentPage * itemsPerPage, totalItems);
 
+	const pageOptions = [...Array(totalPages)].map((_, i) => ({
+		value: i + 1,
+		label: String(i + 1),
+	}));
+
 	return (
-		<div className="flex justify-between items-center">
-			<div className="text-sm text-gray-600">
-				Showing {start}-{end} of {totalItems} cars
+		<div className="flex justify-between items-center text-sm">
+			<div className="text-brg-mid">
+				Showing {start}-{end} of {totalItems}
 			</div>
-			<div className="flex gap-2">
+
+			<div className="flex gap-1 items-stretch">
 				<button
-					className="px-3 py-1 border rounded hover:bg-gray-50"
+					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
 					onClick={() => onPageChange(currentPage - 1)}
 					disabled={currentPage === 1}
 				>
-					&lt;
-				</button>
-				{[...Array(totalPages)].map((_, i) => (
-					<button
-						key={i + 1}
-						className={`px-3 py-1 rounded ${
-							currentPage === i + 1
-								? 'bg-blue-600 text-white'
-								: 'border hover:bg-gray-50'
-						}`}
-						onClick={() => onPageChange(i + 1)}
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#666666"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						className="rotate-90"
 					>
-						{i + 1}
-					</button>
-				))}
+						<polyline points="6 9 12 15 18 9"></polyline>
+					</svg>
+				</button>
+
+				<div className="w-24">
+					<Select
+						value={currentPage}
+						onChange={(value) => {
+							const newPage = Number(value);
+
+							if (newPage !== currentPage) {
+								onPageChange(newPage);
+							}
+						}}
+						options={pageOptions}
+					/>
+				</div>
+
 				<button
-					className="px-3 py-1 border rounded hover:bg-gray-50"
+					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-gray-50"
 					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage === totalPages}
 				>
-					&gt;
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#666666"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						className="-rotate-90"
+					>
+						<polyline points="6 9 12 15 18 9"></polyline>
+					</svg>
 				</button>
 			</div>
 		</div>
