@@ -49,7 +49,7 @@ export const PaginationControls = ({
 
 			<div className="flex gap-1 items-stretch">
 				<button
-					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-brg-light disabled:opacity-30 disabled:cursor-not-allowed"
 					onClick={() => onPageChange(currentPage - 1)}
 					disabled={currentPage === 1}
 				>
@@ -84,7 +84,7 @@ export const PaginationControls = ({
 				</div>
 
 				<button
-					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-gray-50"
+					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-brg-light"
 					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage === totalPages}
 				>

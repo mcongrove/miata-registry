@@ -1,1 +1,1 @@
-For every TSX file, include the AGPL-3.0 license at the top of the file. Use TailwindCSS classes when styling. When referring to the cars in the registry, use the term "limited edition" instead of "special edition"; instead of "model", use "edition".
+For every TSX file, include the AGPL-3.0 license at the top of the file. Use TailwindCSS classes when styling. When referring to the cars in the registry, use the term "limited edition" instead of "special edition"; instead of "model", use "edition". Use the "brg" colors, never use "gray".

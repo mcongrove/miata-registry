@@ -32,7 +32,7 @@ const CreditText = ({
 	direction,
 }: Omit<CreditProps, 'id'>) => (
 	<div
-		className={`flex items-center overflow-hidden bg-white  w-0 h-10 z-10 group-hover:w-auto ${direction === 'left' ? 'rounded-l-full -mr-5' : 'rounded-r-full -ml-5'}`}
+		className={`flex items-center overflow-hidden bg-white w-0 h-10 z-10 group-hover:w-auto ${direction === 'left' ? 'rounded-l-full -mr-5' : 'rounded-r-full -ml-5'}`}
 	>
 		<div
 			className={`text-brg py-2 ${direction === 'left' ? 'pr-5 pl-4' : 'pl-5 pr-4'} whitespace-nowrap text-[10px]`}

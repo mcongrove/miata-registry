@@ -17,8 +17,6 @@
  */
 
 import { useState } from 'react';
-import { Footer } from '../components/Footer';
-import { Header } from '../components/Header';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
@@ -161,7 +159,7 @@ export const Registry = () => {
 		return filtered;
 	};
 
-	const itemsPerPage = 10;
+	const itemsPerPage = 50;
 	const processedCars = getProcessedCars(sampleCars);
 	const totalItems = processedCars.length;
 	const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -172,8 +170,6 @@ export const Registry = () => {
 
 	return (
 		<div className="min-h-screen flex flex-col">
-			<Header />
-
 			<main className="flex-1 flex pt-[72px]">
 				<div className="flex gap-8 flex-1 container mx-auto pt-8 pb-16">
 					<FilterSidebar
@@ -287,8 +283,6 @@ export const Registry = () => {
 					</div>
 				</div>
 			</main>
-
-			<Footer />
 		</div>
 	);
 };

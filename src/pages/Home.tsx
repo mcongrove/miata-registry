@@ -20,14 +20,10 @@ import Symbol from '../assets/symbol.svg?react';
 import { TimelineItem } from '../components/home/TimelineItem';
 import { Credit } from '../components/Credit';
 import { Button } from '../components/Button';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
 
 export const Home = () => {
 	return (
 		<>
-			<Header />
-
 			<header className="h-[90vh] flex bg-brg-light">
 				<div className="w-1/2 px-16 flex items-center ">
 					<div className="pr-40 flex flex-col gap-10">
@@ -399,8 +395,6 @@ export const Home = () => {
 					</div>
 				</div>
 			</main>
-
-			<Footer />
 		</>
 	);
 };

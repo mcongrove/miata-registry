@@ -19,14 +19,30 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { Registry } from './pages/Registry';
+import { Editions } from './pages/Editions';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
+
+function Layout({ children }: { children: React.ReactNode }) {
+	return (
+		<div className="min-h-screen flex flex-col">
+			<Header />
+			{children}
+			<Footer />
+		</div>
+	);
+}
 
 function App() {
 	return (
 		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/registry" element={<Registry />} />
-			</Routes>
+			<Layout>
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/registry" element={<Registry />} />
+					<Route path="/editions" element={<Editions />} />
+				</Routes>
+			</Layout>
 		</BrowserRouter>
 	);
 }

@@ -18,9 +18,16 @@
 
 export type Edition = {
 	color: string;
-	name: string;
 	generation: string;
 	id: string;
+	image?: string;
+	imageCredit?: {
+		car: string;
+		number: string;
+		id: string;
+		owner: string;
+	};
+	name: string;
 	totalProduced?: number;
 	year: number;
 };

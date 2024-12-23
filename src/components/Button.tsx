@@ -42,7 +42,7 @@ export const Button: React.FC<ButtonProps> = ({
 				? 'bg-brg-mid hover:bg-brg-mid/90'
 				: '';
 
-	const textColor = variant === 'tertiary' ? 'text-gray-700' : 'text-white';
+	const textColor = variant === 'tertiary' ? 'text-brg' : 'text-white';
 	const buttonClassName = `group flex items-center ${bgColor} ${textColor} font-medium py-3 px-4 rounded-lg transition-colors ${className || ''}`;
 
 	if (href) {
