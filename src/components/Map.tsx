@@ -93,7 +93,7 @@ export const Map = ({ locations }: MapProps) => {
 							},
 						],
 					}}
-					zoom={4}
+					zoom={5}
 					center={
 						markers[markers.length - 1]?.position || {
 							lat: 39.8283,
