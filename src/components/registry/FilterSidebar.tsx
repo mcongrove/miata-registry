@@ -59,7 +59,7 @@ export const FilterSidebar = ({
 	};
 
 	return (
-		<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-md border-brg-light">
+		<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-md border-brg-light sticky top-4">
 			<div>
 				<FilterHeader
 					title="Year"
