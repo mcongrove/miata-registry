@@ -16,40 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FilterType, FilterOption } from '../../types/Filters';
-
-interface FilterLabelProps {
-	value: string;
-	type: FilterType;
-	isSelected: boolean;
-	onChange: (option: FilterOption) => void;
-}
-
-export const FilterLabel = ({
-	value,
-	type,
-	isSelected,
-	onChange,
-}: FilterLabelProps) => (
-	<label className="flex items-center space-x-2 cursor-pointer">
-		<input
-			type="radio"
-			className="hidden"
-			checked={isSelected}
-			onChange={() =>
-				onChange({
-					type: type as FilterType,
-					value: isSelected ? '' : value,
-				})
-			}
-		/>
-
-		<div
-			className={`w-3 h-3 rounded-full border ${
-				isSelected ? 'bg-brg border-brg' : 'bg-white border-brg-border'
-			}`}
-		/>
-
-		<span>{value}</span>
-	</label>
-);
+export type Owner = {
+	id: string;
+	name?: string;
+};

@@ -1,9 +1,6 @@
 [
 	{
 		"id": "1",
-		"year": 1991,
-		"generation": "NA",
-		"edition": "British Racing Green",
 		"color": "British Racing Green",
 		"vin": "JM1NA3512M1234567",
 		"owner": {
@@ -11,7 +8,14 @@
 			"name": "John Doe"
 		},
 		"sequence": 326,
-		"totalProduced": 4000,
+		"edition": {
+			"id": "brg-1991",
+			"name": "British Racing Green Limited Edition",
+			"color": "British Racing Green",
+			"generation": "NA",
+			"year": 1991,
+			"totalProduced": 4000
+		},
 		"location": {
 			"country": "US",
 			"state": "California",
@@ -20,9 +24,6 @@
 	},
 	{
 		"id": "2",
-		"year": 1993,
-		"generation": "NA",
-		"edition": "LE Black & Red",
 		"color": "Black",
 		"vin": "JM1NA3512P1234568",
 		"owner": {
@@ -30,7 +31,14 @@
 			"name": "Jane Smith"
 		},
 		"sequence": 1205,
-		"totalProduced": 1500,
+		"edition": {
+			"id": "le-black-red-1993",
+			"name": "Black & Red Limited Edition",
+			"color": "Black",
+			"generation": "NA",
+			"year": 1993,
+			"totalProduced": 1500
+		},
 		"location": {
 			"country": "US",
 			"state": "California",
@@ -39,9 +47,6 @@
 	},
 	{
 		"id": "3",
-		"year": 1999,
-		"generation": "NB",
-		"edition": "10th Anniversary",
 		"color": "Mariner Blue",
 		"vin": "JM1NB3512X1234569",
 		"owner": {
@@ -49,7 +54,14 @@
 			"name": "Bob Wilson"
 		},
 		"sequence": 2,
-		"totalProduced": 7500,
+		"edition": {
+			"id": "10th-anniversary-1999",
+			"name": "10th Anniversary",
+			"color": "Mariner Blue",
+			"generation": "NB",
+			"year": 1999,
+			"totalProduced": 7500
+		},
 		"location": {
 			"country": "US",
 			"state": "California",
@@ -58,13 +70,17 @@
 	},
 	{
 		"id": "4",
-		"year": 2004,
-		"generation": "NB",
-		"edition": "Mazdaspeed",
 		"color": "Merlot Mica",
 		"vin": "JM1NB3512Y1234570",
 		"sequence": 782,
-		"totalProduced": 5428,
+		"edition": {
+			"id": "mazdaspeed-2004",
+			"name": "Mazdaspeed",
+			"color": "Merlot Mica",
+			"generation": "NB",
+			"year": 2004,
+			"totalProduced": 5428
+		},
 		"location": {
 			"country": "US",
 			"state": "California",
@@ -73,9 +89,6 @@
 	},
 	{
 		"id": "5",
-		"year": 2005,
-		"generation": "NC",
-		"edition": "PRHT Launch Edition",
 		"color": "Sunburst Yellow",
 		"vin": "JM1NC3512Z1234571",
 		"owner": {
@@ -83,7 +96,14 @@
 			"name": "Charlie Davis"
 		},
 		"sequence": 15,
-		"totalProduced": 400,
+		"edition": {
+			"id": "prht-launch-edition-2005",
+			"name": "PRHT Launch Edition",
+			"color": "Sunburst Yellow",
+			"generation": "NC",
+			"year": 2005,
+			"totalProduced": 400
+		},
 		"location": {
 			"country": "US",
 			"state": "California",

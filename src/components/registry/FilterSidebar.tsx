@@ -92,14 +92,14 @@ export const FilterSidebar = ({
 			/>
 
 			<FilterRadioGroup
-				title="Edition"
+				title="Limited Editions"
 				type="edition"
 				options={[
-					'1991 British Racing Green',
-					'1992 Sunburst Yellow',
+					'1991 British Racing Green Limited Edition',
+					'1992 Sunburst Yellow Limited Edition',
 					'1995 Mazdaspeed',
-					'1999 10th Anniversary',
-					'2001 Limited Edition',
+					'1999 10th Anniversary Limited Edition',
+					'2001 British Racing Green Limited Edition',
 				]}
 				activeValue={getActiveValue('edition')}
 				onClear={handleClear}

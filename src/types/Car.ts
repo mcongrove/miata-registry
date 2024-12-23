@@ -16,22 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Edition } from './Edition';
+import { Location } from './Location';
+import { Owner } from './Owner';
+
 export type Car = {
+	color?: string;
+	edition: Edition;
 	id: string;
-	year: number;
-	generation: string;
-	edition: string;
-	color: string;
-	vin?: string;
-	owner?: {
-		id: string;
-		name: string;
-	};
+	location?: Location;
+	owner?: Owner;
 	sequence?: number;
-	totalProduced?: number;
-	location?: {
-		country: string;
-		state?: string;
-		city?: string;
-	};
+	vin?: string;
 };

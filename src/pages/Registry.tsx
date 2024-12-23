@@ -44,8 +44,8 @@ export const Registry = () => {
 	const [currentPage, setCurrentPage] = useState(
 		parseInt(searchParams.get('page') || '1')
 	);
-	const [sortColumn, setSortColumn] = useState<keyof Car>(
-		(searchParams.get('sortColumn') as keyof Car) || 'year'
+	const [sortColumn, setSortColumn] = useState<string>(
+		searchParams.get('sortColumn') || 'edition.year'
 	);
 	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(
 		(searchParams.get('sortDir') as 'asc' | 'desc') || 'desc'
@@ -72,12 +72,11 @@ export const Registry = () => {
 	};
 
 	// Update handlers to persist state in URL
-	const handleSort = (column: keyof Car) => {
+	const handleSort = (column: string) => {
 		const newDirection =
 			sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
 
 		setSortColumn(column);
-
 		setSortDirection(newDirection);
 
 		updateSearchParams({
@@ -88,11 +87,82 @@ export const Registry = () => {
 
 	const handleFiltersChange = (newFilters: FilterOption[]) => {
 		setActiveFilters(newFilters);
+		setCurrentPage(1); // Reset to first page when filters change
 
 		updateSearchParams({
 			filter: newFilters.map((f) => `${f.type}:${f.value}`),
+			page: '1',
 		});
 	};
+
+	// Add function to get filtered and sorted cars
+	const getProcessedCars = (cars: Car[]) => {
+		let filtered = [...cars];
+
+		// Apply search
+		if (search) {
+			const searchLower = search.toLowerCase();
+			filtered = filtered.filter(
+				(car) =>
+					car.edition.name.toLowerCase().includes(searchLower) ||
+					car.vin?.toLowerCase().includes(searchLower) ||
+					(car.owner?.name ?? '')
+						.toLowerCase()
+						.includes(searchLower) ||
+					(car.location?.city ?? '')
+						.toLowerCase()
+						.includes(searchLower)
+			);
+		}
+
+		// Apply filters
+		activeFilters.forEach((filter) => {
+			filtered = filtered.filter((car) => {
+				switch (filter.type) {
+					case 'generation':
+						return car.edition.generation === filter.value;
+					case 'year':
+						return car.edition.year.toString() === filter.value;
+					default:
+						return true;
+				}
+			});
+		});
+
+		// Apply sorting
+		filtered.sort((a, b) => {
+			const getValue = (car: Car, path: string) => {
+				return (
+					path
+						.split('.')
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						.reduce((obj: any, key) => obj?.[key], car)
+				);
+			};
+
+			const aVal = getValue(a, sortColumn) ?? '';
+			const bVal = getValue(b, sortColumn) ?? '';
+
+			if (typeof aVal === 'string') {
+				return sortDirection === 'asc'
+					? aVal.localeCompare(bVal)
+					: bVal.localeCompare(aVal);
+			}
+
+			return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+		});
+
+		return filtered;
+	};
+
+	const itemsPerPage = 10;
+	const processedCars = getProcessedCars(sampleCars);
+	const totalItems = processedCars.length;
+	const totalPages = Math.ceil(totalItems / itemsPerPage);
+	const currentCars = processedCars.slice(
+		(currentPage - 1) * itemsPerPage,
+		currentPage * itemsPerPage
+	);
 
 	return (
 		<div className="min-h-screen flex flex-col">
@@ -180,29 +250,18 @@ export const Registry = () => {
 
 						<PaginationControls
 							currentPage={currentPage}
-							totalPages={10}
+							totalPages={totalPages}
 							onPageChange={(page) => {
 								setCurrentPage(page);
 								updateSearchParams({ page: page.toString() });
 							}}
-							totalItems={50}
-							itemsPerPage={5}
+							totalItems={totalItems}
+							itemsPerPage={itemsPerPage}
 						/>
 
 						<div className="flex-1 my-3">
 							<RegistryTable
-								cars={[
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-									...sampleCars,
-								]}
+								cars={currentCars}
 								sortColumn={sortColumn}
 								sortDirection={sortDirection}
 								onSort={handleSort}
@@ -211,13 +270,13 @@ export const Registry = () => {
 
 						<PaginationControls
 							currentPage={currentPage}
-							totalPages={10}
+							totalPages={totalPages}
 							onPageChange={(page) => {
 								setCurrentPage(page);
 								updateSearchParams({ page: page.toString() });
 							}}
-							totalItems={50}
-							itemsPerPage={5}
+							totalItems={totalItems}
+							itemsPerPage={itemsPerPage}
 						/>
 					</div>
 				</div>

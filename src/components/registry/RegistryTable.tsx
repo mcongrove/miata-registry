@@ -22,9 +22,9 @@ import { colorMap } from '../../utils/colorMap';
 
 interface RegistryTableProps {
 	cars: Car[];
-	sortColumn: keyof Car;
+	sortColumn: string;
 	sortDirection: 'asc' | 'desc';
-	onSort: (column: keyof Car) => void;
+	onSort: (column: string) => void;
 }
 
 export const RegistryTable = ({
@@ -35,6 +35,16 @@ export const RegistryTable = ({
 }: RegistryTableProps) => {
 	const navigate = useNavigate();
 
+	const columns = [
+		{ header: 'Year', key: 'edition.year' },
+		{ header: 'Gen.', key: 'edition.generation' },
+		{ header: 'Edition', key: 'edition.name' },
+		{ header: 'Color', key: 'color' },
+		{ header: 'Sequence #', key: 'sequence' },
+		{ header: 'Owner', key: 'owner.name' },
+		{ header: 'Country', key: 'location.country' },
+	];
+
 	return (
 		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden">
 			<div
@@ -44,38 +54,17 @@ export const RegistryTable = ({
 				<table className="min-w-full border-collapse">
 					<thead className="z-10">
 						<tr className="bg-brg-light sticky top-0 z-10">
-							{[
-								'Year',
-								'Gen.',
-								'Edition',
-								'Color',
-								'Sequence #',
-								'Owner',
-								'Country',
-							].map((header) => (
+							{columns.map(({ header, key }) => (
 								<th
 									key={header}
 									className="px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light"
-									onClick={() =>
-										onSort(
-											header
-												.toLowerCase()
-												.replace(
-													'Sequence #',
-													'sequence'
-												)
-												.replace('Gen.', 'generation')
-												.toLowerCase() as keyof Car
-										)
-									}
+									onClick={() => onSort(key)}
 								>
 									<div className="flex items-center">
 										{header}
-
 										<span
 											className={`ml-1 ${
-												sortColumn ===
-												header.toLowerCase()
+												sortColumn === key
 													? 'opacity-100'
 													: 'opacity-0'
 											}`}
@@ -100,7 +89,6 @@ export const RegistryTable = ({
 										!(e.target as HTMLElement).closest('a')
 									) {
 										if (e.metaKey || e.ctrlKey) {
-											// Open in new tab
 											window.open(
 												`/car/${car.id}`,
 												'_blank'
@@ -113,14 +101,14 @@ export const RegistryTable = ({
 							>
 								<td className="w-20 px-4 py-3 whitespace-nowrap font-mono">
 									<div className="pointer-events-auto">
-										{car.year}
+										{car.edition.year}
 									</div>
 								</td>
 								<td className="w-20 px-4 py-3 whitespace-nowrap">
-									{car.generation}
+									{car.edition.generation}
 								</td>
 								<td className="w-52 px-4 py-3 whitespace-nowrap">
-									{car.edition}
+									{car.edition.name}
 								</td>
 								<td className="w-52 px-4 py-3 whitespace-nowrap">
 									<div className="flex items-center gap-2">
@@ -129,7 +117,8 @@ export const RegistryTable = ({
 											style={{
 												backgroundColor:
 													colorMap[
-														car.color.toLowerCase()
+														car.color?.toLowerCase() ||
+															''
 													] || '#DDD',
 											}}
 										/>
@@ -140,10 +129,10 @@ export const RegistryTable = ({
 									{car.sequence && (
 										<>
 											{car.sequence.toLocaleString()}
-											{car.totalProduced && (
+											{car.edition.totalProduced && (
 												<span className="text-brg-border">
 													of{' '}
-													{car.totalProduced.toLocaleString()}
+													{car.edition.totalProduced.toLocaleString()}
 												</span>
 											)}
 										</>
