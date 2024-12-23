@@ -33,7 +33,7 @@ export const FilterHeader = ({
 		{hasActiveFilter && (
 			<button
 				onClick={onClear}
-				className="text-xs text-brg-mid hover:text-brg"
+				className="text-xs text-brg-mid hover:text-red-700"
 			>
 				Clear
 			</button>

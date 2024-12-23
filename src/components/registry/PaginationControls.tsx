@@ -43,7 +43,7 @@ export const PaginationControls = ({
 
 	return (
 		<div className="flex justify-between items-center text-sm">
-			<div className="text-brg-mid">
+			<div className="text-brg-mid text-xs">
 				Showing {start}-{end} of {totalItems}
 			</div>
 
@@ -69,7 +69,7 @@ export const PaginationControls = ({
 					</svg>
 				</button>
 
-				<div className="w-24">
+				<div className="w-16">
 					<Select
 						value={currentPage}
 						onChange={(value) => {

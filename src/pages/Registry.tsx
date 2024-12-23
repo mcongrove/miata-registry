@@ -24,6 +24,7 @@ import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
 import { Car } from '../types/Car';
 import { FilterOption } from '../types/Filters';
+import { Chip } from '../components/common/Chip';
 
 const SAMPLE_CARS: Car[] = [
 	{
@@ -105,55 +106,75 @@ export const Registry = () => {
 					/>
 
 					<div className="flex-1">
-						<div className="mb-6">
+						<div className="relative max-w-80">
 							<input
 								type="text"
-								placeholder="Search registry..."
-								className="w-full px-4 py-2 rounded-lg border border-gray-300"
+								placeholder="Search..."
+								className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-4 focus:outline-none placeholder:text-brg-mid/70 pr-8"
 								value={search}
 								onChange={(e) => setSearch(e.target.value)}
 							/>
+
+							{search && (
+								<button
+									onClick={() => setSearch('')}
+									className="absolute right-0 pr-3 pl-1 top-[calc(50%-8px)] -translate-y-1/2 text-brg-mid/70 hover:text-red-700"
+									aria-label="Clear search"
+								>
+									×
+								</button>
+							)}
 						</div>
 
 						{activeFilters.length > 0 && (
-							<div className="mb-4 flex gap-2 flex-wrap">
+							<div className="mb-3 flex gap-2 flex-wrap">
 								{activeFilters.map((filter) => (
-									<span
+									<Chip
 										key={`${filter.type}:${filter.value}`}
-										className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
-									>
-										{filter.type}: {filter.value}
-									</span>
+										label={
+											filter.type
+												.charAt(0)
+												.toUpperCase() +
+											filter.type.slice(1)
+										}
+										value={filter.value}
+										onRemove={() => {
+											const newFilters =
+												activeFilters.filter(
+													(f) =>
+														f.type !== filter.type
+												);
+											setActiveFilters(newFilters);
+										}}
+									/>
 								))}
 							</div>
 						)}
 
-						<div className="mb-4">
-							<PaginationControls
-								currentPage={currentPage}
-								totalPages={10}
-								onPageChange={setCurrentPage}
-								totalItems={50}
-								itemsPerPage={5}
-							/>
-						</div>
-
-						<RegistryTable
-							cars={SAMPLE_CARS}
-							sortColumn={sortColumn}
-							sortDirection={sortDirection}
-							onSort={handleSort}
+						<PaginationControls
+							currentPage={currentPage}
+							totalPages={10}
+							onPageChange={setCurrentPage}
+							totalItems={50}
+							itemsPerPage={5}
 						/>
 
-						<div className="mt-4">
-							<PaginationControls
-								currentPage={currentPage}
-								totalPages={10}
-								onPageChange={setCurrentPage}
-								totalItems={50}
-								itemsPerPage={5}
+						<div className="my-3">
+							<RegistryTable
+								cars={SAMPLE_CARS}
+								sortColumn={sortColumn}
+								sortDirection={sortDirection}
+								onSort={handleSort}
 							/>
 						</div>
+
+						<PaginationControls
+							currentPage={currentPage}
+							totalPages={10}
+							onPageChange={setCurrentPage}
+							totalItems={50}
+							itemsPerPage={5}
+						/>
 					</div>
 				</div>
 			</main>

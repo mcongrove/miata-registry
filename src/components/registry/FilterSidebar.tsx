@@ -19,7 +19,6 @@
 import { FilterOption } from '../../types/Filters';
 import { Select } from '../Select';
 import { FilterRadioGroup } from './FilterRadioGroup';
-import { FilterSection } from './FilterSection';
 import { FilterHeader } from './FilterHeader';
 
 interface FilterSidebarProps {
@@ -60,7 +59,7 @@ export const FilterSidebar = ({
 	};
 
 	return (
-		<FilterSection>
+		<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-md border-brg-light">
 			<div>
 				<FilterHeader
 					title="Year"
@@ -132,6 +131,6 @@ export const FilterSidebar = ({
 					/>
 				</div>
 			</div>
-		</FilterSection>
+		</div>
 	);
 };

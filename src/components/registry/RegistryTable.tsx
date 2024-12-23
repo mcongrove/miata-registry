@@ -32,7 +32,7 @@ export const RegistryTable = ({
 	onSort,
 }: RegistryTableProps) => {
 	return (
-		<div className="bg-white rounded-lg shadow overflow-hidden">
+		<div className="bg-white rounded-md shadow overflow-hidden">
 			<table className="min-w-full divide-y divide-gray-200">
 				<thead className="bg-gray-50">
 					<tr>
@@ -65,6 +65,7 @@ export const RegistryTable = ({
 						))}
 					</tr>
 				</thead>
+
 				<tbody className="bg-white divide-y divide-gray-200">
 					{cars.map((car) => (
 						<tr key={car.id} className="hover:bg-gray-50">

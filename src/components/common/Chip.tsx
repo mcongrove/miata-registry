@@ -16,12 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface FilterSectionProps {
-	children: React.ReactNode;
+interface ChipProps {
+	label: string;
+	value: string;
+	onRemove: () => void;
 }
 
-export const FilterSection = ({ children }: FilterSectionProps) => (
-	<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-lg border-brg-light">
-		{children}
-	</div>
-);
+export const Chip = ({ label, value, onRemove }: ChipProps) => {
+	return (
+		<span className="bg-brg text-brg-light pl-3 pr-0 py-1 rounded-md text-xs flex gap-2 items-center">
+			<span className="text-brg-light/60">{label}</span>
+
+			{value}
+
+			<button
+				onClick={onRemove}
+				className="hover:text-red-300 transition-colors pl-0 pr-3 py-1"
+				aria-label={`Remove ${label} filter`}
+			>
+				×
+			</button>
+		</span>
+	);
+};
