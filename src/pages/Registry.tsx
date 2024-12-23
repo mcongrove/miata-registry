@@ -16,19 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { Registry } from './pages/Registry';
+import { Footer } from '../components/Footer';
+import { Header } from '../components/Header';
 
-function App() {
+export const Registry = () => {
 	return (
-		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/registry" element={<Registry />} />
-			</Routes>
-		</BrowserRouter>
-	);
-}
+		<div className="min-h-screen flex flex-col">
+			<Header />
 
-export default App;
+			<main className="container mx-auto py-16 flex-grow">Hi</main>
+
+			<Footer />
+		</div>
+	);
+};

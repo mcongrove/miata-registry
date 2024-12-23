@@ -16,39 +16,56 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Link } from 'react-router-dom';
+
 interface ButtonProps {
-    children: React.ReactNode;
-    onClick?: () => void;
-    withArrow?: boolean;
-    variant?: 'primary' | 'secondary' | 'tertiary';
+	className?: string;
+	children: React.ReactNode;
+	onClick?: () => void;
+	withArrow?: boolean;
+	variant?: 'primary' | 'secondary' | 'tertiary';
+	href?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-    children,
-    onClick,
-    withArrow = false,
-    variant = 'primary',
+	className,
+	children,
+	onClick,
+	withArrow = false,
+	variant = 'primary',
+	href,
 }) => {
-    const bgColor =
-        variant === 'primary'
-            ? 'bg-brg hover:bg-brg/90'
-            : variant === 'secondary'
-              ? 'bg-brg-mid hover:bg-brg-mid/90'
-              : '';
+	const bgColor =
+		variant === 'primary'
+			? 'bg-brg hover:bg-brg/90'
+			: variant === 'secondary'
+				? 'bg-brg-mid hover:bg-brg-mid/90'
+				: '';
 
-    const textColor = variant === 'tertiary' ? 'text-gray-700' : 'text-white';
+	const textColor = variant === 'tertiary' ? 'text-gray-700' : 'text-white';
+	const buttonClassName = `group flex items-center ${bgColor} ${textColor} font-medium py-3 px-4 rounded-lg transition-colors ${className || ''}`;
 
-    return (
-        <button
-            onClick={onClick}
-            className={`group flex items-center ${bgColor} ${textColor} font-medium py-3 px-4 rounded-lg transition-colors`}
-        >
-            {children}
-            {withArrow && (
-                <span className="ml-2 transform group-hover:translate-x-1 transition-transform">
-                    →
-                </span>
-            )}
-        </button>
-    );
+	if (href) {
+		return (
+			<Link to={href} className={buttonClassName}>
+				{children}
+				{withArrow && (
+					<span className="ml-2 transform group-hover:translate-x-1 transition-transform">
+						→
+					</span>
+				)}
+			</Link>
+		);
+	}
+
+	return (
+		<button onClick={onClick} className={buttonClassName}>
+			{children}
+			{withArrow && (
+				<span className="ml-2 transform group-hover:translate-x-1 transition-transform">
+					→
+				</span>
+			)}
+		</button>
+	);
 };

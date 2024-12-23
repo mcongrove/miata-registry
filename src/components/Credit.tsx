@@ -16,64 +16,77 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCar } from '@fortawesome/free-solid-svg-icons';
-
 interface CreditProps {
-    owner: string;
-    car: string;
-    number?: string;
-    id: string;
-    direction?: 'left' | 'right';
+	className?: string;
+	owner: string;
+	car: string;
+	number?: string;
+	id: string;
+	direction?: 'left' | 'right';
 }
 
-export const Credit = ({
-    id,
-    owner,
-    car,
-    number,
-    direction = 'right',
-}: CreditProps) => {
-    return (
-        <a href={`#${id}`} className="group">
-            <div className="relative">
-                <div
-                    className={`bg-white/70 flex items-center justify-center p-3 ${
-                        direction === 'left'
-                            ? 'rounded-full group-hover:rounded-r-full group-hover:rounded-l-none'
-                            : 'rounded-full group-hover:rounded-l-full group-hover:rounded-r-none'
-                    } transition-all duration-300 relative z-10`}
-                >
-                    <FontAwesomeIcon
-                        icon={faCar}
-                        className={`w-4 h-4 text-brg`}
-                    />
-                </div>
+const CreditText = ({
+	car,
+	number,
+	owner,
+	direction,
+}: Omit<CreditProps, 'id'>) => (
+	<div
+		className={`flex items-center overflow-hidden bg-white  w-0 h-10 z-10 group-hover:w-auto ${direction === 'left' ? 'rounded-l-full -mr-5' : 'rounded-r-full -ml-5'}`}
+	>
+		<div
+			className={`text-brg py-2 ${direction === 'left' ? 'pr-5 pl-4' : 'pl-5 pr-4'} whitespace-nowrap text-[10px]`}
+		>
+			<p>
+				{car}
+				{number && ` #${number}`}
+			</p>
 
-                <div
-                    className={`absolute ${
-                        direction === 'left' ? 'right-full' : 'left-full'
-                    } top-0 h-full bg-white/70 ${
-                        direction === 'left'
-                            ? 'rounded-l-full'
-                            : 'rounded-r-full'
-                    } opacity-0 group-hover:opacity-100 ${
-                        direction === 'left'
-                            ? 'translate-x-2 group-hover:translate-x-0'
-                            : '-translate-x-2 group-hover:translate-x-0'
-                    } transition-all duration-300 delay-0 group-hover:delay-[100ms] pointer-events-none overflow-hidden whitespace-nowrap`}
-                >
-                    <div
-                        className={`h-full flex flex-col text-brg justify-center py-2 ${direction === 'left' ? 'pl-4' : 'pr-4'} text-[10px] opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-0 group-hover:delay-[200ms]`}
-                    >
-                        <p>
-                            {car}
-                            {number && ` #${number}`}
-                        </p>
-                        <p>{owner}</p>
-                    </div>
-                </div>
-            </div>
-        </a>
-    );
+			<p>{owner}</p>
+		</div>
+	</div>
+);
+
+export const Credit = ({
+	className,
+	id,
+	owner,
+	car,
+	number,
+	direction = 'right',
+}: CreditProps) => {
+	return (
+		<a
+			href={`#${id}`}
+			className={`group flex items-center h-10 opacity-60 hover:opacity-100 ${className}`}
+		>
+			{direction === 'left' && (
+				<CreditText
+					car={car}
+					number={number}
+					owner={owner}
+					direction={direction}
+				/>
+			)}
+
+			<div className="bg-white p-3 rounded-full z-20 relative">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					className="w-4 h-4 text-brg"
+					viewBox="0 0 512 512"
+				>
+					<path d="M135.2 117.4L109.1 192l293.8 0-26.1-74.6C372.3 104.6 360.2 96 346.6 96L165.4 96c-13.6 0-25.7 8.6-30.2 21.4zM39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32l181.2 0c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2l0 144 0 48c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-48L96 400l0 48c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-48L0 256c0-26.7 16.4-49.6 39.6-59.2zM128 288a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z" />
+				</svg>
+			</div>
+
+			{direction === 'right' && (
+				<CreditText
+					car={car}
+					number={number}
+					owner={owner}
+					direction={direction}
+				/>
+			)}
+		</a>
+	);
 };

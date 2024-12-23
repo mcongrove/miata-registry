@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from './Button';
@@ -28,19 +27,19 @@ interface DropdownProps {
 }
 
 const Dropdown = ({ label, items, isActive }: DropdownProps) => {
-	const [isOpen, setIsOpen] = useState(false);
+	const location = useLocation();
 
 	return (
-		<div className="relative" onMouseLeave={() => setIsOpen(false)}>
+		<div className="relative group">
 			<button
 				className={`text-sm ${
 					isActive
 						? 'text-brg font-medium'
 						: 'text-brg-mid hover:text-brg'
 				} transition-colors flex items-center gap-1`}
-				onMouseEnter={() => setIsOpen(true)}
 			>
 				{label}
+
 				<svg
 					className="w-4 h-4"
 					viewBox="0 0 20 20"
@@ -54,19 +53,23 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 				</svg>
 			</button>
 
-			{isOpen && (
-				<div className="absolute left-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-lg border border-brg-border">
+			<div className="absolute left-0 top-full invisible group-hover:visible">
+				<div className="mt-2 p-2 w-48 bg-white rounded-lg shadow-lg border border-brg-border">
 					{items.map((item) => (
 						<Link
 							key={item.to}
 							to={item.to}
-							className="block px-4 py-2 text-sm text-brg-mid hover:text-brg hover:bg-brg-light transition-colors"
+							className={`block px-4 py-2 text-sm rounded-md transition-colors ${
+								location.pathname === item.to
+									? 'text-brg font-medium'
+									: 'text-brg-mid hover:text-brg hover:bg-brg-light'
+							}`}
 						>
 							{item.label}
 						</Link>
 					))}
 				</div>
-			)}
+			</div>
 		</div>
 	);
 };
@@ -85,34 +88,29 @@ export const Header = () => {
 				<Dropdown
 					label="Registry"
 					items={[
-						{ label: 'Browse/Search All Cars', to: '/registry' },
-						{ label: 'Limited Edition Models', to: '/models' },
-						{ label: 'Register Your Car', to: '/register' },
+						{ label: 'All Cars', to: '/registry' },
+						{ label: 'Browse Models', to: '/models' },
+						{ label: 'Register Your Miata', to: '/register' },
 					]}
 					isActive={isActive('/registry')}
 				/>
 
-				<Dropdown
-					label="Resources"
-					items={[
-						{
-							label: 'Documentation Library',
-							to: '/resources/docs',
-						},
-					]}
-					isActive={isActive('/resources')}
-				/>
-
-				<Dropdown
-					label="News"
-					items={[{ label: 'Latest Updates', to: '/news' }]}
-					isActive={isActive('/news')}
-				/>
+				<Link
+					to="/resources/docs"
+					className={`text-sm ${
+						isActive('/resources')
+							? 'text-brg'
+							: 'text-brg-mid hover:text-brg'
+					} transition-colors`}
+				>
+					Resources
+				</Link>
 
 				<Dropdown
 					label="About"
 					items={[
 						{ label: 'About', to: '/about' },
+						{ label: 'News', to: '/news' },
 						{ label: 'Contributing', to: '/contributing' },
 						{ label: 'Partners', to: '/partners' },
 					]}
@@ -122,6 +120,7 @@ export const Header = () => {
 				<Dropdown
 					label="Support"
 					items={[
+						{ label: 'Submit a Tip', to: '/tip' },
 						{ label: 'Contact', to: '/contact' },
 						{ label: 'FAQ', to: '/faq' },
 					]}
