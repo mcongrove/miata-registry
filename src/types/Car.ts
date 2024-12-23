@@ -35,4 +35,12 @@ export type Car = {
 		date?: string;
 	};
 	vin?: string;
+	sale?: {
+		msrp?: number;
+		dealer?: {
+			name: string;
+			location?: Location;
+		};
+		date?: string;
+	};
 };

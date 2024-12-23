@@ -25,8 +25,8 @@ export const toTitleCase = (str: string): string => {
 };
 
 export const toPrettyDate = (date: string): string => {
-	const dateObj = new Date(date);
 	const hasTime = date.includes('T');
+	const dateObj = new Date(date + (hasTime ? '' : 'T12:00:00Z'));
 
 	return dateObj.toLocaleDateString('en-US', {
 		month: 'long',

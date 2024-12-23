@@ -18,6 +18,7 @@
 
 export type Edition = {
 	color: string;
+	description?: string[];
 	generation: string;
 	id: string;
 	image?: string;

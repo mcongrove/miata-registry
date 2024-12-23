@@ -22,7 +22,7 @@ import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
 import { Car } from '../types/Car';
 import { FilterOption, FilterType } from '../types/Filters';
-import { Chip } from '../components/common/Chip';
+import { Chip } from '../components/Chip';
 import sampleCars from '../data/sampleCars.json';
 import { useSearchParams } from 'react-router-dom';
 

@@ -7,6 +7,11 @@
 		"year": 1991,
 		"totalProduced": 4000,
 		"image": "/images/cars/1991SE182.jpg",
+		"description": [
+			"The 1991 Special Edition represents Mazda's first special production Miata for the North American market. Limited to just 4,000 units, this edition featured a distinctive British Racing Green exterior paired with a tan leather interior, making it instantly recognizable among early NA Miatas.",
+			"Each car came equipped with a unique numbered dash badge, tan vinyl top, headrest speakers, stainless steel door sills, and color-matched Nardi wooden steering wheel, shift knob, and handbrake handle. The edition also featured power windows, power steering, and a limited-slip differential as standard equipment.",
+			"The combination of British Racing Green paint and tan interior was a deliberate homage to classic British sports cars, particularly those from the 1960s. This edition marked the beginning of Mazda's tradition of producing limited-run Miatas, setting a precedent for future special editions."
+		],
 		"imageCredit": {
 			"car": "1991 British Racing Green",
 			"number": "182",

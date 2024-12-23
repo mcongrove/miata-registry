@@ -27,6 +27,18 @@
 			"country": "US",
 			"state": "TX",
 			"city": "Austin"
+		},
+		"sale": {
+			"date": "1991-02-05",
+			"msrp": 21423,
+			"dealer": {
+				"name": "Marin Mazda",
+				"location": {
+					"country": "US",
+					"state": "CA",
+					"city": "San Rafael"
+				}
+			}
 		}
 	},
 	{

@@ -19,6 +19,7 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import sampleCars from '../../data/sampleCars.json';
+import sampleEditions from '../../data/sampleEditions.json';
 import { Car } from '../../types/Car';
 import { TimelineItem } from '../../components/registry/TimelineItem';
 import { toPrettyDate, toTitleCase } from '../../utils/global';
@@ -39,7 +40,22 @@ export const CarProfile = () => {
 	useEffect(() => {
 		if (id) {
 			const foundCar = sampleCars.find((c) => c.id === id);
-			setCar(foundCar || null);
+			if (foundCar) {
+				// Find the full edition details from sampleEditions
+				const fullEdition = sampleEditions.find(
+					(e) => e.id === foundCar.edition.id
+				);
+				// Merge the edition details with the car data
+				setCar({
+					...foundCar,
+					edition: {
+						...foundCar.edition,
+						...fullEdition,
+					},
+				});
+			} else {
+				setCar(null);
+			}
 
 			if (foundCar?.vin) {
 				fetchVinDetails(foundCar.vin, foundCar.edition.year);
@@ -115,12 +131,101 @@ export const CarProfile = () => {
 		return city && country ? `${city}, ${country}` : '';
 	};
 
+	const getTimelineItems = () => {
+		if (!car) return [];
+
+		const items = [];
+
+		// Current owner
+		if (car.owner) {
+			items.push({
+				name: car.owner.name || 'Unknown',
+				dateRange: '2024 – Present',
+				location: car.location
+					? `${car.location.city}, ${car.location.state}, ${car.location.country}`
+					: undefined,
+				isActive: true,
+			});
+		}
+
+		// Previous owners (hardcoded for now)
+		items.push(
+			{
+				name: 'Russel Hertzog',
+				dateRange: '2022 – 2024',
+				location: 'Georgetown, TX, US',
+			},
+			{
+				name: 'Cherylann Marchese',
+				dateRange: '2016 – 2022',
+				location: 'Henderson, NV, US',
+			},
+			{
+				name: 'Edward Baker',
+				dateRange: '1991 – 2016',
+				location: 'Oakland, CA, US',
+			}
+		);
+
+		// Dealer
+		if (car.sale?.dealer) {
+			items.push({
+				name: car.sale.dealer.name,
+				dateRange: toPrettyDate(car.sale.date || ''),
+				location: car.sale.dealer.location
+					? `${car.sale.dealer.location.city}, ${car.sale.dealer.location.state}, ${car.sale.dealer.location.country}`
+					: undefined,
+			});
+		}
+
+		// Shipping
+		if (car.shipping) {
+			items.push({
+				name: `${car.shipping.vessel ? `Shipped via ${toTitleCase(car.shipping.vessel)}` : 'Shipped'}`,
+				dateRange: toPrettyDate(car.shipping.date || ''),
+				location: car.shipping.port
+					? `Port of ${toTitleCase(car.shipping.port)}`
+					: undefined,
+			});
+		}
+
+		// Factory
+		const plantLocation = formatPlantLocation(vinDetails);
+		if (plantLocation) {
+			items.push({
+				name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
+				dateRange: car.manufactureDate
+					? toPrettyDate(car.manufactureDate)
+					: car.edition.year.toString(),
+				location: plantLocation,
+				isActive: true,
+			});
+		}
+
+		// Find the last valid item to set showConnector=false
+		const lastValidIndex = plantLocation
+			? items.length - 1
+			: car.shipping
+				? items.length - 1
+				: car.sale?.dealer
+					? items.length - 1
+					: items.length - 1;
+
+		return items.map((item, index) => (
+			<TimelineItem
+				key={index}
+				{...item}
+				showConnector={index !== lastValidIndex}
+			/>
+		));
+	};
+
 	if (!car) {
 		return <main className="flex-1 pt-20"></main>;
 	}
 
 	return (
-		<main className="flex-1 pt-20">
+		<main className="flex-1 pt-20 pb-16">
 			<div className="container mx-auto py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 					<div className="lg:col-span-8 space-y-6">
@@ -129,12 +234,15 @@ export const CarProfile = () => {
 								{car.edition.year} {car.edition.name}
 							</h2>
 
-							<p className="text-md font-medium">
-								#{car.sequence}{' '}
-								<span className="text-brg-border">
-									of {car.edition.totalProduced}
-								</span>
-							</p>
+							{car.sequence && (
+								<p className="text-md font-medium">
+									#{car.sequence.toLocaleString()}{' '}
+									<span className="text-brg-border">
+										of{' '}
+										{car.edition.totalProduced?.toLocaleString()}
+									</span>
+								</p>
+							)}
 						</div>
 
 						<div className="aspect-video w-full relative rounded-lg overflow-hidden">
@@ -165,37 +273,113 @@ export const CarProfile = () => {
 									</p>
 								</div>
 
-								{vinDetails && (
-									<>
-										<div className="p-6 border-r border-brg-light">
-											<p className="text-sm text-brg-mid mb-1">
-												Engine
-											</p>
+								<div className="p-6 border-r border-brg-light">
+									<p className="text-sm text-brg-mid mb-1">
+										Engine
+									</p>
 
-											<p
-												className={`font-medium ${formatEngineDetails(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
-											>
-												{formatEngineDetails(
-													vinDetails
-												)}
-											</p>
-										</div>
+									<p
+										className={`font-medium ${!vinDetails ? 'animate-pulse bg-brg-light h-6 w-24 rounded' : formatEngineDetails(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
+									>
+										{vinDetails
+											? formatEngineDetails(vinDetails)
+											: ''}
+									</p>
+								</div>
 
-										<div className="p-6">
-											<p className="text-sm text-brg-mid mb-1">
-												Transmission
-											</p>
+								<div className="p-6">
+									<p className="text-sm text-brg-mid mb-1">
+										Transmission
+									</p>
 
-											<p
-												className={`font-medium ${formatTransmission(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
-											>
-												{formatTransmission(vinDetails)}
-											</p>
-										</div>
-									</>
-								)}
+									<p
+										className={`font-medium ${!vinDetails ? 'animate-pulse bg-brg-light h-6 w-24 rounded' : formatTransmission(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
+									>
+										{vinDetails
+											? formatTransmission(vinDetails)
+											: ''}
+									</p>
+								</div>
 							</div>
+
+							{car.sale && (
+								<div className="flex flex-wrap gap-16 border-t border-brg-light p-6">
+									{car.sale.msrp && (
+										<div>
+											<p className="text-sm text-brg-mid mb-1">
+												Original MSRP
+											</p>
+
+											<p className="font-medium">
+												$
+												{car.sale.msrp.toLocaleString()}
+											</p>
+										</div>
+									)}
+
+									{car.sale.date && (
+										<div>
+											<p className="text-sm text-brg-mid mb-1">
+												Purchase Date
+											</p>
+
+											<p className="font-medium">
+												{toPrettyDate(car.sale.date)}
+											</p>
+										</div>
+									)}
+
+									{car.sale.dealer && (
+										<div>
+											<p className="text-sm text-brg-mid mb-1">
+												Original Dealer
+											</p>
+
+											<p className="font-medium">
+												{car.sale.dealer.name}
+											</p>
+
+											{car.sale.dealer.location && (
+												<p className="text-xs text-brg-mid">
+													{
+														car.sale.dealer.location
+															?.city
+													}
+													,{' '}
+													{
+														car.sale.dealer.location
+															?.state
+													}
+													,{' '}
+													{
+														car.sale.dealer.location
+															?.country
+													}
+												</p>
+											)}
+										</div>
+									)}
+								</div>
+							)}
 						</div>
+
+						{car.edition.description && (
+							<div className="flex flex-col gap-4 mt-6">
+								<h3 className="text-xl font-semibold">
+									About the {car.edition.year}{' '}
+									{car.edition.name.replace('Edition', '')}{' '}
+									Edition
+								</h3>
+
+								<div className="prose prose-brg max-w-none space-y-4">
+									{car.edition.description?.map(
+										(paragraph, index) => (
+											<p key={index}>{paragraph}</p>
+										)
+									)}
+								</div>
+							</div>
+						)}
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
@@ -214,10 +398,12 @@ export const CarProfile = () => {
 													address: `Port of ${toTitleCase(car.shipping.port)}`,
 												}
 											: null,
-										{
-											name: 'Marin Mazda',
-											address: 'San Rafael, CA, US',
-										},
+										car.sale?.dealer?.location
+											? {
+													name: car.sale.dealer.name,
+													address: `${car.sale.dealer.location.city}, ${car.sale.dealer.location.state}, ${car.sale.dealer.location.country}`,
+												}
+											: null,
 										{
 											name: 'Edward Baker',
 											address: 'Oakland, CA, US',
@@ -281,68 +467,7 @@ export const CarProfile = () => {
 							</h2>
 
 							<div className="bg-white rounded-lg border border-brg-light p-6">
-								{car.owner && (
-									<TimelineItem
-										name={car.owner.name || 'Unknown'}
-										dateRange="2024 – Present"
-										location={`${car.location?.city}, ${car.location?.state}, ${car.location?.country}`}
-										isActive={true}
-									/>
-								)}
-								<TimelineItem
-									name="Russel Hertzog"
-									dateRange="2022 – 2024"
-									location="Georgetown, TX, US"
-								/>
-								<TimelineItem
-									name="Cherylann Marchese"
-									dateRange="2016 – 2022"
-									location="Henderson,NV, US"
-								/>
-								<TimelineItem
-									name="Edward Baker"
-									dateRange="February 5, 1991 – 2016"
-									location="Oakland, CA, US"
-								/>
-								<TimelineItem
-									name="Marin Mazda"
-									dateRange="1991"
-									location="San Rafael, CA, US"
-								/>
-								{car.shipping && (
-									<TimelineItem
-										name={`${car.shipping.vessel ? `Shipped via ${toTitleCase(car.shipping.vessel)}` : 'Shipped'}`}
-										location={
-											car.shipping.port
-												? `Port of ${toTitleCase(car.shipping.port)}`
-												: undefined
-										}
-										dateRange={toPrettyDate(
-											car.shipping.date || ''
-										)}
-									/>
-								)}
-
-								{formatPlantLocation(vinDetails) && (
-									<TimelineItem
-										name={`${toTitleCase(
-											vinDetails?.Manufacturer ||
-												'Factory'
-										)}`}
-										dateRange={
-											car.manufactureDate
-												? toPrettyDate(
-														car.manufactureDate
-													)
-												: car.edition.year.toString()
-										}
-										location={formatPlantLocation(
-											vinDetails
-										)}
-										showConnector={false}
-										isActive={true}
-									/>
-								)}
+								{getTimelineItems()}
 							</div>
 						</div>
 					</div>
