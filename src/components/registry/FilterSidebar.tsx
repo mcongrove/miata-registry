@@ -92,7 +92,7 @@ export const FilterSidebar = ({
 			/>
 
 			<FilterRadioGroup
-				title="Limited Editions"
+				title="Edition"
 				type="edition"
 				options={[
 					'1991 British Racing Green',

@@ -47,10 +47,10 @@ export const RegistryTable = ({
 
 	return (
 		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden">
-			<div className="overflow-auto min-h-96 max-h-[calc(100vh-320px)]">
+			<div className="overflow-auto min-h-96 max-h-[calc(100vh-320px)] relative">
 				<table className="min-w-full border-collapse">
-					<thead className="z-10">
-						<tr className="bg-brg-light sticky top-0 z-10">
+					<thead>
+						<tr className="bg-brg-light sticky top-0 z-50">
 							{columns.map(({ header, key }) => (
 								<th
 									key={header}
@@ -80,7 +80,7 @@ export const RegistryTable = ({
 						{cars.map((car) => (
 							<tr
 								key={car.id}
-								className="bg-white hover:bg-brg-light/25 transition-colors relative cursor-pointer"
+								className="bg-white hover:bg-brg-light/25 transition-colors cursor-pointer"
 								onClick={(e) => {
 									if (
 										!(e.target as HTMLElement).closest('a')
