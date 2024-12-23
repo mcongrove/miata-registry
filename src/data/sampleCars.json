@@ -6,7 +6,10 @@
 		"edition": "British Racing Green",
 		"color": "British Racing Green",
 		"vin": "JM1NA3512M1234567",
-		"owner": "John Doe",
+		"owner": {
+			"id": "1",
+			"name": "John Doe"
+		},
 		"sequence": 326,
 		"totalProduced": 4000,
 		"location": {
@@ -22,7 +25,10 @@
 		"edition": "LE Black & Red",
 		"color": "Black",
 		"vin": "JM1NA3512P1234568",
-		"owner": "Jane Smith",
+		"owner": {
+			"id": "2",
+			"name": "Jane Smith"
+		},
 		"sequence": 1205,
 		"totalProduced": 1500,
 		"location": {
@@ -38,7 +44,10 @@
 		"edition": "10th Anniversary",
 		"color": "Mariner Blue",
 		"vin": "JM1NB3512X1234569",
-		"owner": "Bob Wilson",
+		"owner": {
+			"id": "3",
+			"name": "Bob Wilson"
+		},
 		"sequence": 2,
 		"totalProduced": 7500,
 		"location": {
@@ -69,7 +78,10 @@
 		"edition": "PRHT Launch Edition",
 		"color": "Sunburst Yellow",
 		"vin": "JM1NC3512Z1234571",
-		"owner": "Charlie Davis",
+		"owner": {
+			"id": "4",
+			"name": "Charlie Davis"
+		},
 		"sequence": 15,
 		"totalProduced": 400,
 		"location": {

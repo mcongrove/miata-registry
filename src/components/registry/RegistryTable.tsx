@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Car } from '../../types/Car';
 import { colorMap } from '../../utils/colorMap';
 
@@ -33,6 +33,8 @@ export const RegistryTable = ({
 	sortDirection,
 	onSort,
 }: RegistryTableProps) => {
+	const navigate = useNavigate();
+
 	return (
 		<div className="bg-white rounded-md overflow-hidden border border-brg-light text-brg">
 			<table className="min-w-full">
@@ -40,7 +42,7 @@ export const RegistryTable = ({
 					<tr>
 						{[
 							'Year',
-							'Generation',
+							'Gen.',
 							'Edition',
 							'Color',
 							'Sequence #',
@@ -55,6 +57,7 @@ export const RegistryTable = ({
 										header
 											.toLowerCase()
 											.replace('Sequence #', 'sequence')
+											.replace('Gen.', 'generation')
 											.toLowerCase() as keyof Car
 									)
 								}
@@ -81,18 +84,30 @@ export const RegistryTable = ({
 					{cars.map((car) => (
 						<tr
 							key={car.id}
-							className="bg-white hover:bg-brg-light/25 transition-colors"
+							className="bg-white hover:bg-brg-light/25 transition-colors relative cursor-pointer"
+							onClick={(e) => {
+								if (!(e.target as HTMLElement).closest('a')) {
+									if (e.metaKey || e.ctrlKey) {
+										// Open in new tab
+										window.open(`/car/${car.id}`, '_blank');
+									} else {
+										navigate(`/car/${car.id}`);
+									}
+								}
+							}}
 						>
-							<td className="px-4 py-3 whitespace-nowrap font-mono">
-								{car.year}
+							<td className="w-20 px-4 py-3 whitespace-nowrap font-mono">
+								<div className="pointer-events-auto">
+									{car.year}
+								</div>
 							</td>
-							<td className="px-4 py-3 whitespace-nowrap">
+							<td className="w-20 px-4 py-3 whitespace-nowrap">
 								{car.generation}
 							</td>
-							<td className="px-4 py-3 whitespace-nowrap">
+							<td className="w-52 px-4 py-3 whitespace-nowrap">
 								{car.edition}
 							</td>
-							<td className="px-4 py-3 whitespace-nowrap">
+							<td className="w-52 px-4 py-3 whitespace-nowrap">
 								<div className="flex items-center gap-2">
 									<span
 										className="w-4 h-3 rounded-sm inline-block"
@@ -106,7 +121,7 @@ export const RegistryTable = ({
 									{car.color}
 								</div>
 							</td>
-							<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
+							<td className="w-52 flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
 								{car.sequence && (
 									<>
 										{car.sequence.toLocaleString()}
@@ -120,10 +135,17 @@ export const RegistryTable = ({
 								)}
 							</td>
 							<td className="px-4 py-3 whitespace-nowrap">
-								{car.owner || (
+								{car.owner ? (
+									<Link
+										to={`/owner/${car.owner.id}`}
+										className="hover:underline relative z-10"
+									>
+										{car.owner.name}
+									</Link>
+								) : (
 									<Link
 										to={`/claim/${car.id}`}
-										className="text-brg-border hover:text-brg hover:underline"
+										className="text-brg-border hover:text-brg hover:underline relative z-10"
 									>
 										Claim
 									</Link>

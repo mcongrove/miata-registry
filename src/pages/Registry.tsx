@@ -23,28 +23,75 @@ import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
 import { Car } from '../types/Car';
-import { FilterOption } from '../types/Filters';
+import { FilterOption, FilterType } from '../types/Filters';
 import { Chip } from '../components/common/Chip';
 import sampleCars from '../data/sampleCars.json';
+import { useSearchParams } from 'react-router-dom';
 
 export const Registry = () => {
-	const [search, setSearch] = useState('');
-	const [activeFilters, setActiveFilters] = useState<FilterOption[]>([]);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [sortColumn, setSortColumn] = useState<keyof Car>('year');
-	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+	const parseFiltersFromURL = (filterParams: string[]): FilterOption[] => {
+		return filterParams.map((param) => {
+			const [type, value] = param.split(':') as [FilterType, string];
+			return { type, value };
+		});
+	};
 
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [search, setSearch] = useState(searchParams.get('search') || '');
+	const [activeFilters, setActiveFilters] = useState<FilterOption[]>(
+		parseFiltersFromURL(searchParams.getAll('filter'))
+	);
+	const [currentPage, setCurrentPage] = useState(
+		parseInt(searchParams.get('page') || '1')
+	);
+	const [sortColumn, setSortColumn] = useState<keyof Car>(
+		(searchParams.get('sortColumn') as keyof Car) || 'year'
+	);
+	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(
+		(searchParams.get('sortDir') as 'asc' | 'desc') || 'desc'
+	);
+
+	const updateSearchParams = (
+		updates: Record<string, string | string[] | null>
+	) => {
+		const newParams = new URLSearchParams(searchParams);
+
+		Object.entries(updates).forEach(([key, value]) => {
+			if (value === null) {
+				newParams.delete(key);
+			} else if (Array.isArray(value)) {
+				newParams.delete(key);
+
+				value.forEach((v) => newParams.append(key, v));
+			} else {
+				newParams.set(key, value);
+			}
+		});
+
+		setSearchParams(newParams);
+	};
+
+	// Update handlers to persist state in URL
 	const handleSort = (column: keyof Car) => {
-		if (sortColumn === column) {
-			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-		} else {
-			setSortColumn(column);
-			setSortDirection('asc');
-		}
+		const newDirection =
+			sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
+
+		setSortColumn(column);
+
+		setSortDirection(newDirection);
+
+		updateSearchParams({
+			sortColumn: column,
+			sortDir: newDirection,
+		});
 	};
 
 	const handleFiltersChange = (newFilters: FilterOption[]) => {
 		setActiveFilters(newFilters);
+
+		updateSearchParams({
+			filter: newFilters.map((f) => `${f.type}:${f.value}`),
+		});
 	};
 
 	return (
@@ -65,7 +112,12 @@ export const Registry = () => {
 								placeholder="Search..."
 								className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-3 focus:outline-none placeholder:text-brg-mid/70 pr-8"
 								value={search}
-								onChange={(e) => setSearch(e.target.value)}
+								onChange={(e) => {
+									setSearch(e.target.value);
+									updateSearchParams({
+										search: e.target.value || null,
+									});
+								}}
 							/>
 
 							{search && (
@@ -97,17 +149,37 @@ export const Registry = () => {
 													(f) =>
 														f.type !== filter.type
 												);
+
 											setActiveFilters(newFilters);
+
+											updateSearchParams({
+												filter: newFilters.map(
+													(f) =>
+														`${f.type}:${f.value}`
+												),
+											});
 										}}
 									/>
 								))}
+								<button
+									onClick={() => {
+										setActiveFilters([]);
+										updateSearchParams({ filter: null });
+									}}
+									className="text-brg px-2 py-1 text-xs hover:text-red-700"
+								>
+									Clear All
+								</button>
 							</div>
 						)}
 
 						<PaginationControls
 							currentPage={currentPage}
 							totalPages={10}
-							onPageChange={setCurrentPage}
+							onPageChange={(page) => {
+								setCurrentPage(page);
+								updateSearchParams({ page: page.toString() });
+							}}
 							totalItems={50}
 							itemsPerPage={5}
 						/>
@@ -124,7 +196,10 @@ export const Registry = () => {
 						<PaginationControls
 							currentPage={currentPage}
 							totalPages={10}
-							onPageChange={setCurrentPage}
+							onPageChange={(page) => {
+								setCurrentPage(page);
+								updateSearchParams({ page: page.toString() });
+							}}
 							totalItems={50}
 							itemsPerPage={5}
 						/>

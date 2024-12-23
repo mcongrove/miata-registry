@@ -30,7 +30,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	const location = useLocation();
 
 	return (
-		<div className="relative group">
+		<div className="relative group z-50">
 			<button
 				className={`text-sm ${
 					isActive

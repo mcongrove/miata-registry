@@ -23,7 +23,10 @@ export type Car = {
 	edition: string;
 	color: string;
 	vin?: string;
-	owner?: string;
+	owner?: {
+		id: string;
+		name: string;
+	};
 	sequence?: number;
 	totalProduced?: number;
 	location?: {
