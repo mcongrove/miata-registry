@@ -104,14 +104,14 @@ function App() {
 
     return (
         <>
-            <header className="h-[90vh] flex bg-[#E8EBEA]">
+            <header className="h-[90vh] flex bg-brg-light">
                 <div className="w-1/2 flex items-center justify-center">
                     <div className="max-w-[600px] flex flex-col px-16 gap-10">
-                        <Symbol className="w-40 h-auto text-[#172E28] mb-6" />
+                        <Symbol className="w-40 h-auto text-brg mb-6" />
 
-                        <button className="inline-flex w-fit items-center gap-2 text-sm text-[#5D6D69] hover:text-[#172E28] rounded-full border border-[#BAC1BF] hover:border-[#5D6D69] transition-colors px-4 py-2">
+                        <button className="inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2">
                             The registry is now open!
-                            <span className="text-[#172E28] font-medium">
+                            <span className="text-brg font-medium">
                                 Read more{' '}
                                 <FontAwesomeIcon
                                     icon={faArrowRight}
@@ -121,11 +121,11 @@ function App() {
                         </button>
 
                         <div className="flex flex-col gap-3">
-                            <h1 className="text-6xl font-medium text-[#172E28]">
+                            <h1 className="text-6xl font-medium text-brg">
                                 Welcome to the Miata Registry
                             </h1>
 
-                            <p className="text-xl text-[#5D6D69]">
+                            <p className="text-xl text-brg-mid">
                                 A community-driven project that aims to document
                                 and preserve the history of limited edition
                                 Mazda Miatas.
@@ -133,11 +133,11 @@ function App() {
                         </div>
 
                         <div className="flex items-center gap-4 text-sm">
-                            <button className="bg-[#172E28] hover:bg-[#10201C] transition-colors text-white rounded-md px-4 py-3">
+                            <button className="bg-brg hover:bg-brg-dark transition-colors text-white rounded-md px-4 py-3">
                                 Register your Miata
                             </button>
 
-                            <button className="text-[#172E28] hover:text-[#10201C] transition-colors">
+                            <button className="text-brg hover:text-brg-dark transition-colors">
                                 View the registry{' '}
                                 <FontAwesomeIcon
                                     icon={faArrowRight}
@@ -163,6 +163,42 @@ function App() {
                     </svg>
                 </div>
             </header>
+
+            <main className="relative bg-white overflow-hidden">
+                <svg
+                    className="absolute top-0 left-0 w-full h-[90vh] pointer-events-none"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 100 100"
+                >
+                    <defs>
+                        <linearGradient
+                            id="fadeGradient"
+                            x1="0"
+                            x2="0"
+                            y1="0"
+                            y2="1"
+                        >
+                            <stop
+                                offset="0%"
+                                stopColor="#E8EBEA"
+                                stopOpacity="1"
+                            />
+                            <stop
+                                offset="15%"
+                                stopColor="#E8EBEA"
+                                stopOpacity="0"
+                            />
+                        </linearGradient>
+                    </defs>
+
+                    <path
+                        d="M0 0 L0 100 L47 100 L50 0 Z"
+                        fill="url(#fadeGradient)"
+                    />
+                </svg>
+
+                <div className="relative min-h-[500px]"></div>
+            </main>
 
             {/* {window.location.pathname !== '/' && (
                 <header>
