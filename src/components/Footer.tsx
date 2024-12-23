@@ -25,7 +25,13 @@ export const Footer = () => {
 			<div className="container mx-auto">
 				<div className="flex gap-24 mb-16">
 					<div className="w-1/4">
-						<Symbol className="w-32 h-auto text-brg-mid mb-6" />
+						<div className="flex flex-col gap-1.5 w-32 mb-6 text-brg-mid">
+							<Symbol className="w-full h-auto" />
+
+							<small className="w-full text-center uppercase text-xs font-medium">
+								The Miata Registry
+							</small>
+						</div>
 
 						<p className="text-brg-mid mb-8">
 							A community-driven project documenting the history
@@ -187,7 +193,7 @@ export const Footer = () => {
 						>
 							Source code
 						</a>{' '}
-						licensed under AGPL-3.0. All other rights reserved.
+						licensed under AGPL-3. All other rights reserved.
 					</p>
 				</div>
 			</div>
