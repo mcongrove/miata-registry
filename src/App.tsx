@@ -108,7 +108,7 @@ function App() {
 		<BrowserRouter>
 			<Header />
 
-			<header className="h-[85vh] flex bg-brg-light">
+			<header className="h-[90vh] flex bg-brg-light">
 				<div className="w-1/2 px-16 flex items-center ">
 					<div className="pr-40 flex flex-col gap-10">
 						<Symbol className="w-40 h-auto text-brg mb-6" />
@@ -171,7 +171,7 @@ function App() {
 
 			<main className="relative bg-white overflow-hidden">
 				<svg
-					className="absolute top-0 left-0 w-full h-[85vh] pointer-events-none"
+					className="absolute top-0 left-0 w-full h-[90vh] pointer-events-none"
 					preserveAspectRatio="none"
 					viewBox="0 0 100 100"
 				>
@@ -336,7 +336,7 @@ function App() {
 								Community Collaborators
 							</h2>
 
-							<p className="text-brg-mid max-w-2xl mx-auto">
+							<p className="text-brg-mid max-w-xl mx-auto">
 								We're grateful to collaborate with these amazing
 								organizations and communities who share our
 								passion for preserving Miata history
