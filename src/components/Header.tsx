@@ -89,7 +89,7 @@ export const Header = () => {
 					label="Registry"
 					items={[
 						{ label: 'Browse the cars', to: '/registry' },
-						{ label: 'Browse the models', to: '/models' },
+						{ label: 'Browse the editions', to: '/editions' },
 						{ label: 'Claim your Miata', to: '/register' },
 					]}
 					isActive={isActive('/registry')}

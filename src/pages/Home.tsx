@@ -188,13 +188,13 @@ export const Home = () => {
 								and preserving the history of limited edition
 								Mazda Miatas. Our mission is to document these
 								unique vehicles and help enthusiasts connect
-								with rare and significant models from across the
-								Miata's storied history.
+								with rare and significant editions from across
+								the Miata's storied history.
 							</p>
 
 							<p className="text-brg-mid mt-4">
 								From the iconic British Racing Green edition to
-								the exclusive 25th Anniversary model, we're
+								the exclusive 25th Anniversary edition, we're
 								building a comprehensive record of these limited
 								cars. Whether you're an owner, collector, or
 								enthusiast, the Registry serves as your
