@@ -16,23 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Edition } from './Edition';
-import { Location } from './Location';
-import { Owner } from './Owner';
-
-export type Car = {
-	color?: string;
-	manufactureDate?: string;
-	edition: Edition;
-	id: string;
-	image?: string;
-	location?: Location;
-	owner?: Owner;
-	sequence?: number;
-	shipping?: {
-		port?: string;
-		vessel?: string;
-		date?: string;
-	};
-	vin?: string;
+export const countryMap: { [key: string]: string } = {
+	JAPAN: 'JP',
+	'UNITED STATES': 'US',
+	MEXICO: 'MX',
 };

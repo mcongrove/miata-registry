@@ -16,23 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Edition } from './Edition';
-import { Location } from './Location';
-import { Owner } from './Owner';
+export const toTitleCase = (str: string): string => {
+	return str
+		.toLowerCase()
+		.split(' ')
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ');
+};
 
-export type Car = {
-	color?: string;
-	manufactureDate?: string;
-	edition: Edition;
-	id: string;
-	image?: string;
-	location?: Location;
-	owner?: Owner;
-	sequence?: number;
-	shipping?: {
-		port?: string;
-		vessel?: string;
-		date?: string;
-	};
-	vin?: string;
+export const toPrettyDate = (date: string): string => {
+	const dateObj = new Date(date);
+	const hasTime = date.includes('T');
+
+	return dateObj.toLocaleDateString('en-US', {
+		month: 'long',
+		day: 'numeric',
+		year: 'numeric',
+		...(hasTime && {
+			hour: 'numeric',
+			minute: 'numeric',
+		}),
+	});
 };

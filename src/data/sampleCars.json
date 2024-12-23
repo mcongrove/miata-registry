@@ -2,7 +2,7 @@
 	{
 		"id": "1",
 		"color": "British Racing Green",
-		"vin": "JM1NA3512M1234567",
+		"vin": "JM1NA3510M1221538",
 		"owner": {
 			"id": "1",
 			"name": "Matthew Congrove"
@@ -17,9 +17,15 @@
 			"year": 1991,
 			"totalProduced": 4000
 		},
+		"manufactureDate": "1990-12-06T20:40:00",
+		"shipping": {
+			"port": "BENECIA",
+			"vessel": "ASIAN HIGHWAY",
+			"date": "1990-12-14"
+		},
 		"location": {
 			"country": "US",
-			"state": "Texas",
+			"state": "TX",
 			"city": "Austin"
 		}
 	},
@@ -43,7 +49,7 @@
 		},
 		"location": {
 			"country": "US",
-			"state": "California",
+			"state": "CA",
 			"city": "Los Angeles"
 		}
 	},
@@ -67,7 +73,7 @@
 		},
 		"location": {
 			"country": "US",
-			"state": "California",
+			"state": "CA",
 			"city": "Los Angeles"
 		}
 	},
@@ -87,7 +93,7 @@
 		},
 		"location": {
 			"country": "US",
-			"state": "California",
+			"state": "CA",
 			"city": "Los Angeles"
 		}
 	},
@@ -111,7 +117,7 @@
 		},
 		"location": {
 			"country": "US",
-			"state": "California",
+			"state": "CA",
 			"city": "Los Angeles"
 		}
 	}
