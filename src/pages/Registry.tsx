@@ -47,9 +47,15 @@ export const Registry = () => {
 	const [sortColumn, setSortColumn] = useState<string>(
 		searchParams.get('sortColumn') || 'edition.year'
 	);
-	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(
-		(searchParams.get('sortDir') as 'asc' | 'desc') || 'desc'
-	);
+	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
+		const urlSortDir = searchParams.get('sortDir') as 'asc' | 'desc';
+
+		// If there's a sort direction in the URL, use it
+		if (urlSortDir) return urlSortDir;
+
+		// Otherwise, always use 'asc' since we're defaulting to year
+		return 'asc';
+	});
 
 	const updateSearchParams = (
 		updates: Record<string, string | string[] | null>

@@ -5,9 +5,9 @@
 		"vin": "JM1NA3512M1234567",
 		"owner": {
 			"id": "1",
-			"name": "John Doe"
+			"name": "Matthew Congrove"
 		},
-		"sequence": 326,
+		"sequence": 182,
 		"edition": {
 			"id": "brg-1991",
 			"name": "British Racing Green Limited Edition",
@@ -18,8 +18,8 @@
 		},
 		"location": {
 			"country": "US",
-			"state": "California",
-			"city": "Los Angeles"
+			"state": "Texas",
+			"city": "Austin"
 		}
 	},
 	{
