@@ -344,6 +344,17 @@ export const Home = () => {
 								direction="right"
 								className="absolute bottom-4 left-4"
 							/>
+
+							<svg
+								className="absolute inset-0 w-full h-full pointer-events-none"
+								preserveAspectRatio="none"
+								viewBox="0 0 100 100"
+							>
+								<path
+									d="M93 0 L100 100 L100 0 Z"
+									fill="#E8EBEA"
+								/>
+							</svg>
 						</div>
 
 						<div className="w-2/3 p-12">

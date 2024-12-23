@@ -69,7 +69,7 @@ export const Credit = ({
 				/>
 			)}
 
-			<div className="bg-white p-3 rounded-full z-10 relative">
+			<div className="bg-white p-3 rounded-full z-20 relative">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					className="w-4 h-4 text-brg"
