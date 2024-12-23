@@ -24,6 +24,7 @@ export type Car = {
 	color?: string;
 	edition: Edition;
 	id: string;
+	image?: string;
 	location?: Location;
 	owner?: Owner;
 	sequence?: number;

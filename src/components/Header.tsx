@@ -74,7 +74,11 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	);
 };
 
-export const Header = () => {
+interface HeaderProps {
+	showShadow?: boolean;
+}
+
+export const Header = ({ showShadow = true }: HeaderProps) => {
 	const location = useLocation();
 	const isHomePage = location.pathname === '/';
 
@@ -89,7 +93,10 @@ export const Header = () => {
 					label="Registry"
 					items={[
 						{ label: 'Browse the cars', to: '/registry' },
-						{ label: 'Browse the editions', to: '/editions' },
+						{
+							label: 'Browse the editions',
+							to: '/registry/editions',
+						},
 						{ label: 'Claim your Miata', to: '/register' },
 					]}
 					isActive={isActive('/registry')}
@@ -156,7 +163,7 @@ export const Header = () => {
 
 	if (isHomePage) {
 		return (
-			<header className="absolute top-0 left-0 right-0 z-50">
+			<header className="absolute top-0 left-0 right-0 z-50 h-20">
 				<div className="mx-auto py-6 px-16">
 					<div className="flex items-center">
 						<NavLinks />
@@ -167,7 +174,7 @@ export const Header = () => {
 	}
 
 	return (
-		<header className="fixed top-0 left-0 right-0 bg-white z-50">
+		<header className="fixed top-0 left-0 right-0 bg-white z-50 h-20">
 			<div className="container mx-auto py-4 relative">
 				<div className="flex items-center">
 					<Link to="/" className="mr-12">
@@ -176,7 +183,9 @@ export const Header = () => {
 
 					<NavLinks />
 				</div>
-				<div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent translate-y-full pointer-events-none z-50"></div>
+				{showShadow && (
+					<div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent translate-y-full pointer-events-none z-50"></div>
+				)}
 			</div>
 		</header>
 	);

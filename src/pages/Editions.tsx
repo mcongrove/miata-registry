@@ -29,7 +29,7 @@ export const Editions = () => {
 	};
 
 	return (
-		<main className="flex-1 pt-[72px]">
+		<main className="flex-1 pt-20">
 			<div className="container mx-auto py-8">
 				<h1 className="text-2xl font-bold mb-6">
 					Limited Edition Models

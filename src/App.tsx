@@ -16,18 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { Registry } from './pages/Registry';
 import { Editions } from './pages/Editions';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { CarProfile } from './pages/registry/[id]';
 
-function Layout({ children }: { children: React.ReactNode }) {
+interface LayoutProps {
+	showHeaderShadow?: boolean;
+}
+
+function Layout({ showHeaderShadow = true }: LayoutProps) {
 	return (
 		<div className="min-h-screen flex flex-col">
-			<Header />
-			{children}
+			<Header showShadow={showHeaderShadow} />
+			<Outlet />
 			<Footer />
 		</div>
 	);
@@ -36,13 +41,16 @@ function Layout({ children }: { children: React.ReactNode }) {
 function App() {
 	return (
 		<BrowserRouter>
-			<Layout>
-				<Routes>
+			<Routes>
+				<Route element={<Layout showHeaderShadow={true} />}>
 					<Route path="/" element={<Home />} />
 					<Route path="/registry" element={<Registry />} />
-					<Route path="/editions" element={<Editions />} />
-				</Routes>
-			</Layout>
+					<Route path="/registry/editions" element={<Editions />} />
+				</Route>
+				<Route element={<Layout showHeaderShadow={false} />}>
+					<Route path="/registry/:id" element={<CarProfile />} />
+				</Route>
+			</Routes>
 		</BrowserRouter>
 	);
 }

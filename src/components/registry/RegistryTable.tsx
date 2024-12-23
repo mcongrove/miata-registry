@@ -87,11 +87,11 @@ export const RegistryTable = ({
 									) {
 										if (e.metaKey || e.ctrlKey) {
 											window.open(
-												`/car/${car.id}`,
+												`/registry/${car.id}`,
 												'_blank'
 											);
 										} else {
-											navigate(`/car/${car.id}`);
+											navigate(`/registry/${car.id}`);
 										}
 									}
 								}}
