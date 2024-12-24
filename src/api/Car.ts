@@ -27,6 +27,8 @@ import {
 	query,
 	where,
 } from 'firebase/firestore';
+import { countryCodeMap } from '../utils/geo';
+import { toTitleCase } from '../utils/global';
 
 export const getCar = async (id: string): Promise<Car | null> => {
 	try {
@@ -108,4 +110,74 @@ export const getEditionCount = async (): Promise<number> => {
 
 		throw error;
 	}
+};
+
+export const getVinDetails = async (vin: string, year: number) => {
+	try {
+		const response = await fetch(
+			`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json&modelyear=${year}`
+		);
+
+		const data = await response.json();
+
+		if (data.Results?.[0]) {
+			return data.Results[0];
+		}
+		return null;
+	} catch (error) {
+		console.error('Error fetching VIN details:', error);
+		return null;
+	}
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formatEngineDetails = (details: any) => {
+	const displacement = details.DisplacementL
+		? `${Number(details.DisplacementL).toFixed(1)}L`
+		: '';
+
+	const cylinders = details.EngineCylinders
+		? `${details.EngineCylinders}-cylinder`
+		: '';
+
+	const configuration =
+		details.EngineConfiguration?.toLowerCase() === 'inline'
+			? 'Inline'
+			: details.EngineConfiguration;
+
+	const horsepower = details.EngineHP ? `${details.EngineHP}hp` : '';
+
+	return (
+		[displacement, configuration, cylinders, horsepower]
+			.filter(Boolean)
+			.join(' ')
+			.trim() || 'Not specified'
+	);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formatTransmission = (details: any) => {
+	const speed = details.TransmissionSpeeds || details.TransmissionSpeed;
+	const style = details.TransmissionStyle || details.DriveType;
+
+	if (!speed && !style) return 'Not specified';
+
+	return [
+		speed ? `${speed}-speed` : '',
+		style?.toLowerCase().includes('manual') ? 'Manual' : 'Automatic',
+	]
+		.filter(Boolean)
+		.join(' ');
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formatPlantLocation = (details: any) => {
+	const city = details?.PlantCity
+		? toTitleCase(details?.PlantCity?.toLowerCase())
+		: '';
+
+	const country =
+		countryCodeMap[details?.PlantCountry] || details?.PlantCountry;
+
+	return city && country ? `${city}, ${country}` : '';
 };

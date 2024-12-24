@@ -17,7 +17,7 @@
  */
 
 interface TimelineItemProps {
-	name?: string;
+	name?: string | React.ReactNode;
 	dateRange?: string;
 	location?: string;
 	isActive?: boolean;

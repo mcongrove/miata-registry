@@ -28,7 +28,10 @@ export type Car = {
 	id: string;
 	image?: string;
 	location?: Location;
-	manufactureDate?: string;
+	manufacture?: {
+		date?: string;
+		location?: Location;
+	};
 	ownerId?: DocumentReference<Owner>;
 	owner: Owner;
 	sale?: {

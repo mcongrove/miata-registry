@@ -21,11 +21,15 @@ import { useParams } from 'react-router-dom';
 import { Map } from '../components/car/Map';
 import { TimelineItem } from '../components/car/TimelineItem';
 import { Tooltip } from '../components/Tooltip';
-import sampleCars from '../data/sampleCars.json';
-import sampleEditions from '../data/sampleEditions.json';
 import { Car } from '../types/Car';
 import { toPrettyDate, toTitleCase } from '../utils/global';
-import { countryCodeMap } from '../utils/geo';
+import {
+	getCar,
+	formatEngineDetails,
+	formatTransmission,
+	formatPlantLocation,
+	getVinDetails,
+} from '../api/Car';
 
 interface Location {
 	name: string;
@@ -39,100 +43,31 @@ export const CarProfile = () => {
 	const [vinDetails, setVinDetails] = useState<any>(null);
 
 	useEffect(() => {
-		if (id) {
-			const foundCar = sampleCars.find((c) => c.id === id);
+		const loadCar = async () => {
+			if (!id) return;
 
-			if (foundCar) {
-				// Find the full edition details from sampleEditions
-				const fullEdition = sampleEditions.find(
-					(e) => e.id === foundCar.edition.id
-				);
+			try {
+				const carData = await getCar(id);
 
-				// Merge the edition details with the car data
-				setCar({
-					...foundCar,
-					edition: {
-						...foundCar.edition,
-						...fullEdition,
-					},
-				});
-			} else {
+				setCar(carData);
+
+				if (carData?.vin) {
+					const details = await getVinDetails(
+						carData.vin,
+						carData.edition.year
+					);
+
+					setVinDetails(details);
+				}
+			} catch (error) {
+				console.error('Error loading car:', error);
+
 				setCar(null);
 			}
+		};
 
-			if (foundCar?.vin) {
-				fetchVinDetails(foundCar.vin, foundCar.edition.year);
-			}
-		}
+		loadCar();
 	}, [id]);
-
-	const fetchVinDetails = async (vin: string, year: number) => {
-		try {
-			const response = await fetch(
-				`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json&modelyear=${year}`
-			);
-
-			const data = await response.json();
-
-			if (data.Results?.[0]) {
-				setVinDetails(data.Results[0]);
-			}
-		} catch (error) {
-			console.error('Error fetching VIN details:', error);
-		}
-	};
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const formatEngineDetails = (details: any) => {
-		const displacement = details.DisplacementL
-			? `${Number(details.DisplacementL).toFixed(1)}L`
-			: '';
-
-		const cylinders = details.EngineCylinders
-			? `${details.EngineCylinders}-cylinder`
-			: '';
-
-		const configuration =
-			details.EngineConfiguration?.toLowerCase() === 'inline'
-				? 'Inline'
-				: details.EngineConfiguration;
-
-		const horsepower = details.EngineHP ? `${details.EngineHP}hp` : '';
-
-		return (
-			[displacement, configuration, cylinders, horsepower]
-				.filter(Boolean)
-				.join(' ')
-				.trim() || 'Not specified'
-		);
-	};
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const formatTransmission = (details: any) => {
-		const speed = details.TransmissionSpeeds || details.TransmissionSpeed;
-		const style = details.TransmissionStyle || details.DriveType;
-
-		if (!speed && !style) return 'Not specified';
-
-		return [
-			speed ? `${speed}-speed` : '',
-			style?.toLowerCase().includes('manual') ? 'Manual' : 'Automatic',
-		]
-			.filter(Boolean)
-			.join(' ');
-	};
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const formatPlantLocation = (details: any) => {
-		const city = details?.PlantCity
-			? toTitleCase(details?.PlantCity?.toLowerCase())
-			: '';
-
-		const country =
-			countryCodeMap[details?.PlantCountry] || details?.PlantCountry;
-
-		return city && country ? `${city}, ${country}` : '';
-	};
 
 	const getTimelineItems = () => {
 		if (!car) return [];
@@ -143,7 +78,7 @@ export const CarProfile = () => {
 		if (car.owner) {
 			items.push({
 				name: car.owner.name || 'Unknown',
-				dateRange: '2024 – Present',
+				dateRange: `${car.owner.dateStart ? toPrettyDate(car.owner.dateStart) : ''} – ${car.owner.dateEnd ? toPrettyDate(car.owner.dateEnd) : 'Present'}`,
 				location: car.location
 					? `${car.location.city}, ${car.location.state}, ${car.location.country}`
 					: undefined,
@@ -184,7 +119,16 @@ export const CarProfile = () => {
 		// Shipping
 		if (car.shipping) {
 			items.push({
-				name: `${car.shipping.vessel ? `Shipped via ${toTitleCase(car.shipping.vessel)}` : 'Shipped'}`,
+				name: car.shipping.vessel ? (
+					<>
+						Shipped{' '}
+						<span className="text-brg-border">
+							via {toTitleCase(car.shipping.vessel)}
+						</span>
+					</>
+				) : (
+					'Shipped'
+				),
 				dateRange: toPrettyDate(car.shipping.date || ''),
 				location: car.shipping.port
 					? `Port of ${toTitleCase(car.shipping.port)}`
@@ -193,12 +137,24 @@ export const CarProfile = () => {
 		}
 
 		// Factory
-		const plantLocation = formatPlantLocation(vinDetails);
+		const plantLocation = car.manufacture?.location?.city
+			? `${car.manufacture.location.city}, ${car.manufacture.location.country}`
+			: formatPlantLocation(vinDetails);
+
 		if (plantLocation) {
 			items.push({
-				name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
-				dateRange: car.manufactureDate
-					? toPrettyDate(car.manufactureDate)
+				name: vinDetails?.Manufacturer ? (
+					<>
+						Built{' '}
+						<span className="text-brg-border">
+							by {toTitleCase(vinDetails.Manufacturer)}
+						</span>
+					</>
+				) : (
+					'Built'
+				),
+				dateRange: car.manufacture?.date
+					? toPrettyDate(car.manufacture.date)
 					: car.edition.year.toString(),
 				location: plantLocation,
 				isActive: true,
@@ -206,13 +162,7 @@ export const CarProfile = () => {
 		}
 
 		// Find the last valid item to set showConnector=false
-		const lastValidIndex = plantLocation
-			? items.length - 1
-			: car.shipping
-				? items.length - 1
-				: car.sale?.dealer
-					? items.length - 1
-					: items.length - 1;
+		const lastValidIndex = items.length - 1;
 
 		return items.map((item, index) => (
 			<TimelineItem
@@ -302,9 +252,8 @@ export const CarProfile = () => {
 									<p
 										className={`font-medium ${!vinDetails ? 'animate-pulse bg-brg-light h-6 w-24 rounded' : formatEngineDetails(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
 									>
-										{vinDetails
-											? formatEngineDetails(vinDetails)
-											: ''}
+										{vinDetails &&
+											formatEngineDetails(vinDetails)}
 									</p>
 								</div>
 
@@ -333,9 +282,8 @@ export const CarProfile = () => {
 									<p
 										className={`font-medium ${!vinDetails ? 'animate-pulse bg-brg-light h-6 w-24 rounded' : formatTransmission(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
 									>
-										{vinDetails
-											? formatTransmission(vinDetails)
-											: ''}
+										{vinDetails &&
+											formatTransmission(vinDetails)}
 									</p>
 								</div>
 							</div>
@@ -355,7 +303,7 @@ export const CarProfile = () => {
 										</div>
 									)}
 
-									{car.sale.date && (
+									{car.sale?.date && (
 										<div>
 											<p className="text-sm text-brg-mid mb-1">
 												Purchase Date

@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Timestamp } from 'firebase/firestore';
+
 export const toTitleCase = (str: string): string => {
+	if (!str) return '';
+
 	return str
 		.toLowerCase()
 		.split(' ')
@@ -24,17 +28,42 @@ export const toTitleCase = (str: string): string => {
 		.join(' ');
 };
 
-export const toPrettyDate = (date: string): string => {
-	const hasTime = date.includes('T');
-	const dateObj = new Date(date + (hasTime ? '' : 'T12:00:00Z'));
+export const toPrettyDate = (
+	timestamp: Timestamp | Date | string | null | undefined
+): string => {
+	if (!timestamp) return '';
 
-	return dateObj.toLocaleDateString('en-US', {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-		...(hasTime && {
-			hour: 'numeric',
-			minute: 'numeric',
-		}),
-	});
+	let date: Date;
+
+	try {
+		if (timestamp instanceof Timestamp) {
+			date = timestamp.toDate();
+		} else if (timestamp instanceof Date) {
+			date = timestamp;
+		} else {
+			date = new Date(timestamp);
+		}
+
+		const isMidnight =
+			date.getHours() === 0 &&
+			date.getMinutes() === 0 &&
+			date.getSeconds() === 0;
+
+		return date.toLocaleString('en-US', {
+			month: 'long',
+			day: 'numeric',
+			year: 'numeric',
+			...(isMidnight
+				? {}
+				: {
+						hour: 'numeric',
+						minute: '2-digit',
+						hour12: true,
+					}),
+		});
+	} catch (error) {
+		console.error('Error formatting date:', error);
+
+		return '';
+	}
 };
