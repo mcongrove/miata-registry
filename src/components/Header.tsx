@@ -80,7 +80,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 export const Header = () => {
 	const location = useLocation();
 	const isHomePage = location.pathname === '/';
-	const { user } = useAuth();
+	const { user, loading } = useAuth();
 
 	const handleSignIn = async () => {
 		await signInWithGoogle();
@@ -88,6 +88,42 @@ export const Header = () => {
 
 	const isActive = (path: string) => {
 		return location.pathname.startsWith(path);
+	};
+
+	const AuthSection = () => {
+		if (loading) return null;
+
+		return user ? (
+			<UserMenu user={user} />
+		) : (
+			<>
+				{isHomePage ? (
+					<div className="flex items-center text-sm text-white">
+						<button
+							onClick={handleSignIn}
+							className="block bg-brg hover:bg-brg-dark rounded-l-lg transition-colors py-3 px-4 border-r border-brg-mid"
+						>
+							Sign In
+						</button>
+
+						<button
+							onClick={handleSignIn}
+							className="bg-brg hover:bg-brg-dark rounded-r-lg transition-colors py-3 px-4"
+						>
+							Register
+						</button>
+					</div>
+				) : (
+					<div className="flex items-center text-sm gap-2">
+						<Button variant="tertiary" onClick={handleSignIn}>
+							Sign In
+						</Button>
+
+						<Button onClick={handleSignIn}>Register</Button>
+					</div>
+				)}
+			</>
+		);
 	};
 
 	const NavLinks = () => (
@@ -130,43 +166,7 @@ export const Header = () => {
 				/>
 			</div>
 
-			{isHomePage ? (
-				<div className="flex items-center text-sm text-white">
-					{user ? (
-						<UserMenu user={user} />
-					) : (
-						<>
-							<button
-								onClick={handleSignIn}
-								className="block bg-brg hover:bg-brg-dark rounded-l-lg transition-colors py-3 px-4 border-r border-brg-mid"
-							>
-								Sign In
-							</button>
-
-							<button
-								onClick={handleSignIn}
-								className="bg-brg hover:bg-brg-dark rounded-r-lg transition-colors py-3 px-4"
-							>
-								Register
-							</button>
-						</>
-					)}
-				</div>
-			) : (
-				<div className="flex items-center text-sm gap-2">
-					{user ? (
-						<UserMenu user={user} />
-					) : (
-						<>
-							<Button variant="tertiary" onClick={handleSignIn}>
-								Sign In
-							</Button>
-
-							<Button onClick={handleSignIn}>Register</Button>
-						</>
-					)}
-				</div>
-			)}
+			<AuthSection />
 		</nav>
 	);
 

@@ -27,6 +27,7 @@ import {
 import { getCountCountries } from '../api/Owner';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { StatisticItem } from '../components/about/StatisticItem';
+import emailjs from '@emailjs/browser';
 
 const getCountCodeCommits = async (owner: string, repo: string) => {
 	const response = await fetch(
@@ -49,6 +50,8 @@ export const About = () => {
 	);
 	const [commitCount, setCommitCount] = useState<number>(0);
 	const location = useLocation();
+	const [isEmailSent, setIsEmailSent] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	usePageTitle('About');
 
@@ -82,6 +85,29 @@ export const About = () => {
 
 	const getHighlightClass = (sectionId: string) => {
 		return highlightedSection === sectionId ? 'text-red-800' : 'text-brg';
+	};
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		setIsSubmitting(true);
+
+		try {
+			await emailjs.sendForm(
+				import.meta.env.VITE_EMAILJS_SERVICE_ID,
+				'template_juttm4b',
+				e.currentTarget,
+				import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+			);
+
+			setIsEmailSent(true);
+		} catch (error) {
+			console.error('Error:', error);
+
+			alert('Failed to send message. Please try again.');
+
+			setIsSubmitting(false);
+		}
 	};
 
 	return (
@@ -312,40 +338,53 @@ export const About = () => {
 							Get in Touch
 						</h2>
 
-						<form className="flex flex-col gap-4 mx-auto w-full max-w-2xl">
-							<TextField
-								id="name"
-								name="name"
-								label="Name"
-								placeholder="Name"
-								required
-							/>
-
-							<TextField
-								id="email"
-								name="email"
-								label="Email"
-								type="email"
-								placeholder="email@example.com"
-								required
-							/>
-
-							<TextField
-								id="message"
-								name="message"
-								label="Message"
-								type="textarea"
-								placeholder="Message"
-								required
-							/>
-
-							<button
-								type="submit"
-								className="mt-2 rounded-lg bg-brg px-6 py-2 text-sm font-medium text-white hover:bg-brg-dark"
+						{isEmailSent ? (
+							<p className="text-sm text-brg-mid">
+								Thanks for your message, we'll get back to you
+								soon.
+							</p>
+						) : (
+							<form
+								className="flex flex-col gap-4 mx-auto w-full max-w-2xl"
+								onSubmit={handleSubmit}
 							>
-								Send Message
-							</button>
-						</form>
+								<TextField
+									id="name"
+									name="name"
+									label="Name"
+									placeholder="Name"
+									required
+								/>
+
+								<TextField
+									id="email"
+									name="email"
+									label="Email"
+									type="email"
+									placeholder="email@example.com"
+									required
+								/>
+
+								<TextField
+									id="message"
+									name="message"
+									label="Message"
+									type="textarea"
+									placeholder="Message"
+									required
+								/>
+
+								<button
+									type="submit"
+									disabled={isSubmitting}
+									className="mt-2 rounded-lg bg-brg px-6 py-2 text-sm font-medium text-white hover:bg-brg-dark disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									{isSubmitting
+										? 'Sending...'
+										: 'Send Message'}
+								</button>
+							</form>
+						)}
 					</div>
 				</div>
 			</div>
