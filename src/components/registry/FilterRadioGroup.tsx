@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FilterType, FilterOption } from '../../types/Filters';
+import { FilterOption, FilterType } from '../../types/Filters';
 import { FilterHeader } from './FilterHeader';
 import { FilterLabel } from './FilterLabel';
 

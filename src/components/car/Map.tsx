@@ -8,13 +8,13 @@
  * (at your option) any later version.
  */
 
-import { useEffect, useState } from 'react';
 import {
 	GoogleMap,
 	LoadScript,
 	Marker,
 	Polyline,
 } from '@react-google-maps/api';
+import { useEffect, useState } from 'react';
 
 interface Location {
 	name: string;

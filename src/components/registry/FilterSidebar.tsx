@@ -18,8 +18,8 @@
 
 import { FilterOption } from '../../types/Filters';
 import { Select } from '../Select';
-import { FilterRadioGroup } from './FilterRadioGroup';
 import { FilterHeader } from './FilterHeader';
+import { FilterRadioGroup } from './FilterRadioGroup';
 
 interface FilterSidebarProps {
 	activeFilters: FilterOption[];

@@ -16,16 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useRef, useState } from 'react';
 import {
+	arrow,
 	FloatingPortal,
+	offset,
+	Placement,
 	useFloating,
 	useHover,
 	useInteractions,
-	arrow,
-	offset,
-	Placement,
 } from '@floating-ui/react';
+import { useRef, useState } from 'react';
 
 type TooltipProps = {
 	children: React.ReactNode;

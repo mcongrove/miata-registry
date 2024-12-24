@@ -17,9 +17,9 @@
  */
 
 import Symbol from '../assets/symbol.svg?react';
-import { TimelineItem } from '../components/home/TimelineItem';
-import { Credit } from '../components/Credit';
 import { Button } from '../components/Button';
+import { Credit } from '../components/Credit';
+import { TimelineItem } from '../components/home/TimelineItem';
 
 export const Home = () => {
 	return (

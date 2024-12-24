@@ -17,14 +17,14 @@
  */
 
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Chip } from '../components/Chip';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
+import sampleCars from '../data/sampleCars.json';
 import { Car } from '../types/Car';
 import { FilterOption, FilterType } from '../types/Filters';
-import { Chip } from '../components/Chip';
-import sampleCars from '../data/sampleCars.json';
-import { useSearchParams } from 'react-router-dom';
 
 export const Registry = () => {
 	const parseFiltersFromURL = (filterParams: string[]): FilterOption[] => {

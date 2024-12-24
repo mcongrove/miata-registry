@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Symbol from '../assets/symbol.svg?react';
 import { Link } from 'react-router-dom';
+import Symbol from '../assets/symbol.svg?react';
 
 export const Footer = () => {
 	return (

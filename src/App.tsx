@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom';
+import { Footer } from './components/Footer';
+import { Header } from './components/Header';
+import { Editions } from './pages/Editions';
 import { Home } from './pages/Home';
 import { Registry } from './pages/Registry';
-import { Editions } from './pages/Editions';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
 import { CarProfile } from './pages/registry/[id]';
 
 interface LayoutProps {

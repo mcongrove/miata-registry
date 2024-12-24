@@ -16,16 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { Map } from '../../components/car/Map';
+import { TimelineItem } from '../../components/car/TimelineItem';
+import { Tooltip } from '../../components/Tooltip';
 import sampleCars from '../../data/sampleCars.json';
 import sampleEditions from '../../data/sampleEditions.json';
 import { Car } from '../../types/Car';
-import { TimelineItem } from '../../components/registry/TimelineItem';
 import { toPrettyDate, toTitleCase } from '../../utils/global';
 import { countryMap } from '../../utils/map';
-import { Map } from '../../components/Map';
-import { Tooltip } from '../../components/Tooltip';
 
 interface Location {
 	name: string;
