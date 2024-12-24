@@ -173,38 +173,49 @@ export const CarProfile = () => {
 		));
 	};
 
-	if (!car) {
-		return <main className="flex-1 pt-20"></main>;
-	}
-
 	return (
 		<main className="flex-1 pt-20 pb-16">
 			<div className="container mx-auto py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 					<div className="lg:col-span-8 space-y-6">
 						<div>
-							<h2 className="text-4xl font-bold">
-								{car.edition.year} {car.edition.name}
-							</h2>
+							{car ? (
+								<>
+									<h2 className="text-4xl font-bold">
+										{car.edition.year} {car.edition.name}
+									</h2>
 
-							{car.sequence && (
-								<p className="text-md font-medium">
-									<span className="text-brg-border">No.</span>{' '}
-									{car.sequence.toLocaleString()}{' '}
-									<span className="text-brg-border">
-										of{' '}
-										{car.edition.totalProduced?.toLocaleString()}
-									</span>
-								</p>
+									{car.sequence && (
+										<p className="text-md font-medium">
+											<span className="text-brg-border">
+												No.
+											</span>{' '}
+											{car.sequence.toLocaleString()}{' '}
+											<span className="text-brg-border">
+												of{' '}
+												{car.edition.totalProduced?.toLocaleString()}
+											</span>
+										</p>
+									)}
+								</>
+							) : (
+								<div className="space-y-2">
+									<div className="h-10 w-96 bg-brg-light rounded-lg animate-pulse" />
+									<div className="h-6 w-48 bg-brg-light rounded-lg animate-pulse" />
+								</div>
 							)}
 						</div>
 
 						<div className="aspect-video w-full relative rounded-lg overflow-hidden">
-							<img
-								src={car.image}
-								alt={`${car.edition.name}`}
-								className="w-full h-full object-cover"
-							/>
+							{car ? (
+								<img
+									src={car.image || car.edition.image}
+									alt={`${car.edition.name}`}
+									className={`w-full h-full object-cover ${!car.image ? 'grayscale' : ''}`}
+								/>
+							) : (
+								<div className="w-full h-full bg-brg-light animate-pulse" />
+							)}
 						</div>
 
 						<div className="bg-white rounded-lg overflow-hidden border border-brg-light">
@@ -213,18 +224,26 @@ export const CarProfile = () => {
 									<p className="text-sm text-brg-mid mb-1">
 										Factory Color
 									</p>
-
-									<p className="font-medium">{car.color}</p>
+									{car ? (
+										<p className="font-medium">
+											{car.color}
+										</p>
+									) : (
+										<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
+									)}
 								</div>
 
 								<div className="p-6 md:border-r border-brg-light">
 									<p className="text-sm text-brg-mid mb-1">
 										VIN
 									</p>
-
-									<p className="font-medium font-mono pt-px">
-										{car.vin}
-									</p>
+									{car ? (
+										<p className="font-medium font-mono pt-px">
+											{car.vin}
+										</p>
+									) : (
+										<div className="h-6 w-32 bg-brg-light rounded animate-pulse" />
+									)}
 								</div>
 
 								<div className="p-6 border-r border-brg-light">
@@ -288,7 +307,7 @@ export const CarProfile = () => {
 								</div>
 							</div>
 
-							{car.sale && (
+							{car?.sale && (
 								<div className="flex flex-wrap gap-16 border-t border-brg-light p-6">
 									{car.sale.msrp && (
 										<div>
@@ -349,7 +368,7 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						{car.edition.description && (
+						{car?.edition.description ? (
 							<div className="flex flex-col gap-4">
 								<h3 className="text-xl font-semibold">
 									About the {car.edition.year}{' '}
@@ -365,85 +384,99 @@ export const CarProfile = () => {
 									)}
 								</div>
 							</div>
-						)}
+						) : null}
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
 						<div className="bg-white rounded-lg border border-brg-light overflow-hidden">
 							<div className="aspect-[16/9] w-full relative">
-								<Map
-									locations={[
-										{
-											name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
-											address:
-												formatPlantLocation(vinDetails),
-										},
-										car.shipping?.port
-											? {
-													name: `Port of ${toTitleCase(car.shipping.port)}`,
-													address: `Port of ${toTitleCase(car.shipping.port)}`,
-												}
-											: null,
-										car.sale?.dealer?.location
-											? {
-													name: car.sale.dealer.name,
-													address: `${car.sale.dealer.location.city}, ${car.sale.dealer.location.state}, ${car.sale.dealer.location.country}`,
-												}
-											: null,
-										{
-											name: 'Edward Baker',
-											address: 'Oakland, CA, US',
-										},
-										{
-											name: 'Cherylann Marchese',
-											address: 'Henderson, NV, US',
-										},
-										{
-											name: 'Russel Hertzog',
-											address: 'Georgetown, TX, US',
-										},
-										{
-											name: `${car.location?.city}, ${car.location?.state}`,
-											address: `${car.location?.city}, ${car.location?.state}, ${car.location?.country}`,
-										},
-									].filter(
-										(location): location is Location =>
-											location !== null
-									)}
-								/>
+								{car ? (
+									<Map
+										locations={[
+											{
+												name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
+												address:
+													formatPlantLocation(
+														vinDetails
+													),
+											},
+											car.shipping?.port
+												? {
+														name: `Port of ${toTitleCase(car.shipping.port)}`,
+														address: `Port of ${toTitleCase(car.shipping.port)}`,
+													}
+												: null,
+											car.sale?.dealer?.location
+												? {
+														name: car.sale.dealer
+															.name,
+														address: `${car.sale.dealer.location.city}, ${car.sale.dealer.location.state}, ${car.sale.dealer.location.country}`,
+													}
+												: null,
+											{
+												name: 'Edward Baker',
+												address: 'Oakland, CA, US',
+											},
+											{
+												name: 'Cherylann Marchese',
+												address: 'Henderson, NV, US',
+											},
+											{
+												name: 'Russel Hertzog',
+												address: 'Georgetown, TX, US',
+											},
+											{
+												name: `${car.location?.city}, ${car.location?.state}`,
+												address: `${car.location?.city}, ${car.location?.state}, ${car.location?.country}`,
+											},
+										].filter(
+											(location): location is Location =>
+												location !== null
+										)}
+									/>
+								) : (
+									<div className="w-full h-full bg-brg-light animate-pulse" />
+								)}
 							</div>
 
 							<div className="p-4 flex items-center justify-between">
-								<div>
-									<p className="font-medium text-lg">
-										{car.location?.city}
-									</p>
-
-									<p className="text-brg-mid">
-										{car.location?.state},{' '}
-										{car.location?.country}
-									</p>
-								</div>
-
-								<svg
-									className="w-5 h-5 text-brg-mid"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-									/>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-									/>
-								</svg>
+								{car?.location ? (
+									<>
+										<div>
+											<p className="font-medium text-lg">
+												{car.location.city}
+											</p>
+											<p className="text-brg-mid">
+												{car.location.state},{' '}
+												{car.location.country}
+											</p>
+										</div>
+										<svg
+											className="w-5 h-5 text-brg-mid"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+											/>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+											/>
+										</svg>
+									</>
+								) : (
+									<div className="w-full">
+										<div className="h-6 w-32 bg-brg-light rounded animate-pulse mb-2" />
+										<div className="h-5 w-48 bg-brg-light rounded animate-pulse" />
+									</div>
+								)}
 							</div>
 						</div>
 
