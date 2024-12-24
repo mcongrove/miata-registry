@@ -98,7 +98,7 @@ export const Header = () => {
 					isActive={isActive('/registry')}
 				/>
 
-				<Link
+				{/* <Link
 					to="/resources/docs"
 					className={`text-sm ${
 						isActive('/resources')
@@ -107,27 +107,18 @@ export const Header = () => {
 					} transition-colors`}
 				>
 					Resources
-				</Link>
+				</Link> */}
 
 				<Dropdown
 					label="About"
 					items={[
 						{ label: 'About the Registry', to: '/about' },
 						{ label: 'News', to: '/news' },
-						{ label: 'Contributing', to: '/contributing' },
-						{ label: 'Partners', to: '/partners' },
+						{ label: 'Contributing', to: '/about#contribute' },
+						{ label: 'Submit a tip', to: '/tip' },
+						{ label: 'Contact us', to: '/about#contact' },
 					]}
 					isActive={isActive('/about')}
-				/>
-
-				<Dropdown
-					label="Support"
-					items={[
-						{ label: 'Submit a tip', to: '/tip' },
-						{ label: 'Contact', to: '/contact' },
-						{ label: 'FAQ', to: '/faq' },
-					]}
-					isActive={isActive('/support')}
 				/>
 			</div>
 

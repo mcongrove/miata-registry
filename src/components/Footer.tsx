@@ -157,7 +157,7 @@ export const Footer = () => {
 								</li>
 								<li>
 									<Link
-										to="/contact"
+										to="/about#contact"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
 										Contact
