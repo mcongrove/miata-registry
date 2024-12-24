@@ -23,10 +23,13 @@ import {
 	query,
 	limit,
 	QueryConstraint,
-	DocumentReference,
 	doc,
 	getCountFromServer,
 	where,
+	orderBy,
+	startAfter,
+	QueryLimitConstraint,
+	QueryStartAtConstraint,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Car } from '../types/Car';
@@ -96,124 +99,72 @@ export const getCars = async ({
 }: CarQueryParams = {}): Promise<{ cars: Car[]; total: number }> => {
 	try {
 		const carsRef = collection(db, 'cars');
-		const constraints: QueryConstraint[] = [limit(pageSize)];
+		const constraints: QueryConstraint[] = [];
 
-		// Create query with basic constraints
-		const q = query(carsRef, ...constraints);
-		const snapshot = await getDocs(q);
-
-		// Fetch edition and owner data for each car
-		const cars = await Promise.all(
-			snapshot.docs.map(async (doc) => {
-				const carData = doc.data();
-
-				if (!carData.editionId) {
-					console.warn(`Car ${doc.id} has no editionId`);
-					return null;
-				}
-
-				try {
-					const editionDoc = await getDoc(
-						carData.editionId as DocumentReference
+		// Add filters to query constraints
+		filters.forEach((filter) => {
+			switch (filter.type) {
+				case 'generation':
+					constraints.push(
+						where('edition.generation', '==', filter.value)
 					);
-					if (!editionDoc.exists()) {
-						console.warn(`Edition not found for car ${doc.id}`);
-						return null;
-					}
-
-					let ownerData = null;
-					if (carData.ownerId) {
-						const ownerDoc = await getDoc(
-							carData.ownerId as DocumentReference
-						);
-						if (ownerDoc.exists()) {
-							ownerData = ownerDoc.data() as Owner;
-						}
-					}
-
-					return {
-						...carData,
-						id: doc.id,
-						edition: editionDoc.data() as Edition,
-						owner: ownerData,
-					} as Car;
-				} catch (error) {
-					console.error(
-						`Error fetching related data for car ${doc.id}:`,
-						error
+					break;
+				case 'year':
+					constraints.push(
+						where('edition.year', '==', parseInt(filter.value))
 					);
-					return null;
+					break;
+				case 'country':
+					constraints.push(
+						where('owner.location.country', '==', filter.value)
+					);
+					break;
+				case 'edition': {
+					const [year, ...nameParts] = filter.value.split(' ');
+					const name = nameParts.join(' ');
+					constraints.push(
+						where('edition.year', '==', parseInt(year))
+					);
+					constraints.push(where('edition.name', '==', name));
+					break;
 				}
-			})
-		);
-
-		// Filter out any null results
-		let validCars = cars.filter((car): car is Car => car !== null);
-
-		// Apply filters in memory
-		if (filters.length > 0) {
-			validCars = validCars.filter((car) => {
-				return filters.every((filter) => {
-					switch (filter.type) {
-						case 'generation':
-							return car.edition.generation === filter.value;
-						case 'year':
-							return car.edition.year === parseInt(filter.value);
-						case 'country':
-							return (
-								car.owner?.location?.country === filter.value
-							);
-						case 'edition': {
-							const [year, ...nameParts] =
-								filter.value.split(' ');
-							const name = nameParts.join(' ');
-							return (
-								car.edition.year === parseInt(year) &&
-								car.edition.name === name
-							);
-						}
-						default:
-							return true;
-					}
-				});
-			});
-		}
-
-		// Sort the results in memory
-		validCars.sort((a, b) => {
-			switch (sortColumn) {
-				case 'edition.year':
-					return sortDirection === 'asc'
-						? a.edition.year - b.edition.year
-						: b.edition.year - a.edition.year;
-				case 'edition.name':
-					return sortDirection === 'asc'
-						? a.edition.name.localeCompare(b.edition.name)
-						: b.edition.name.localeCompare(a.edition.name);
-				default:
-					return 0;
 			}
 		});
 
-		// Apply pagination in memory
-		const startIndex = (page - 1) * pageSize;
-		const paginatedCars = validCars.slice(
-			startIndex,
-			startIndex + pageSize
-		);
+		// Add sorting
+		const sortField = sortColumn.replace('.', '.'); // e.g., 'edition.year' stays as is
+		constraints.push(orderBy(sortField, sortDirection));
 
-		// Log for debugging
-		console.log('Query results:', {
-			filters,
-			totalFetched: snapshot.size,
-			afterFilters: validCars.length,
-			afterPagination: paginatedCars.length,
-			firstCar: paginatedCars[0],
-		});
+		// Add pagination
+		const startAt = (page - 1) * pageSize;
+		constraints.push(startAfter(startAt));
+		constraints.push(limit(pageSize));
+
+		// Create and execute query
+		const q = query(carsRef, ...constraints);
+		const [snapshot, totalSnapshot] = await Promise.all([
+			getDocs(q),
+			getCountFromServer(
+				query(
+					carsRef,
+					...constraints.filter(
+						(c) =>
+							// Remove pagination constraints for total count using correct types
+							!(c instanceof QueryStartAtConstraint) &&
+							!(c instanceof QueryLimitConstraint)
+					)
+				)
+			),
+		]);
+
+		const cars = snapshot.docs.map((doc) => ({
+			...doc.data(),
+			id: doc.id,
+		})) as Car[];
 
 		return {
-			cars: paginatedCars,
-			total: validCars.length,
+			cars,
+			total: totalSnapshot.data().count,
 		};
 	} catch (error) {
 		console.error('Error fetching cars:', error);
@@ -270,9 +221,11 @@ export const getVinDetails = async (vin: string, year: number) => {
 		if (data.Results?.[0]) {
 			return data.Results[0];
 		}
+
 		return null;
 	} catch (error) {
 		console.error('Error fetching VIN details:', error);
+
 		return null;
 	}
 };
