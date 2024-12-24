@@ -16,28 +16,62 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
+import { getEditionStats } from '../../api/Edition';
 
 type EditionStatsProps = {
-	totalProduced?: number;
+	produced?: number;
+	id: string;
 	showText?: boolean;
 };
 
 export const EditionStats = ({
-	totalProduced = 0,
+	produced = 0,
+	id,
 	showText = true,
 }: EditionStatsProps) => {
-	const stats = useMemo(() => {
-		const totalInRegistry = Math.floor(totalProduced * 0.6);
-		const totalClaimed = Math.floor(totalInRegistry * 0.4);
+	const [stats, setStats] = useState({
+		claimed: 0,
+		inRegistry: 0,
+		registeredPercentage: 0,
+		claimedPercentage: 0,
+	});
+	const [isLoading, setIsLoading] = useState(true);
 
-		return {
-			totalClaimed,
-			totalInRegistry,
-			registeredPercentage: (totalInRegistry / totalProduced) * 100,
-			claimedPercentage: (totalClaimed / totalInRegistry) * 100,
+	useEffect(() => {
+		const loadStats = async () => {
+			try {
+				const editionStats = await getEditionStats(id);
+
+				setStats({
+					claimed: editionStats.claimed,
+					inRegistry: editionStats.inRegistry,
+					registeredPercentage:
+						(editionStats.inRegistry / produced) * 100,
+					claimedPercentage:
+						(editionStats.claimed / editionStats.inRegistry) * 100,
+				});
+			} catch (error) {
+				console.error('Error loading edition stats:', error);
+			} finally {
+				setIsLoading(false);
+			}
 		};
-	}, [totalProduced]);
+
+		if (id) {
+			loadStats();
+		}
+	}, [id, produced]);
+
+	if (isLoading) {
+		return (
+			<div className="w-full">
+				<div className="text-sm text-brg-mid space-y-2">
+					<div className="w-full h-2 bg-brg-light rounded-full animate-pulse" />
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="w-full">
@@ -46,23 +80,21 @@ export const EditionStats = ({
 					<div className="flex justify-between text-xs">
 						<span>
 							<span className="font-bold">
-								{stats.totalClaimed.toLocaleString()}
+								{stats.claimed.toLocaleString()}
 							</span>{' '}
 							Claimed
 						</span>
 
 						<span>
 							<span className="font-bold">
-								{(
-									stats.totalInRegistry - stats.totalClaimed
-								).toLocaleString()}
+								{stats.inRegistry.toLocaleString()}
 							</span>{' '}
 							in Registry
 						</span>
 
 						<span>
 							<span className="font-bold">
-								{totalProduced.toLocaleString()}
+								{produced.toLocaleString()}
 							</span>{' '}
 							Produced
 						</span>
@@ -75,12 +107,14 @@ export const EditionStats = ({
 							className="bg-brg-mid h-full"
 							style={{ width: `${stats.claimedPercentage}%` }}
 						/>
+
 						<div
 							className="bg-brg-border h-full"
 							style={{
 								width: `${stats.registeredPercentage - stats.claimedPercentage}%`,
 							}}
 						/>
+
 						<div
 							className="bg-brg-light h-full"
 							style={{

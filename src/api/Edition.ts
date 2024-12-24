@@ -16,7 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { collection, getDocs } from 'firebase/firestore';
+import {
+	collection,
+	doc,
+	getCountFromServer,
+	getDocs,
+	query,
+	where,
+} from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Edition } from '../types/Edition';
 
@@ -34,6 +41,40 @@ export const getEditions = async (): Promise<Edition[]> => {
 		);
 	} catch (error) {
 		console.error('Error fetching editions:', error);
+
+		throw error;
+	}
+};
+
+export const getEditionStats = async (id: string) => {
+	try {
+		const editionRef = doc(db, 'editions', id);
+
+		const registeredQuery = query(
+			collection(db, 'cars'),
+			where('editionId', '==', editionRef)
+		);
+
+		const registeredSnapshot = await getCountFromServer(registeredQuery);
+
+		const totalInRegistry = registeredSnapshot.data().count;
+
+		const claimedQuery = query(
+			collection(db, 'cars'),
+			where('editionId', '==', editionRef),
+			where('ownerId', '!=', '')
+		);
+
+		const claimedSnapshot = await getCountFromServer(claimedQuery);
+
+		const totalClaimed = claimedSnapshot.data().count;
+
+		return {
+			inRegistry: totalInRegistry,
+			claimed: totalClaimed,
+		};
+	} catch (error) {
+		console.error('Error getting edition stats:', error);
 
 		throw error;
 	}

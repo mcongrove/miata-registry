@@ -27,26 +27,26 @@ type EditionCardProps = {
 
 export const EditionCard = ({ edition }: EditionCardProps) => {
 	return (
-		<Link
-			to={`/registry?filter=edition:${encodeURIComponent(edition.name)}`}
-			className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light"
-		>
+		<div className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light">
 			{edition.image && (
 				<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
-					<img
-						src={edition.image}
-						alt={edition.name}
-						className="w-full h-full object-cover"
-						loading="lazy"
-					/>
+					<Link
+						to={`/registry?filter=${encodeURIComponent(
+							`edition:${edition.year} ${edition.name}`
+						).replace(/%20/g, '+')}`}
+					>
+						<img
+							src={edition.image}
+							alt={edition.name}
+							className="w-full h-full object-cover"
+							loading="lazy"
+						/>
+					</Link>
 
-					{edition.imageCredit && (
+					{edition.imageCarId && (
 						<div className="absolute bottom-4 right-4">
 							<Credit
-								car={edition.imageCredit.car}
-								number={edition.imageCredit.number}
-								owner={edition.imageCredit.owner}
-								id={edition.imageCredit.id}
+								id={edition.imageCarId.id}
 								direction="left"
 							/>
 						</div>
@@ -54,7 +54,12 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 				</div>
 			)}
 
-			<div className="flex flex-col gap-4 p-4">
+			<Link
+				to={`/registry?filter=${encodeURIComponent(
+					`edition:${edition.year} ${edition.name}`
+				).replace(/%20/g, '+')}`}
+				className="flex flex-col gap-4 p-4"
+			>
 				<div className="flex flex-col">
 					<p className="text-xs text-brg-mid">
 						{edition.year} {edition.generation}
@@ -67,8 +72,11 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 					<p className="text-xs text-brg-mid">{edition.color}</p>
 				</div>
 
-				<EditionStats totalProduced={edition.totalProduced} />
-			</div>
-		</Link>
+				<EditionStats
+					id={edition.id}
+					produced={edition.totalProduced}
+				/>
+			</Link>
+		</div>
 	);
 };

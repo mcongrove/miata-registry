@@ -16,12 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useEffect, useState } from 'react';
 import { EditionCard } from '../components/editions/EditionCard';
-import sampleEditions from '../data/sampleEditions.json';
+import { getEditions } from '../api/Edition';
+import { Edition } from '../types/Edition';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export const Editions = () => {
+	const [editions, setEditions] = useState<Edition[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
 	usePageTitle('Editions');
+
+	useEffect(() => {
+		const loadEditions = async () => {
+			try {
+				const editionsData = await getEditions();
+
+				setEditions(editionsData);
+			} catch (error) {
+				console.error('Error loading editions:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		loadEditions();
+	}, []);
 
 	return (
 		<main className="flex-1 pt-20">
@@ -31,9 +52,25 @@ export const Editions = () => {
 				</h1>
 
 				<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-					{sampleEditions.map((edition) => (
-						<EditionCard key={edition.id} edition={edition} />
-					))}
+					{isLoading ? (
+						<>
+							{[...Array(4)].map((_, index) => (
+								<div
+									key={index}
+									className="bg-brg-light rounded-lg h-80 animate-pulse"
+								/>
+							))}
+						</>
+					) : (
+						<>
+							{editions.map((edition) => (
+								<EditionCard
+									key={edition.id}
+									edition={edition}
+								/>
+							))}
+						</>
+					)}
 				</div>
 			</div>
 		</main>

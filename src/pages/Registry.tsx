@@ -161,12 +161,6 @@ export const Registry = () => {
 						{activeFilters.length > 0 && (
 							<div className="mb-3 flex gap-2 flex-wrap">
 								{activeFilters.map((filter) => {
-									console.log('Filter:', {
-										type: filter.type,
-										value: filter.value,
-										valueType: typeof filter.value,
-									});
-
 									// Format the filter value for display
 									const displayValue = filter.value;
 
