@@ -25,6 +25,7 @@ interface PaginationControlsProps {
 	onPageChange: (page: number) => void;
 	totalItems: number;
 	itemsPerPage: number;
+	isLoading?: boolean;
 }
 
 export const PaginationControls = ({
@@ -34,25 +35,45 @@ export const PaginationControls = ({
 	onPageChange,
 	totalItems,
 	itemsPerPage,
+	isLoading = false,
 }: PaginationControlsProps) => {
 	const start = (currentPage - 1) * itemsPerPage + 1;
 	const end = Math.min(currentPage * itemsPerPage, totalItems);
 
-	const pageOptions = [...Array(totalPages)].map((_, i) => ({
-		value: i + 1,
-		label: String(i + 1),
-	}));
+	const pageOptions =
+		totalPages === 0
+			? [{ value: 1, label: '1' }]
+			: [...Array(totalPages)].map((_, i) => ({
+					value: i + 1,
+					label: String(i + 1),
+				}));
 
 	return (
-		<div className="flex justify-between items-center text-sm">
+		<div
+			className={`flex justify-between items-center text-sm ${
+				isLoading ? 'opacity-50 pointer-events-none' : ''
+			}`}
+		>
 			<div className="text-brg-mid text-xs">
-				Showing{' '}
-				<span className="font-semibold">{start.toLocaleString()}</span>-
-				<span className="font-semibold">{end.toLocaleString()}</span> of{' '}
-				<span className="font-semibold">
-					{totalItems.toLocaleString()}
-				</span>
-				{hasFilters ? ' matches' : ' total cars'}
+				{totalItems > 0 ? (
+					<>
+						Showing{' '}
+						<span className="font-semibold">
+							{start.toLocaleString()}
+						</span>
+						-
+						<span className="font-semibold">
+							{end.toLocaleString()}
+						</span>{' '}
+						of{' '}
+						<span className="font-semibold">
+							{totalItems.toLocaleString()}
+						</span>
+						{hasFilters ? ' matches' : ' total cars'}
+					</>
+				) : (
+					'Showing 0 matches'
+				)}
 			</div>
 
 			<div className="flex gap-1 items-stretch">
@@ -80,7 +101,7 @@ export const PaginationControls = ({
 				<div className="w-16">
 					<Select
 						value={currentPage}
-						disabled={totalPages === 1}
+						disabled={totalPages <= 1}
 						className="disabled:opacity-30 disabled:cursor-not-allowed"
 						onChange={(value) => {
 							const newPage = Number(value);
@@ -96,7 +117,7 @@ export const PaginationControls = ({
 				<button
 					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-brg-light disabled:opacity-30 disabled:cursor-not-allowed"
 					onClick={() => onPageChange(currentPage + 1)}
-					disabled={currentPage === totalPages}
+					disabled={currentPage === totalPages || totalPages <= 1}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

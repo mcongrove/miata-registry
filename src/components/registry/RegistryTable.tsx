@@ -25,6 +25,7 @@ interface RegistryTableProps {
 	sortColumn: string;
 	sortDirection: 'asc' | 'desc';
 	onSort: (column: string) => void;
+	isLoading: boolean;
 }
 
 export const RegistryTable = ({
@@ -32,17 +33,18 @@ export const RegistryTable = ({
 	sortColumn,
 	sortDirection,
 	onSort,
+	isLoading = false,
 }: RegistryTableProps) => {
 	const navigate = useNavigate();
 
 	const columns = [
-		{ header: 'Year', key: 'edition.year' },
-		{ header: 'Gen.', key: 'edition.generation' },
-		{ header: 'Edition', key: 'edition.name' },
-		{ header: 'Color', key: 'color' },
-		{ header: 'Sequence #', key: 'sequence' },
-		{ header: 'Owner', key: 'owner.name' },
-		{ header: 'Country', key: 'location.country' },
+		{ header: 'Year', key: 'edition.year', width: 'w-20' },
+		{ header: 'Gen.', key: 'edition.generation', width: 'w-20' },
+		{ header: 'Edition', key: 'edition.name', width: 'w-44' },
+		{ header: 'Color', key: 'color', width: 'w-52' },
+		{ header: 'Sequence #', key: 'sequence', width: 'w-36' },
+		{ header: 'Owner', key: 'owner.name', width: 'w-44' },
+		{ header: 'Country', key: 'location.country', width: 'w-40' },
 	];
 
 	const handleSort = (key: string) => (e: React.MouseEvent) => {
@@ -56,10 +58,10 @@ export const RegistryTable = ({
 				<table className="min-w-full border-collapse">
 					<thead>
 						<tr className="bg-brg-light sticky top-0 z-10">
-							{columns.map(({ header, key }) => (
+							{columns.map(({ header, key, width }) => (
 								<th
 									key={header}
-									className="px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light"
+									className={`${width} px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light`}
 									onClick={handleSort(key)}
 								>
 									<div className="flex items-center">
@@ -82,97 +84,121 @@ export const RegistryTable = ({
 					</thead>
 
 					<tbody className="divide-y divide-brg-light text-xs">
-						{cars.map((car) => (
-							<tr
-								key={car.id}
-								className="bg-white hover:bg-brg-light/25 transition-colors cursor-pointer"
-								onClick={(e) => {
-									if (
-										!(e.target as HTMLElement).closest('a')
-									) {
-										if (e.metaKey || e.ctrlKey) {
-											window.open(
-												`/registry/${car.id}`,
-												'_blank'
-											);
-										} else {
-											navigate(`/registry/${car.id}`);
-										}
-									}
-								}}
-							>
-								<td className="w-20 px-4 py-3 whitespace-nowrap font-mono">
-									<div className="pointer-events-auto">
-										{car.edition.year}
-									</div>
-								</td>
-								<td className="w-20 px-4 py-3 whitespace-nowrap">
-									{car.edition.generation}
-								</td>
-								<td className="w-52 px-4 py-3 whitespace-nowrap">
-									{car.edition.name}
-								</td>
-								<td className="w-52 px-4 py-3 whitespace-nowrap">
-									<div className="flex items-center gap-2">
-										<span
-											className="w-4 h-3 rounded-sm inline-block"
-											style={{
-												backgroundColor:
-													colorMap[
-														car.color?.toLowerCase() ||
-															''
-													] || '#DDD',
-											}}
-										/>
-										{car.color}
-									</div>
-								</td>
-								<td className="w-52 flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
-									{car.sequence && (
-										<>
-											{car.sequence.toLocaleString()}
-											{car.edition.totalProduced && (
-												<span className="text-brg-border">
-													of{' '}
-													{car.edition.totalProduced.toLocaleString()}
-												</span>
-											)}
-										</>
-									)}
-								</td>
-								<td className="px-4 py-3 whitespace-nowrap">
-									{car.owner ? (
-										<Link
-											to={`/owner/${car.owner.id}`}
-											className="hover:underline relative z-0"
-										>
-											{car.owner.name}
-										</Link>
-									) : (
-										<Link
-											to={`/claim/${car.id}`}
-											className="text-brg-border hover:text-brg hover:underline relative z-0"
-										>
-											Claim
-										</Link>
-									)}
-								</td>
-								<td className="px-4 py-3 whitespace-nowrap">
-									{car.owner.location && (
-										<span className="flex items-center gap-2">
-											<img
-												src={`https://flagcdn.com/16x12/${car.owner.location.country.toLowerCase()}.png`}
-												alt={`${car.owner.location.country} flag`}
-												className="w-4 h-3"
-											/>
-											{new Intl.DisplayNames(['en'], {
-												type: 'region',
-											}).of(car.owner.location.country)}
-										</span>
-									)}
+						{isLoading ? (
+							<tr>
+								<td
+									colSpan={columns.length}
+									className="px-4 py-3 text-xs text-brg-border"
+								>
+									Loading...
 								</td>
 							</tr>
-						))}
+						) : cars.length === 0 ? (
+							<tr>
+								<td
+									colSpan={columns.length}
+									className="px-4 py-3 text-xs text-brg-mid"
+								>
+									No matches found
+								</td>
+							</tr>
+						) : (
+							cars.map((car) => (
+								<tr
+									key={car.id}
+									className="bg-white hover:bg-brg-light/25 transition-colors cursor-pointer"
+									onClick={(e) => {
+										if (
+											!(e.target as HTMLElement).closest(
+												'a'
+											)
+										) {
+											if (e.metaKey || e.ctrlKey) {
+												window.open(
+													`/registry/${car.id}`,
+													'_blank'
+												);
+											} else {
+												navigate(`/registry/${car.id}`);
+											}
+										}
+									}}
+								>
+									<td className="px-4 py-3 whitespace-nowrap font-mono">
+										<div className="pointer-events-auto">
+											{car.edition.year}
+										</div>
+									</td>
+									<td className="px-4 py-3 whitespace-nowrap">
+										{car.edition.generation}
+									</td>
+									<td className="px-4 py-3 whitespace-nowrap">
+										{car.edition.name}
+									</td>
+									<td className="px-4 py-3 whitespace-nowrap">
+										<div className="flex items-center gap-2">
+											<span
+												className="w-4 h-3 rounded-sm inline-block"
+												style={{
+													backgroundColor:
+														colorMap[
+															car.color?.toLowerCase() ||
+																''
+														] || '#DDD',
+												}}
+											/>
+											{car.color}
+										</div>
+									</td>
+									<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
+										{car.sequence && (
+											<>
+												{car.sequence.toLocaleString()}
+												{car.edition.totalProduced && (
+													<span className="text-brg-border">
+														of{' '}
+														{car.edition.totalProduced.toLocaleString()}
+													</span>
+												)}
+											</>
+										)}
+									</td>
+									<td className="px-4 py-3 whitespace-nowrap">
+										{car.owner ? (
+											<Link
+												to={`/owner/${car.owner.id}`}
+												className="hover:underline relative z-0"
+											>
+												{car.owner.name}
+											</Link>
+										) : (
+											<Link
+												to={`/claim/${car.id}`}
+												className="text-brg-border hover:text-brg hover:underline relative z-0"
+											>
+												Claim
+											</Link>
+										)}
+									</td>
+									<td className="px-4 py-3 whitespace-nowrap">
+										{car.owner.location && (
+											<span className="flex items-center gap-2">
+												<img
+													src={`https://flagcdn.com/16x12/${car.owner.location.country.toLowerCase()}.png`}
+													alt={`${car.owner.location.country} flag`}
+													className="w-4 h-3"
+												/>
+												{new Intl.DisplayNames(['en'], {
+													type: 'region',
+												}).of(
+													car.owner.location.country
+												)}
+											</span>
+										)}
+									</td>
+								</tr>
+							))
+						)}
 					</tbody>
 				</table>
 			</div>

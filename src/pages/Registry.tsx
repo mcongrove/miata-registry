@@ -70,13 +70,15 @@ export const Registry = () => {
 
 	useEffect(() => {
 		const loadCars = async () => {
+			setIsLoading(true);
+
 			try {
-				setIsLoading(true);
 				const carsData = await getCars({
 					filters: activeFilters,
 					sortColumn,
 					sortDirection,
 				});
+
 				setCars(carsData.cars);
 			} catch (error) {
 				console.error('Error loading cars:', error);
@@ -222,6 +224,7 @@ export const Registry = () => {
 							totalItems={totalItems}
 							itemsPerPage={itemsPerPage}
 							hasFilters={activeFilters.length > 0}
+							isLoading={isLoading}
 						/>
 
 						<div className="flex-1 my-3">
@@ -230,6 +233,7 @@ export const Registry = () => {
 								sortColumn={sortColumn}
 								sortDirection={sortDirection}
 								onSort={handleSort}
+								isLoading={isLoading}
 							/>
 						</div>
 
@@ -243,6 +247,7 @@ export const Registry = () => {
 							totalItems={totalItems}
 							itemsPerPage={itemsPerPage}
 							hasFilters={activeFilters.length > 0}
+							isLoading={isLoading}
 						/>
 					</div>
 				</div>
