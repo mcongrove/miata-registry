@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Chip } from '../components/Chip';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
@@ -54,6 +54,23 @@ export const Registry = () => {
 		// Otherwise, always use 'asc' since we're defaulting to year
 		return 'asc';
 	});
+
+	const [searchInputRef, setSearchInputRef] =
+		useState<HTMLInputElement | null>(null);
+
+	useEffect(() => {
+		if (window.location.hash === '#search' && searchInputRef) {
+			setTimeout(() => {
+				searchInputRef.focus();
+
+				history.pushState(
+					'',
+					document.title,
+					window.location.pathname + window.location.search
+				);
+			}, 0);
+		}
+	}, [searchInputRef]);
 
 	const updateSearchParams = (
 		updates: Record<string, string | string[] | null>
@@ -180,6 +197,7 @@ export const Registry = () => {
 					<div className="flex-1 flex flex-col">
 						<div className="relative max-w-80">
 							<input
+								ref={setSearchInputRef}
 								type="text"
 								placeholder="Search..."
 								className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-3 focus:outline-none placeholder:text-brg-mid/70 pr-8"

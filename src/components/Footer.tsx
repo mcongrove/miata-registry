@@ -124,7 +124,7 @@ export const Footer = () => {
 								</li>
 								<li>
 									<Link
-										to="/registry?search"
+										to="/registry#search"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
 										Search
@@ -185,15 +185,35 @@ export const Footer = () => {
 				</div>
 
 				<div className="border-t border-white/10 pt-8">
-					<p className="text-sm text-brg-mid text-center">
-						© {new Date().getFullYear()} Matthew Congrove.{' '}
+					<p className="text-sm text-brg-mid/60 text-center">
+						© {new Date().getFullYear()}{' '}
+						<a
+							href="https://mattcongrove.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-brg-mid"
+						>
+							Matthew Congrove
+						</a>
+						.{' '}
 						<a
 							href="https://github.com/mcongrove/miata-registry"
-							className="underline"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-brg-mid"
 						>
 							Source code
 						</a>{' '}
-						licensed under AGPL-3. All other rights reserved.
+						licensed under{' '}
+						<a
+							href="https://github.com/mcongrove/miata-registry/blob/main/LICENSE"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-brg-mid"
+						>
+							AGPL-3
+						</a>
+						. All other rights reserved.
 					</p>
 				</div>
 			</div>

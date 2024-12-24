@@ -113,7 +113,7 @@ export const Header = () => {
 					label="About"
 					items={[
 						{ label: 'About the Registry', to: '/about' },
-						{ label: 'News', to: '/news' },
+						// { label: 'News', to: '/news' },
 						{ label: 'Contributing', to: '/about#contribute' },
 						{ label: 'Submit a tip', to: '/tip' },
 						{ label: 'Contact us', to: '/about#contact' },

@@ -16,7 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom';
+import {
+	BrowserRouter,
+	Outlet,
+	Route,
+	Routes,
+	useLocation,
+} from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { Editions } from './pages/Editions';
@@ -24,10 +30,22 @@ import { Home } from './pages/Home';
 import { Registry } from './pages/Registry';
 import { CarProfile } from './pages/Car';
 import { About } from './pages/About';
+import { useEffect } from 'react';
+
+function ScrollToTop() {
+	const { pathname } = useLocation();
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
+
+	return null;
+}
 
 function Layout() {
 	return (
 		<div className="min-h-screen flex flex-col">
+			<ScrollToTop />
 			<Header />
 			<Outlet />
 			<Footer />

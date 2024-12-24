@@ -50,12 +50,14 @@ export const About = () => {
 		const hash = location.hash.replace('#', '');
 
 		if (hash) {
+			history.pushState('', document.title, window.location.pathname);
+
 			setHighlightedSection(hash);
 
 			const element = document.getElementById(hash);
 
 			if (element) {
-				element.scrollIntoView({ behavior: 'smooth' });
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
 
 			setTimeout(() => setHighlightedSection(null), 500);
