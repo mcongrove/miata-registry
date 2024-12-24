@@ -17,7 +17,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { TextField } from '../components/form/TextField';
 
 const getCommitCount = async (owner: string, repo: string) => {
@@ -107,15 +107,15 @@ export const About = () => {
 
 						<p className="text-md text-brg-mid">
 							The Miata Registry was created at the end of 2024 by
-							Matthew Congrove, a Miata enthusiast and software
-							engineer who owns 1991 BRG #182. After researching
-							and documenting limited edition Miatas across
-							forums, social media, and car shows, he recognized
-							the need for a centralized database to preserve the
-							history of these special cars. The registry combines
-							his passion for Miatas with modern web technology to
-							create an accessible, open source resource for the
-							global Miata community.
+							Matthew Congrove, a Miata enthusiast, software
+							engineer, and owner of 1991 BRG #182. After
+							researching and documenting limited edition Miatas
+							across forums, social media, and car shows, he
+							recognized the need for a centralized database to
+							preserve the history of these special cars. The
+							registry combines his passion for Miatas with modern
+							web technology to create an accessible, open source
+							resource for the global Miata community.
 						</p>
 					</div>
 				</div>
@@ -124,17 +124,20 @@ export const About = () => {
 					<div className="relative h-[544px] w-[544px]">
 						<img
 							src="/images/cars/pexels-chris-black-78566801-8837309.jpg"
-							className="absolute right-60 top-0 size-64 rounded-lg object-cover shadow-xl"
+							className="absolute right-60 top-0 size-64 rounded-lg object-cover shadow-xl bg-brg-light"
+							loading="lazy"
 						/>
 
 						<img
 							src="/images/cars/pexels-hoodzie-11401673.jpg"
-							className="absolute right-0 top-24 size-72 rounded-lg object-cover shadow-xl"
+							className="absolute right-0 top-24 size-72 rounded-lg object-cover shadow-xl bg-brg-light"
+							loading="lazy"
 						/>
 
 						<img
 							src="/images/cars/pexels-michalrobak-28577510.jpg"
-							className="absolute right-40 top-72 w-96 h-64 rounded-lg object-cover shadow-xl"
+							className="absolute right-40 top-72 w-96 h-64 rounded-lg object-cover shadow-xl bg-brg-light"
+							loading="lazy"
 						/>
 					</div>
 				</div>
@@ -278,14 +281,17 @@ export const About = () => {
 							the Miata Registry. If you own a limited edition
 							Miata, you can create an account and claim your
 							vehicle by providing documentation and photos. Know
-							of other limited edition Miatas in your area? Submit
-							a tip through our form and our verification team
-							will follow up. For developers interested in
-							improving the platform itself, our codebase is open
-							source on GitHub and we welcome pull requests. Every
-							contribution, whether it's registering your own car
-							or helping verify others, makes the registry a more
-							valuable resource for the entire Miata community.
+							of other limited edition Miatas in your area?{' '}
+							<Link to="/tip" className="underline">
+								Submit a tip
+							</Link>{' '}
+							and our verification team will follow up. For
+							developers interested in improving the platform
+							itself, our codebase is open source on GitHub and we
+							welcome pull requests. Every contribution, whether
+							it's registering your own car or helping verify
+							others, makes the registry a more valuable resource
+							for the entire Miata community.
 						</p>
 					</div>
 

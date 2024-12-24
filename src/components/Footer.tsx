@@ -165,18 +165,10 @@ export const Footer = () => {
 								</li>
 								<li>
 									<Link
-										to="/privacy"
+										to="/legal"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
-										Privacy Policy
-									</Link>
-								</li>
-								<li>
-									<Link
-										to="/terms"
-										className="text-brg-mid hover:text-brg-light transition-colors"
-									>
-										Terms of Service
+										Legal
 									</Link>
 								</li>
 							</ul>
@@ -206,7 +198,7 @@ export const Footer = () => {
 						</a>{' '}
 						licensed under{' '}
 						<a
-							href="https://github.com/mcongrove/miata-registry/blob/main/LICENSE"
+							href="https://www.gnu.org/licenses/agpl-3.0.en.html"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-brg-mid"

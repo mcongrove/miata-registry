@@ -30,6 +30,7 @@ import { Home } from './pages/Home';
 import { Registry } from './pages/Registry';
 import { CarProfile } from './pages/Car';
 import { About } from './pages/About';
+import { Legal } from './pages/Legal';
 import { useEffect } from 'react';
 
 function ScrollToTop() {
@@ -63,6 +64,7 @@ function App() {
 					<Route path="/registry/editions" element={<Editions />} />
 					<Route path="/registry/:id" element={<CarProfile />} />
 					<Route path="/about" element={<About />} />
+					<Route path="/legal" element={<Legal />} />
 				</Route>
 			</Routes>
 		</BrowserRouter>
