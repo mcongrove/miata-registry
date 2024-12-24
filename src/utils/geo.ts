@@ -25,9 +25,13 @@ export const countryCodeMap: { [key: string]: string } = {
 };
 
 export const formatLocation = (
-	location: Location,
+	location?: Location,
 	short: boolean = false
 ): string => {
+	if (!location) {
+		return '';
+	}
+
 	const parts: string[] = [];
 
 	if (!short && location.city) {

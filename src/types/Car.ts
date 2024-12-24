@@ -45,7 +45,7 @@ export type Car = {
 	sequence?: number;
 	shipping?: {
 		date?: string;
-		port?: string;
+		location?: Location;
 		vessel?: string;
 	};
 	vin?: string;

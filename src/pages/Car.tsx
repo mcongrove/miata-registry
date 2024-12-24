@@ -30,8 +30,9 @@ import {
 	formatPlantLocation,
 	getVinDetails,
 } from '../api/Car';
+import { formatLocation } from '../utils/geo';
 
-interface Location {
+interface MapLocation {
 	name: string;
 	address: string;
 }
@@ -79,9 +80,7 @@ export const CarProfile = () => {
 			items.push({
 				name: car.owner.name || 'Unknown',
 				dateRange: `${car.owner.dateStart ? toPrettyDate(car.owner.dateStart) : ''} – ${car.owner.dateEnd ? toPrettyDate(car.owner.dateEnd) : 'Present'}`,
-				location: car.location
-					? `${car.location.city}, ${car.location.state}, ${car.location.country}`
-					: undefined,
+				location: formatLocation(car.location),
 				isActive: true,
 			});
 		}
@@ -110,9 +109,7 @@ export const CarProfile = () => {
 			items.push({
 				name: car.sale.dealer.name,
 				dateRange: toPrettyDate(car.sale.date || ''),
-				location: car.sale.dealer.location
-					? `${car.sale.dealer.location.city}, ${car.sale.dealer.location.state}, ${car.sale.dealer.location.country}`
-					: undefined,
+				location: formatLocation(car.sale.dealer.location),
 			});
 		}
 
@@ -130,15 +127,13 @@ export const CarProfile = () => {
 					'Shipped'
 				),
 				dateRange: toPrettyDate(car.shipping.date || ''),
-				location: car.shipping.port
-					? `Port of ${toTitleCase(car.shipping.port)}`
-					: undefined,
+				location: formatLocation(car.shipping.location),
 			});
 		}
 
 		// Factory
-		const plantLocation = car.manufacture?.location?.city
-			? `${car.manufacture.location.city}, ${car.manufacture.location.country}`
+		const plantLocation = car.manufacture?.location
+			? formatLocation(car.manufacture.location)
 			: formatPlantLocation(vinDetails);
 
 		if (plantLocation) {
@@ -346,20 +341,9 @@ export const CarProfile = () => {
 
 											{car.sale.dealer.location && (
 												<p className="text-xs text-brg-mid">
-													{
+													{formatLocation(
 														car.sale.dealer.location
-															?.city
-													}
-													,{' '}
-													{
-														car.sale.dealer.location
-															?.state
-													}
-													,{' '}
-													{
-														car.sale.dealer.location
-															?.country
-													}
+													)}
 												</p>
 											)}
 										</div>
@@ -400,17 +384,26 @@ export const CarProfile = () => {
 														vinDetails
 													),
 											},
-											car.shipping?.port
+											car.shipping?.location
 												? {
-														name: `Port of ${toTitleCase(car.shipping.port)}`,
-														address: `Port of ${toTitleCase(car.shipping.port)}`,
+														name: formatLocation(
+															car.shipping
+																.location
+														),
+														address: formatLocation(
+															car.shipping
+																.location
+														),
 													}
 												: null,
 											car.sale?.dealer?.location
 												? {
 														name: car.sale.dealer
 															.name,
-														address: `${car.sale.dealer.location.city}, ${car.sale.dealer.location.state}, ${car.sale.dealer.location.country}`,
+														address: formatLocation(
+															car.sale.dealer
+																.location
+														),
 													}
 												: null,
 											{
@@ -426,11 +419,17 @@ export const CarProfile = () => {
 												address: 'Georgetown, TX, US',
 											},
 											{
-												name: `${car.location?.city}, ${car.location?.state}`,
-												address: `${car.location?.city}, ${car.location?.state}, ${car.location?.country}`,
+												name: formatLocation(
+													car.location
+												),
+												address: formatLocation(
+													car.location
+												),
 											},
 										].filter(
-											(location): location is Location =>
+											(
+												location
+											): location is MapLocation =>
 												location !== null
 										)}
 									/>
@@ -446,11 +445,15 @@ export const CarProfile = () => {
 											<p className="font-medium text-lg">
 												{car.location.city}
 											</p>
+
 											<p className="text-brg-mid">
-												{car.location.state},{' '}
-												{car.location.country}
+												{formatLocation(
+													car.location,
+													true
+												)}
 											</p>
 										</div>
+
 										<svg
 											className="w-5 h-5 text-brg-mid"
 											fill="none"
