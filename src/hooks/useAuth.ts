@@ -16,8 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+import { User } from '../types/User';
 
 export function useAuth() {
 	const [user, setUser] = useState<User | null>(null);
@@ -26,8 +27,8 @@ export function useAuth() {
 	useEffect(() => {
 		const auth = getAuth();
 
-		const unsubscribe = onAuthStateChanged(auth, (user) => {
-			setUser(user);
+		const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+			setUser(firebaseUser as User);
 			setLoading(false);
 		});
 

@@ -16,16 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { User } from 'firebase/auth';
+import { User as FirebaseUser } from 'firebase/auth';
 
-interface AuthenticatedViewProps {
-    user: User;
+export interface User extends FirebaseUser {
+	// Firebase
+	uid: string;
+	email: string | null;
+	displayName: string | null;
+	photoURL: string | null;
+
+	// Custom
+	location?: string;
+	cars?: string[];
+	createdAt?: Date;
+	lastLoginAt?: Date;
 }
 
-export function AuthenticatedView({ user }: AuthenticatedViewProps) {
-    return (
-        <div>
-            <h2>Welcome to your dashboard, {user.displayName}</h2>
-        </div>
-    );
+export interface UserProfile {
+	uid: string;
+	email: string;
+	displayName: string;
+	location?: string;
+	cars?: string[];
+	createdAt: Date;
+	lastLoginAt: Date;
 }

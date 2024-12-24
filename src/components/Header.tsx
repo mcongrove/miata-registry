@@ -19,6 +19,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from './Button';
+import { useAuth } from '../hooks/useAuth';
+import { signInWithGoogle } from '../utils/auth';
+import { UserMenu } from './UserMenu';
 
 interface DropdownProps {
 	label: string;
@@ -77,13 +80,18 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 export const Header = () => {
 	const location = useLocation();
 	const isHomePage = location.pathname === '/';
+	const { user } = useAuth();
+
+	const handleSignIn = async () => {
+		await signInWithGoogle();
+	};
 
 	const isActive = (path: string) => {
 		return location.pathname.startsWith(path);
 	};
 
 	const NavLinks = () => (
-		<nav className="flex items-center justify-between w-full">
+		<nav className="flex items-center justify-between w-full h-11">
 			<div className="flex items-center gap-6">
 				<Dropdown
 					label="Registry"
@@ -124,25 +132,39 @@ export const Header = () => {
 
 			{isHomePage ? (
 				<div className="flex items-center text-sm text-white">
-					<a
-						href="#"
-						className="block bg-brg hover:bg-brg-dark rounded-l-lg transition-colors py-3 px-4 border-r border-brg-mid"
-					>
-						Sign In
-					</a>
+					{user ? (
+						<UserMenu user={user} />
+					) : (
+						<>
+							<button
+								onClick={handleSignIn}
+								className="block bg-brg hover:bg-brg-dark rounded-l-lg transition-colors py-3 px-4 border-r border-brg-mid"
+							>
+								Sign In
+							</button>
 
-					<a
-						href="#"
-						className="bg-brg hover:bg-brg-dark rounded-r-lg transition-colors py-3 px-4"
-					>
-						Register
-					</a>
+							<button
+								onClick={handleSignIn}
+								className="bg-brg hover:bg-brg-dark rounded-r-lg transition-colors py-3 px-4"
+							>
+								Register
+							</button>
+						</>
+					)}
 				</div>
 			) : (
 				<div className="flex items-center text-sm gap-2">
-					<Button variant="tertiary">Sign In</Button>
+					{user ? (
+						<UserMenu user={user} />
+					) : (
+						<>
+							<Button variant="tertiary" onClick={handleSignIn}>
+								Sign In
+							</Button>
 
-					<Button>Register</Button>
+							<Button onClick={handleSignIn}>Register</Button>
+						</>
+					)}
 				</div>
 			)}
 		</nav>
