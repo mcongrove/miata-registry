@@ -70,10 +70,7 @@ export const Home = () => {
 					/>
 
 					<div className="absolute bottom-4 right-4">
-						<Credit
-							id="05583ab8-d670-48ee-b006-2202dc9ee77a"
-							direction="left"
-						/>
+						<Credit id="eCaYE10lSttLaWK0frN7" direction="left" />
 					</div>
 
 					<svg
@@ -328,22 +325,12 @@ export const Home = () => {
 					<div className="flex flex-row items-stretch">
 						<div className="w-1/3 relative">
 							<img
-								src="/images/cars/1992SBY1176.jpg"
-								alt="1992 Sunburst Yellow #1176"
-								className="absolute inset-0 w-full h-full object-cover object-bottom"
-							/>
-
-							<Credit
-								// car="1992 Sunburst Yellow"
-								// number="1176"
-								// owner="MaxWellSmart1919, Oregon, USA"
-								id="05583ab8-d670-48ee-b006-2202dc9ee77a"
-								direction="right"
-								className="absolute bottom-4 left-4"
+								src="/images/cars/about-3.jpg"
+								className="absolute inset-0 w-full h-full object-cover object-bottom scale-x-[-1]"
 							/>
 
 							<svg
-								className="absolute inset-0 w-full h-full pointer-events-none"
+								className="absolute top-0 left-0 bottom-0 -right-px pointer-events-none"
 								preserveAspectRatio="none"
 								viewBox="0 0 100 100"
 							>

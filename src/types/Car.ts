@@ -26,7 +26,6 @@ export type Car = {
 	editionId: DocumentReference<Edition>;
 	edition: Edition;
 	id: string;
-	image?: string;
 	manufacture?: {
 		date?: Timestamp;
 		location?: Location;

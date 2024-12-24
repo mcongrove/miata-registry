@@ -28,7 +28,7 @@ type EditionCardProps = {
 export const EditionCard = ({ edition }: EditionCardProps) => {
 	return (
 		<div className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light">
-			{edition.image && (
+			{edition.imageCarId && (
 				<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
 					<Link
 						to={`/registry?filter=${encodeURIComponent(
@@ -36,21 +36,16 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 						).replace(/%20/g, '+')}`}
 					>
 						<img
-							src={edition.image}
+							src={`/images/store/car/${edition.imageCarId.id}.jpg`}
 							alt={edition.name}
 							className="w-full h-full object-cover"
 							loading="lazy"
 						/>
 					</Link>
 
-					{edition.imageCarId && (
-						<div className="absolute bottom-4 right-4">
-							<Credit
-								id={edition.imageCarId.id}
-								direction="left"
-							/>
-						</div>
-					)}
+					<div className="absolute bottom-4 right-4">
+						<Credit id={edition.imageCarId.id} direction="left" />
+					</div>
 				</div>
 			)}
 

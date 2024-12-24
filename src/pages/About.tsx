@@ -161,19 +161,19 @@ export const About = () => {
 				<div className="flex items-center justify-center w-1/2">
 					<div className="relative h-[544px] w-[544px]">
 						<img
-							src="/images/cars/pexels-chris-black-78566801-8837309.jpg"
+							src="/images/cars/about-1.jpg"
 							className="absolute right-60 top-0 size-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 
 						<img
-							src="/images/cars/pexels-hoodzie-11401673.jpg"
+							src="/images/cars/about-2.jpg"
 							className="absolute right-0 top-24 size-72 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 
 						<img
-							src="/images/cars/pexels-michalrobak-28577510.jpg"
+							src="/images/cars/about-3.jpg"
 							className="absolute right-40 top-72 w-96 h-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>

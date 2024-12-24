@@ -232,9 +232,17 @@ export const CarProfile = () => {
 						<div className="aspect-video w-full relative rounded-lg overflow-hidden">
 							{car ? (
 								<img
-									src={car.image || car.edition.image}
+									src={`/images/store/car/${car.id}.jpg`}
 									alt={`${car.edition.name}`}
-									className={`w-full h-full object-cover ${!car.image ? 'grayscale' : ''}`}
+									className="w-full h-full object-cover"
+									onError={(e) => {
+										if (car.edition.imageCarId) {
+											const img =
+												e.target as HTMLImageElement;
+											img.src = `/images/store/car/${car.edition.imageCarId.id}.jpg`;
+											img.classList.add('grayscale');
+										}
+									}}
 								/>
 							) : (
 								<div className="w-full h-full bg-brg-light animate-pulse" />
