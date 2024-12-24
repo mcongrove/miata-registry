@@ -20,6 +20,7 @@ import { Select } from '../Select';
 
 interface PaginationControlsProps {
 	currentPage: number;
+	hasFilters: boolean;
 	totalPages: number;
 	onPageChange: (page: number) => void;
 	totalItems: number;
@@ -28,6 +29,7 @@ interface PaginationControlsProps {
 
 export const PaginationControls = ({
 	currentPage,
+	hasFilters = false,
 	totalPages,
 	onPageChange,
 	totalItems,
@@ -44,7 +46,13 @@ export const PaginationControls = ({
 	return (
 		<div className="flex justify-between items-center text-sm">
 			<div className="text-brg-mid text-xs">
-				Showing {start}-{end} of {totalItems}
+				Showing{' '}
+				<span className="font-semibold">{start.toLocaleString()}</span>-
+				<span className="font-semibold">{end.toLocaleString()}</span> of{' '}
+				<span className="font-semibold">
+					{totalItems.toLocaleString()}
+				</span>
+				{hasFilters ? ' matches' : ' total cars'}
 			</div>
 
 			<div className="flex gap-1 items-stretch">

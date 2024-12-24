@@ -178,77 +178,74 @@ export const Registry = () => {
 					/>
 
 					<div className="flex-1 flex flex-col">
-						<div className="mb-3">
-							<div className="relative max-w-80">
-								<input
-									type="text"
-									placeholder="Search..."
-									className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-3 focus:outline-none placeholder:text-brg-mid/70 pr-8"
-									value={search}
-									onChange={(e) => {
-										setSearch(e.target.value);
-										updateSearchParams({
-											search: e.target.value || null,
-										});
-									}}
-								/>
+						<div className="relative max-w-80">
+							<input
+								type="text"
+								placeholder="Search..."
+								className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-3 focus:outline-none placeholder:text-brg-mid/70 pr-8"
+								value={search}
+								onChange={(e) => {
+									setSearch(e.target.value);
+									updateSearchParams({
+										search: e.target.value || null,
+									});
+								}}
+							/>
 
-								{search && (
-									<button
-										onClick={() => setSearch('')}
-										className="absolute right-0 pr-3 pl-1 top-[calc(50%-8px)] -translate-y-1/2 text-brg-mid/70 hover:text-red-700"
-										aria-label="Clear search"
-									>
-										×
-									</button>
-								)}
-							</div>
-
-							{activeFilters.length > 0 && (
-								<div className="mb-3 flex gap-2 flex-wrap">
-									{activeFilters.map((filter) => (
-										<Chip
-											key={`${filter.type}:${filter.value}`}
-											label={
-												filter.type
-													.charAt(0)
-													.toUpperCase() +
-												filter.type.slice(1)
-											}
-											value={filter.value}
-											onRemove={() => {
-												const newFilters =
-													activeFilters.filter(
-														(f) =>
-															f.type !==
-															filter.type
-													);
-
-												setActiveFilters(newFilters);
-
-												updateSearchParams({
-													filter: newFilters.map(
-														(f) =>
-															`${f.type}:${f.value}`
-													),
-												});
-											}}
-										/>
-									))}
-									<button
-										onClick={() => {
-											setActiveFilters([]);
-											updateSearchParams({
-												filter: null,
-											});
-										}}
-										className="text-brg px-2 py-1 text-xs hover:text-red-700"
-									>
-										Clear All
-									</button>
-								</div>
+							{search && (
+								<button
+									onClick={() => setSearch('')}
+									className="absolute right-0 pr-3 pl-1 top-[calc(50%-8px)] -translate-y-1/2 text-brg-mid/70 hover:text-red-700"
+									aria-label="Clear search"
+								>
+									×
+								</button>
 							)}
 						</div>
+
+						{activeFilters.length > 0 && (
+							<div className="mb-3 flex gap-2 flex-wrap">
+								{activeFilters.map((filter) => (
+									<Chip
+										key={`${filter.type}:${filter.value}`}
+										label={
+											filter.type
+												.charAt(0)
+												.toUpperCase() +
+											filter.type.slice(1)
+										}
+										value={filter.value}
+										onRemove={() => {
+											const newFilters =
+												activeFilters.filter(
+													(f) =>
+														f.type !== filter.type
+												);
+
+											setActiveFilters(newFilters);
+
+											updateSearchParams({
+												filter: newFilters.map(
+													(f) =>
+														`${f.type}:${f.value}`
+												),
+											});
+										}}
+									/>
+								))}
+								<button
+									onClick={() => {
+										setActiveFilters([]);
+										updateSearchParams({
+											filter: null,
+										});
+									}}
+									className="text-brg px-2 py-1 text-xs hover:text-red-700"
+								>
+									Clear All
+								</button>
+							</div>
+						)}
 
 						<PaginationControls
 							currentPage={currentPage}
@@ -259,6 +256,9 @@ export const Registry = () => {
 							}}
 							totalItems={totalItems}
 							itemsPerPage={itemsPerPage}
+							hasFilters={
+								activeFilters.length > 0 || search.length > 0
+							}
 						/>
 
 						<div className="flex-1 my-3">
@@ -279,6 +279,9 @@ export const Registry = () => {
 							}}
 							totalItems={totalItems}
 							itemsPerPage={itemsPerPage}
+							hasFilters={
+								activeFilters.length > 0 || search.length > 0
+							}
 						/>
 					</div>
 				</div>
