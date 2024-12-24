@@ -22,7 +22,7 @@ import { Header } from './components/Header';
 import { Editions } from './pages/Editions';
 import { Home } from './pages/Home';
 import { Registry } from './pages/Registry';
-import { CarProfile } from './pages/registry/[id]';
+import { CarProfile } from './pages/Car';
 
 interface LayoutProps {
 	showHeaderShadow?: boolean;

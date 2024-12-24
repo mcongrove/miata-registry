@@ -18,14 +18,14 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Map } from '../../components/car/Map';
-import { TimelineItem } from '../../components/car/TimelineItem';
-import { Tooltip } from '../../components/Tooltip';
-import sampleCars from '../../data/sampleCars.json';
-import sampleEditions from '../../data/sampleEditions.json';
-import { Car } from '../../types/Car';
-import { toPrettyDate, toTitleCase } from '../../utils/global';
-import { countryMap } from '../../utils/map';
+import { Map } from '../components/car/Map';
+import { TimelineItem } from '../components/car/TimelineItem';
+import { Tooltip } from '../components/Tooltip';
+import sampleCars from '../data/sampleCars.json';
+import sampleEditions from '../data/sampleEditions.json';
+import { Car } from '../types/Car';
+import { toPrettyDate, toTitleCase } from '../utils/global';
+import { countryMap } from '../utils/map';
 
 interface Location {
 	name: string;
@@ -41,11 +41,13 @@ export const CarProfile = () => {
 	useEffect(() => {
 		if (id) {
 			const foundCar = sampleCars.find((c) => c.id === id);
+
 			if (foundCar) {
 				// Find the full edition details from sampleEditions
 				const fullEdition = sampleEditions.find(
 					(e) => e.id === foundCar.edition.id
 				);
+
 				// Merge the edition details with the car data
 				setCar({
 					...foundCar,
