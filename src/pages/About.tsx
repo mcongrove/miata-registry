@@ -53,8 +53,7 @@ export const About = () => {
 	usePageTitle('About');
 
 	useEffect(() => {
-		// getCountCodeCommits('mcongrove', 'miata-registry').then((count) => {
-		getCountCodeCommits('mcongrove', 'ChariTi').then((count) => {
+		getCountCodeCommits('mcongrove', 'miata-registry').then((count) => {
 			setCommitCount(count);
 		});
 	}, []);
