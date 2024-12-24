@@ -22,10 +22,10 @@ import { Chip } from '../components/Chip';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
-import sampleCars from '../data/sampleCars.json';
 import { Car } from '../types/Car';
 import { FilterOption, FilterType } from '../types/Filters';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { getCars } from '../api/Car';
 
 export const Registry = () => {
 	const parseFiltersFromURL = (filterParams: string[]): FilterOption[] => {
@@ -57,6 +57,8 @@ export const Registry = () => {
 	});
 	const [searchInputRef, setSearchInputRef] =
 		useState<HTMLInputElement | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [cars, setCars] = useState<Car[]>([]);
 
 	usePageTitle('Cars');
 
@@ -73,6 +75,22 @@ export const Registry = () => {
 			}, 0);
 		}
 	}, [searchInputRef]);
+
+	useEffect(() => {
+		const loadCars = async () => {
+			try {
+				setIsLoading(true);
+				const carsData = await getCars();
+				setCars(carsData);
+			} catch (error) {
+				console.error('Error loading cars:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		loadCars();
+	}, []);
 
 	const updateSearchParams = (
 		updates: Record<string, string | string[] | null>
@@ -174,7 +192,7 @@ export const Registry = () => {
 	};
 
 	const itemsPerPage = 50;
-	const processedCars = getProcessedCars(sampleCars);
+	const processedCars = getProcessedCars(cars);
 	const totalItems = processedCars.length;
 	const totalPages = Math.ceil(totalItems / itemsPerPage);
 	const currentCars = processedCars.slice(
@@ -201,6 +219,7 @@ export const Registry = () => {
 								value={search}
 								onChange={(e) => {
 									setSearch(e.target.value);
+
 									updateSearchParams({
 										search: e.target.value || null,
 									});
@@ -277,12 +296,18 @@ export const Registry = () => {
 						/>
 
 						<div className="flex-1 my-3">
-							<RegistryTable
-								cars={currentCars}
-								sortColumn={sortColumn}
-								sortDirection={sortDirection}
-								onSort={handleSort}
-							/>
+							{isLoading ? (
+								<div className="bg-white rounded-md border border-brg-light p-8 text-center text-brg-mid">
+									Loading cars...
+								</div>
+							) : (
+								<RegistryTable
+									cars={currentCars}
+									sortColumn={sortColumn}
+									sortDirection={sortDirection}
+									onSort={handleSort}
+								/>
+							)}
 						</div>
 
 						<PaginationControls

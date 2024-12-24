@@ -23,13 +23,12 @@ import { TimelineItem } from '../components/car/TimelineItem';
 import { Tooltip } from '../components/Tooltip';
 import { Car } from '../types/Car';
 import { toPrettyDate, toTitleCase } from '../utils/global';
+import { getCar, getVinDetails } from '../api/Car';
 import {
-	getCar,
 	formatEngineDetails,
 	formatTransmission,
 	formatPlantLocation,
-	getVinDetails,
-} from '../api/Car';
+} from '../utils/car';
 import { formatLocation } from '../utils/geo';
 import { usePageTitle } from '../hooks/usePageTitle';
 

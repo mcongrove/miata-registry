@@ -16,32 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ButtonHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
 
-interface ButtonProps {
-	className?: string;
-	children: React.ReactNode;
-	onClick?: () => void;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	withArrow?: boolean;
 	variant?: 'primary' | 'secondary' | 'tertiary';
 	href?: string;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button = ({
 	className,
 	children,
 	onClick,
 	withArrow = false,
 	variant = 'primary',
 	href,
-}) => {
+	...props
+}: ButtonProps) => {
 	const bgColor =
 		variant === 'primary'
 			? 'bg-brg hover:bg-brg/90'
 			: variant === 'secondary'
 				? 'bg-brg-mid hover:bg-brg-mid/90'
 				: '';
-
 	const textColor = variant === 'tertiary' ? 'text-brg' : 'text-white';
 	const buttonClassName = `group flex items-center ${bgColor} ${textColor} font-medium py-3 px-4 rounded-lg transition-colors ${className || ''}`;
 
@@ -59,7 +57,7 @@ export const Button: React.FC<ButtonProps> = ({
 	}
 
 	return (
-		<button onClick={onClick} className={buttonClassName}>
+		<button onClick={onClick} className={buttonClassName} {...props}>
 			{children}
 			{withArrow && (
 				<span className="ml-2 transform group-hover:translate-x-1 transition-transform">

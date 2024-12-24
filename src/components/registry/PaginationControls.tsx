@@ -80,6 +80,8 @@ export const PaginationControls = ({
 				<div className="w-16">
 					<Select
 						value={currentPage}
+						disabled={totalPages === 1}
+						className="disabled:opacity-30 disabled:cursor-not-allowed"
 						onChange={(value) => {
 							const newPage = Number(value);
 
@@ -92,7 +94,7 @@ export const PaginationControls = ({
 				</div>
 
 				<button
-					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-brg-light"
+					className="w-8 flex items-center justify-center border border-brg-border rounded-md hover:bg-brg-light disabled:opacity-30 disabled:cursor-not-allowed"
 					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage === totalPages}
 				>

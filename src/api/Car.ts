@@ -26,9 +26,8 @@ import {
 	getCountFromServer,
 	query,
 	where,
+	getDocs,
 } from 'firebase/firestore';
-import { countryCodeMap } from '../utils/geo';
-import { toTitleCase } from '../utils/global';
 
 export const getCar = async (id: string): Promise<Car | null> => {
 	try {
@@ -74,7 +73,43 @@ export const getCar = async (id: string): Promise<Car | null> => {
 	}
 };
 
-export const getCarCount = async (): Promise<number> => {
+export const getCars = async (): Promise<Car[]> => {
+	try {
+		const carsRef = collection(db, 'cars');
+		const snapshot = await getDocs(carsRef);
+
+		const cars: Car[] = [];
+
+		for (const doc of snapshot.docs) {
+			const carData = doc.data() as Car;
+
+			// Get edition data
+			const editionDoc = await getDoc(carData.editionId);
+			const editionData = editionDoc.data();
+
+			// Get owner data if it exists
+			let ownerData = null;
+			if (carData.ownerId) {
+				const ownerDoc = await getDoc(carData.ownerId);
+				ownerData = ownerDoc.data();
+			}
+
+			cars.push({
+				...carData,
+				id: doc.id,
+				edition: editionData,
+				owner: ownerData,
+			});
+		}
+
+		return cars;
+	} catch (error) {
+		console.error('Error fetching cars:', error);
+		throw error;
+	}
+};
+
+export const getCountCars = async (): Promise<number> => {
 	try {
 		const snapshot = await getCountFromServer(collection(db, 'cars'));
 
@@ -86,7 +121,7 @@ export const getCarCount = async (): Promise<number> => {
 	}
 };
 
-export const getClaimedCarCount = async (): Promise<number> => {
+export const getCountClaimedCars = async (): Promise<number> => {
 	try {
 		const q = query(collection(db, 'cars'), where('ownerId', '!=', null));
 
@@ -100,7 +135,7 @@ export const getClaimedCarCount = async (): Promise<number> => {
 	}
 };
 
-export const getEditionCount = async (): Promise<number> => {
+export const getCountEditions = async (): Promise<number> => {
 	try {
 		const snapshot = await getCountFromServer(collection(db, 'editions'));
 
@@ -128,56 +163,4 @@ export const getVinDetails = async (vin: string, year: number) => {
 		console.error('Error fetching VIN details:', error);
 		return null;
 	}
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const formatEngineDetails = (details: any) => {
-	const displacement = details.DisplacementL
-		? `${Number(details.DisplacementL).toFixed(1)}L`
-		: '';
-
-	const cylinders = details.EngineCylinders
-		? `${details.EngineCylinders}-cylinder`
-		: '';
-
-	const configuration =
-		details.EngineConfiguration?.toLowerCase() === 'inline'
-			? 'Inline'
-			: details.EngineConfiguration;
-
-	const horsepower = details.EngineHP ? `${details.EngineHP}hp` : '';
-
-	return (
-		[displacement, configuration, cylinders, horsepower]
-			.filter(Boolean)
-			.join(' ')
-			.trim() || 'Not specified'
-	);
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const formatTransmission = (details: any) => {
-	const speed = details.TransmissionSpeeds || details.TransmissionSpeed;
-	const style = details.TransmissionStyle || details.DriveType;
-
-	if (!speed && !style) return 'Not specified';
-
-	return [
-		speed ? `${speed}-speed` : '',
-		style?.toLowerCase().includes('manual') ? 'Manual' : 'Automatic',
-	]
-		.filter(Boolean)
-		.join(' ');
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const formatPlantLocation = (details: any) => {
-	const city = details?.PlantCity
-		? toTitleCase(details?.PlantCity?.toLowerCase())
-		: '';
-
-	const country =
-		countryCodeMap[details?.PlantCountry] || details?.PlantCountry;
-
-	return city && country ? `${city}, ${country}` : '';
 };

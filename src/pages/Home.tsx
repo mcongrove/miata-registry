@@ -366,7 +366,7 @@ export const Home = () => {
 								these special cars for future generations.
 							</p>
 
-							<Button withArrow>Claim your Miata</Button>
+							<Button>Claim your Miata</Button>
 
 							<div className="flex flex-col items-start gap-3 mt-8 pt-8 border-t border-brg-border text-sm">
 								<h3 className="flex gap-2 items-center text-brg-mid font-bold">

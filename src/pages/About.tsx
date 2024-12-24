@@ -19,12 +19,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { TextField } from '../components/form/TextField';
-import { getCarCount, getClaimedCarCount, getEditionCount } from '../api/Car';
-import { getCountryCount } from '../api/Owner';
+import {
+	getCountCars,
+	getCountClaimedCars,
+	getCountEditions,
+} from '../api/Car';
+import { getCountCountries } from '../api/Owner';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { StatisticItem } from '../components/about/StatisticItem';
 
-const getCommitCount = async (owner: string, repo: string) => {
+const getCountCodeCommits = async (owner: string, repo: string) => {
 	const response = await fetch(
 		`https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`
 	);
@@ -49,8 +53,8 @@ export const About = () => {
 	usePageTitle('About');
 
 	useEffect(() => {
-		// getCommitCount('mcongrove', 'miata-registry').then((count) => {
-		getCommitCount('mcongrove', 'ChariTi').then((count) => {
+		// getCountCodeCommits('mcongrove', 'miata-registry').then((count) => {
+		getCountCodeCommits('mcongrove', 'ChariTi').then((count) => {
 			setCommitCount(count);
 		});
 	}, []);
@@ -162,19 +166,19 @@ export const About = () => {
 
 					<div className="grid grid-cols-5 gap-8">
 						<StatisticItem
-							value={getCarCount()}
+							value={getCountCars()}
 							label="Total Vehicles"
 						/>
 						<StatisticItem
-							value={getClaimedCarCount()}
+							value={getCountClaimedCars()}
 							label="Claimed Vehicles"
 						/>
 						<StatisticItem
-							value={getEditionCount()}
+							value={getCountEditions()}
 							label="Limited Editions"
 						/>
 						<StatisticItem
-							value={getCountryCount()}
+							value={getCountCountries()}
 							label="Countries Represented"
 						/>
 						<StatisticItem

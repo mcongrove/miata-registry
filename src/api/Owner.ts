@@ -20,7 +20,7 @@ import { db } from '../config/firebase';
 import { Owner } from '../types/Owner';
 import { collection, getDocs } from 'firebase/firestore';
 
-export const getCountryCount = async (): Promise<number> => {
+export const getCountCountries = async (): Promise<number> => {
 	try {
 		const ownersRef = collection(db, 'owners');
 		const snapshot = await getDocs(ownersRef);
