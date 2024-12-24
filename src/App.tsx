@@ -24,14 +24,10 @@ import { Home } from './pages/Home';
 import { Registry } from './pages/Registry';
 import { CarProfile } from './pages/Car';
 
-interface LayoutProps {
-	showHeaderShadow?: boolean;
-}
-
-function Layout({ showHeaderShadow = true }: LayoutProps) {
+function Layout() {
 	return (
 		<div className="min-h-screen flex flex-col">
-			<Header showShadow={showHeaderShadow} />
+			<Header />
 			<Outlet />
 			<Footer />
 		</div>
@@ -42,12 +38,10 @@ function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				<Route element={<Layout showHeaderShadow={true} />}>
+				<Route element={<Layout />}>
 					<Route path="/" element={<Home />} />
 					<Route path="/registry" element={<Registry />} />
 					<Route path="/registry/editions" element={<Editions />} />
-				</Route>
-				<Route element={<Layout showHeaderShadow={false} />}>
 					<Route path="/registry/:id" element={<CarProfile />} />
 				</Route>
 			</Routes>

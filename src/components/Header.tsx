@@ -74,11 +74,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	);
 };
 
-interface HeaderProps {
-	showShadow?: boolean;
-}
-
-export const Header = ({ showShadow = true }: HeaderProps) => {
+export const Header = () => {
 	const location = useLocation();
 	const isHomePage = location.pathname === '/';
 
@@ -174,7 +170,7 @@ export const Header = ({ showShadow = true }: HeaderProps) => {
 	}
 
 	return (
-		<header className="fixed top-0 left-0 right-0 bg-white z-50 h-20">
+		<header className="fixed top-0 left-0 right-0 bg-white border-b border-brg-light z-50 h-20">
 			<div className="container mx-auto py-4 relative">
 				<div className="flex items-center">
 					<Link to="/" className="mr-12">
@@ -183,9 +179,6 @@ export const Header = ({ showShadow = true }: HeaderProps) => {
 
 					<NavLinks />
 				</div>
-				{showShadow && (
-					<div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-white to-transparent translate-y-full pointer-events-none z-50"></div>
-				)}
 			</div>
 		</header>
 	);
