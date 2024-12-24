@@ -27,7 +27,6 @@ export type Car = {
 	edition: Edition;
 	id: string;
 	image?: string;
-	location?: Location;
 	manufacture?: {
 		date?: string;
 		location?: Location;

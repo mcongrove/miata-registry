@@ -18,8 +18,11 @@
 
 import { EditionCard } from '../components/editions/EditionCard';
 import sampleEditions from '../data/sampleEditions.json';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export const Editions = () => {
+	usePageTitle('Editions');
+
 	return (
 		<main className="flex-1 pt-20">
 			<div className="container mx-auto py-8">

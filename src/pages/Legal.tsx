@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export const Legal = () => {
+	usePageTitle('Legal Information');
+
 	return (
 		<main className="flex-1 pt-20">
 			<div className="container mx-auto py-8">

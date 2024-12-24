@@ -21,46 +21,22 @@ import { Link, useLocation } from 'react-router-dom';
 import { TextField } from '../components/form/TextField';
 import { getCarCount, getClaimedCarCount, getEditionCount } from '../api/Car';
 import { getCountryCount } from '../api/Owner';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { StatisticItem } from '../components/about/StatisticItem';
 
 const getCommitCount = async (owner: string, repo: string) => {
 	const response = await fetch(
 		`https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`
 	);
+
 	const link = response.headers.get('link');
+
 	if (link) {
 		const match = link.match(/page=(\d+)>; rel="last"/);
+
 		return match ? parseInt(match[1]) : 0;
 	}
 	return 0;
-};
-
-const StatisticItem = ({
-	value,
-	label,
-}: {
-	value: number | Promise<number>;
-	label: string;
-}) => {
-	const [count, setCount] = useState<number>(0);
-
-	useEffect(() => {
-		if (value instanceof Promise) {
-			value.then(setCount);
-		} else {
-			setCount(value);
-		}
-	}, [value]);
-
-	return (
-		<div className="flex flex-col items-center gap-2">
-			<span className="text-5xl font-medium text-brg tracking-tight">
-				{count}
-			</span>
-			<span className="text-sm font-medium text-brg-mid text-center">
-				{label}
-			</span>
-		</div>
-	);
 };
 
 export const About = () => {
@@ -69,6 +45,8 @@ export const About = () => {
 	);
 	const [commitCount, setCommitCount] = useState<number>(0);
 	const location = useLocation();
+
+	usePageTitle('About');
 
 	useEffect(() => {
 		// getCommitCount('mcongrove', 'miata-registry').then((count) => {

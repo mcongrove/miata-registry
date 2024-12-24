@@ -48,7 +48,9 @@ export const TimelineItem = ({
 			<div
 				className={`space-y-0.5 flex-1 ${showConnector ? 'pb-6' : ''}`}
 			>
-				<p className={`font-medium ${!name ? 'text-brg-border' : ''}`}>
+				<p
+					className={`font-medium ${!name ? 'text-brg-border' : !isActive ? 'text-brg-mid' : ''}`}
+				>
 					{name || 'Unknown'}
 				</p>
 

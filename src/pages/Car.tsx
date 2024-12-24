@@ -31,6 +31,7 @@ import {
 	getVinDetails,
 } from '../api/Car';
 import { formatLocation } from '../utils/geo';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface MapLocation {
 	name: string;
@@ -43,13 +44,24 @@ export const CarProfile = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const [vinDetails, setVinDetails] = useState<any>(null);
 
+	usePageTitle(
+		car
+			? `${car.edition.year} ${car.edition.name}${car.sequence ? ` #${car.sequence}` : ''}`
+			: ''
+	);
+
+	const manufactureLocation = car?.manufacture?.location
+		? formatLocation(car.manufacture.location)
+		: vinDetails
+			? formatPlantLocation(vinDetails)
+			: '';
+
 	useEffect(() => {
 		const loadCar = async () => {
 			if (!id) return;
 
 			try {
 				const carData = await getCar(id);
-
 				setCar(carData);
 
 				if (carData?.vin) {
@@ -57,12 +69,10 @@ export const CarProfile = () => {
 						carData.vin,
 						carData.edition.year
 					);
-
 					setVinDetails(details);
 				}
 			} catch (error) {
 				console.error('Error loading car:', error);
-
 				setCar(null);
 			}
 		};
@@ -80,7 +90,7 @@ export const CarProfile = () => {
 			items.push({
 				name: car.owner.name || 'Unknown',
 				dateRange: `${car.owner.dateStart ? toPrettyDate(car.owner.dateStart) : ''} – ${car.owner.dateEnd ? toPrettyDate(car.owner.dateEnd) : 'Present'}`,
-				location: formatLocation(car.location),
+				location: formatLocation(car.owner.location),
 				isActive: true,
 			});
 		}
@@ -132,11 +142,7 @@ export const CarProfile = () => {
 		}
 
 		// Factory
-		const plantLocation = car.manufacture?.location
-			? formatLocation(car.manufacture.location)
-			: formatPlantLocation(vinDetails);
-
-		if (plantLocation) {
+		if (manufactureLocation) {
 			items.push({
 				name: vinDetails?.Manufacturer ? (
 					<>
@@ -151,8 +157,7 @@ export const CarProfile = () => {
 				dateRange: car.manufacture?.date
 					? toPrettyDate(car.manufacture.date)
 					: car.edition.year.toString(),
-				location: plantLocation,
-				isActive: true,
+				location: manufactureLocation,
 			});
 		}
 
@@ -379,10 +384,7 @@ export const CarProfile = () => {
 										locations={[
 											{
 												name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
-												address:
-													formatPlantLocation(
-														vinDetails
-													),
+												address: manufactureLocation,
 											},
 											car.shipping?.location
 												? {
@@ -420,10 +422,10 @@ export const CarProfile = () => {
 											},
 											{
 												name: formatLocation(
-													car.location
+													car.owner.location
 												),
 												address: formatLocation(
-													car.location
+													car.owner.location
 												),
 											},
 										].filter(
@@ -439,16 +441,16 @@ export const CarProfile = () => {
 							</div>
 
 							<div className="p-4 flex items-center justify-between">
-								{car?.location ? (
+								{car?.owner.location ? (
 									<>
 										<div>
 											<p className="font-medium text-lg">
-												{car.location.city}
+												{car.owner.location?.city}
 											</p>
 
 											<p className="text-brg-mid">
 												{formatLocation(
-													car.location,
+													car.owner.location,
 													true
 												)}
 											</p>

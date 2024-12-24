@@ -25,6 +25,7 @@ import { RegistryTable } from '../components/registry/RegistryTable';
 import sampleCars from '../data/sampleCars.json';
 import { Car } from '../types/Car';
 import { FilterOption, FilterType } from '../types/Filters';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export const Registry = () => {
 	const parseFiltersFromURL = (filterParams: string[]): FilterOption[] => {
@@ -54,9 +55,10 @@ export const Registry = () => {
 		// Otherwise, always use 'asc' since we're defaulting to year
 		return 'asc';
 	});
-
 	const [searchInputRef, setSearchInputRef] =
 		useState<HTMLInputElement | null>(null);
+
+	usePageTitle('Cars');
 
 	useEffect(() => {
 		if (window.location.hash === '#search' && searchInputRef) {
@@ -127,12 +129,7 @@ export const Registry = () => {
 				(car) =>
 					car.edition.name.toLowerCase().includes(searchLower) ||
 					car.vin?.toLowerCase().includes(searchLower) ||
-					(car.owner?.name ?? '')
-						.toLowerCase()
-						.includes(searchLower) ||
-					(car.location?.city ?? '')
-						.toLowerCase()
-						.includes(searchLower)
+					(car.owner?.name ?? '').toLowerCase().includes(searchLower)
 			);
 		}
 
