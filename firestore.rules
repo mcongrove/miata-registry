@@ -1,7 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Anyone can read cars and editions
+    // Anyone can read cars, editions, and owners
     match /cars/{carId} {
       allow read: if true;
       // Only authenticated users can create/update cars
@@ -13,5 +13,11 @@ service cloud.firestore {
       // Only admins can modify editions
       allow write: if false;
     }
+
+    match /owners/{ownerId} {
+      allow read: if true;
+      // Only authenticated users can create/update owners
+      allow write: if request.auth != null;
+    }
   }
-} 
+}

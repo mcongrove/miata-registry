@@ -25,7 +25,7 @@ import sampleCars from '../data/sampleCars.json';
 import sampleEditions from '../data/sampleEditions.json';
 import { Car } from '../types/Car';
 import { toPrettyDate, toTitleCase } from '../utils/global';
-import { countryMap } from '../utils/map';
+import { countryCodeMap } from '../utils/geo';
 
 interface Location {
 	name: string;
@@ -129,7 +129,7 @@ export const CarProfile = () => {
 			: '';
 
 		const country =
-			countryMap[details?.PlantCountry] || details?.PlantCountry;
+			countryCodeMap[details?.PlantCountry] || details?.PlantCountry;
 
 		return city && country ? `${city}, ${country}` : '';
 	};

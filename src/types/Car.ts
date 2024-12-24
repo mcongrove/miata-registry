@@ -23,24 +23,27 @@ import { Location } from './Location';
 
 export type Car = {
 	color: string;
-	vin?: string;
-	ownerId?: DocumentReference<Owner>;
-	image?: string;
-	sequence?: number;
 	editionId: DocumentReference<Edition>;
-	manufactureDate?: string;
-	shipping?: {
-		port?: string;
-		vessel?: string;
-		date?: string;
-	};
+	edition: Edition;
+	id: string;
+	image?: string;
 	location?: Location;
+	manufactureDate?: string;
+	ownerId?: DocumentReference<Owner>;
+	owner: Owner;
 	sale?: {
 		date?: string;
-		msrp?: number;
 		dealer?: {
-			name: string;
 			location?: Location;
+			name: string;
 		};
+		msrp?: number;
 	};
+	sequence?: number;
+	shipping?: {
+		date?: string;
+		port?: string;
+		vessel?: string;
+	};
+	vin?: string;
 };

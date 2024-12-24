@@ -16,14 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './config/firebase';
-import App from './App.tsx';
-import './index.css';
+import { Location } from '../types/Location';
 
-createRoot(document.getElementById('root')!).render(
-	<StrictMode>
-		<App />
-	</StrictMode>
-);
+export const countryCodeMap: { [key: string]: string } = {
+	JAPAN: 'JP',
+	'UNITED STATES': 'US',
+	MEXICO: 'MX',
+};
+
+export const formatLocation = (
+	location: Location,
+	short: boolean = false
+): string => {
+	const parts: string[] = [];
+
+	if (!short && location.city) {
+		parts.push(location.city);
+	}
+
+	if (location.state) {
+		parts.push(location.state);
+	}
+
+	if (location.country) {
+		parts.push(location.country);
+	}
+
+	return parts.join(', ');
+};

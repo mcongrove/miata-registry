@@ -71,10 +71,7 @@ export const Home = () => {
 
 					<div className="absolute bottom-4 right-4">
 						<Credit
-							car="1991 British Racing Green"
-							number="182"
-							owner="Matthew Congrove, Texas, USA"
-							id="1-182"
+							id="05583ab8-d670-48ee-b006-2202dc9ee77a"
 							direction="left"
 						/>
 					</div>
@@ -337,10 +334,10 @@ export const Home = () => {
 							/>
 
 							<Credit
-								car="1992 Sunburst Yellow"
-								number="1176"
-								owner="MaxWellSmart1919, Oregon, USA"
-								id="2-1176"
+								// car="1992 Sunburst Yellow"
+								// number="1176"
+								// owner="MaxWellSmart1919, Oregon, USA"
+								id="05583ab8-d670-48ee-b006-2202dc9ee77a"
 								direction="right"
 								className="absolute bottom-4 left-4"
 							/>

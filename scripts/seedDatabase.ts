@@ -92,8 +92,64 @@ const cars = [
 	},
 ];
 
+// After the existing sample data, add owners array
+const owners = [
+	{
+		id: guidOwner,
+		name: 'Matthew Congrove',
+		location: {
+			country: 'US',
+			state: 'TX',
+			city: 'Austin',
+		},
+		dateStart: '2024-01-01',
+	},
+	{
+		name: 'Russel Hertzog',
+		location: {
+			country: 'US',
+			state: 'TX',
+			city: 'Georgetown',
+		},
+		dateStart: '2022-01-01',
+		dateEnd: '2024-01-01',
+	},
+	{
+		name: 'Cherylann Marchese',
+		location: {
+			country: 'US',
+			state: 'NV',
+			city: 'Henderson',
+		},
+		dateStart: '2016-01-01',
+		dateEnd: '2022-01-01',
+	},
+	{
+		name: 'Edward Baker',
+		location: {
+			country: 'US',
+			state: 'CA',
+			city: 'Oakland',
+		},
+		dateStart: '1991-02-05',
+		dateEnd: '2016-01-01',
+	},
+];
+
 async function seedDatabase() {
 	try {
+		// Seed owners
+		const ownersBatch = db.batch();
+
+		owners.forEach((owner) => {
+			const ref = db.collection('owners').doc(owner.id || uuidv4());
+			ownersBatch.set(ref, owner);
+		});
+
+		await ownersBatch.commit();
+
+		console.log('Owners seeded successfully');
+
 		// Seed editions
 		const editionsBatch = db.batch();
 

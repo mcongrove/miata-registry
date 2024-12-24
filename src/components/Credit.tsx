@@ -17,22 +17,24 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Car } from '../types/Car';
+import { getCar } from '../api/Car';
+import { formatLocation } from '../utils/geo';
 
 interface CreditProps {
 	className?: string;
-	owner: string;
-	car: string;
-	number?: string;
 	id: string;
 	direction?: 'left' | 'right';
 }
 
 const CreditText = ({
 	car,
-	number,
-	owner,
 	direction,
-}: Omit<CreditProps, 'id'>) => (
+}: {
+	car: Car | null;
+	direction: 'left' | 'right';
+}) => (
 	<div
 		className={`flex items-center overflow-hidden bg-white w-0 h-10 z-10 group-hover:w-auto ${direction === 'left' ? 'rounded-l-full -mr-5' : 'rounded-r-full -ml-5'}`}
 	>
@@ -40,35 +42,40 @@ const CreditText = ({
 			className={`text-brg py-2 ${direction === 'left' ? 'pr-5 pl-4' : 'pl-5 pr-4'} whitespace-nowrap text-[10px]`}
 		>
 			<p>
-				{car}
-				{number && ` #${number}`}
+				{car?.edition.year} {car?.edition.name}
+				{car?.sequence && ` #${car.sequence}`}
 			</p>
 
-			<p>{owner}</p>
+			{car?.owner && (
+				<p>
+					{car.owner.name}
+					{car.owner.location &&
+						` • ${formatLocation(car.owner.location, true)}`}
+				</p>
+			)}
 		</div>
 	</div>
 );
 
-export const Credit = ({
-	className,
-	id,
-	owner,
-	car,
-	number,
-	direction = 'right',
-}: CreditProps) => {
+export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
+	const [car, setCar] = useState<Car | null>(null);
+
+	useEffect(() => {
+		const loadCar = async () => {
+			const carData = await getCar(id);
+
+			setCar(carData);
+		};
+		loadCar();
+	}, [id]);
+
 	return (
 		<Link
 			to={`/registry/${id}`}
 			className={`group flex items-center h-10 opacity-60 hover:opacity-100 ${className}`}
 		>
 			{direction === 'left' && (
-				<CreditText
-					car={car}
-					number={number}
-					owner={owner}
-					direction={direction}
-				/>
+				<CreditText car={car} direction={direction} />
 			)}
 
 			<div className="bg-white p-3 rounded-full z-20 relative">
@@ -82,12 +89,7 @@ export const Credit = ({
 			</div>
 
 			{direction === 'right' && (
-				<CreditText
-					car={car}
-					number={number}
-					owner={owner}
-					direction={direction}
-				/>
+				<CreditText car={car} direction={direction} />
 			)}
 		</Link>
 	);

@@ -23,6 +23,7 @@ export type Edition = {
 	color: string;
 	description?: string[];
 	generation: string;
+	id: string;
 	image?: string;
 	imageCarId?: DocumentReference<Car>;
 	name: string;

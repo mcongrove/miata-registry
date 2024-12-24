@@ -19,6 +19,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { TextField } from '../components/form/TextField';
+import { getCarCount, getClaimedCarCount, getEditionCount } from '../api/Car';
+import { getCountryCount } from '../api/Owner';
 
 const getCommitCount = async (owner: string, repo: string) => {
 	const response = await fetch(
@@ -30,6 +32,35 @@ const getCommitCount = async (owner: string, repo: string) => {
 		return match ? parseInt(match[1]) : 0;
 	}
 	return 0;
+};
+
+const StatisticItem = ({
+	value,
+	label,
+}: {
+	value: number | Promise<number>;
+	label: string;
+}) => {
+	const [count, setCount] = useState<number>(0);
+
+	useEffect(() => {
+		if (value instanceof Promise) {
+			value.then(setCount);
+		} else {
+			setCount(value);
+		}
+	}, [value]);
+
+	return (
+		<div className="flex flex-col items-center gap-2">
+			<span className="text-5xl font-medium text-brg tracking-tight">
+				{count}
+			</span>
+			<span className="text-sm font-medium text-brg-mid text-center">
+				{label}
+			</span>
+		</div>
+	);
 };
 
 export const About = () => {
@@ -152,50 +183,26 @@ export const About = () => {
 					</h2>
 
 					<div className="grid grid-cols-5 gap-8">
-						<div className="flex flex-col items-center gap-2">
-							<span className="text-5xl font-medium text-brg tracking-tight">
-								2,481
-							</span>
-							<span className="text-sm font-medium text-brg-mid text-center">
-								Total Vehicles
-							</span>
-						</div>
-
-						<div className="flex flex-col items-center gap-2">
-							<span className="text-5xl font-medium text-brg tracking-tight">
-								1,873
-							</span>
-							<span className="text-sm font-medium text-brg-mid text-center">
-								Claimed Vehicles
-							</span>
-						</div>
-
-						<div className="flex flex-col items-center gap-2">
-							<span className="text-5xl font-medium text-brg tracking-tight">
-								47
-							</span>
-							<span className="text-sm font-medium text-brg-mid text-center">
-								Limited Editions
-							</span>
-						</div>
-
-						<div className="flex flex-col items-center gap-2">
-							<span className="text-5xl font-medium text-brg tracking-tight">
-								31
-							</span>
-							<span className="text-sm font-medium text-brg-mid text-center">
-								Countries Represented
-							</span>
-						</div>
-
-						<div className="flex flex-col items-center gap-2">
-							<span className="text-5xl font-medium text-brg tracking-tight">
-								{commitCount}
-							</span>
-							<span className="text-sm font-medium text-brg-mid text-center">
-								Code Releases
-							</span>
-						</div>
+						<StatisticItem
+							value={getCarCount()}
+							label="Total Vehicles"
+						/>
+						<StatisticItem
+							value={getClaimedCarCount()}
+							label="Claimed Vehicles"
+						/>
+						<StatisticItem
+							value={getEditionCount()}
+							label="Limited Editions"
+						/>
+						<StatisticItem
+							value={getCountryCount()}
+							label="Countries Represented"
+						/>
+						<StatisticItem
+							value={Promise.resolve(commitCount)}
+							label="Code Releases"
+						/>
 					</div>
 				</div>
 			</div>

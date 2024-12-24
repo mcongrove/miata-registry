@@ -16,8 +16,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const countryMap: { [key: string]: string } = {
-	JAPAN: 'JP',
-	'UNITED STATES': 'US',
-	MEXICO: 'MX',
+import { db } from '../config/firebase';
+import { Owner } from '../types/Owner';
+import { collection, getDocs } from 'firebase/firestore';
+
+export const getCountryCount = async (): Promise<number> => {
+	try {
+		const ownersRef = collection(db, 'owners');
+		const snapshot = await getDocs(ownersRef);
+
+		const uniqueCountries = new Set<string>();
+
+		snapshot.forEach((doc) => {
+			const ownerData = doc.data() as Owner;
+
+			if (ownerData.location?.country) {
+				uniqueCountries.add(ownerData.location.country);
+			}
+		});
+
+		return uniqueCountries.size;
+	} catch (error) {
+		console.error('Error getting unique country count:', error);
+
+		throw error;
+	}
 };
