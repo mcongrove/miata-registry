@@ -18,7 +18,26 @@
 
 import { db } from '../config/firebase';
 import { Owner } from '../types/Owner';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+
+export const getOwner = async (ownerId: string): Promise<Owner | null> => {
+	try {
+		const ownerRef = doc(db, 'owners', ownerId);
+		const ownerSnap = await getDoc(ownerRef);
+
+		if (!ownerSnap.exists()) {
+			console.warn(`No owner found with ID: ${ownerId}`);
+
+			return null;
+		}
+
+		return ownerSnap.data() as Owner;
+	} catch (error) {
+		console.error('Error getting owner:', error);
+
+		throw error;
+	}
+};
 
 export const getCountries = async (): Promise<string[]> => {
 	try {

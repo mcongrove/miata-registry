@@ -17,6 +17,7 @@
  */
 
 import { User as FirebaseUser } from 'firebase/auth';
+import { Timestamp } from 'firebase/firestore';
 
 export interface User extends FirebaseUser {
 	// Firebase
@@ -27,17 +28,17 @@ export interface User extends FirebaseUser {
 
 	// Custom
 	cars?: string[];
-	createdAt?: Date;
-	lastLoginAt?: Date;
+	createdAt?: Timestamp;
+	lastLoginAt?: Timestamp;
 	location?: string;
 }
 
 export interface UserProfile {
 	cars?: string[];
-	createdAt: Date;
+	createdAt: Timestamp;
 	displayName: string;
 	email: string;
-	lastLoginAt: Date;
+	lastLoginAt: Timestamp;
 	location?: string;
 	uid: string;
 }

@@ -31,6 +31,8 @@ import {
 } from '../utils/car';
 import { formatLocation } from '../utils/geo';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { getOwner } from '../api/Owner';
+import { Owner } from '../types/Owner';
 
 interface MapLocation {
 	name: string;
@@ -42,6 +44,8 @@ export const CarProfile = () => {
 	const [car, setCar] = useState<Car | null>(null);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const [vinDetails, setVinDetails] = useState<any>(null);
+	const [currentOwner, setCurrentOwner] = useState<Owner | null>(null);
+	const [timelineOwners, setTimelineOwners] = useState<Owner[]>([]);
 
 	usePageTitle(
 		car
@@ -61,17 +65,44 @@ export const CarProfile = () => {
 
 			try {
 				const carData = await getCar(id);
+
 				setCar(carData);
+
+				if (carData?.owners?.length) {
+					const ownerPromises = carData.owners.map(async (owner) => {
+						const ownerData = await getOwner(owner.ownerId.id);
+
+						return {
+							...ownerData,
+							dateStart: owner.dateStart,
+							dateEnd: owner.dateEnd,
+						};
+					});
+
+					const ownerDetails = await Promise.all(ownerPromises);
+
+					setTimelineOwners(ownerDetails);
+				}
+
+				if (carData?.owners?.[0]?.ownerId) {
+					const ownerData = await getOwner(
+						carData.owners[0].ownerId.id
+					);
+
+					setCurrentOwner(ownerData);
+				}
 
 				if (carData?.vin) {
 					const details = await getVinDetails(
 						carData.vin,
 						carData.edition.year
 					);
+
 					setVinDetails(details);
 				}
 			} catch (error) {
 				console.error('Error loading car:', error);
+
 				setCar(null);
 			}
 		};
@@ -84,34 +115,27 @@ export const CarProfile = () => {
 
 		const items = [];
 
-		// Current owner
-		if (car.owner) {
-			items.push({
-				name: car.owner.name || 'Unknown',
-				dateRange: `${car.owner.dateStart ? toPrettyDate(car.owner.dateStart) : ''} – ${car.owner.dateEnd ? toPrettyDate(car.owner.dateEnd) : 'Present'}`,
-				location: formatLocation(car.owner.location),
-				isActive: true,
+		// Owners
+		if (timelineOwners.length > 0) {
+			timelineOwners.forEach((owner, index) => {
+				const startYear = owner.dateStart
+					? new Date(owner.dateStart.seconds * 1000).getFullYear()
+					: '';
+				const endYear = owner.dateEnd
+					? new Date(owner.dateEnd.seconds * 1000).getFullYear()
+					: '';
+
+				items.push({
+					name: owner.name || 'Unknown',
+					dateRange:
+						index === 0
+							? `${startYear} – Present`
+							: `${startYear} – ${endYear}`,
+					location: formatLocation(owner.location),
+					isActive: index === 0,
+				});
 			});
 		}
-
-		// Previous owners (hardcoded for now)
-		items.push(
-			{
-				name: 'Russel Hertzog',
-				dateRange: '2022 – 2024',
-				location: 'Georgetown, TX, US',
-			},
-			{
-				name: 'Cherylann Marchese',
-				dateRange: '2016 – 2022',
-				location: 'Henderson, NV, US',
-			},
-			{
-				name: 'Edward Baker',
-				dateRange: '1991 – 2016',
-				location: 'Oakland, CA, US',
-			}
-		);
 
 		// Dealer
 		if (car.sale?.dealer) {
@@ -225,7 +249,7 @@ export const CarProfile = () => {
 									</p>
 									{car ? (
 										<p className="font-medium">
-											{car.color}
+											{car.edition.color}
 										</p>
 									) : (
 										<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
@@ -385,7 +409,7 @@ export const CarProfile = () => {
 												name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
 												address: manufactureLocation,
 											},
-											car.shipping?.location
+											car?.shipping?.location
 												? {
 														name: formatLocation(
 															car.shipping
@@ -397,7 +421,7 @@ export const CarProfile = () => {
 														),
 													}
 												: null,
-											car.sale?.dealer?.location
+											car?.sale?.dealer?.location
 												? {
 														name: car.sale.dealer
 															.name,
@@ -407,26 +431,28 @@ export const CarProfile = () => {
 														),
 													}
 												: null,
-											{
-												name: 'Edward Baker',
-												address: 'Oakland, CA, US',
-											},
-											{
-												name: 'Cherylann Marchese',
-												address: 'Henderson, NV, US',
-											},
-											{
-												name: 'Russel Hertzog',
-												address: 'Georgetown, TX, US',
-											},
-											{
-												name: formatLocation(
-													car.owner.location
+											...timelineOwners
+												.slice()
+												.sort(
+													(a, b) =>
+														(a.dateStart?.seconds ||
+															0) -
+														(b.dateStart?.seconds ||
+															0)
+												)
+												.map((owner) =>
+													owner.location
+														? {
+																name:
+																	owner.name ||
+																	'Unknown Owner',
+																address:
+																	formatLocation(
+																		owner.location
+																	),
+															}
+														: null
 												),
-												address: formatLocation(
-													car.owner.location
-												),
-											},
 										].filter(
 											(
 												location
@@ -440,16 +466,16 @@ export const CarProfile = () => {
 							</div>
 
 							<div className="p-4 flex items-center justify-between">
-								{car?.owner.location ? (
+								{currentOwner?.location ? (
 									<>
 										<div>
 											<p className="font-medium text-lg">
-												{car.owner.location?.city}
+												{currentOwner.location?.city}
 											</p>
 
 											<p className="text-brg-mid">
 												{formatLocation(
-													car.owner.location,
+													currentOwner.location,
 													true
 												)}
 											</p>

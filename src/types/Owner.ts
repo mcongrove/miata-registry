@@ -17,10 +17,11 @@
  */
 
 import { Location } from './Location';
+import { Timestamp } from 'firebase/firestore';
 
 export type Owner = {
-	dateEnd?: string;
-	dateStart?: string;
+	dateEnd?: Timestamp;
+	dateStart?: Timestamp;
 	id?: string;
 	location?: Location;
 	name?: string;

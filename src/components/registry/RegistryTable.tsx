@@ -142,12 +142,12 @@ export const RegistryTable = ({
 												style={{
 													backgroundColor:
 														colorMap[
-															car.color?.toLowerCase() ||
+															car.edition.color?.toLowerCase() ||
 																''
 														] || '#DDD',
 												}}
 											/>
-											{car.color}
+											{car.edition.color}
 										</div>
 									</td>
 									<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">

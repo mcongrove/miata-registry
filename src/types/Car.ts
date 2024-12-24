@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { DocumentReference } from 'firebase/firestore';
+import { DocumentReference, Timestamp } from 'firebase/firestore';
 import { Edition } from './Edition';
 import { Owner } from './Owner';
 import { Location } from './Location';
@@ -28,13 +28,14 @@ export type Car = {
 	id: string;
 	image?: string;
 	manufacture?: {
-		date?: string;
+		date?: Timestamp;
 		location?: Location;
 	};
 	ownerId?: DocumentReference<Owner>;
 	owner: Owner;
+	owners?: (Owner & { ownerId: DocumentReference<Owner> })[];
 	sale?: {
-		date?: string;
+		date?: Timestamp;
 		dealer?: {
 			location?: Location;
 			name: string;
@@ -43,7 +44,7 @@ export type Car = {
 	};
 	sequence?: number;
 	shipping?: {
-		date?: string;
+		date?: Timestamp;
 		location?: Location;
 		vessel?: string;
 	};
