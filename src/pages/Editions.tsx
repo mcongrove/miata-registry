@@ -20,14 +20,6 @@ import { EditionCard } from '../components/editions/EditionCard';
 import sampleEditions from '../data/sampleEditions.json';
 
 export const Editions = () => {
-	const getRandomStats = (totalProduced: number) => {
-		const totalInRegistry = Math.floor(
-			Math.random() * (totalProduced * 0.8)
-		); // Up to 80% in registry
-		const totalClaimed = Math.floor(Math.random() * totalInRegistry); // Up to 100% of registry claimed
-		return { totalInRegistry, totalClaimed };
-	};
-
 	return (
 		<main className="flex-1 pt-20">
 			<div className="container mx-auto py-8">
@@ -37,11 +29,7 @@ export const Editions = () => {
 
 				<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 					{sampleEditions.map((edition) => (
-						<EditionCard
-							key={edition.id}
-							edition={edition}
-							stats={getRandomStats(edition.totalProduced || 0)}
-						/>
+						<EditionCard key={edition.id} edition={edition} />
 					))}
 				</div>
 			</div>

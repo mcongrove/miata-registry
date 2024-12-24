@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Link } from 'react-router-dom';
+
 interface CreditProps {
 	className?: string;
 	owner: string;
@@ -56,8 +58,8 @@ export const Credit = ({
 	direction = 'right',
 }: CreditProps) => {
 	return (
-		<a
-			href={`#${id}`}
+		<Link
+			to={`/registry/${id}`}
 			className={`group flex items-center h-10 opacity-60 hover:opacity-100 ${className}`}
 		>
 			{direction === 'left' && (
@@ -87,6 +89,6 @@ export const Credit = ({
 					direction={direction}
 				/>
 			)}
-		</a>
+		</Link>
 	);
 };

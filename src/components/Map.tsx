@@ -32,6 +32,7 @@ interface MarkerData {
 
 export const Map = ({ locations }: MapProps) => {
 	const [markers, setMarkers] = useState<MarkerData[]>([]);
+	const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
 
 	useEffect(() => {
 		const geocodeLocations = async () => {
@@ -71,44 +72,52 @@ export const Map = ({ locations }: MapProps) => {
 			setMarkers(validMarkers);
 		};
 
-		geocodeLocations();
-	}, [locations]);
+		if (isGoogleLoaded) {
+			geocodeLocations();
+		}
+	}, [locations, isGoogleLoaded]);
+
+	const handleGoogleLoad = () => {
+		setIsGoogleLoaded(true);
+	};
 
 	return (
-		<div className="w-full h-[400px]">
+		<div className="w-full h-[400px] bg-brg-50">
 			<LoadScript
 				googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+				onLoad={handleGoogleLoad}
+				loadingElement={<div className="hidden" />}
 			>
-				<GoogleMap
-					mapContainerClassName="w-full h-full"
-					options={{
-						disableDefaultUI: true,
-						zoomControl: true,
-						styles: [
-							{
-								stylers: [
-									{ saturation: -100 },
-									{ lightness: 10 },
-								],
-							},
-						],
-					}}
-					zoom={5}
-					center={
-						markers[markers.length - 1]?.position || {
-							lat: 39.8283,
-							lng: -98.5795,
+				{isGoogleLoaded && (
+					<GoogleMap
+						mapContainerClassName="w-full h-full"
+						options={{
+							disableDefaultUI: true,
+							zoomControl: true,
+							styles: [
+								{
+									stylers: [
+										{ saturation: -100 },
+										{ lightness: 10 },
+									],
+								},
+							],
+						}}
+						zoom={5}
+						center={
+							markers[markers.length - 1]?.position || {
+								lat: 39.8283,
+								lng: -98.5795,
+							}
 						}
-					} // US center
-				>
-					{markers.map((marker, index) => {
-						return (
+					>
+						{markers.map((marker, index) => (
 							<Marker
 								key={index}
 								position={marker.position}
 								title={marker.name}
 								icon={{
-									path: google.maps.SymbolPath.CIRCLE,
+									path: window.google.maps.SymbolPath.CIRCLE,
 									fillColor: '#172E28',
 									fillOpacity: 1,
 									strokeColor: '#FFFFFF',
@@ -116,21 +125,21 @@ export const Map = ({ locations }: MapProps) => {
 									scale: index === markers.length - 1 ? 8 : 4,
 								}}
 							/>
-						);
-					})}
+						))}
 
-					{markers.length > 1 && (
-						<Polyline
-							path={markers.map((marker) => marker.position)}
-							options={{
-								strokeColor: '#172E28',
-								strokeOpacity: 0.8,
-								strokeWeight: 2,
-								geodesic: true,
-							}}
-						/>
-					)}
-				</GoogleMap>
+						{markers.length > 1 && (
+							<Polyline
+								path={markers.map((marker) => marker.position)}
+								options={{
+									strokeColor: '#172E28',
+									strokeOpacity: 0.8,
+									strokeWeight: 2,
+									geodesic: true,
+								}}
+							/>
+						)}
+					</GoogleMap>
+				)}
 			</LoadScript>
 		</div>
 	);

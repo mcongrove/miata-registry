@@ -19,27 +19,13 @@
 import { Edition } from '../../types/Edition';
 import { Link } from 'react-router-dom';
 import { Credit } from '../Credit';
-
-export type EditionStats = {
-	totalInRegistry: number;
-	totalClaimed: number;
-};
+import { EditionStats } from './EditionStats';
 
 type EditionCardProps = {
 	edition: Edition;
-	stats: EditionStats;
 };
 
-export const EditionCard = ({ edition, stats }: EditionCardProps) => {
-	const registryPercentage = edition.totalProduced
-		? (stats.totalInRegistry / edition.totalProduced) * 100
-		: 0;
-	const claimedPercentage = edition.totalProduced
-		? (stats.totalClaimed / edition.totalProduced) * 100
-		: 0;
-
-	console.log(edition);
-
+export const EditionCard = ({ edition }: EditionCardProps) => {
 	return (
 		<Link
 			to={`/registry?filter=edition:${encodeURIComponent(edition.name)}`}
@@ -68,7 +54,7 @@ export const EditionCard = ({ edition, stats }: EditionCardProps) => {
 				</div>
 			)}
 
-			<div className="p-4">
+			<div className="flex flex-col gap-4 p-4">
 				<div className="flex flex-col">
 					<p className="text-xs text-brg-mid">
 						{edition.year} {edition.generation}
@@ -81,51 +67,7 @@ export const EditionCard = ({ edition, stats }: EditionCardProps) => {
 					<p className="text-xs text-brg-mid">{edition.color}</p>
 				</div>
 
-				<div className="mt-4">
-					<div className="text-sm text-brg-mid space-y-1">
-						<div className="flex justify-between text-xs">
-							<span>
-								<span className="font-bold">
-									{stats.totalClaimed.toLocaleString()}
-								</span>{' '}
-								Claimed
-							</span>
-
-							<span>
-								<span className="font-bold">
-									{(
-										stats.totalInRegistry -
-										stats.totalClaimed
-									).toLocaleString()}
-								</span>{' '}
-								In Registry
-							</span>
-
-							<span>
-								<span className="font-bold">
-									{edition.totalProduced?.toLocaleString()}
-								</span>{' '}
-								Produced
-							</span>
-						</div>
-
-						<div className="w-full h-2 bg-brg-light rounded-full overflow-hidden">
-							<div className="h-full flex">
-								<div
-									className="bg-brg-mid h-full"
-									style={{ width: `${claimedPercentage}%` }}
-								/>
-
-								<div
-									className="bg-brg-border h-full"
-									style={{
-										width: `${registryPercentage - claimedPercentage}%`,
-									}}
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
+				<EditionStats totalProduced={edition.totalProduced} />
 			</div>
 		</Link>
 	);
