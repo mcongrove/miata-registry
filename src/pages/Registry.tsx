@@ -45,7 +45,6 @@ export const Registry = () => {
 	};
 
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [search, setSearch] = useState(searchParams.get('search') || '');
 	const [activeFilters, setActiveFilters] = useState<FilterOption[]>(
 		parseFiltersFromURL(searchParams.getAll('filter'))
 	);
@@ -64,38 +63,21 @@ export const Registry = () => {
 		// Otherwise, always use 'asc' since we're defaulting to year
 		return 'asc';
 	});
-	const [searchInputRef, setSearchInputRef] =
-		useState<HTMLInputElement | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [cars, setCars] = useState<Car[]>([]);
 
 	usePageTitle('Cars');
 
 	useEffect(() => {
-		if (window.location.hash === '#search' && searchInputRef) {
-			setTimeout(() => {
-				searchInputRef.focus();
-
-				history.pushState(
-					'',
-					document.title,
-					window.location.pathname + window.location.search
-				);
-			}, 0);
-		}
-	}, [searchInputRef]);
-
-	useEffect(() => {
 		const loadCars = async () => {
 			try {
 				setIsLoading(true);
 				const carsData = await getCars({
-					search,
 					filters: activeFilters,
 					sortColumn,
 					sortDirection,
 				});
-				setCars(carsData);
+				setCars(carsData.cars);
 			} catch (error) {
 				console.error('Error loading cars:', error);
 			} finally {
@@ -104,7 +86,7 @@ export const Registry = () => {
 		};
 
 		loadCars();
-	}, [search, activeFilters, sortColumn, sortDirection]);
+	}, [activeFilters, sortColumn, sortDirection]);
 
 	const updateSearchParams = (
 		updates: Record<string, string | string[] | null>
@@ -174,33 +156,6 @@ export const Registry = () => {
 					/>
 
 					<div className="flex-1 flex flex-col">
-						<div className="relative max-w-80">
-							<input
-								ref={setSearchInputRef}
-								type="text"
-								placeholder="Search..."
-								className="w-full px-3 py-2 rounded-md border border-brg-light text-sm mb-3 focus:outline-none placeholder:text-brg-mid/70 pr-8"
-								value={search}
-								onChange={(e) => {
-									setSearch(e.target.value);
-
-									updateSearchParams({
-										search: e.target.value || null,
-									});
-								}}
-							/>
-
-							{search && (
-								<button
-									onClick={() => setSearch('')}
-									className="absolute right-0 pr-3 pl-1 top-[calc(50%-8px)] -translate-y-1/2 text-brg-mid/70 hover:text-red-700"
-									aria-label="Clear search"
-								>
-									×
-								</button>
-							)}
-						</div>
-
 						{activeFilters.length > 0 && (
 							<div className="mb-3 flex gap-2 flex-wrap">
 								{activeFilters.map((filter) => {
@@ -266,24 +221,16 @@ export const Registry = () => {
 							}}
 							totalItems={totalItems}
 							itemsPerPage={itemsPerPage}
-							hasFilters={
-								activeFilters.length > 0 || search.length > 0
-							}
+							hasFilters={activeFilters.length > 0}
 						/>
 
 						<div className="flex-1 my-3">
-							{isLoading ? (
-								<div className="bg-white rounded-md border border-brg-light p-8 text-center text-brg-mid">
-									Loading cars...
-								</div>
-							) : (
-								<RegistryTable
-									cars={currentCars}
-									sortColumn={sortColumn}
-									sortDirection={sortDirection}
-									onSort={handleSort}
-								/>
-							)}
+							<RegistryTable
+								cars={isLoading ? [] : currentCars}
+								sortColumn={sortColumn}
+								sortDirection={sortDirection}
+								onSort={handleSort}
+							/>
 						</div>
 
 						<PaginationControls
@@ -295,9 +242,7 @@ export const Registry = () => {
 							}}
 							totalItems={totalItems}
 							itemsPerPage={itemsPerPage}
-							hasFilters={
-								activeFilters.length > 0 || search.length > 0
-							}
+							hasFilters={activeFilters.length > 0}
 						/>
 					</div>
 				</div>

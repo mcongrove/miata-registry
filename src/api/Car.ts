@@ -16,30 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { doc, getDoc } from 'firebase/firestore';
+import {
+	collection,
+	getDocs,
+	getDoc,
+	query,
+	limit,
+	QueryConstraint,
+	DocumentReference,
+	doc,
+	getCountFromServer,
+	where,
+} from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Car } from '../types/Car';
 import { Edition } from '../types/Edition';
 import { Owner } from '../types/Owner';
-import {
-	collection,
-	getCountFromServer,
-	query,
-	where,
-	getDocs,
-} from 'firebase/firestore';
-import { FilterType } from '../types/Filters';
+import { FilterOption } from '../types/Filters';
 
-export interface FilterOption {
-	type: FilterType;
-	value: string;
-}
-
-export interface CarQueryParams {
+interface CarQueryParams {
 	search?: string;
 	filters?: FilterOption[];
 	sortColumn?: string;
 	sortDirection?: 'asc' | 'desc';
+	page?: number;
+	pageSize?: number;
 }
 
 export const getCar = async (id: string): Promise<Car | null> => {
@@ -87,55 +88,71 @@ export const getCar = async (id: string): Promise<Car | null> => {
 };
 
 export const getCars = async ({
-	search,
-	filters,
+	filters = [],
 	sortColumn = 'edition.year',
 	sortDirection = 'asc',
-}: CarQueryParams = {}): Promise<Car[]> => {
+	page = 1,
+	pageSize = 50,
+}: CarQueryParams = {}): Promise<{ cars: Car[]; total: number }> => {
 	try {
 		const carsRef = collection(db, 'cars');
-		let q = query(carsRef);
+		const constraints: QueryConstraint[] = [limit(pageSize)];
 
-		// Get all cars first
+		// Create query with basic constraints
+		const q = query(carsRef, ...constraints);
 		const snapshot = await getDocs(q);
-		let cars: Car[] = [];
 
-		// Fetch all cars with their related data
-		for (const doc of snapshot.docs) {
-			const carData = doc.data() as Car;
+		// Fetch edition and owner data for each car
+		const cars = await Promise.all(
+			snapshot.docs.map(async (doc) => {
+				const carData = doc.data();
 
-			// Get edition data
-			const editionDoc = await getDoc(carData.editionId);
-			if (!editionDoc.exists()) {
-				continue;
-			}
-			const editionData = editionDoc.data() as Edition;
-
-			// Get owner data if it exists
-			let ownerData: Owner | null = null;
-			if (carData.ownerId) {
-				const ownerDoc = await getDoc(carData.ownerId);
-				if (!ownerDoc.exists()) {
-					continue;
+				if (!carData.editionId) {
+					console.warn(`Car ${doc.id} has no editionId`);
+					return null;
 				}
-				ownerData = ownerDoc.data() as Owner;
-			}
 
-			if (ownerData === null) {
-				continue;
-			}
+				try {
+					const editionDoc = await getDoc(
+						carData.editionId as DocumentReference
+					);
+					if (!editionDoc.exists()) {
+						console.warn(`Edition not found for car ${doc.id}`);
+						return null;
+					}
 
-			cars.push({
-				...carData,
-				id: doc.id,
-				edition: editionData,
-				owner: ownerData,
-			});
-		}
+					let ownerData = null;
+					if (carData.ownerId) {
+						const ownerDoc = await getDoc(
+							carData.ownerId as DocumentReference
+						);
+						if (ownerDoc.exists()) {
+							ownerData = ownerDoc.data() as Owner;
+						}
+					}
+
+					return {
+						...carData,
+						id: doc.id,
+						edition: editionDoc.data() as Edition,
+						owner: ownerData,
+					} as Car;
+				} catch (error) {
+					console.error(
+						`Error fetching related data for car ${doc.id}:`,
+						error
+					);
+					return null;
+				}
+			})
+		);
+
+		// Filter out any null results
+		let validCars = cars.filter((car): car is Car => car !== null);
 
 		// Apply filters in memory
-		if (filters?.length) {
-			cars = cars.filter((car) => {
+		if (filters.length > 0) {
+			validCars = validCars.filter((car) => {
 				return filters.every((filter) => {
 					switch (filter.type) {
 						case 'generation':
@@ -143,12 +160,13 @@ export const getCars = async ({
 						case 'year':
 							return car.edition.year === parseInt(filter.value);
 						case 'country':
-							return car.owner.location?.country === filter.value;
+							return (
+								car.owner?.location?.country === filter.value
+							);
 						case 'edition': {
 							const [year, ...nameParts] =
 								filter.value.split(' ');
 							const name = nameParts.join(' ');
-
 							return (
 								car.edition.year === parseInt(year) &&
 								car.edition.name === name
@@ -161,92 +179,42 @@ export const getCars = async ({
 			});
 		}
 
-		// Apply search if present
-		if (search) {
-			const searchLower = search.toLowerCase();
-
-			// Create queries for each searchable field
-			const editionQuery = query(
-				carsRef,
-				where('edition.name', '>=', searchLower),
-				where('edition.name', '<=', searchLower + '\uf8ff')
-			);
-			const vinQuery = query(
-				carsRef,
-				where('vin', '>=', searchLower),
-				where('vin', '<=', searchLower + '\uf8ff')
-			);
-			const ownerQuery = query(
-				carsRef,
-				where('owner.name', '>=', searchLower),
-				where('owner.name', '<=', searchLower + '\uf8ff')
-			);
-
-			// Execute all queries in parallel
-			const [editionDocs, vinDocs, ownerDocs] = await Promise.all([
-				getDocs(editionQuery),
-				getDocs(vinQuery),
-				getDocs(ownerQuery),
-			]);
-
-			// Merge results and remove duplicates
-			const results = new Map();
-			[...editionDocs.docs, ...vinDocs.docs, ...ownerDocs.docs].forEach(
-				(doc) => {
-					if (!results.has(doc.id)) {
-						results.set(doc.id, doc);
-					}
-				}
-			);
-
-			q = query(q, where('__name__', 'in', Array.from(results.keys())));
-		}
-
-		// Sort the results in memory since we need to sort by joined data
-		return cars.sort((a, b) => {
-			let aVal, bVal;
-
+		// Sort the results in memory
+		validCars.sort((a, b) => {
 			switch (sortColumn) {
 				case 'edition.year':
-					aVal = a.edition.year;
-					bVal = b.edition.year;
-					break;
-				case 'edition.generation':
-					aVal = a.edition.generation;
-					bVal = b.edition.generation;
-					break;
+					return sortDirection === 'asc'
+						? a.edition.year - b.edition.year
+						: b.edition.year - a.edition.year;
 				case 'edition.name':
-					aVal = a.edition.name;
-					bVal = b.edition.name;
-					break;
-				case 'color':
-					aVal = a.color;
-					bVal = b.color;
-					break;
-				case 'sequence':
-					aVal = a.sequence || 0;
-					bVal = b.sequence || 0;
-					break;
-				case 'owner.name':
-					aVal = a.owner.name;
-					bVal = b.owner.name;
-					break;
-				case 'owner.location.country':
-					aVal = a.owner.location?.country;
-					bVal = b.owner.location?.country;
-					break;
+					return sortDirection === 'asc'
+						? a.edition.name.localeCompare(b.edition.name)
+						: b.edition.name.localeCompare(a.edition.name);
 				default:
-					aVal = a[sortColumn as keyof Car];
-					bVal = b[sortColumn as keyof Car];
+					return 0;
 			}
-
-			if (aVal === bVal) return 0;
-			if (aVal === undefined) return 1;
-			if (bVal === undefined) return -1;
-
-			const comparison = aVal < bVal ? -1 : 1;
-			return sortDirection === 'asc' ? comparison : -comparison;
 		});
+
+		// Apply pagination in memory
+		const startIndex = (page - 1) * pageSize;
+		const paginatedCars = validCars.slice(
+			startIndex,
+			startIndex + pageSize
+		);
+
+		// Log for debugging
+		console.log('Query results:', {
+			filters,
+			totalFetched: snapshot.size,
+			afterFilters: validCars.length,
+			afterPagination: paginatedCars.length,
+			firstCar: paginatedCars[0],
+		});
+
+		return {
+			cars: paginatedCars,
+			total: validCars.length,
+		};
 	} catch (error) {
 		console.error('Error fetching cars:', error);
 		throw error;
