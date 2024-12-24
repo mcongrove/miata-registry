@@ -139,60 +139,55 @@ export const About = () => {
 			</div>
 
 			<div className="container mx-auto">
-				<div id="statistics" className="flex flex-col gap-8 py-16">
+				<div id="statistics" className="flex flex-col gap-12 py-24">
 					<h2
-						className={`text-2xl font-medium text-center ${getHighlightClass('statistics')}`}
+						className={`text-3xl font-medium text-center ${getHighlightClass('statistics')}`}
 					>
 						Registry Statistics
 					</h2>
 
 					<div className="grid grid-cols-5 gap-8">
-						<div className="flex flex-col items-center gap-2 p-6 rounded-lg bg-white border border-brg-light">
-							<span className="text-4xl font-medium text-brg">
+						<div className="flex flex-col items-center gap-2">
+							<span className="text-5xl font-medium text-brg tracking-tight">
 								2,481
 							</span>
-
-							<span className="text-sm text-brg-mid text-center">
+							<span className="text-sm font-medium text-brg-mid text-center">
 								Total Vehicles
 							</span>
 						</div>
 
-						<div className="flex flex-col items-center gap-2 p-6 rounded-lg bg-white border border-brg-light">
-							<span className="text-4xl font-medium text-brg">
+						<div className="flex flex-col items-center gap-2">
+							<span className="text-5xl font-medium text-brg tracking-tight">
 								1,873
 							</span>
-
-							<span className="text-sm text-brg-mid text-center">
+							<span className="text-sm font-medium text-brg-mid text-center">
 								Claimed Vehicles
 							</span>
 						</div>
 
-						<div className="flex flex-col items-center gap-2 p-6 rounded-lg bg-white border border-brg-light">
-							<span className="text-4xl font-medium text-brg">
+						<div className="flex flex-col items-center gap-2">
+							<span className="text-5xl font-medium text-brg tracking-tight">
 								47
 							</span>
-
-							<span className="text-sm text-brg-mid text-center">
+							<span className="text-sm font-medium text-brg-mid text-center">
 								Limited Editions
 							</span>
 						</div>
 
-						<div className="flex flex-col items-center gap-2 p-6 rounded-lg bg-white border border-brg-light">
-							<span className="text-4xl font-medium text-brg">
+						<div className="flex flex-col items-center gap-2">
+							<span className="text-5xl font-medium text-brg tracking-tight">
 								31
 							</span>
-
-							<span className="text-sm text-brg-mid text-center">
+							<span className="text-sm font-medium text-brg-mid text-center">
 								Countries Represented
 							</span>
 						</div>
 
-						<div className="flex flex-col items-center gap-2 p-6 rounded-lg bg-white border border-brg-light">
-							<span className="text-4xl font-medium text-brg">
+						<div className="flex flex-col items-center gap-2">
+							<span className="text-5xl font-medium text-brg tracking-tight">
 								{commitCount}
 							</span>
-
-							<span className="text-sm text-brg-mid text-center">
+							<span className="text-sm font-medium text-brg-mid text-center">
 								Code Releases
 							</span>
 						</div>
