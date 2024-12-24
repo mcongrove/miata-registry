@@ -21,26 +21,36 @@ import { Location } from './Location';
 import { Owner } from './Owner';
 
 export type Car = {
-	color?: string;
-	manufactureDate?: string;
 	edition: Edition;
 	id: string;
 	image?: string;
 	location?: Location;
+	manufacture?: {
+		date?: string;
+		location?: {
+			city?: string;
+			country?: string;
+			state?: string;
+		};
+	};
 	owner?: Owner;
+	history?: {
+		locations?: Location[];
+		owners?: Owner[];
+	};
+	sale?: {
+		date?: string;
+		dealer?: {
+			location?: Location;
+			name: string;
+		};
+		msrp?: number;
+	};
 	sequence?: number;
 	shipping?: {
+		date?: string;
 		port?: string;
 		vessel?: string;
-		date?: string;
 	};
 	vin?: string;
-	sale?: {
-		msrp?: number;
-		dealer?: {
-			name: string;
-			location?: Location;
-		};
-		date?: string;
-	};
 };

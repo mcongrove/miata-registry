@@ -24,8 +24,8 @@ export type Edition = {
 	image?: string;
 	imageCredit?: {
 		car: string;
-		number: string;
 		id: string;
+		number: string;
 		owner: string;
 	};
 	name: string;

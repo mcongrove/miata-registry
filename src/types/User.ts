@@ -20,24 +20,24 @@ import { User as FirebaseUser } from 'firebase/auth';
 
 export interface User extends FirebaseUser {
 	// Firebase
-	uid: string;
-	email: string | null;
 	displayName: string | null;
+	email: string | null;
 	photoURL: string | null;
+	uid: string;
 
 	// Custom
-	location?: string;
 	cars?: string[];
 	createdAt?: Date;
 	lastLoginAt?: Date;
+	location?: string;
 }
 
 export interface UserProfile {
-	uid: string;
-	email: string;
-	displayName: string;
-	location?: string;
 	cars?: string[];
 	createdAt: Date;
+	displayName: string;
+	email: string;
 	lastLoginAt: Date;
+	location?: string;
+	uid: string;
 }

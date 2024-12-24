@@ -16,7 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Location } from './Location';
+
 export type Owner = {
-	id: string;
+	dateEnd?: string;
+	dateStart?: string;
+	id?: string;
+	location?: Location;
 	name?: string;
 };
