@@ -16,10 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ChangeEvent, useEffect, useState } from 'react';
 import { FilterOption } from '../../types/Filters';
 import { Select } from '../Select';
 import { FilterHeader } from './FilterHeader';
 import { FilterRadioGroup } from './FilterRadioGroup';
+import { getEditions } from '../../api/Edition';
+import { getCountries } from '../../api/Owner';
 
 interface FilterSidebarProps {
 	activeFilters: FilterOption[];
@@ -35,6 +38,43 @@ export const FilterSidebar = ({
 		{ length: currentYear - 1989 + 1 },
 		(_, i) => currentYear - i
 	).reverse();
+
+	const [editionOptions, setEditionOptions] = useState<string[]>([]);
+	const [countries, setCountries] = useState<
+		Array<{ value: string; label: string }>
+	>([]);
+
+	useEffect(() => {
+		const loadEditions = async () => {
+			const editions = await getEditions();
+			const formattedOptions = editions.map(
+				(edition) => `${edition.year} ${edition.name}`
+			);
+			setEditionOptions(formattedOptions.sort());
+		};
+
+		loadEditions();
+	}, []);
+
+	useEffect(() => {
+		const loadCountries = async () => {
+			const countryList = await getCountries();
+			const formattedCountries = countryList.map((code) => ({
+				value: code,
+				label:
+					new Intl.DisplayNames(['en'], { type: 'region' }).of(
+						code
+					) || code,
+			}));
+			setCountries(
+				formattedCountries.sort((a, b) =>
+					a.label.localeCompare(b.label)
+				)
+			);
+		};
+
+		loadCountries();
+	}, []);
 
 	const getActiveValue = (type: FilterOption['type']) =>
 		activeFilters.find((f) => f.type === type)?.value;
@@ -70,8 +110,8 @@ export const FilterSidebar = ({
 				<div className="p-4 pt-0">
 					<Select
 						value={getActiveValue('year') || ''}
-						onChange={(value: string) =>
-							handleSelectChange(value, 'year')
+						onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+							handleSelectChange(e.target.value, 'year')
 						}
 						options={years.map((year) => ({
 							value: String(year),
@@ -94,13 +134,7 @@ export const FilterSidebar = ({
 			<FilterRadioGroup
 				title="Edition"
 				type="edition"
-				options={[
-					'1991 British Racing Green',
-					'1992 Sunburst Yellow',
-					'1995 Mazdaspeed',
-					'1999 10th Anniversary',
-					'2001 British Racing Green',
-				]}
+				options={editionOptions}
 				activeValue={getActiveValue('edition')}
 				onClear={handleClear}
 				onChange={handleOptionChange}
@@ -116,17 +150,10 @@ export const FilterSidebar = ({
 				<div className="p-4 pt-0">
 					<Select
 						value={getActiveValue('country') || ''}
-						onChange={(value: string) =>
-							handleSelectChange(value, 'country')
+						onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+							handleSelectChange(e.target.value, 'country')
 						}
-						options={[
-							{ value: 'United States', label: 'United States' },
-							{ value: 'Japan', label: 'Japan' },
-							{
-								value: 'United Kingdom',
-								label: 'United Kingdom',
-							},
-						]}
+						options={countries}
 						placeholder="Select country"
 					/>
 				</div>

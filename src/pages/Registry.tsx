@@ -31,6 +31,15 @@ export const Registry = () => {
 	const parseFiltersFromURL = (filterParams: string[]): FilterOption[] => {
 		return filterParams.map((param) => {
 			const [type, value] = param.split(':') as [FilterType, string];
+
+			// Parse the value if it's a year
+			if (type === 'year') {
+				return {
+					type,
+					value: parseInt(value).toString(),
+				};
+			}
+
 			return { type, value };
 		});
 	};
@@ -80,7 +89,12 @@ export const Registry = () => {
 		const loadCars = async () => {
 			try {
 				setIsLoading(true);
-				const carsData = await getCars();
+				const carsData = await getCars({
+					search,
+					filters: activeFilters,
+					sortColumn,
+					sortDirection,
+				});
 				setCars(carsData);
 			} catch (error) {
 				console.error('Error loading cars:', error);
@@ -90,7 +104,7 @@ export const Registry = () => {
 		};
 
 		loadCars();
-	}, []);
+	}, [search, activeFilters, sortColumn, sortDirection]);
 
 	const updateSearchParams = (
 		updates: Record<string, string | string[] | null>
@@ -128,74 +142,24 @@ export const Registry = () => {
 
 	const handleFiltersChange = (newFilters: FilterOption[]) => {
 		setActiveFilters(newFilters);
-		setCurrentPage(1); // Reset to first page when filters change
+		setCurrentPage(1);
 
 		updateSearchParams({
-			filter: newFilters.map((f) => `${f.type}:${f.value}`),
+			filter: newFilters.map((f) => {
+				const value =
+					typeof f.value === 'object'
+						? JSON.stringify(f.value)
+						: f.value;
+				return `${f.type}:${value}`;
+			}),
 			page: '1',
 		});
 	};
 
-	// Add function to get filtered and sorted cars
-	const getProcessedCars = (cars: Car[]) => {
-		let filtered = [...cars];
-
-		// Apply search
-		if (search) {
-			const searchLower = search.toLowerCase();
-			filtered = filtered.filter(
-				(car) =>
-					car.edition.name.toLowerCase().includes(searchLower) ||
-					car.vin?.toLowerCase().includes(searchLower) ||
-					(car.owner?.name ?? '').toLowerCase().includes(searchLower)
-			);
-		}
-
-		// Apply filters
-		activeFilters.forEach((filter) => {
-			filtered = filtered.filter((car) => {
-				switch (filter.type) {
-					case 'generation':
-						return car.edition.generation === filter.value;
-					case 'year':
-						return car.edition.year.toString() === filter.value;
-					default:
-						return true;
-				}
-			});
-		});
-
-		// Apply sorting
-		filtered.sort((a, b) => {
-			const getValue = (car: Car, path: string) => {
-				return (
-					path
-						.split('.')
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						.reduce((obj: any, key) => obj?.[key], car)
-				);
-			};
-
-			const aVal = getValue(a, sortColumn) ?? '';
-			const bVal = getValue(b, sortColumn) ?? '';
-
-			if (typeof aVal === 'string') {
-				return sortDirection === 'asc'
-					? aVal.localeCompare(bVal)
-					: bVal.localeCompare(aVal);
-			}
-
-			return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
-		});
-
-		return filtered;
-	};
-
 	const itemsPerPage = 50;
-	const processedCars = getProcessedCars(cars);
-	const totalItems = processedCars.length;
+	const totalItems = cars.length;
 	const totalPages = Math.ceil(totalItems / itemsPerPage);
-	const currentCars = processedCars.slice(
+	const currentCars = cars.slice(
 		(currentPage - 1) * itemsPerPage,
 		currentPage * itemsPerPage
 	);
@@ -239,34 +203,46 @@ export const Registry = () => {
 
 						{activeFilters.length > 0 && (
 							<div className="mb-3 flex gap-2 flex-wrap">
-								{activeFilters.map((filter) => (
-									<Chip
-										key={`${filter.type}:${filter.value}`}
-										label={
-											filter.type
-												.charAt(0)
-												.toUpperCase() +
-											filter.type.slice(1)
-										}
-										value={filter.value}
-										onRemove={() => {
-											const newFilters =
-												activeFilters.filter(
-													(f) =>
-														f.type !== filter.type
-												);
+								{activeFilters.map((filter) => {
+									console.log('Filter:', {
+										type: filter.type,
+										value: filter.value,
+										valueType: typeof filter.value,
+									});
 
-											setActiveFilters(newFilters);
+									// Format the filter value for display
+									const displayValue = filter.value;
 
-											updateSearchParams({
-												filter: newFilters.map(
-													(f) =>
-														`${f.type}:${f.value}`
-												),
-											});
-										}}
-									/>
-								))}
+									return (
+										<Chip
+											key={`${filter.type}:${filter.value}`}
+											label={
+												filter.type
+													.charAt(0)
+													.toUpperCase() +
+												filter.type.slice(1)
+											}
+											value={displayValue}
+											onRemove={() => {
+												const newFilters =
+													activeFilters.filter(
+														(f) =>
+															f.type !==
+																filter.type ||
+															f.value !==
+																filter.value
+													);
+												setActiveFilters(newFilters);
+												updateSearchParams({
+													filter: newFilters.map(
+														(f) =>
+															`${f.type}:${f.value}`
+													),
+												});
+											}}
+										/>
+									);
+								})}
 								<button
 									onClick={() => {
 										setActiveFilters([]);

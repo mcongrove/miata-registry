@@ -45,6 +45,11 @@ export const RegistryTable = ({
 		{ header: 'Country', key: 'location.country' },
 	];
 
+	const handleSort = (key: string) => (e: React.MouseEvent) => {
+		e.preventDefault();
+		onSort(key);
+	};
+
 	return (
 		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden">
 			<div className="overflow-auto h-[calc(100vh-332px)] relative">
@@ -55,7 +60,7 @@ export const RegistryTable = ({
 								<th
 									key={header}
 									className="px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light"
-									onClick={() => onSort(key)}
+									onClick={handleSort(key)}
 								>
 									<div className="flex items-center">
 										{header}
@@ -153,16 +158,16 @@ export const RegistryTable = ({
 									)}
 								</td>
 								<td className="px-4 py-3 whitespace-nowrap">
-									{car.location && (
+									{car.owner.location && (
 										<span className="flex items-center gap-2">
 											<img
-												src={`https://flagcdn.com/16x12/${car.location.country.toLowerCase()}.png`}
-												alt={`${car.location.country} flag`}
+												src={`https://flagcdn.com/16x12/${car.owner.location.country.toLowerCase()}.png`}
+												alt={`${car.owner.location.country} flag`}
 												className="w-4 h-3"
 											/>
 											{new Intl.DisplayNames(['en'], {
 												type: 'region',
-											}).of(car.location.country)}
+											}).of(car.owner.location.country)}
 										</span>
 									)}
 								</td>

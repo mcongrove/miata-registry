@@ -20,11 +20,32 @@ import { db } from '../config/firebase';
 import { Owner } from '../types/Owner';
 import { collection, getDocs } from 'firebase/firestore';
 
-export const getCountCountries = async (): Promise<number> => {
+export const getCountries = async (): Promise<string[]> => {
 	try {
 		const ownersRef = collection(db, 'owners');
 		const snapshot = await getDocs(ownersRef);
 
+		const uniqueCountries = new Set<string>();
+
+		snapshot.forEach((doc) => {
+			const ownerData = doc.data() as Owner;
+
+			if (ownerData.location?.country) {
+				uniqueCountries.add(ownerData.location.country);
+			}
+		});
+
+		return Array.from(uniqueCountries).sort();
+	} catch (error) {
+		console.error('Error getting unique countries:', error);
+		throw error;
+	}
+};
+
+export const getCountCountries = async (): Promise<number> => {
+	try {
+		const ownersRef = collection(db, 'owners');
+		const snapshot = await getDocs(ownersRef);
 		const uniqueCountries = new Set<string>();
 
 		snapshot.forEach((doc) => {

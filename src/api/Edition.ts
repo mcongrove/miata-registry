@@ -16,40 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FilterOption, FilterType } from '../../types/Filters';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { Edition } from '../types/Edition';
 
-interface FilterLabelProps {
-	value: string;
-	type: FilterType;
-	isSelected: boolean;
-	onChange: (option: FilterOption) => void;
-}
+export const getEditions = async (): Promise<Edition[]> => {
+	try {
+		const editionsRef = collection(db, 'editions');
+		const snapshot = await getDocs(editionsRef);
 
-export const FilterLabel = ({
-	value,
-	type,
-	isSelected,
-	onChange,
-}: FilterLabelProps) => (
-	<label className="flex items-center space-x-2 cursor-pointer">
-		<input
-			type="radio"
-			className="hidden"
-			checked={isSelected}
-			onChange={() => {
-				onChange({
-					type,
-					value: isSelected ? '' : value,
-				});
-			}}
-		/>
+		return snapshot.docs.map(
+			(doc) =>
+				({
+					id: doc.id,
+					...doc.data(),
+				}) as Edition
+		);
+	} catch (error) {
+		console.error('Error fetching editions:', error);
 
-		<div
-			className={`w-3 h-3 rounded-full border ${
-				isSelected ? 'bg-brg border-brg' : 'bg-white border-brg-border'
-			}`}
-		/>
-
-		<span>{value}</span>
-	</label>
-);
+		throw error;
+	}
+};

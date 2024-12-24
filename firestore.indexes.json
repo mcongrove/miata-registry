@@ -3,14 +3,25 @@
 		{
 			"collectionGroup": "cars",
 			"queryScope": "COLLECTION",
-			"fields": [{ "fieldPath": "sequence", "order": "ASCENDING" }]
+			"fields": [
+				{ "fieldPath": "edition.generation", "order": "ASCENDING" },
+				{ "fieldPath": "edition.year", "order": "ASCENDING" }
+			]
 		},
 		{
 			"collectionGroup": "cars",
 			"queryScope": "COLLECTION",
 			"fields": [
-				{ "fieldPath": "location.country", "order": "ASCENDING" },
-				{ "fieldPath": "location.state", "order": "ASCENDING" }
+				{ "fieldPath": "edition.name", "order": "ASCENDING" },
+				{ "fieldPath": "edition.year", "order": "ASCENDING" }
+			]
+		},
+		{
+			"collectionGroup": "cars",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{ "fieldPath": "owner.name", "order": "ASCENDING" },
+				{ "fieldPath": "edition.year", "order": "ASCENDING" }
 			]
 		}
 	]
