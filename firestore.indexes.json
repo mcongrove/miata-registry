@@ -1,0 +1,17 @@
+{
+	"indexes": [
+		{
+			"collectionGroup": "cars",
+			"queryScope": "COLLECTION",
+			"fields": [{ "fieldPath": "sequence", "order": "ASCENDING" }]
+		},
+		{
+			"collectionGroup": "cars",
+			"queryScope": "COLLECTION",
+			"fields": [
+				{ "fieldPath": "location.country", "order": "ASCENDING" },
+				{ "fieldPath": "location.state", "order": "ASCENDING" }
+			]
+		}
+	]
+}

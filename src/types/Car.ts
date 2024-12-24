@@ -16,41 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { DocumentReference } from 'firebase/firestore';
 import { Edition } from './Edition';
-import { Location } from './Location';
 import { Owner } from './Owner';
+import { Location } from './Location';
 
 export type Car = {
-	edition: Edition;
-	id: string;
+	color: string;
+	vin?: string;
+	ownerId?: DocumentReference<Owner>;
 	image?: string;
-	location?: Location;
-	manufacture?: {
-		date?: string;
-		location?: {
-			city?: string;
-			country?: string;
-			state?: string;
-		};
-	};
-	owner?: Owner;
-	history?: {
-		locations?: Location[];
-		owners?: Owner[];
-	};
-	sale?: {
-		date?: string;
-		dealer?: {
-			location?: Location;
-			name: string;
-		};
-		msrp?: number;
-	};
 	sequence?: number;
+	editionId: DocumentReference<Edition>;
+	manufactureDate?: string;
 	shipping?: {
-		date?: string;
 		port?: string;
 		vessel?: string;
+		date?: string;
 	};
-	vin?: string;
+	location?: Location;
+	sale?: {
+		date?: string;
+		msrp?: number;
+		dealer?: {
+			name: string;
+			location?: Location;
+		};
+	};
 };

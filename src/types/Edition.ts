@@ -16,18 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { DocumentReference } from 'firebase/firestore';
+import { Car } from './Car';
+
 export type Edition = {
 	color: string;
 	description?: string[];
 	generation: string;
-	id: string;
 	image?: string;
-	imageCredit?: {
-		car: string;
-		id: string;
-		number: string;
-		owner: string;
-	};
+	imageCarId?: DocumentReference<Car>;
 	name: string;
 	totalProduced?: number;
 	year: number;
