@@ -44,7 +44,7 @@ export async function onRequest(context: WorkerContext) {
 
 async function handleUpload(context: WorkerContext) {
 	const { carId } = await context.request.json();
-	const filePath = `store/car/${carId}.jpg`;
+	const filePath = `car/${carId}.jpg`;
 
 	const metadata: ImageMetadata = {
 		carId,
@@ -73,7 +73,7 @@ async function handleUpload(context: WorkerContext) {
 
 async function handleDelete(context: WorkerContext) {
 	const { carId } = context.params;
-	const filePath = `store/car/${carId}.jpg`;
+	const filePath = `car/${carId}.jpg`;
 
 	const image = await context.env.IMAGES.head(filePath);
 

@@ -24,7 +24,7 @@ interface UploadResponse {
 }
 
 export function getImage(carId: string): string {
-	return `https://miataregistry.com/store/car/${carId}.jpg`;
+	return `https://store.miataregistry.com/car/${carId}.jpg`;
 }
 
 export async function uploadImage(file: File, carEditionId: string) {

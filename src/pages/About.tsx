@@ -161,19 +161,19 @@ export const About = () => {
 				<div className="flex items-center justify-center w-1/2">
 					<div className="relative h-[544px] w-[544px]">
 						<img
-							src="https://miataregistry.com/images/cars/about-1.jpg"
+							src="https://store.miataregistry.com/app/car/about-1.jpg"
 							className="absolute right-60 top-0 size-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 
 						<img
-							src="https://miataregistry.com/images/cars/about-2.jpg"
+							src="https://store.miataregistry.com/app/car/about-2.jpg"
 							className="absolute right-0 top-24 size-72 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 
 						<img
-							src="https://miataregistry.com/images/cars/about-3.jpg"
+							src="https://store.miataregistry.com/app/car/about-3.jpg"
 							className="absolute right-40 top-72 w-96 h-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
