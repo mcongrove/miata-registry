@@ -30,13 +30,13 @@ export const EditionStats = ({
 	id,
 	showText = true,
 }: EditionStatsProps) => {
+	const [isLoading, setIsLoading] = useState(true);
 	const [stats, setStats] = useState({
 		claimed: 0,
-		inRegistry: 0,
-		registeredPercentage: 0,
 		claimedPercentage: 0,
+		inRegistry: 0,
+		inRegistryPercentage: 0,
 	});
-	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const loadStats = async () => {
@@ -46,10 +46,14 @@ export const EditionStats = ({
 				setStats({
 					claimed: editionStats.claimed,
 					inRegistry: editionStats.inRegistry,
-					registeredPercentage:
+					inRegistryPercentage: Math.max(
 						(editionStats.inRegistry / produced) * 100,
-					claimedPercentage:
-						(editionStats.claimed / editionStats.inRegistry) * 100,
+						3
+					),
+					claimedPercentage: Math.max(
+						(editionStats.claimed / produced) * 100,
+						3
+					),
 				});
 			} catch (error) {
 				console.error('Error loading edition stats:', error);
@@ -102,25 +106,20 @@ export const EditionStats = ({
 				)}
 
 				<div className="w-full h-2 bg-brg-light rounded-full overflow-hidden">
-					<div className="h-full flex">
+					<div className="relative h-full flex">
 						<div
-							className="bg-brg-mid h-full"
+							className="absolute top-0 left-0 bg-brg-mid h-full z-20 rounded-r-full"
 							style={{ width: `${stats.claimedPercentage}%` }}
 						/>
 
 						<div
-							className="bg-brg-border h-full"
+							className="absolute top-0 left-0 bg-brg-border h-full z-10 rounded-r-full"
 							style={{
-								width: `${stats.registeredPercentage - stats.claimedPercentage}%`,
+								width: `${stats.inRegistryPercentage}%`,
 							}}
 						/>
 
-						<div
-							className="bg-brg-light h-full"
-							style={{
-								width: `${100 - stats.registeredPercentage}%`,
-							}}
-						/>
+						<div className="absolute top-0 left-0 bg-brg-light w-full h-full z-0" />
 					</div>
 				</div>
 			</div>
