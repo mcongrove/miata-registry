@@ -45,21 +45,6 @@ export const formatEngineDetails = (details: any) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const formatTransmission = (details: any) => {
-	const speed = details.TransmissionSpeeds || details.TransmissionSpeed;
-	const style = details.TransmissionStyle || details.DriveType;
-
-	if (!speed && !style) return 'Not specified';
-
-	return [
-		speed ? `${speed}-speed` : '',
-		style?.toLowerCase().includes('manual') ? 'Manual' : 'Automatic',
-	]
-		.filter(Boolean)
-		.join(' ');
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatPlantLocation = (details: any) => {
 	const city = details?.PlantCity
 		? toTitleCase(details?.PlantCity?.toLowerCase())

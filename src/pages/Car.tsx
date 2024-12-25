@@ -24,11 +24,7 @@ import { Tooltip } from '../components/Tooltip';
 import { Car } from '../types/Car';
 import { toPrettyDate, toTitleCase } from '../utils/global';
 import { getCar, getVinDetails } from '../api/Car';
-import {
-	formatEngineDetails,
-	formatTransmission,
-	formatPlantLocation,
-} from '../utils/car';
+import { formatEngineDetails, formatPlantLocation } from '../utils/car';
 import { formatLocation } from '../utils/geo';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { getOwner } from '../api/Owner';
@@ -278,7 +274,7 @@ export const CarProfile = () => {
 						</div>
 
 						<div className="bg-white rounded-lg overflow-hidden border border-brg-light">
-							<div className="grid grid-cols-2 md:grid-cols-4">
+							<div className="grid grid-cols-2 md:grid-cols-3">
 								<div className="p-6 border-r border-brg-light">
 									<p className="text-sm text-brg-mid mb-1">
 										Factory Color
@@ -332,36 +328,6 @@ export const CarProfile = () => {
 									>
 										{vinDetails &&
 											formatEngineDetails(vinDetails)}
-									</p>
-								</div>
-
-								<div className="p-6">
-									<div className="flex items-center gap-1 mb-1">
-										<p className="text-sm text-brg-mid">
-											Transmission
-										</p>
-
-										<Tooltip content="Information retrieved based on VIN; may be inaccurate">
-											<svg
-												className="w-3.5 h-3.5 text-brg-mid cursor-help"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-												/>
-											</svg>
-										</Tooltip>
-									</div>
-									<p
-										className={`font-medium ${!vinDetails ? 'animate-pulse bg-brg-light h-6 w-24 rounded' : formatTransmission(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
-									>
-										{vinDetails &&
-											formatTransmission(vinDetails)}
 									</p>
 								</div>
 							</div>
