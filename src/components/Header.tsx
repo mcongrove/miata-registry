@@ -73,6 +73,13 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	);
 };
 
+const ConstructionBanner = () => (
+	<div className="bg-amber-300 text-amber-700 text-xs py-2 text-center w-full z-[70]">
+		🚧 &nbsp; This project is under construction. Features may be incomplete
+		or change without notice.
+	</div>
+);
+
 export const Header = () => {
 	const location = useLocation();
 	const isHomePage = location.pathname === '/';
@@ -168,27 +175,33 @@ export const Header = () => {
 
 	if (isHomePage) {
 		return (
-			<header className="absolute top-0 left-0 right-0 z-50 h-20">
-				<div className="mx-auto py-6 px-16">
-					<div className="flex items-center">
-						<NavLinks />
+			<>
+				<ConstructionBanner />
+				<header className="absolute top-[32px] left-0 right-0 z-50 h-20">
+					<div className="mx-auto py-6 px-16">
+						<div className="flex items-center">
+							<NavLinks />
+						</div>
 					</div>
-				</div>
-			</header>
+				</header>
+			</>
 		);
 	}
 
 	return (
-		<header className="fixed top-0 left-0 right-0 bg-white border-b border-brg-light z-50 h-20">
-			<div className="container mx-auto py-4 relative">
-				<div className="flex items-center">
-					<Link to="/" className="mr-12">
-						<Symbol className="w-16 h-auto text-brg" />
-					</Link>
+		<>
+			<ConstructionBanner />
+			<header className="fixed top-[32px] left-0 right-0 bg-white border-b border-brg-light z-50 h-20">
+				<div className="container mx-auto py-4 relative">
+					<div className="flex items-center">
+						<Link to="/" className="mr-12">
+							<Symbol className="w-16 h-auto text-brg" />
+						</Link>
 
-					<NavLinks />
+						<NavLinks />
+					</div>
 				</div>
-			</div>
-		</header>
+			</header>
+		</>
 	);
 };
