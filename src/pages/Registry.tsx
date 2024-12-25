@@ -111,15 +111,35 @@ export const Registry = () => {
 
 	// Update handlers to persist state in URL
 	const handleSort = (column: string) => {
-		const newDirection =
-			sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
+		if (column !== sortColumn) {
+			setSortColumn(column);
+			setSortDirection('asc');
 
-		setSortColumn(column);
-		setSortDirection(newDirection);
+			updateSearchParams({
+				sortColumn: column,
+				sortDir: 'asc',
+			});
+
+			return;
+		}
+
+		if (sortDirection === 'asc') {
+			setSortDirection('desc');
+
+			updateSearchParams({
+				sortColumn: column,
+				sortDir: 'desc',
+			});
+
+			return;
+		}
+
+		setSortColumn('edition.year');
+		setSortDirection('asc');
 
 		updateSearchParams({
-			sortColumn: column,
-			sortDir: newDirection,
+			sortColumn: 'edition.year',
+			sortDir: 'asc',
 		});
 	};
 

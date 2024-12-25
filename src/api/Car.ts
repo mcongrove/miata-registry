@@ -157,8 +157,6 @@ export const getCars = async ({
 
 		constraints.push(limit(pageSize));
 
-		console.log(constraints);
-
 		const q = query(carsRef, ...constraints);
 
 		const [snapshot, totalSnapshot] = await Promise.all([
