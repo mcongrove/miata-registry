@@ -84,12 +84,6 @@ export const CarProfile = () => {
 					setTimelineOwners(ownerDetails);
 				}
 
-				if (carData?.ownerId) {
-					const ownerData = await getOwner(carData.ownerId.id);
-
-					setCurrentOwner(ownerData);
-				}
-
 				if (carData?.vin) {
 					const details = await getVinDetails(
 						carData.vin,
@@ -209,24 +203,20 @@ export const CarProfile = () => {
 												{car.edition.name}
 											</h2>
 
-											{car.sequence ? (
-												<p className="text-md font-medium">
-													<span className="text-brg-border">
-														No.
-													</span>{' '}
-													{car.sequence.toLocaleString()}{' '}
-													<span className="text-brg-border">
-														of{' '}
-														{car.edition.totalProduced?.toLocaleString()}
-													</span>
-												</p>
-											) : (
-												<p className="text-md font-medium">
-													<span className="text-brg-border">
-														One of the{' '}
-														{car.edition.totalProduced?.toLocaleString()}{' '}
-														produced
-													</span>
+											{car.edition.totalProduced && (
+												<p className="text-md font-medium text-brg-border">
+													{car.sequence ? (
+														<>
+															No.{' '}
+															<span className="text-brg">
+																{car.sequence.toLocaleString()}
+															</span>{' '}
+															of{' '}
+															{car.edition.totalProduced?.toLocaleString()}
+														</>
+													) : (
+														`One of the ${car.edition.totalProduced?.toLocaleString()} produced`
+													)}
 												</p>
 											)}
 										</div>
@@ -248,28 +238,40 @@ export const CarProfile = () => {
 
 						<div className="aspect-video w-full h-[550px] relative rounded-lg overflow-hidden">
 							{car ? (
-								<>
+								<div className="w-full h-full bg-brg-light">
 									<img
 										src={getImage(car.id)}
 										alt={`${car.edition.name}`}
-										className={`w-full h-full object-cover ${car.destroyed ? 'grayscale opacity-70' : ''}`}
+										className="w-full h-full object-cover opacity-0"
+										onLoad={(e) => {
+											const img =
+												e.target as HTMLImageElement;
+											img.classList.add(
+												car.destroyed
+													? 'opacity-70'
+													: 'opacity-100'
+											);
+										}}
 										onError={(e) => {
 											if (car.edition.imageCarId) {
 												const img =
 													e.target as HTMLImageElement;
+
 												img.src = getImage(
 													car.edition.imageCarId.id
 												);
+
 												img.classList.add('grayscale');
 											}
 										}}
 									/>
+
 									{car.destroyed && (
 										<div className="absolute inset-0 overflow-hidden">
 											<div className="absolute top-1/2 left-1/2 w-[200%] h-4 bg-red-500/80 -translate-x-1/2 -translate-y-1/2 -rotate-[28deg]" />
 										</div>
 									)}
-								</>
+								</div>
 							) : (
 								<div className="w-full h-full bg-brg-light animate-pulse" />
 							)}
