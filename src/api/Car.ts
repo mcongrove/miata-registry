@@ -135,6 +135,14 @@ export const getCars = async ({
 
 		constraints.push(orderBy(sortColumn, sortDirection));
 
+		if (sortColumn !== 'edition.year') {
+			constraints.push(orderBy('edition.year', 'asc'));
+		}
+
+		if (sortColumn !== 'edition.name') {
+			constraints.push(orderBy('edition.name', 'asc'));
+		}
+
 		// Pagination
 		if (page > 1) {
 			const startAt = (page - 1) * pageSize;
