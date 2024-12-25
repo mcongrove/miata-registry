@@ -68,14 +68,16 @@ export const getCar = async (id: string): Promise<Car | null> => {
 		const editionData = editionDoc.data() as Edition;
 
 		// Verify ownerId exists before querying
-		if (!carData.ownerId) throw new Error('Owner reference is missing');
+		let ownerData;
 
-		const ownerDoc = await getDoc(carData.ownerId);
+		if (carData.ownerId) {
+			const ownerDoc = await getDoc(carData.ownerId);
 
-		if (!ownerDoc.exists())
-			throw new Error('Referenced owner does not exist');
+			if (!ownerDoc.exists())
+				throw new Error('Referenced owner does not exist');
 
-		const ownerData = ownerDoc.data() as Owner;
+			ownerData = ownerDoc.data() as Owner;
+		}
 
 		return {
 			...carData,
@@ -101,7 +103,6 @@ export const getCars = async ({
 		const carsRef = collection(db, 'cars');
 		const constraints: QueryConstraint[] = [];
 
-		// Add filters to query constraints
 		filters.forEach((filter) => {
 			switch (filter.type) {
 				case 'generation':
@@ -122,6 +123,7 @@ export const getCars = async ({
 				case 'edition': {
 					const [year, ...nameParts] = filter.value.split(' ');
 					const name = nameParts.join(' ');
+
 					constraints.push(
 						where('edition.year', '==', parseInt(year))
 					);
@@ -131,17 +133,34 @@ export const getCars = async ({
 			}
 		});
 
-		// Add sorting
-		const sortField = sortColumn.replace('.', '.'); // e.g., 'edition.year' stays as is
-		constraints.push(orderBy(sortField, sortDirection));
+		constraints.push(orderBy(sortColumn, sortDirection));
 
-		// Add pagination
-		const startAt = (page - 1) * pageSize;
-		constraints.push(startAfter(startAt));
+		// Pagination
+		if (page > 1) {
+			const startAt = (page - 1) * pageSize;
+
+			const previousPageQuery = query(
+				carsRef,
+				...constraints,
+				limit(startAt)
+			);
+
+			const previousPageSnapshot = await getDocs(previousPageQuery);
+
+			const lastDoc =
+				previousPageSnapshot.docs[previousPageSnapshot.docs.length - 1];
+
+			if (lastDoc) {
+				constraints.push(startAfter(lastDoc));
+			}
+		}
+
 		constraints.push(limit(pageSize));
 
-		// Create and execute query
+		console.log(constraints);
+
 		const q = query(carsRef, ...constraints);
+
 		const [snapshot, totalSnapshot] = await Promise.all([
 			getDocs(q),
 			getCountFromServer(
@@ -149,7 +168,6 @@ export const getCars = async ({
 					carsRef,
 					...constraints.filter(
 						(c) =>
-							// Remove pagination constraints for total count using correct types
 							!(c instanceof QueryStartAtConstraint) &&
 							!(c instanceof QueryLimitConstraint)
 					)
@@ -168,6 +186,7 @@ export const getCars = async ({
 		};
 	} catch (error) {
 		console.error('Error fetching cars:', error);
+
 		throw error;
 	}
 };

@@ -23,6 +23,7 @@ import { Location } from './Location';
 
 export type Car = {
 	color: string;
+	destroyed?: boolean;
 	editionId: DocumentReference<Edition>;
 	edition: Edition;
 	id: string;
@@ -31,7 +32,7 @@ export type Car = {
 		location?: Location;
 	};
 	ownerId?: DocumentReference<Owner>;
-	owner: Owner;
+	owner?: Owner;
 	owners?: (Owner & { ownerId: DocumentReference<Owner> })[];
 	sale?: {
 		date?: Timestamp;

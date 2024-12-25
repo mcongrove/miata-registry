@@ -23,6 +23,7 @@ interface Location {
 
 interface MapProps {
 	locations: Location[];
+	hasOwners: boolean;
 }
 
 interface MarkerData {
@@ -30,7 +31,7 @@ interface MarkerData {
 	position: google.maps.LatLngLiteral;
 }
 
-export const Map = ({ locations }: MapProps) => {
+export const Map = ({ locations, hasOwners = false }: MapProps) => {
 	const [markers, setMarkers] = useState<MarkerData[]>([]);
 	const { isLoaded } = useJsApiLoader({
 		id: 'google-map-script',
@@ -81,11 +82,11 @@ export const Map = ({ locations }: MapProps) => {
 	}, [locations, isLoaded]);
 
 	if (!isLoaded) {
-		return <div className="w-full h-[400px] bg-brg-50" />;
+		return <div className="w-full h-96 bg-brg-50" />;
 	}
 
 	return (
-		<div className="w-full h-[400px] bg-brg-50">
+		<div className="w-full h-96 bg-brg-50">
 			<GoogleMap
 				mapContainerClassName="w-full h-full"
 				options={{
@@ -97,7 +98,7 @@ export const Map = ({ locations }: MapProps) => {
 						},
 					],
 				}}
-				zoom={5}
+				zoom={hasOwners ? 5 : 1}
 				center={
 					markers[markers.length - 1]?.position || {
 						lat: 39.8283,

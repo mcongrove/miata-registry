@@ -45,7 +45,6 @@ export const CarProfile = () => {
 	const [car, setCar] = useState<Car | null>(null);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const [vinDetails, setVinDetails] = useState<any>(null);
-	const [currentOwner, setCurrentOwner] = useState<Owner | null>(null);
 	const [timelineOwners, setTimelineOwners] = useState<Owner[]>([]);
 
 	usePageTitle(
@@ -85,10 +84,8 @@ export const CarProfile = () => {
 					setTimelineOwners(ownerDetails);
 				}
 
-				if (carData?.owners?.[0]?.ownerId) {
-					const ownerData = await getOwner(
-						carData.owners[0].ownerId.id
-					);
+				if (carData?.ownerId) {
+					const ownerData = await getOwner(carData.ownerId.id);
 
 					setCurrentOwner(ownerData);
 				}
@@ -130,7 +127,7 @@ export const CarProfile = () => {
 					name: owner.name || 'Unknown',
 					dateRange:
 						index === 0
-							? `${startYear} – Present`
+							? `${startYear} – ${car.destroyed ? 'Destruction' : 'Present'}`
 							: `${startYear} – ${endYear}`,
 					location: formatLocation(owner.location),
 					isActive: index === 0,
@@ -205,22 +202,41 @@ export const CarProfile = () => {
 						<div>
 							{car ? (
 								<>
-									<h2 className="text-4xl font-bold">
-										{car.edition.year} {car.edition.name}
-									</h2>
+									<div className="flex items-start justify-between">
+										<div>
+											<h2 className="text-4xl font-bold">
+												{car.edition.year}{' '}
+												{car.edition.name}
+											</h2>
 
-									{car.sequence && (
-										<p className="text-md font-medium">
-											<span className="text-brg-border">
-												No.
-											</span>{' '}
-											{car.sequence.toLocaleString()}{' '}
-											<span className="text-brg-border">
-												of{' '}
-												{car.edition.totalProduced?.toLocaleString()}
+											{car.sequence ? (
+												<p className="text-md font-medium">
+													<span className="text-brg-border">
+														No.
+													</span>{' '}
+													{car.sequence.toLocaleString()}{' '}
+													<span className="text-brg-border">
+														of{' '}
+														{car.edition.totalProduced?.toLocaleString()}
+													</span>
+												</p>
+											) : (
+												<p className="text-md font-medium">
+													<span className="text-brg-border">
+														One of the{' '}
+														{car.edition.totalProduced?.toLocaleString()}{' '}
+														produced
+													</span>
+												</p>
+											)}
+										</div>
+
+										{car.destroyed && (
+											<span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
+												Destroyed
 											</span>
-										</p>
-									)}
+										)}
+									</div>
 								</>
 							) : (
 								<div className="space-y-2">
@@ -230,23 +246,30 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						<div className="aspect-video w-full relative rounded-lg overflow-hidden">
+						<div className="aspect-video w-full h-[550px] relative rounded-lg overflow-hidden">
 							{car ? (
-								<img
-									src={getImage(car.id)}
-									alt={`${car.edition.name}`}
-									className="w-full h-full object-cover"
-									onError={(e) => {
-										if (car.edition.imageCarId) {
-											const img =
-												e.target as HTMLImageElement;
-											img.src = getImage(
-												car.edition.imageCarId.id
-											);
-											img.classList.add('grayscale');
-										}
-									}}
-								/>
+								<>
+									<img
+										src={getImage(car.id)}
+										alt={`${car.edition.name}`}
+										className={`w-full h-full object-cover ${car.destroyed ? 'grayscale opacity-70' : ''}`}
+										onError={(e) => {
+											if (car.edition.imageCarId) {
+												const img =
+													e.target as HTMLImageElement;
+												img.src = getImage(
+													car.edition.imageCarId.id
+												);
+												img.classList.add('grayscale');
+											}
+										}}
+									/>
+									{car.destroyed && (
+										<div className="absolute inset-0 overflow-hidden">
+											<div className="absolute top-1/2 left-1/2 w-[200%] h-4 bg-red-500/80 -translate-x-1/2 -translate-y-1/2 -rotate-[28deg]" />
+										</div>
+									)}
+								</>
 							) : (
 								<div className="w-full h-full bg-brg-light animate-pulse" />
 							)}
@@ -415,6 +438,11 @@ export const CarProfile = () => {
 							<div className="aspect-[16/9] w-full relative">
 								{car ? (
 									<Map
+										hasOwners={
+											car.owners
+												? car.owners.length > 0
+												: false
+										}
 										locations={[
 											{
 												name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
@@ -476,49 +504,57 @@ export const CarProfile = () => {
 								)}
 							</div>
 
-							<div className="p-4 flex items-center justify-between">
-								{currentOwner?.location ? (
-									<>
+							{car ? (
+								<div className="p-4 flex items-center justify-between">
+									{car?.owner?.location ? (
 										<div>
 											<p className="font-medium text-lg">
-												{currentOwner.location?.city}
+												{car.owner?.location?.city}
 											</p>
 
 											<p className="text-brg-mid">
 												{formatLocation(
-													currentOwner.location,
+													car.owner?.location,
 													true
 												)}
 											</p>
 										</div>
+									) : (
+										<div>
+											<p className="font-medium text-lg text-brg-border">
+												Unknown Location
+											</p>
+										</div>
+									)}
 
-										<svg
-											className="w-5 h-5 text-brg-mid"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-											/>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-											/>
-										</svg>
-									</>
-								) : (
+									<svg
+										className="size-5 text-brg-mid"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+										/>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+										/>
+									</svg>
+								</div>
+							) : (
+								<div className="p-4 flex items-center justify-between">
 									<div className="w-full">
 										<div className="h-6 w-32 bg-brg-light rounded animate-pulse mb-2" />
 										<div className="h-5 w-48 bg-brg-light rounded animate-pulse" />
 									</div>
-								)}
-							</div>
+								</div>
+							)}
 						</div>
 
 						<div>{getTimelineItems()}</div>

@@ -159,7 +159,7 @@ export const About = () => {
 				</div>
 
 				<div className="flex items-center justify-center w-1/2">
-					<div className="relative h-[544px] w-[544px]">
+					<div className="relative size-[544px]">
 						<img
 							src="https://store.miataregistry.com/app/car/about-1.jpg"
 							className="absolute right-60 top-0 size-64 rounded-lg object-cover shadow-xl bg-brg-light"

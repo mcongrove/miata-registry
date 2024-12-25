@@ -32,7 +32,6 @@ export const Registry = () => {
 		return filterParams.map((param) => {
 			const [type, value] = param.split(':') as [FilterType, string];
 
-			// Parse the value if it's a year
 			if (type === 'year') {
 				return {
 					type,

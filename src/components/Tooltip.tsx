@@ -68,7 +68,7 @@ export const Tooltip = ({
 
 						<div
 							ref={arrowRef}
-							className="absolute bg-brg-dark w-2 h-2 rotate-45 -z-10"
+							className="absolute bg-brg-dark size-2 rotate-45 -z-10"
 							style={{
 								bottom: '-4px',
 								left: '50%',

@@ -35,7 +35,7 @@ export const TimelineItem = ({
 		<div className="relative flex gap-6">
 			<div className="relative">
 				<div
-					className={`w-3 h-3 ${isActive ? 'bg-brg' : 'bg-brg-border'} rounded-full mt-1.5 relative z-10`}
+					className={`size-3 ${isActive ? 'bg-brg' : 'bg-brg-border'} rounded-full mt-1.5 relative z-10`}
 				/>
 				<div
 					className={`

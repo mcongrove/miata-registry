@@ -46,7 +46,7 @@ export const UserMenu = ({ user }: UserMenuProps) => {
 				) : (
 					<div className="size-11 rounded-full bg-brg flex items-center justify-center">
 						<svg
-							className="w-6 h-6 text-brg-border"
+							className="size-6 text-brg-border"
 							viewBox="0 0 24 24"
 							fill="currentColor"
 						>

@@ -45,7 +45,7 @@ export const FilterLabel = ({
 		/>
 
 		<div
-			className={`w-3 h-3 rounded-full border ${
+			className={`size-3 rounded-full border ${
 				isSelected ? 'bg-brg border-brg' : 'bg-white border-brg-border'
 			}`}
 		/>

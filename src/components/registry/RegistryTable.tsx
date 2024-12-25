@@ -41,10 +41,10 @@ export const RegistryTable = ({
 		{ header: 'Year', key: 'edition.year', width: 'w-20' },
 		{ header: 'Gen.', key: 'edition.generation', width: 'w-20' },
 		{ header: 'Edition', key: 'edition.name', width: 'w-44' },
-		{ header: 'Color', key: 'color', width: 'w-52' },
+		{ header: 'Color', key: 'edition.color', width: 'w-52' },
 		{ header: 'Sequence #', key: 'sequence', width: 'w-36' },
 		{ header: 'Owner', key: 'owner.name', width: 'w-44' },
-		{ header: 'Country', key: 'location.country', width: 'w-40' },
+		{ header: 'Country', key: 'owner.location.country', width: 'w-40' },
 	];
 
 	const handleSort = (key: string) => (e: React.MouseEvent) => {
@@ -150,19 +150,27 @@ export const RegistryTable = ({
 											{car.edition.color}
 										</div>
 									</td>
-									<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
-										{car.sequence && (
-											<>
-												{car.sequence.toLocaleString()}
-												{car.edition.totalProduced && (
-													<span className="text-brg-border">
-														of{' '}
-														{car.edition.totalProduced.toLocaleString()}
-													</span>
-												)}
-											</>
-										)}
-									</td>
+									{car.sequence ? (
+										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
+											{car.sequence.toLocaleString()}
+											{car.edition.totalProduced && (
+												<span className="text-brg-border">
+													of{' '}
+													{car.edition.totalProduced.toLocaleString()}
+												</span>
+											)}
+										</td>
+									) : (
+										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40 text-brg-border">
+											Unknown{' '}
+											{car.edition.totalProduced && (
+												<span>
+													of{' '}
+													{car.edition.totalProduced.toLocaleString()}
+												</span>
+											)}
+										</td>
+									)}
 									<td className="px-4 py-3 whitespace-nowrap">
 										{car.owner ? (
 											<Link
@@ -181,18 +189,23 @@ export const RegistryTable = ({
 										)}
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
-										{car.owner.location && (
+										{car.owner?.location ? (
 											<span className="flex items-center gap-2">
 												<img
-													src={`https://flagcdn.com/16x12/${car.owner.location.country.toLowerCase()}.png`}
-													alt={`${car.owner.location.country} flag`}
+													src={`https://flagcdn.com/16x12/${car.owner?.location?.country.toLowerCase()}.png`}
+													alt={`${car.owner?.location?.country} flag`}
 													className="w-4 h-3"
 												/>
 												{new Intl.DisplayNames(['en'], {
 													type: 'region',
 												}).of(
-													car.owner.location.country
+													car.owner?.location
+														?.country || ''
 												)}
+											</span>
+										) : (
+											<span className="text-brg-border">
+												Unknown
 											</span>
 										)}
 									</td>
