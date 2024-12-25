@@ -32,6 +32,7 @@ import { CarProfile } from './pages/Car';
 import { About } from './pages/About';
 import { Legal } from './pages/Legal';
 import { useEffect } from 'react';
+import { Analytics } from './components/Analytics';
 
 function ScrollToTop() {
 	const { pathname } = useLocation();
@@ -57,6 +58,7 @@ function Layout() {
 function App() {
 	return (
 		<BrowserRouter>
+			<Analytics />
 			<Routes>
 				<Route element={<Layout />}>
 					<Route path="/" element={<Home />} />
