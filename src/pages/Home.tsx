@@ -64,7 +64,7 @@ export const Home = () => {
 
 				<div className="w-1/2 h-full relative">
 					<img
-						src="/images/cars/1991SE182.jpg"
+						src="https://miataregistry.com/images/cars/1991SE182.jpg"
 						alt="1991 British Racing Green #182"
 						className="w-full h-full object-cover object-left"
 					/>
@@ -264,7 +264,7 @@ export const Home = () => {
 								rel="noopener noreferrer"
 							>
 								<img
-									src="/images/partners/miatanet.jpg"
+									src="https://miataregistry.com/images/partners/miatanet.jpg"
 									alt="Miata.net"
 									className="max-h-32 max-w-32 w-auto h-auto"
 								/>
@@ -276,7 +276,7 @@ export const Home = () => {
 								rel="noopener noreferrer"
 							>
 								<img
-									src="/images/partners/brgeunosownersclub.jpg"
+									src="https://miataregistry.com/images/partners/brgeunosownersclub.jpg"
 									alt="BRG Eunos Owners Club"
 									className="max-h-20 max-w-20 w-auto h-auto"
 								/>
@@ -288,7 +288,7 @@ export const Home = () => {
 								rel="noopener noreferrer"
 							>
 								<img
-									src="/images/partners/mazdaforum.jpg"
+									src="https://miataregistry.com/images/partners/mazdaforum.jpg"
 									alt="Mazda Forum"
 									className="max-h-32 max-w-32 w-auto h-auto"
 								/>
@@ -300,7 +300,7 @@ export const Home = () => {
 								rel="noopener noreferrer"
 							>
 								<img
-									src="/images/partners/mx5nutz.jpg"
+									src="https://miataregistry.com/images/partners/mx5nutz.jpg"
 									alt="MX5 Nutz"
 									className="max-h-32 max-w-32 w-auto h-auto"
 								/>
@@ -312,7 +312,7 @@ export const Home = () => {
 								rel="noopener noreferrer"
 							>
 								<img
-									src="/images/partners/clubroadster.jpg"
+									src="https://miataregistry.com/images/partners/clubroadster.jpg"
 									alt="Club Roadster"
 									className="max-h-32 max-w-32 w-auto h-auto"
 								/>
@@ -325,7 +325,7 @@ export const Home = () => {
 					<div className="flex flex-row items-stretch">
 						<div className="w-1/3 relative">
 							<img
-								src="/images/cars/about-3.jpg"
+								src="https://miataregistry.com/images/cars/about-3.jpg"
 								className="absolute inset-0 w-full h-full object-cover object-bottom scale-x-[-1]"
 							/>
 

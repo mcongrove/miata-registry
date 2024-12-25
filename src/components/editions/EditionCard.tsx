@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom';
 import { Edition } from '../../types/Edition';
 import { Credit } from '../Credit';
 import { EditionStats } from './EditionStats';
+import { getImage } from '../../api/Image';
 
 type EditionCardProps = {
 	edition: Edition;
@@ -36,7 +37,7 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 						).replace(/%20/g, '+')}`}
 					>
 						<img
-							src={`/images/store/car/${edition.imageCarId.id}.jpg`}
+							src={getImage(edition.imageCarId.id)}
 							alt={edition.name}
 							className="w-full h-full object-cover"
 							loading="lazy"

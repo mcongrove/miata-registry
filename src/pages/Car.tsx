@@ -33,6 +33,7 @@ import { formatLocation } from '../utils/geo';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { getOwner } from '../api/Owner';
 import { Owner } from '../types/Owner';
+import { getImage } from '../api/Image';
 
 interface MapLocation {
 	name: string;
@@ -232,14 +233,16 @@ export const CarProfile = () => {
 						<div className="aspect-video w-full relative rounded-lg overflow-hidden">
 							{car ? (
 								<img
-									src={`/images/store/car/${car.id}.jpg`}
+									src={getImage(car.id)}
 									alt={`${car.edition.name}`}
 									className="w-full h-full object-cover"
 									onError={(e) => {
 										if (car.edition.imageCarId) {
 											const img =
 												e.target as HTMLImageElement;
-											img.src = `/images/store/car/${car.edition.imageCarId.id}.jpg`;
+											img.src = getImage(
+												car.edition.imageCarId.id
+											);
 											img.classList.add('grayscale');
 										}
 									}}
