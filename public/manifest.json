@@ -1,35 +1,35 @@
 {
-    "short_name": "Miata Registry",
-    "name": "Miata Registry",
-    "icons": [
-        {
-            "src": "favicon.png",
-            "sizes": "64x64 32x32 24x24 16x16",
-            "type": "image/x-icon"
-        }
-    ],
-    "start_url": ".",
-    "display": "standalone",
-    "theme_color": "#000000",
-    "background_color": "#ffffff",
-    "description": "A registry of all limited edition Mazda Miatas",
-    "lang": "en",
-    "categories": ["automotive", "community"],
-    "author": {
-        "name": "Matthew Congrove",
-        "website": "https://mattcongrove.com/",
-        "github": "https://github.com/mcongrove"
-    },
-    "developer": {
-        "name": "Matthew Congrove",
-        "url": "https://mattcongrove.com/"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mcongrove/miata-registry",
-        "issues": "https://github.com/mcongrove/miata-registryy/issues",
-        "branch": "main"
-    },
-    "license": "AGPL-3.0",
-    "version": "1.0.0"
+	"short_name": "Miata Registry",
+	"name": "Miata Registry",
+	"icons": [
+		{
+			"src": "favicon.png",
+			"sizes": "64x64 32x32 24x24 16x16",
+			"type": "image/x-icon"
+		}
+	],
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#000000",
+	"background_color": "#ffffff",
+	"description": "A community-driven project documenting the history of limited edition Mazda Miatas.",
+	"lang": "en",
+	"categories": ["automotive", "community"],
+	"author": {
+		"name": "Matthew Congrove",
+		"website": "https://mattcongrove.com/",
+		"github": "https://github.com/mcongrove"
+	},
+	"developer": {
+		"name": "Matthew Congrove",
+		"url": "https://mattcongrove.com/"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mcongrove/miata-registry",
+		"issues": "https://github.com/mcongrove/miata-registryy/issues",
+		"branch": "main"
+	},
+	"license": "AGPL-3.0",
+	"version": "1.0.0"
 }

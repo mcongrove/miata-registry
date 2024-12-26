@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useEffect } from 'react';
 import {
 	BrowserRouter,
 	Outlet,
@@ -25,13 +26,12 @@ import {
 } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { About } from './pages/About';
+import { CarProfile } from './pages/Car';
 import { Editions } from './pages/Editions';
 import { Home } from './pages/Home';
-import { Registry } from './pages/Registry';
-import { CarProfile } from './pages/Car';
-import { About } from './pages/About';
 import { Legal } from './pages/Legal';
-import { useEffect } from 'react';
+import { Registry } from './pages/Registry';
 
 function ScrollToTop() {
 	const { pathname } = useLocation();
@@ -60,11 +60,11 @@ function App() {
 			<Routes>
 				<Route element={<Layout />}>
 					<Route path="/" element={<Home />} />
-					<Route path="/registry" element={<Registry />} />
-					<Route path="/registry/editions" element={<Editions />} />
-					<Route path="/registry/:id" element={<CarProfile />} />
 					<Route path="/about" element={<About />} />
 					<Route path="/legal" element={<Legal />} />
+					<Route path="/registry" element={<Registry />} />
+					<Route path="/registry/:id" element={<CarProfile />} />
+					<Route path="/registry/editions" element={<Editions />} />
 				</Route>
 			</Routes>
 		</BrowserRouter>

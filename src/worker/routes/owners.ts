@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Hono } from 'hono';
 import { eq, sql } from 'drizzle-orm';
-import { Cars, Owners } from '../../db/schema';
+import { Hono } from 'hono';
 import { createDb } from '../../db';
+import { Cars, Owners } from '../../db/schema';
 import type { Bindings } from '../types';
 
 const ownersRouter = new Hono<{ Bindings: Bindings }>();

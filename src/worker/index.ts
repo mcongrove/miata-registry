@@ -18,11 +18,11 @@
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import type { Bindings } from './types';
 import carsRouter from './routes/cars';
 import editionsRouter from './routes/editions';
 import ownersRouter from './routes/owners';
 import statsRouter from './routes/stats';
+import type { Bindings } from './types';
 
 const app = new Hono<{ Bindings: Bindings }>();
 

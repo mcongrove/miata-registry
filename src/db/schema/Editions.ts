@@ -19,12 +19,12 @@
 import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
 
 export const Editions = sqliteTable('editions', {
-	id: text('id').primaryKey(),
-	name: text('name').notNull(),
 	color: text('color').notNull(),
-	generation: text('generation').notNull(),
-	year: integer('year').notNull(),
-	total_produced: integer('total_produced'),
 	description: text('description'),
+	generation: text('generation').notNull(),
+	id: text('id').primaryKey(),
 	image_car_id: text('image_car_id'),
+	name: text('name').notNull(),
+	total_produced: integer('total_produced'),
+	year: integer('year').notNull(),
 });

@@ -16,15 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Chip } from '../components/Chip';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { TCar } from '../types/Car';
 import { TFilterOption, TFilterType } from '../types/Filters';
-import { usePageTitle } from '../hooks/usePageTitle';
 
 export const Registry = () => {
 	const parseFiltersFromURL = (filterParams: string[]): TFilterOption[] => {

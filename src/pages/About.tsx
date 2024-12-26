@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import emailjs from '@emailjs/browser';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { StatisticItem } from '../components/about/StatisticItem';
 import { TextField } from '../components/form/TextField';
 import { usePageTitle } from '../hooks/usePageTitle';
-import { StatisticItem } from '../components/about/StatisticItem';
-import emailjs from '@emailjs/browser';
 
 const getCountCodeCommits = async (owner: string, repo: string) => {
 	const response = await fetch(

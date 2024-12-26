@@ -19,9 +19,9 @@
 import { text, sqliteTable } from 'drizzle-orm/sqlite-core';
 
 export const Owners = sqliteTable('owners', {
+	city: text('city'),
+	country: text('country'),
 	id: text('id').primaryKey(),
 	name: text('name'),
-	country: text('country'),
 	state: text('state'),
-	city: text('city'),
 });

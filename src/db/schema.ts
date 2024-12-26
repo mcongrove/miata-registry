@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from './schema/Editions';
-export * from './schema/Cars';
-export * from './schema/Owners';
 export * from './schema/CarOwners';
+export * from './schema/Cars';
+export * from './schema/Editions';
+export * from './schema/Owners';

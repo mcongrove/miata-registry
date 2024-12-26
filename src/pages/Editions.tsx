@@ -18,8 +18,8 @@
 
 import { useEffect, useState } from 'react';
 import { EditionCard } from '../components/editions/EditionCard';
-import { TEdition } from '../types/Edition';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { TEdition } from '../types/Edition';
 
 export const Editions = () => {
 	const [editions, setEditions] = useState<TEdition[]>([]);

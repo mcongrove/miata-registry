@@ -17,7 +17,7 @@
  */
 
 import { relations } from 'drizzle-orm';
-import { text, sqliteTable, primaryKey } from 'drizzle-orm/sqlite-core';
+import { primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { Cars } from './Cars';
 import { Owners } from './Owners';
 
@@ -27,11 +27,11 @@ export const CarOwners = sqliteTable(
 		car_id: text('car_id')
 			.references(() => Cars.id)
 			.notNull(),
+		date_end: text('date_end'),
+		date_start: text('date_start'),
 		owner_id: text('owner_id')
 			.references(() => Owners.id)
 			.notNull(),
-		date_start: text('date_start'),
-		date_end: text('date_end'),
 	},
 	(table) => ({
 		pk: primaryKey({
