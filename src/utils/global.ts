@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Timestamp } from 'firebase/firestore';
-
 export const toTitleCase = (str: string): string => {
 	if (!str) return '';
 
@@ -29,16 +27,14 @@ export const toTitleCase = (str: string): string => {
 };
 
 export const toPrettyDate = (
-	timestamp: Timestamp | Date | string | null | undefined
+	timestamp: Date | string | null | undefined
 ): string => {
 	if (!timestamp) return '';
 
 	let date: Date;
 
 	try {
-		if (timestamp instanceof Timestamp) {
-			date = timestamp.toDate();
-		} else if (timestamp instanceof Date) {
+		if (timestamp instanceof Date) {
 			date = timestamp;
 		} else {
 			date = new Date(timestamp);

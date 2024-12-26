@@ -18,10 +18,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
-import { Button } from './Button';
-import { useAuth } from '../hooks/useAuth';
-import { signInWithGoogle } from '../utils/auth';
-import { UserMenu } from './UserMenu';
+// import { Button } from './Button';
 
 interface DropdownProps {
 	label: string;
@@ -83,51 +80,51 @@ const ConstructionBanner = () => (
 export const Header = () => {
 	const location = useLocation();
 	const isHomePage = location.pathname === '/';
-	const { user, loading } = useAuth();
+	// const { user, loading } = useAuth();
 
-	const handleSignIn = async () => {
-		await signInWithGoogle();
-	};
+	// const handleSignIn = async () => {
+	// 	await signInWithGoogle();
+	// };
 
 	const isActive = (path: string) => {
 		return location.pathname.startsWith(path);
 	};
 
-	const AuthSection = () => {
-		if (loading) return null;
+	// const AuthSection = () => {
+	// 	if (loading) return null;
 
-		return user ? (
-			<UserMenu user={user} />
-		) : (
-			<>
-				{isHomePage ? (
-					<div className="flex items-center text-sm text-white">
-						<button
-							onClick={handleSignIn}
-							className="block bg-brg hover:bg-brg-dark rounded-l-lg transition-colors py-3 px-4 border-r border-brg-mid"
-						>
-							Sign In
-						</button>
+	// 	return user ? (
+	// 		<UserMenu user={user} />
+	// 	) : (
+	// 		<>
+	// 			{isHomePage ? (
+	// 				<div className="flex items-center text-sm text-white">
+	// 					<button
+	// 						onClick={handleSignIn}
+	// 						className="block bg-brg hover:bg-brg-dark rounded-l-lg transition-colors py-3 px-4 border-r border-brg-mid"
+	// 					>
+	// 						Sign In
+	// 					</button>
 
-						<button
-							onClick={handleSignIn}
-							className="bg-brg hover:bg-brg-dark rounded-r-lg transition-colors py-3 px-4"
-						>
-							Register
-						</button>
-					</div>
-				) : (
-					<div className="flex items-center text-sm gap-2">
-						<Button variant="tertiary" onClick={handleSignIn}>
-							Sign In
-						</Button>
+	// 					<button
+	// 						onClick={handleSignIn}
+	// 						className="bg-brg hover:bg-brg-dark rounded-r-lg transition-colors py-3 px-4"
+	// 					>
+	// 						Register
+	// 					</button>
+	// 				</div>
+	// 			) : (
+	// 				<div className="flex items-center text-sm gap-2">
+	// 					<Button variant="tertiary" onClick={handleSignIn}>
+	// 						Sign In
+	// 					</Button>
 
-						<Button onClick={handleSignIn}>Register</Button>
-					</div>
-				)}
-			</>
-		);
-	};
+	// 					<Button onClick={handleSignIn}>Register</Button>
+	// 				</div>
+	// 			)}
+	// 		</>
+	// 	);
+	// };
 
 	const NavLinks = () => (
 		<nav className="flex items-center justify-between w-full h-11">
@@ -171,7 +168,7 @@ export const Header = () => {
 				<ConstructionBanner />
 			</div>
 
-			<AuthSection />
+			{/* <AuthSection /> */}
 		</nav>
 	);
 
