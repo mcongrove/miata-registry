@@ -16,6 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+CREATE TABLE owners (
+  id TEXT PRIMARY KEY,
+  name TEXT,
+  country TEXT,
+  state TEXT,
+  city TEXT
+)
+
+CREATE TABLE car_owners (
+  car_id TEXT,
+  owner_id TEXT,
+  date_start TIMESTAMP NOT NULL,
+  date_end TIMESTAMP,
+  PRIMARY KEY (car_id, owner_id, date_start),
+  FOREIGN KEY(car_id) REFERENCES cars(id),
+  FOREIGN KEY(owner_id) REFERENCES owners(id)
+)
+*/
+
 import { Location } from './Location';
 import { Timestamp } from 'firebase/firestore';
 

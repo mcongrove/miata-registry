@@ -16,6 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+CREATE TABLE editions (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  color TEXT NOT NULL,
+  generation TEXT NOT NULL,
+  year INTEGER NOT NULL,
+  total_produced INTEGER,
+  description TEXT,
+  image_car_id TEXT
+)
+*/
+
 import { DocumentReference } from 'firebase/firestore';
 import { Car } from './Car';
 

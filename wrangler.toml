@@ -1,13 +1,15 @@
 name = "miata-registry"
 compatibility_date = "2024-01-01"
 
-[[routes]]
-pattern = "miataregistry.com/store/car/*"
-script = "image-read"
+routes = [
+  { pattern = "miataregistry.com/store/car/*", zone_name = "miataregistry.com" },
+  { pattern = "miataregistry.com/worker/api/images/*", zone_name = "miataregistry.com" }
+]
 
-[[routes]]
-pattern = "miataregistry.com/worker/api/images/*"
-script = "image-write"
+[[d1_databases]]
+binding = "DB"
+database_name = "registry"
+database_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
 
 [env.production]
 r2_buckets = [

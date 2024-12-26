@@ -53,3 +53,6 @@ yarn-error.log*
 # dotenv environment variables file
 .env
 /backups
+
+# Wrangler
+/.wrangler

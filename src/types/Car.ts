@@ -16,6 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ CREATE TABLE cars (
+   id TEXT PRIMARY KEY,
+   vin TEXT,
+   color TEXT NOT NULL,
+   edition_id TEXT NOT NULL,
+   sequence INTEGER,
+   destroyed BOOLEAN DEFAULT FALSE,
+   manufacture_date TIMESTAMP,
+   manufacture_city TEXT,
+   manufacture_country TEXT,
+   shipping_date TIMESTAMP,
+   shipping_city TEXT,
+   shipping_state TEXT,
+   shipping_country TEXT,
+   shipping_vessel TEXT,
+   sale_date TIMESTAMP,
+   sale_dealer_name TEXT,
+   sale_dealer_location_city TEXT,
+   sale_dealer_location_state TEXT,
+   sale_dealer_location_country TEXT,
+   sale_msrp INTEGER,
+   FOREIGN KEY(edition_id) REFERENCES editions(id)
+ )
+*/
+
 import { DocumentReference, Timestamp } from 'firebase/firestore';
 import { Edition } from './Edition';
 import { Owner } from './Owner';
