@@ -18,12 +18,11 @@
 
 import { useEffect, useState } from 'react';
 import { EditionCard } from '../components/editions/EditionCard';
-import { getEditions } from '../api/Edition';
-import { Edition } from '../types/Edition';
+import { TEdition } from '../types/Edition';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export const Editions = () => {
-	const [editions, setEditions] = useState<Edition[]>([]);
+	const [editions, setEditions] = useState<TEdition[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
 	usePageTitle('Editions');
@@ -31,7 +30,10 @@ export const Editions = () => {
 	useEffect(() => {
 		const loadEditions = async () => {
 			try {
-				const editionsData = await getEditions();
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/editions`
+				);
+				const editionsData = await response.json();
 
 				setEditions(editionsData);
 			} catch (error) {

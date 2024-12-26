@@ -22,15 +22,14 @@ import { Chip } from '../components/Chip';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
-import { Car } from '../types/Car';
-import { FilterOption, FilterType } from '../types/Filters';
+import { TCar } from '../types/Car';
+import { TFilterOption, TFilterType } from '../types/Filters';
 import { usePageTitle } from '../hooks/usePageTitle';
-import { getCars } from '../api/Car';
 
 export const Registry = () => {
-	const parseFiltersFromURL = (filterParams: string[]): FilterOption[] => {
+	const parseFiltersFromURL = (filterParams: string[]): TFilterOption[] => {
 		return filterParams.map((param) => {
-			const [type, value] = param.split(':') as [FilterType, string];
+			const [type, value] = param.split(':') as [TFilterType, string];
 
 			if (type === 'year') {
 				return {
@@ -44,7 +43,7 @@ export const Registry = () => {
 	};
 
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [activeFilters, setActiveFilters] = useState<FilterOption[]>(
+	const [activeFilters, setActiveFilters] = useState<TFilterOption[]>(
 		parseFiltersFromURL(searchParams.getAll('filter'))
 	);
 	const [currentPage, setCurrentPage] = useState(
@@ -63,7 +62,9 @@ export const Registry = () => {
 		return 'asc';
 	});
 	const [isLoading, setIsLoading] = useState(true);
-	const [cars, setCars] = useState<Car[]>([]);
+	const [cars, setCars] = useState<TCar[]>([]);
+	const [totalItems, setTotalItems] = useState(0);
+	const [totalPages, setTotalPages] = useState(1);
 
 	usePageTitle('Cars');
 
@@ -72,13 +73,31 @@ export const Registry = () => {
 			setIsLoading(true);
 
 			try {
-				const carsData = await getCars({
-					filters: activeFilters,
+				// Build query parameters
+				const params = new URLSearchParams({
+					page: currentPage.toString(),
+					pageSize: itemsPerPage.toString(),
 					sortColumn,
 					sortDirection,
 				});
 
-				setCars(carsData.cars);
+				// Add filters if present
+				if (activeFilters.length > 0) {
+					params.set('filters', JSON.stringify(activeFilters));
+				}
+
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars?${params}`
+				);
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch cars');
+				}
+
+				const data = await response.json();
+				setCars(data.cars);
+				setTotalItems(data.total);
+				setTotalPages(data.totalPages);
 			} catch (error) {
 				console.error('Error loading cars:', error);
 			} finally {
@@ -87,7 +106,7 @@ export const Registry = () => {
 		};
 
 		loadCars();
-	}, [activeFilters, sortColumn, sortDirection]);
+	}, [activeFilters, sortColumn, sortDirection, currentPage]);
 
 	const updateSearchParams = (
 		updates: Record<string, string | string[] | null>
@@ -143,7 +162,7 @@ export const Registry = () => {
 		});
 	};
 
-	const handleFiltersChange = (newFilters: FilterOption[]) => {
+	const handleFiltersChange = (newFilters: TFilterOption[]) => {
 		setActiveFilters(newFilters);
 		setCurrentPage(1);
 
@@ -160,12 +179,6 @@ export const Registry = () => {
 	};
 
 	const itemsPerPage = 50;
-	const totalItems = cars.length;
-	const totalPages = Math.ceil(totalItems / itemsPerPage);
-	const currentCars = cars.slice(
-		(currentPage - 1) * itemsPerPage,
-		currentPage * itemsPerPage
-	);
 
 	return (
 		<div className="min-h-screen flex flex-col">
@@ -242,7 +255,7 @@ export const Registry = () => {
 
 						<div className="flex-1 my-3">
 							<RegistryTable
-								cars={isLoading ? [] : currentCars}
+								cars={isLoading ? [] : cars}
 								sortColumn={sortColumn}
 								sortDirection={sortDirection}
 								onSort={handleSort}

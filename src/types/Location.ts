@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type Location = {
+export type TLocation = {
 	city?: string;
 	country: string;
 	state?: string;

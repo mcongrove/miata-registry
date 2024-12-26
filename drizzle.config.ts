@@ -16,24 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState } from 'react';
-import { TUser } from '../types/User';
+import type { Config } from 'drizzle-kit';
 
-export function useAuth() {
-	const [user, setUser] = useState<TUser | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		const auth = getAuth();
-
-		const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-			setUser(firebaseUser as TUser);
-			setLoading(false);
-		});
-
-		return unsubscribe;
-	}, []);
-
-	return { user, loading };
-}
+export default {
+	schema: './src/db/schema/*',
+	out: './migrations',
+	dialect: 'sqlite',
+	driver: 'd1-http',
+	dbCredentials: {
+		accountId: process.env.VITE_CLOUDFLARE_ACCOUNT_ID!,
+		databaseId: process.env.VITE_CLOUDFLARE_DATABASE_ID!,
+		token: process.env.VITE_CLOUDFLARE_D1_TOKEN!,
+	},
+} satisfies Config;

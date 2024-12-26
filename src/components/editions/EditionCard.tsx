@@ -17,19 +17,18 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Edition } from '../../types/Edition';
+import { TEdition } from '../../types/Edition';
 import { Credit } from '../Credit';
 import { EditionStats } from './EditionStats';
-import { getImage } from '../../api/Image';
 
 type EditionCardProps = {
-	edition: Edition;
+	edition: TEdition;
 };
 
 export const EditionCard = ({ edition }: EditionCardProps) => {
 	return (
 		<div className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light">
-			{edition.imageCarId && (
+			{edition.image_car_id && (
 				<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
 					<Link
 						to={`/registry?filter=${encodeURIComponent(
@@ -37,7 +36,7 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 						).replace(/%20/g, '+')}`}
 					>
 						<img
-							src={getImage(edition.imageCarId.id)}
+							src={`https://store.miataregistry.com/car/${edition.image_car_id}.jpg`}
 							alt={edition.name}
 							className="w-full h-full object-cover"
 							loading="lazy"
@@ -45,7 +44,7 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 					</Link>
 
 					<div className="absolute bottom-4 right-4">
-						<Credit id={edition.imageCarId.id} direction="left" />
+						<Credit id={edition.image_car_id} direction="left" />
 					</div>
 				</div>
 			)}
@@ -68,10 +67,7 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 					<p className="text-xs text-brg-mid">{edition.color}</p>
 				</div>
 
-				<EditionStats
-					id={edition.id}
-					produced={edition.totalProduced}
-				/>
+				<EditionStats edition={edition} />
 			</Link>
 		</div>
 	);

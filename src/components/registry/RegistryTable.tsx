@@ -17,11 +17,11 @@
  */
 
 import { Link, useNavigate } from 'react-router-dom';
-import { Car } from '../../types/Car';
+import { TCar } from '../../types/Car';
 import { colorMap } from '../../utils/colorMap';
 
 interface RegistryTableProps {
-	cars: Car[];
+	cars: TCar[];
 	sortColumn: string;
 	sortDirection: 'asc' | 'desc';
 	onSort: (column: string) => void;
@@ -44,7 +44,7 @@ export const RegistryTable = ({
 		{ header: 'Color', key: 'edition.color', width: 'w-52' },
 		{ header: 'Sequence #', key: 'sequence', width: 'w-36' },
 		{ header: 'Owner', key: 'owner.name', width: 'w-44' },
-		{ header: 'Country', key: 'owner.location.country', width: 'w-40' },
+		{ header: 'Country', key: 'owner.country', width: 'w-40' },
 	];
 
 	const handleSort = (key: string) => (e: React.MouseEvent) => {
@@ -53,8 +53,8 @@ export const RegistryTable = ({
 	};
 
 	return (
-		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden h-full">
-			<div className="overflow-auto h-[calc(100vh-332px)] relative">
+		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-268px)]">
+			<div className="overflow-auto h-full relative">
 				<table className="min-w-full border-collapse">
 					<thead>
 						<tr className="bg-brg-light sticky top-0 z-10">
@@ -126,14 +126,14 @@ export const RegistryTable = ({
 								>
 									<td className="px-4 py-3 whitespace-nowrap font-mono">
 										<div className="pointer-events-auto">
-											{car.edition.year}
+											{car.edition?.year}
 										</div>
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
-										{car.edition.generation}
+										{car.edition?.generation}
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
-										{car.edition.name}
+										{car.edition?.name}
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
 										<div className="flex items-center gap-2">
@@ -142,43 +142,38 @@ export const RegistryTable = ({
 												style={{
 													backgroundColor:
 														colorMap[
-															car.edition.color?.toLowerCase() ||
+															car.edition?.color?.toLowerCase() ||
 																''
 														] || '#DDD',
 												}}
 											/>
-											{car.edition.color}
+											{car.edition?.color}
 										</div>
 									</td>
 									{car.sequence ? (
 										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
 											{car.sequence.toLocaleString()}
-											{car.edition.totalProduced && (
+											{car.edition?.total_produced && (
 												<span className="text-brg-border">
 													of{' '}
-													{car.edition.totalProduced.toLocaleString()}
+													{car.edition.total_produced.toLocaleString()}
 												</span>
 											)}
 										</td>
 									) : (
 										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40 text-brg-border">
 											Unknown{' '}
-											{car.edition.totalProduced && (
+											{car.edition?.total_produced && (
 												<span>
 													of{' '}
-													{car.edition.totalProduced.toLocaleString()}
+													{car.edition.total_produced.toLocaleString()}
 												</span>
 											)}
 										</td>
 									)}
 									<td className="px-4 py-3 whitespace-nowrap">
-										{car.owner ? (
-											<Link
-												to={`/owner/${car.owner.id}`}
-												className="hover:underline relative z-0"
-											>
-												{car.owner.name}
-											</Link>
+										{car.current_owner ? (
+											car.current_owner.name
 										) : (
 											<Link
 												to={`/claim/${car.id}`}
@@ -189,17 +184,17 @@ export const RegistryTable = ({
 										)}
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
-										{car.owner?.location ? (
+										{car.current_owner?.country ? (
 											<span className="flex items-center gap-2">
 												<img
-													src={`https://flagcdn.com/16x12/${car.owner?.location?.country.toLowerCase()}.png`}
-													alt={`${car.owner?.location?.country} flag`}
+													src={`https://flagcdn.com/16x12/${car.current_owner?.country.toLowerCase()}.png`}
+													alt={`${car.current_owner?.country} flag`}
 													className="w-4 h-3"
 												/>
 												{new Intl.DisplayNames(['en'], {
 													type: 'region',
 												}).of(
-													car.owner?.location
+													car.current_owner
 														?.country || ''
 												)}
 											</span>

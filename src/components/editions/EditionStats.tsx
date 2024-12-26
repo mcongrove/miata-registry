@@ -16,66 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useEffect, useState } from 'react';
-import { getEditionStats } from '../../api/Edition';
+import { TEdition } from '../../types/Edition';
 
 type EditionStatsProps = {
-	produced?: number;
-	id: string;
+	edition: TEdition;
 	showText?: boolean;
 };
 
 export const EditionStats = ({
-	produced = 0,
-	id,
+	edition,
 	showText = true,
 }: EditionStatsProps) => {
-	const [isLoading, setIsLoading] = useState(true);
-	const [stats, setStats] = useState({
-		claimed: 0,
-		claimedPercentage: 0,
-		inRegistry: 0,
-		inRegistryPercentage: 0,
-	});
-
-	useEffect(() => {
-		const loadStats = async () => {
-			try {
-				const editionStats = await getEditionStats(id);
-
-				setStats({
-					claimed: editionStats.claimed,
-					inRegistry: editionStats.inRegistry,
-					inRegistryPercentage: Math.max(
-						(editionStats.inRegistry / produced) * 100,
-						3
-					),
-					claimedPercentage: Math.max(
-						(editionStats.claimed / produced) * 100,
-						3
-					),
-				});
-			} catch (error) {
-				console.error('Error loading edition stats:', error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		if (id) {
-			loadStats();
-		}
-	}, [id, produced]);
-
-	if (isLoading) {
-		return (
-			<div className="w-full">
-				<div className="text-sm text-brg-mid space-y-2">
-					<div className="w-full h-2 bg-brg-light rounded-full animate-pulse" />
-				</div>
-			</div>
-		);
-	}
+	const inRegistryPercentage = Math.max(
+		(edition.in_registry ?? 0 / (edition.total_produced ?? 0)) * 100,
+		3
+	);
+	const claimedPercentage = Math.max(
+		(edition.claimed ?? 0 / (edition.total_produced ?? 0)) * 100,
+		3
+	);
 
 	return (
 		<div className="w-full">
@@ -84,21 +43,21 @@ export const EditionStats = ({
 					<div className="flex justify-between text-xs">
 						<span>
 							<span className="font-bold">
-								{stats.claimed.toLocaleString()}
+								{edition.claimed?.toLocaleString()}
 							</span>{' '}
 							Claimed
 						</span>
 
 						<span>
 							<span className="font-bold">
-								{stats.inRegistry.toLocaleString()}
+								{edition.in_registry?.toLocaleString()}
 							</span>{' '}
 							in Registry
 						</span>
 
 						<span>
 							<span className="font-bold">
-								{produced.toLocaleString()}
+								{edition.total_produced?.toLocaleString()}
 							</span>{' '}
 							Produced
 						</span>
@@ -109,13 +68,13 @@ export const EditionStats = ({
 					<div className="relative h-full flex">
 						<div
 							className="absolute top-0 left-0 bg-brg-mid h-full z-20 rounded-r-full"
-							style={{ width: `${stats.claimedPercentage}%` }}
+							style={{ width: `${claimedPercentage}%` }}
 						/>
 
 						<div
 							className="absolute top-0 left-0 bg-brg-border h-full z-10 rounded-r-full"
 							style={{
-								width: `${stats.inRegistryPercentage}%`,
+								width: `${inRegistryPercentage}%`,
 							}}
 						/>
 

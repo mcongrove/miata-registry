@@ -1,6 +1,6 @@
-export type FilterType = 'year' | 'generation' | 'edition' | 'country';
+export type TFilterType = 'year' | 'generation' | 'edition' | 'country';
 
-export type FilterOption = {
-	type: FilterType;
+export type TFilterOption = {
+	type: TFilterType;
 	value: string;
 };

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Location } from '../types/Location';
+import { TLocation } from '../types/Location';
 
 export const countryCodeMap: { [key: string]: string } = {
 	JAPAN: 'JP',
@@ -25,7 +25,7 @@ export const countryCodeMap: { [key: string]: string } = {
 };
 
 export const formatLocation = (
-	location?: Location,
+	location?: TLocation,
 	short: boolean = false
 ): string => {
 	if (!location) {

@@ -52,7 +52,11 @@ yarn-error.log*
 
 # dotenv environment variables file
 .env
-/backups
+.env.production
+.dev.vars
 
 # Wrangler
 /.wrangler
+
+# Data files
+/backups

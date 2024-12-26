@@ -7,19 +7,25 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
-		"worker:dev": "wrangler dev",
-		"worker:deploy": "wrangler deploy",
 		"worker:deploy:prod": "wrangler deploy --env production",
 		"worker:deploy:dev": "wrangler deploy --env development",
 		"seed": "NODE_OPTIONS=\"--loader ts-node/esm\" node --experimental-specifier-resolution=node scripts/seedDatabase.ts",
 		"lint": "eslint .",
-		"format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+		"format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+		"db:generate": "drizzle-kit generate:sqlite",
+		"db:push": "drizzle-kit push:sqlite",
+		"worker:build": "esbuild src/worker/index.ts --bundle --outfile=dist/worker.js --format=esm --platform=browser",
+		"worker:deploy": "npm run worker:build && wrangler deploy",
+		"worker:dev": "wrangler dev src/worker/index.ts --remote"
 	},
 	"dependencies": {
+		"@cloudflare/workers-types": "^4.20241224.0",
 		"@emailjs/browser": "^4.4.1",
 		"@floating-ui/react": "^0.27.2",
 		"@react-google-maps/api": "^2.20.3",
+		"drizzle-orm": "^0.38.3",
 		"firebase": "^10.13.1",
+		"hono": "^4.6.14",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-router-dom": "^7.1.0",
@@ -35,6 +41,7 @@
 		"autoprefixer": "^10.4.20",
 		"csv-parse": "^5.6.0",
 		"dotenv": "^16.4.7",
+		"drizzle-kit": "^0.30.1",
 		"eslint": "^9.9.0",
 		"firebase-admin": "^13.0.2",
 		"postcss": "^8.4.45",
@@ -44,6 +51,7 @@
 		"uuid": "^11.0.3",
 		"vite": "^5.4.1",
 		"vite-plugin-svgr": "^4.3.0",
-		"wrangler": "^3.99.0"
+		"wrangler": "^3.99.0",
+		"esbuild": "^0.20.0"
 	}
 }

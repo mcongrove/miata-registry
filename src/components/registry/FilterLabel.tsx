@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FilterOption, FilterType } from '../../types/Filters';
+import { TFilterOption, TFilterType } from '../../types/Filters';
 
 interface FilterLabelProps {
 	value: string;
-	type: FilterType;
+	type: TFilterType;
 	isSelected: boolean;
-	onChange: (option: FilterOption) => void;
+	onChange: (option: TFilterOption) => void;
 }
 
 export const FilterLabel = ({

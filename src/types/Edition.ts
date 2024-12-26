@@ -16,29 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
-CREATE TABLE editions (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  color TEXT NOT NULL,
-  generation TEXT NOT NULL,
-  year INTEGER NOT NULL,
-  total_produced INTEGER,
-  description TEXT,
-  image_car_id TEXT
-)
-*/
-
-import { DocumentReference } from 'firebase/firestore';
-import { Car } from './Car';
-
-export type Edition = {
-	color: string;
-	description?: string[];
-	generation: string;
+export type TEdition = {
 	id: string;
-	imageCarId?: DocumentReference<Car>;
 	name: string;
-	totalProduced?: number;
+	color: string;
+	generation: string;
 	year: number;
+	total_produced?: number;
+	description?: string;
+	image_car_id?: string;
+	in_registry?: number;
+	claimed?: number;
 };

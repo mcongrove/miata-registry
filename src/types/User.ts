@@ -19,7 +19,7 @@
 import { User as FirebaseUser } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
 
-export interface User extends FirebaseUser {
+export interface TUser extends FirebaseUser {
 	// Firebase
 	displayName: string | null;
 	email: string | null;

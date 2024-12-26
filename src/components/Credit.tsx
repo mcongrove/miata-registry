@@ -18,8 +18,6 @@
 
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Car } from '../types/Car';
-import { getCar } from '../api/Car';
 import { formatLocation } from '../utils/geo';
 
 interface CreditProps {
@@ -28,11 +26,22 @@ interface CreditProps {
 	direction?: 'left' | 'right';
 }
 
+interface CarSummary {
+	year: number;
+	editionName: string;
+	sequence?: number;
+	current_owner?: {
+		name: string;
+		state: string;
+		country: string;
+	};
+}
+
 const CreditText = ({
 	car,
 	direction,
 }: {
-	car: Car | null;
+	car: CarSummary | null;
 	direction: 'left' | 'right';
 }) => (
 	<div
@@ -42,15 +51,21 @@ const CreditText = ({
 			className={`text-brg py-2 ${direction === 'left' ? 'pr-5 pl-4' : 'pl-5 pr-4'} whitespace-nowrap text-[10px]`}
 		>
 			<p>
-				{car?.edition.year} {car?.edition.name}
+				{car?.year} {car?.editionName}
 				{car?.sequence && ` #${car.sequence}`}
 			</p>
 
-			{car?.owner && (
+			{car?.current_owner && (
 				<p>
-					{car.owner.name}
-					{car.owner.location &&
-						` • ${formatLocation(car.owner.location, true)}`}
+					{car.current_owner.name}
+					{car.current_owner.country &&
+						` • ${formatLocation(
+							{
+								state: car.current_owner.state,
+								country: car.current_owner.country,
+							},
+							true
+						)}`}
 				</p>
 			)}
 		</div>
@@ -58,14 +73,33 @@ const CreditText = ({
 );
 
 export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
-	const [car, setCar] = useState<Car | null>(null);
+	const [car, setCar] = useState<CarSummary | null>(null);
 
 	useEffect(() => {
 		const loadCar = async () => {
-			const carData = await getCar(id);
+			try {
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${id}/summary`
+				);
 
-			setCar(carData);
+				if (!response.ok) {
+					if (response.status === 404) {
+						setCar(null);
+
+						return;
+					}
+					throw new Error('Failed to fetch car summary');
+				}
+
+				const data = await response.json();
+
+				setCar(data);
+			} catch (error) {
+				console.error('Error loading car summary:', error);
+				setCar(null);
+			}
 		};
+
 		loadCar();
 	}, [id]);
 

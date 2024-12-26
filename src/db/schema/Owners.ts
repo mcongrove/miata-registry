@@ -16,24 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState } from 'react';
-import { TUser } from '../types/User';
+import { text, sqliteTable } from 'drizzle-orm/sqlite-core';
 
-export function useAuth() {
-	const [user, setUser] = useState<TUser | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		const auth = getAuth();
-
-		const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-			setUser(firebaseUser as TUser);
-			setLoading(false);
-		});
-
-		return unsubscribe;
-	}, []);
-
-	return { user, loading };
-}
+export const Owners = sqliteTable('owners', {
+	id: text('id').primaryKey(),
+	name: text('name'),
+	country: text('country'),
+	state: text('state'),
+	city: text('city'),
+});

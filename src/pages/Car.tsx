@@ -21,36 +21,55 @@ import { useParams } from 'react-router-dom';
 import { Map } from '../components/car/Map';
 import { TimelineItem } from '../components/car/TimelineItem';
 import { Tooltip } from '../components/Tooltip';
-import { Car } from '../types/Car';
-import { toPrettyDate, toTitleCase } from '../utils/global';
-import { getCar, getVinDetails } from '../api/Car';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { TCar } from '../types/Car';
+import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
 import { formatLocation } from '../utils/geo';
-import { usePageTitle } from '../hooks/usePageTitle';
-import { getOwner } from '../api/Owner';
-import { Owner } from '../types/Owner';
-import { getImage } from '../api/Image';
+import { toPrettyDate, toTitleCase } from '../utils/global';
 
 interface MapLocation {
 	name: string;
 	address: string;
 }
 
+export const getVinDetails = async (vin: string, year: number) => {
+	try {
+		const response = await fetch(
+			`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json&modelyear=${year}`
+		);
+
+		const data = await response.json();
+
+		if (data.Results?.[0]) {
+			return data.Results[0];
+		}
+
+		return null;
+	} catch (error) {
+		console.error('Error fetching VIN details:', error);
+
+		return null;
+	}
+};
+
 export const CarProfile = () => {
 	const { id } = useParams();
-	const [car, setCar] = useState<Car | null>(null);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const [car, setCar] = useState<TCar | null>(null);
 	const [vinDetails, setVinDetails] = useState<any>(null);
-	const [timelineOwners, setTimelineOwners] = useState<Owner[]>([]);
+	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
 
 	usePageTitle(
 		car
-			? `${car.edition.year} ${car.edition.name}${car.sequence ? ` #${car.sequence}` : ''}`
+			? `${car.edition?.year} ${car.edition?.name}${car.sequence ? ` #${car.sequence}` : ''}`
 			: ''
 	);
 
-	const manufactureLocation = car?.manufacture?.location
-		? formatLocation(car.manufacture.location)
+	const manufactureLocation = car?.manufacture_country
+		? formatLocation({
+				country: car.manufacture_country,
+				city: car.manufacture_city,
+			})
 		: vinDetails
 			? formatPlantLocation(vinDetails)
 			: '';
@@ -60,24 +79,20 @@ export const CarProfile = () => {
 			if (!id) return;
 
 			try {
-				const carData = await getCar(id);
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${id}`
+				);
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch car');
+				}
+
+				const carData = await response.json();
 
 				setCar(carData);
 
-				if (carData?.owners?.length) {
-					const ownerPromises = carData.owners.map(async (owner) => {
-						const ownerData = await getOwner(owner.ownerId.id);
-
-						return {
-							...ownerData,
-							dateStart: owner.dateStart,
-							dateEnd: owner.dateEnd,
-						};
-					});
-
-					const ownerDetails = await Promise.all(ownerPromises);
-
-					setTimelineOwners(ownerDetails);
+				if (carData?.owner_history?.length) {
+					setTimelineOwners(carData.owner_history);
 				}
 
 				if (carData?.vin) {
@@ -90,7 +105,6 @@ export const CarProfile = () => {
 				}
 			} catch (error) {
 				console.error('Error loading car:', error);
-
 				setCar(null);
 			}
 		};
@@ -105,50 +119,68 @@ export const CarProfile = () => {
 
 		// Owners
 		if (timelineOwners.length > 0) {
-			timelineOwners.forEach((owner, index) => {
-				const startYear = owner.dateStart
-					? new Date(owner.dateStart.seconds * 1000).getFullYear()
+			timelineOwners.forEach((owner: TCarOwner, index: number) => {
+				const startYear = owner.date_start
+					? new Date(owner.date_start).getFullYear()
 					: '';
-				const endYear = owner.dateEnd
-					? new Date(owner.dateEnd.seconds * 1000).getFullYear()
+				const endYear = owner.date_end
+					? new Date(owner.date_end).getFullYear()
 					: '';
 
 				items.push({
 					name: owner.name || 'Unknown',
 					dateRange:
-						index === 0
-							? `${startYear} – ${car.destroyed ? 'Destruction' : 'Present'}`
-							: `${startYear} – ${endYear}`,
-					location: formatLocation(owner.location),
+						!startYear && !endYear
+							? ''
+							: index === 0
+								? `${startYear || 'Unknown'} – ${
+										car.destroyed
+											? 'Destruction'
+											: 'Present'
+									}`
+								: `${startYear || 'Unknown'} – ${endYear || 'Unknown'}`,
+					location: formatLocation({
+						city: owner.city,
+						state: owner.state,
+						country: owner.country || '',
+					}),
 					isActive: index === 0,
 				});
 			});
 		}
 
 		// Dealer
-		if (car.sale?.dealer) {
+		if (car.sale_dealer_name) {
 			items.push({
-				name: car.sale.dealer.name,
-				dateRange: toPrettyDate(car.sale.date || ''),
-				location: formatLocation(car.sale.dealer.location),
+				name: car.sale_dealer_name,
+				dateRange: toPrettyDate(car.sale_date || ''),
+				location: formatLocation({
+					city: car.sale_dealer_city,
+					state: car.sale_dealer_state,
+					country: car.sale_dealer_country || '',
+				}),
 			});
 		}
 
 		// Shipping
-		if (car.shipping) {
+		if (car.shipping_vessel) {
 			items.push({
-				name: car.shipping.vessel ? (
+				name: car.shipping_vessel ? (
 					<>
 						Shipped{' '}
 						<span className="text-brg-border">
-							via {toTitleCase(car.shipping.vessel)}
+							via {toTitleCase(car.shipping_vessel)}
 						</span>
 					</>
 				) : (
 					'Shipped'
 				),
-				dateRange: toPrettyDate(car.shipping.date || ''),
-				location: formatLocation(car.shipping.location),
+				dateRange: toPrettyDate(car.shipping_date || ''),
+				location: formatLocation({
+					city: car.shipping_city,
+					state: car.shipping_state,
+					country: car.shipping_country || '',
+				}),
 			});
 		}
 
@@ -165,9 +197,9 @@ export const CarProfile = () => {
 				) : (
 					'Built'
 				),
-				dateRange: car.manufacture?.date
-					? toPrettyDate(car.manufacture.date)
-					: car.edition.year.toString(),
+				dateRange: car.manufacture_date
+					? toPrettyDate(car.manufacture_date)
+					: car.edition?.year.toString(),
 				location: manufactureLocation,
 			});
 		}
@@ -195,11 +227,11 @@ export const CarProfile = () => {
 									<div className="flex items-start justify-between">
 										<div>
 											<h2 className="text-4xl font-bold">
-												{car.edition.year}{' '}
-												{car.edition.name}
+												{car.edition?.year}{' '}
+												{car.edition?.name}
 											</h2>
 
-											{car.edition.totalProduced && (
+											{car.edition?.total_produced && (
 												<p className="text-md font-medium text-brg-border">
 													{car.sequence ? (
 														<>
@@ -208,10 +240,10 @@ export const CarProfile = () => {
 																{car.sequence.toLocaleString()}
 															</span>{' '}
 															of{' '}
-															{car.edition.totalProduced?.toLocaleString()}
+															{car.edition?.total_produced?.toLocaleString()}
 														</>
 													) : (
-														`One of the ${car.edition.totalProduced?.toLocaleString()} produced`
+														`One of the ${car.edition?.total_produced?.toLocaleString()} produced`
 													)}
 												</p>
 											)}
@@ -236,8 +268,8 @@ export const CarProfile = () => {
 							{car ? (
 								<div className="w-full h-full bg-brg-light">
 									<img
-										src={getImage(car.id)}
-										alt={`${car.edition.name}`}
+										src={`https://store.miataregistry.com/car/${car.id}.jpg`}
+										alt={`${car.edition?.name}`}
 										className="w-full h-full object-cover opacity-0"
 										onLoad={(e) => {
 											const img =
@@ -249,13 +281,11 @@ export const CarProfile = () => {
 											);
 										}}
 										onError={(e) => {
-											if (car.edition.imageCarId) {
+											if (car.edition?.image_car_id) {
 												const img =
 													e.target as HTMLImageElement;
 
-												img.src = getImage(
-													car.edition.imageCarId.id
-												);
+												img.src = `https://store.miataregistry.com/car/${car.edition?.image_car_id}.jpg`;
 
 												img.classList.add('grayscale');
 											}
@@ -281,7 +311,7 @@ export const CarProfile = () => {
 									</p>
 									{car ? (
 										<p className="font-medium">
-											{car.edition.color}
+											{car.edition?.color}
 										</p>
 									) : (
 										<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
@@ -332,9 +362,11 @@ export const CarProfile = () => {
 								</div>
 							</div>
 
-							{car?.sale && (
+							{(car?.sale_date ||
+								car?.sale_msrp ||
+								car?.sale_dealer_name) && (
 								<div className="flex flex-wrap gap-16 border-t border-brg-light p-6">
-									{car.sale.msrp && (
+									{car?.sale_msrp && (
 										<div>
 											<p className="text-sm text-brg-mid mb-1">
 												Original MSRP
@@ -342,38 +374,42 @@ export const CarProfile = () => {
 
 											<p className="font-medium">
 												$
-												{car.sale.msrp.toLocaleString()}
+												{car?.sale_msrp?.toLocaleString()}
 											</p>
 										</div>
 									)}
 
-									{car.sale?.date && (
+									{car?.sale_date && (
 										<div>
 											<p className="text-sm text-brg-mid mb-1">
 												Purchase Date
 											</p>
 
 											<p className="font-medium">
-												{toPrettyDate(car.sale.date)}
+												{toPrettyDate(car?.sale_date)}
 											</p>
 										</div>
 									)}
 
-									{car.sale.dealer && (
+									{car?.sale_dealer_name && (
 										<div>
 											<p className="text-sm text-brg-mid mb-1">
 												Original Dealer
 											</p>
 
 											<p className="font-medium">
-												{car.sale.dealer.name}
+												{car?.sale_dealer_name}
 											</p>
 
-											{car.sale.dealer.location && (
+											{car?.sale_dealer_city && (
 												<p className="text-xs text-brg-mid">
-													{formatLocation(
-														car.sale.dealer.location
-													)}
+													{formatLocation({
+														city: car.sale_dealer_city,
+														state: car.sale_dealer_state,
+														country:
+															car.sale_dealer_country ||
+															'',
+													})}
 												</p>
 											)}
 										</div>
@@ -382,7 +418,7 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						{car?.edition.description ? (
+						{car?.edition?.description ? (
 							<div className="flex flex-col gap-4">
 								<h3 className="text-xl font-semibold">
 									About the {car.edition.year}{' '}
@@ -391,11 +427,14 @@ export const CarProfile = () => {
 								</h3>
 
 								<div className="prose prose-brg max-w-none space-y-4">
-									{car.edition.description?.map(
-										(paragraph, index) => (
-											<p key={index}>{paragraph}</p>
-										)
-									)}
+									{car?.edition?.description
+										?.split('\n')
+										.map(
+											(
+												paragraph: string,
+												index: number
+											) => <p key={index}>{paragraph}</p>
+										)}
 								</div>
 							</div>
 						) : null}
@@ -407,55 +446,57 @@ export const CarProfile = () => {
 								{car ? (
 									<Map
 										hasOwners={
-											car.owners
-												? car.owners.length > 0
+											car.owner_history
+												? car.owner_history.length > 0
 												: false
 										}
 										locations={[
-											{
-												name: `${toTitleCase(vinDetails?.Manufacturer || 'Factory')}`,
-												address: manufactureLocation,
-											},
-											car?.shipping?.location
+											car?.manufacture_city
 												? {
-														name: formatLocation(
-															car.shipping
-																.location
-														),
+														name: 'Manufactured',
 														address: formatLocation(
-															car.shipping
-																.location
+															{
+																city: car.manufacture_city,
+																state: '',
+																country:
+																	car.manufacture_country ||
+																	'',
+															}
 														),
 													}
 												: null,
-											car?.sale?.dealer?.location
+											car?.sale_dealer_name
 												? {
-														name: car.sale.dealer
-															.name,
+														name: car.sale_dealer_name,
 														address: formatLocation(
-															car.sale.dealer
-																.location
+															{
+																city: car.sale_dealer_city,
+																state: car.sale_dealer_state,
+																country:
+																	car.sale_dealer_country ||
+																	'',
+															}
 														),
 													}
 												: null,
 											...timelineOwners
 												.slice()
-												.sort(
-													(a, b) =>
-														(a.dateStart?.seconds ||
-															0) -
-														(b.dateStart?.seconds ||
-															0)
-												)
+												.reverse()
 												.map((owner) =>
-													owner.location
+													owner.city
 														? {
 																name:
 																	owner.name ||
 																	'Unknown Owner',
 																address:
 																	formatLocation(
-																		owner.location
+																		{
+																			city: owner.city,
+																			state: owner.state,
+																			country:
+																				owner.country ||
+																				'',
+																		}
 																	),
 															}
 														: null
@@ -474,15 +515,23 @@ export const CarProfile = () => {
 
 							{car ? (
 								<div className="p-4 flex items-center justify-between">
-									{car?.owner?.location ? (
+									{car?.current_owner?.country ? (
 										<div>
 											<p className="font-medium text-lg">
-												{car.owner?.location?.city}
+												{car.current_owner?.city}
 											</p>
 
 											<p className="text-brg-mid">
 												{formatLocation(
-													car.owner?.location,
+													{
+														city: car.current_owner
+															?.city,
+														state: car.current_owner
+															?.state,
+														country:
+															car.current_owner
+																?.country || '',
+													},
 													true
 												)}
 											</p>

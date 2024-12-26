@@ -16,17 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { FilterOption, FilterType } from '../../types/Filters';
+import { TFilterOption, TFilterType } from '../../types/Filters';
 import { FilterHeader } from './FilterHeader';
 import { FilterLabel } from './FilterLabel';
 
 interface FilterRadioGroupProps {
 	title: string;
-	type: FilterType;
+	type: TFilterType;
 	options: string[];
 	activeValue: string | undefined;
-	onClear: (type: FilterType) => void;
-	onChange: (option: FilterOption) => void;
+	onClear: (type: TFilterType) => void;
+	onChange: (option: TFilterOption) => void;
 }
 
 export const FilterRadioGroup = ({

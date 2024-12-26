@@ -16,63 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- CREATE TABLE cars (
-   id TEXT PRIMARY KEY,
-   vin TEXT,
-   color TEXT NOT NULL,
-   edition_id TEXT NOT NULL,
-   sequence INTEGER,
-   destroyed BOOLEAN DEFAULT FALSE,
-   manufacture_date TIMESTAMP,
-   manufacture_city TEXT,
-   manufacture_country TEXT,
-   shipping_date TIMESTAMP,
-   shipping_city TEXT,
-   shipping_state TEXT,
-   shipping_country TEXT,
-   shipping_vessel TEXT,
-   sale_date TIMESTAMP,
-   sale_dealer_name TEXT,
-   sale_dealer_location_city TEXT,
-   sale_dealer_location_state TEXT,
-   sale_dealer_location_country TEXT,
-   sale_msrp INTEGER,
-   FOREIGN KEY(edition_id) REFERENCES editions(id)
- )
-*/
+import { TEdition } from './Edition';
+import { TCarOwner, TOwner } from './Owner';
 
-import { DocumentReference, Timestamp } from 'firebase/firestore';
-import { Edition } from './Edition';
-import { Owner } from './Owner';
-import { Location } from './Location';
-
-export type Car = {
-	color: string;
-	destroyed?: boolean;
-	editionId: DocumentReference<Edition>;
-	edition: Edition;
+export type TCar = {
 	id: string;
-	manufacture?: {
-		date?: Timestamp;
-		location?: Location;
-	};
-	ownerId?: DocumentReference<Owner>;
-	owner?: Owner;
-	owners?: (Owner & { ownerId: DocumentReference<Owner> })[];
-	sale?: {
-		date?: Timestamp;
-		dealer?: {
-			location?: Location;
-			name: string;
-		};
-		msrp?: number;
-	};
-	sequence?: number;
-	shipping?: {
-		date?: Timestamp;
-		location?: Location;
-		vessel?: string;
-	};
 	vin?: string;
+	color: string;
+	edition_id: string;
+	edition?: TEdition;
+	sequence?: number;
+	destroyed?: boolean;
+	manufacture_date?: string;
+	manufacture_city?: string;
+	manufacture_country?: string;
+	shipping_date?: string;
+	shipping_city?: string;
+	shipping_state?: string;
+	shipping_country?: string;
+	shipping_vessel?: string;
+	sale_date?: string;
+	sale_dealer_name?: string;
+	sale_dealer_city?: string;
+	sale_dealer_state?: string;
+	sale_dealer_country?: string;
+	sale_msrp?: number;
+	current_owner_id?: string;
+	current_owner?: TOwner;
+	owner_history?: TCarOwner[];
 };

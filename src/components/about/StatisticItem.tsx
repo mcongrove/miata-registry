@@ -24,7 +24,7 @@ interface StatisticItemProps {
 }
 
 export const StatisticItem = ({ value, label }: StatisticItemProps) => {
-	const [count, setCount] = useState<number>(0);
+	const [count, setCount] = useState<number | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -41,11 +41,11 @@ export const StatisticItem = ({ value, label }: StatisticItemProps) => {
 
 	return (
 		<div className="flex flex-col items-center gap-2">
-			{loading ? (
+			{loading || !count ? (
 				<div className="h-12 w-16 bg-brg-light animate-pulse rounded" />
 			) : (
 				<span className="text-5xl font-medium text-brg tracking-tight">
-					{count}
+					{count.toLocaleString()}
 				</span>
 			)}
 			<span className="text-sm font-medium text-brg-mid text-center">

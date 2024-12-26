@@ -16,24 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState } from 'react';
-import { TUser } from '../types/User';
+import { drizzle } from 'drizzle-orm/d1';
+import * as schema from './schema';
+import { D1Database } from '@cloudflare/workers-types';
 
-export function useAuth() {
-	const [user, setUser] = useState<TUser | null>(null);
-	const [loading, setLoading] = useState(true);
+export const createDb = (d1: D1Database) => {
+	return drizzle(d1, { schema });
+};
 
-	useEffect(() => {
-		const auth = getAuth();
-
-		const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-			setUser(firebaseUser as TUser);
-			setLoading(false);
-		});
-
-		return unsubscribe;
-	}, []);
-
-	return { user, loading };
-}
+export type DrizzleDb = ReturnType<typeof createDb>;

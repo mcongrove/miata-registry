@@ -17,16 +17,30 @@
  */
 
 import { ChangeEvent, useEffect, useState } from 'react';
-import { FilterOption } from '../../types/Filters';
+import { TFilterOption } from '../../types/Filters';
 import { Select } from '../Select';
 import { FilterHeader } from './FilterHeader';
 import { FilterRadioGroup } from './FilterRadioGroup';
-import { getEditions } from '../../api/Edition';
-import { getCountries } from '../../api/Owner';
+
+const getCountries = async () => {
+	const response = await fetch(
+		`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/countries`
+	);
+
+	return response.json();
+};
+
+const getEditionNames = async () => {
+	const response = await fetch(
+		`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/editions/names`
+	);
+
+	return response.json();
+};
 
 interface FilterSidebarProps {
-	activeFilters: FilterOption[];
-	onFiltersChange: (filters: FilterOption[]) => void;
+	activeFilters: TFilterOption[];
+	onFiltersChange: (filters: TFilterOption[]) => void;
 }
 
 export const FilterSidebar = ({
@@ -45,21 +59,9 @@ export const FilterSidebar = ({
 	>([]);
 
 	useEffect(() => {
-		const loadEditions = async () => {
-			const editions = await getEditions();
-			const formattedOptions = editions.map(
-				(edition) => `${edition.year} ${edition.name}`
-			);
-			setEditionOptions(formattedOptions.sort());
-		};
-
-		loadEditions();
-	}, []);
-
-	useEffect(() => {
 		const loadCountries = async () => {
 			const countryList = await getCountries();
-			const formattedCountries = countryList.map((code) => ({
+			const formattedCountries = countryList.map((code: string) => ({
 				value: code,
 				label:
 					new Intl.DisplayNames(['en'], { type: 'region' }).of(
@@ -67,19 +69,26 @@ export const FilterSidebar = ({
 					) || code,
 			}));
 			setCountries(
-				formattedCountries.sort((a, b) =>
-					a.label.localeCompare(b.label)
+				formattedCountries.sort(
+					(a: { label: string }, b: { label: string }) =>
+						a.label.localeCompare(b.label)
 				)
 			);
 		};
 
+		const loadEditions = async () => {
+			const editions = await getEditionNames();
+			setEditionOptions(editions.sort());
+		};
+
 		loadCountries();
+		loadEditions();
 	}, []);
 
-	const getActiveValue = (type: FilterOption['type']) =>
+	const getActiveValue = (type: TFilterOption['type']) =>
 		activeFilters.find((f) => f.type === type)?.value;
 
-	const handleOptionChange = (newOption: FilterOption) => {
+	const handleOptionChange = (newOption: TFilterOption) => {
 		const otherTypeFilters = activeFilters.filter(
 			(f) => f.type !== newOption.type
 		);
@@ -94,7 +103,7 @@ export const FilterSidebar = ({
 		onFiltersChange(activeFilters.filter((f) => f.type !== filterType));
 	};
 
-	const handleSelectChange = (value: string, type: FilterOption['type']) => {
+	const handleSelectChange = (value: string, type: TFilterOption['type']) => {
 		handleOptionChange({ type, value });
 	};
 

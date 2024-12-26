@@ -16,24 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState } from 'react';
-import { TUser } from '../types/User';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import type { Bindings } from './types';
+import carsRouter from './routes/cars';
+import editionsRouter from './routes/editions';
+import ownersRouter from './routes/owners';
+import statsRouter from './routes/stats';
 
-export function useAuth() {
-	const [user, setUser] = useState<TUser | null>(null);
-	const [loading, setLoading] = useState(true);
+const app = new Hono<{ Bindings: Bindings }>();
 
-	useEffect(() => {
-		const auth = getAuth();
+// Enable CORS
+app.use('*', cors());
 
-		const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-			setUser(firebaseUser as TUser);
-			setLoading(false);
-		});
+// Basic test endpoint
+app.get('/', (c) => c.json({ status: 'ok' }));
 
-		return unsubscribe;
-	}, []);
+// Mount API routes
+app.route('/cars', carsRouter);
+app.route('/editions', editionsRouter);
+app.route('/owners', ownersRouter);
+app.route('/stats', statsRouter);
 
-	return { user, loading };
-}
+export default app;

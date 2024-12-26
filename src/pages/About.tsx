@@ -19,12 +19,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { TextField } from '../components/form/TextField';
-import {
-	getCountCars,
-	getCountClaimedCars,
-	getCountEditions,
-} from '../api/Car';
-import { getCountCountries } from '../api/Owner';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { StatisticItem } from '../components/about/StatisticItem';
 import emailjs from '@emailjs/browser';
@@ -52,12 +46,24 @@ export const About = () => {
 	const location = useLocation();
 	const [isEmailSent, setIsEmailSent] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [stats, setStats] = useState<{
+		cars: number;
+		claimedCars: number;
+		editions: number;
+		countries: number;
+	} | null>(null);
 
 	usePageTitle('About');
 
 	useEffect(() => {
-		getCountCodeCommits('mcongrove', 'miata-registry').then((count) => {
-			setCommitCount(count);
+		Promise.all([
+			fetch(`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/stats`).then(
+				(res) => res.json()
+			),
+			getCountCodeCommits('mcongrove', 'miata-registry'),
+		]).then(([statsData, commits]) => {
+			setStats(statsData);
+			setCommitCount(commits);
 		});
 	}, []);
 
@@ -191,19 +197,19 @@ export const About = () => {
 
 					<div className="grid grid-cols-5 gap-8">
 						<StatisticItem
-							value={getCountCars()}
+							value={stats?.cars ?? 0}
 							label="Total Vehicles"
 						/>
 						<StatisticItem
-							value={getCountClaimedCars()}
+							value={stats?.claimedCars ?? 0}
 							label="Claimed Vehicles"
 						/>
 						<StatisticItem
-							value={getCountEditions()}
+							value={stats?.editions ?? 0}
 							label="Limited Editions"
 						/>
 						<StatisticItem
-							value={getCountCountries()}
+							value={stats?.countries ?? 0}
 							label="Countries Represented"
 						/>
 						<StatisticItem
