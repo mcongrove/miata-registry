@@ -15,8 +15,8 @@
 		"db:generate": "drizzle-kit generate:sqlite",
 		"db:push": "drizzle-kit push:sqlite",
 		"worker:build": "esbuild src/worker/index.ts --bundle --outfile=dist/worker.js --format=esm --platform=browser",
-		"worker:deploy": "npm run worker:build && wrangler deploy",
-		"worker:dev": "wrangler dev src/worker/index.ts --remote"
+		"worker:deploy": "npm run worker:build && npx wrangler deploy",
+		"worker:dev": "npx wrangler dev src/worker/index.ts --remote"
 	},
 	"dependencies": {
 		"@cloudflare/workers-types": "^4.20241224.0",
