@@ -49,6 +49,7 @@ export const RegistryTable = ({
 
 	const handleSort = (key: string) => (e: React.MouseEvent) => {
 		e.preventDefault();
+
 		onSort(key);
 	};
 

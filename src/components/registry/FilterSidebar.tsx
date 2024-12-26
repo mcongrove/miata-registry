@@ -68,6 +68,7 @@ export const FilterSidebar = ({
 						code
 					) || code,
 			}));
+
 			setCountries(
 				formattedCountries.sort(
 					(a: { label: string }, b: { label: string }) =>
@@ -78,6 +79,7 @@ export const FilterSidebar = ({
 
 		const loadEditions = async () => {
 			const editions = await getEditionNames();
+
 			setEditionOptions(editions.sort());
 		};
 
@@ -167,6 +169,15 @@ export const FilterSidebar = ({
 					/>
 				</div>
 			</div>
+
+			<FilterRadioGroup
+				title="Claim Status"
+				type="claimStatus"
+				options={['Claimed', 'Unclaimed']}
+				activeValue={getActiveValue('claimStatus')}
+				onClear={handleClear}
+				onChange={handleOptionChange}
+			/>
 		</div>
 	);
 };

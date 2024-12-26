@@ -95,6 +95,7 @@ export const Registry = () => {
 				}
 
 				const data = await response.json();
+
 				setCars(data.cars);
 				setTotalItems(data.total);
 				setTotalPages(data.totalPages);
@@ -199,12 +200,12 @@ export const Registry = () => {
 									return (
 										<Chip
 											key={`${filter.type}:${filter.value}`}
-											label={
-												filter.type
-													.charAt(0)
-													.toUpperCase() +
-												filter.type.slice(1)
-											}
+											label={filter.type
+												.replace(/([A-Z])/g, ' $1')
+												.replace(/^./, (str) =>
+													str.toUpperCase()
+												)
+												.trim()}
 											value={displayValue}
 											onRemove={() => {
 												const newFilters =
@@ -215,7 +216,9 @@ export const Registry = () => {
 															f.value !==
 																filter.value
 													);
+
 												setActiveFilters(newFilters);
+
 												updateSearchParams({
 													filter: newFilters.map(
 														(f) =>
@@ -229,6 +232,7 @@ export const Registry = () => {
 								<button
 									onClick={() => {
 										setActiveFilters([]);
+
 										updateSearchParams({
 											filter: null,
 										});

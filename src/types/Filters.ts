@@ -16,7 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TFilterType = 'year' | 'generation' | 'edition' | 'country';
+export type TFilterType =
+	| 'claimStatus'
+	| 'country'
+	| 'edition'
+	| 'generation'
+	| 'year';
 
 export type TFilterOption = {
 	type: TFilterType;

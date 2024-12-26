@@ -42,26 +42,42 @@ carsRouter.get('/', async (c) => {
 
 		for (const filter of filters) {
 			switch (filter.type) {
-				case 'generation':
-					conditions.push(eq(Editions.generation, filter.value));
-					break;
-				case 'year':
-					conditions.push(eq(Editions.year, parseInt(filter.value)));
+				case 'claimStatus':
+					if (filter.value === 'Claimed') {
+						conditions.push(
+							sql`${Cars.current_owner_id} IS NOT NULL`
+						);
+					} else if (filter.value === 'Unclaimed') {
+						conditions.push(sql`${Cars.current_owner_id} IS NULL`);
+					}
+
 					break;
 				case 'country':
 					conditions.push(eq(Owners.country, filter.value));
+
 					break;
-				case 'edition': {
+				case 'edition':
 					const [year, ...nameParts] = filter.value.split(' ');
 					const name = nameParts.join(' ');
+
 					conditions.push(
 						and(
 							eq(Editions.year, parseInt(year)),
 							eq(Editions.name, name)
 						)
 					);
+
 					break;
-				}
+				case 'generation':
+					conditions.push(eq(Editions.generation, filter.value));
+
+					break;
+				case 'year':
+					conditions.push(eq(Editions.year, parseInt(filter.value)));
+
+					break;
+				default:
+					break;
 			}
 		}
 
