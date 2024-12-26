@@ -22,10 +22,20 @@ import { createDb } from '../../db';
 import { Cars, Owners } from '../../db/schema';
 import type { Bindings } from '../types';
 
+const CACHE_TTL = {
+	COUNTRIES: 60 * 60 * 24 * 7, // 7 days
+};
+
 const ownersRouter = new Hono<{ Bindings: Bindings }>();
 
 ownersRouter.get('/countries', async (c) => {
 	try {
+		const cached = await c.env.CACHE.get('owners:countries');
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
+
 		const db = createDb(c.env.DB);
 
 		const countries = await db
@@ -36,7 +46,13 @@ ownersRouter.get('/countries', async (c) => {
 			.groupBy(Owners.country)
 			.orderBy(Owners.country);
 
-		return c.json(countries.map((row) => row.country));
+		const countryList = countries.map((row) => row.country);
+
+		await c.env.CACHE.put('owners:countries', JSON.stringify(countryList), {
+			expirationTtl: CACHE_TTL.COUNTRIES,
+		});
+
+		return c.json(countryList);
 	} catch (error: unknown) {
 		console.error('Error fetching owner countries:', error);
 

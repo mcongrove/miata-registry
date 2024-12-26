@@ -22,10 +22,21 @@ import { createDb } from '../../db';
 import { Cars, Editions } from '../../db/schema';
 import type { Bindings } from '../types';
 
+const CACHE_TTL = {
+	EDITIONS: 60 * 60 * 24 * 7, // 7 days
+	EDITIONS_NAMES: 60 * 60 * 24 * 7, // 7 days
+};
+
 const editionsRouter = new Hono<{ Bindings: Bindings }>();
 
 editionsRouter.get('/', async (c) => {
 	try {
+		const cached = await c.env.CACHE.get('editions:all');
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
+
 		const db = createDb(c.env.DB);
 
 		const editionsWithCounts = await db
@@ -56,6 +67,14 @@ editionsRouter.get('/', async (c) => {
 			)
 			.orderBy(asc(Editions.year), asc(Editions.name));
 
+		await c.env.CACHE.put(
+			'editions:all',
+			JSON.stringify(editionsWithCounts),
+			{
+				expirationTtl: CACHE_TTL.EDITIONS,
+			}
+		);
+
 		return c.json(editionsWithCounts);
 	} catch (error) {
 		console.error('Error fetching editions:', error);
@@ -73,6 +92,12 @@ editionsRouter.get('/', async (c) => {
 
 editionsRouter.get('/names', async (c) => {
 	try {
+		const cached = await c.env.CACHE.get('editions:names');
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
+
 		const db = createDb(c.env.DB);
 
 		const uniqueNames = await db
@@ -86,7 +111,13 @@ editionsRouter.get('/names', async (c) => {
 			.orderBy(asc(Editions.year), asc(Editions.name))
 			.groupBy(sql`${Editions.id}, ${Editions.year}, ${Editions.name}`);
 
-		return c.json(uniqueNames.map((edition) => edition.name));
+		const names = uniqueNames.map((edition) => edition.name);
+
+		await c.env.CACHE.put('editions:names', JSON.stringify(names), {
+			expirationTtl: CACHE_TTL.EDITIONS_NAMES,
+		});
+
+		return c.json(names);
 	} catch (error) {
 		console.error('Error fetching edition names:', error);
 

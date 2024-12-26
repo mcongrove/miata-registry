@@ -22,10 +22,20 @@ import { createDb } from '../../db';
 import { CarOwners, Cars, Owners } from '../../db/schema';
 import type { Bindings } from '../types';
 
+const CACHE_TTL = {
+	STATS: 60 * 60 * 24 * 7, // 7 days
+};
+
 const statsRouter = new Hono<{ Bindings: Bindings }>();
 
 statsRouter.get('/', async (c) => {
 	try {
+		const cached = await c.env.CACHE.get('stats:all');
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
+
 		const db = createDb(c.env.DB);
 
 		const [totalCars] = await db
@@ -46,12 +56,18 @@ statsRouter.get('/', async (c) => {
 			.from(Owners)
 			.innerJoin(CarOwners, eq(Owners.id, CarOwners.owner_id));
 
-		return c.json({
+		const stats = {
 			cars: totalCars.count,
 			claimedCars: carsWithOwners.count,
 			editions: uniqueEditions.count,
 			countries: uniqueCountries.count,
+		};
+
+		await c.env.CACHE.put('stats:all', JSON.stringify(stats), {
+			expirationTtl: CACHE_TTL.STATS,
 		});
+
+		return c.json(stats);
 	} catch (error: unknown) {
 		console.error('Error fetching registry statistics:', error);
 

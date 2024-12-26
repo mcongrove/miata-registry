@@ -16,15 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { D1Database, R2Bucket } from '@cloudflare/workers-types';
+import { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
 
 export type ApiError = {
 	error: string;
 	details?: string;
 };
 
-export type Bindings = {
+export interface Bindings {
 	DB: D1Database;
 	IMAGES: R2Bucket;
 	NODE_ENV: string;
-};
+	CACHE: KVNamespace;
+}

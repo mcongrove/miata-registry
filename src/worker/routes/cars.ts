@@ -22,6 +22,12 @@ import { createDb } from '../../db';
 import { CarOwners, Cars, Editions, Owners } from '../../db/schema';
 import type { Bindings } from '../types';
 
+const CACHE_TTL = {
+	CARS_LIST: 60 * 60, // 1 hour
+	CAR_DETAILS: 60 * 60 * 24 * 7, // 7 days
+	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
+};
+
 const carsRouter = new Hono<{ Bindings: Bindings }>();
 
 // Get cars list with filtering, sorting, and pagination
@@ -29,12 +35,24 @@ carsRouter.get('/', async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 		const params = c.req.query();
+		const filters = params.filters ? JSON.parse(params.filters) : [];
+		const page = parseInt(params.page || '1');
+
+		// Only cache if there are no filters and we're on page 1
+		const shouldCache = filters.length === 0 && page === 1;
+
+		if (shouldCache) {
+			const cacheKey = `cars:list:${JSON.stringify(params)}`;
+			const cached = await c.env.CACHE.get(cacheKey);
+
+			if (cached) {
+				return c.json(JSON.parse(cached));
+			}
+		}
 
 		// Parse query parameters
-		const filters = params.filters ? JSON.parse(params.filters) : [];
 		const sortColumn = params.sortColumn || 'edition.year';
 		const sortDirection = (params.sortDirection || 'asc') as 'asc' | 'desc';
-		const page = parseInt(params.page || '1');
 		const pageSize = Math.min(parseInt(params.pageSize || '50'), 50);
 
 		// Build conditions first
@@ -188,13 +206,23 @@ carsRouter.get('/', async (c) => {
 
 		const total = cars[0]?.total ?? 0;
 
-		return c.json({
-			cars: cars.map(({ total, ...car }) => car), // Remove total from each row
+		const result = {
+			cars: cars.map(({ total, ...car }) => car),
 			total,
 			page,
 			pageSize,
 			totalPages: Math.ceil(total / pageSize),
-		});
+		};
+
+		// Only cache if conditions are met
+		if (shouldCache) {
+			const cacheKey = `cars:list:${JSON.stringify(params)}`;
+			await c.env.CACHE.put(cacheKey, JSON.stringify(result), {
+				expirationTtl: CACHE_TTL.CARS_LIST,
+			});
+		}
+
+		return c.json(result);
 	} catch (error) {
 		console.error('Error fetching cars:', error);
 		return c.json(
@@ -213,6 +241,13 @@ carsRouter.get('/:id', async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 		const id = c.req.param('id');
+		const cacheKey = `cars:details:${id}`;
+
+		const cached = await c.env.CACHE.get(cacheKey);
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
 
 		const [carData] = await db
 			.select({
@@ -283,10 +318,16 @@ carsRouter.get('/:id', async (c) => {
 				desc(CarOwners.date_end)
 			);
 
-		return c.json({
+		const result = {
 			...carData,
 			owner_history: ownerHistory,
+		};
+
+		await c.env.CACHE.put(cacheKey, JSON.stringify(result), {
+			expirationTtl: CACHE_TTL.CAR_DETAILS,
 		});
+
+		return c.json(result);
 	} catch (error: unknown) {
 		console.error('Error fetching car:', error);
 
@@ -306,6 +347,13 @@ carsRouter.get('/:id/summary', async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 		const id = c.req.param('id');
+		const cacheKey = `cars:summary:${id}`;
+
+		const cached = await c.env.CACHE.get(cacheKey);
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
 
 		const [car] = await db
 			.select({
@@ -326,6 +374,10 @@ carsRouter.get('/:id/summary', async (c) => {
 		if (!car) {
 			return c.json({ error: 'Car not found' }, 404);
 		}
+
+		await c.env.CACHE.put(cacheKey, JSON.stringify(car), {
+			expirationTtl: CACHE_TTL.CAR_SUMMARY,
+		});
 
 		return c.json(car);
 	} catch (error: unknown) {

@@ -1,26 +1,38 @@
+# Global Configuration
 name = "miata-registry"
 main = "src/worker/index.ts"
 compatibility_date = "2024-01-01"
 
-# Default environment variables
-vars = { NODE_ENV = "production" }
-
+# Global D1 Configuration
 [[d1_databases]]
 binding = "DB"
 database_name = "registry"
 database_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
-database_preview_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
 
+# Global KV Configuration
+[[kv_namespaces]]
+binding = "CACHE"
+id = "7fda99700a024497bc3da8172120a3d5"
+preview_id = "7fda99700a024497bc3da8172120a3d5"
+
+# Development Environment
 [env.development]
-vars = { NODE_ENV = "development" }
+vars = { NODE_ENV = "development", ENVIRONMENT = "development" }
+
 [[env.development.d1_databases]]
 binding = "DB"
 database_name = "registry"
 database_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
-database_preview_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
 
+[[env.development.kv_namespaces]]
+binding = "CACHE"
+id = "7fda99700a024497bc3da8172120a3d5"
+preview_id = "7fda99700a024497bc3da8172120a3d5"
+
+# Production Environment
 [env.production]
 vars = { NODE_ENV = "production" }
-r2_buckets = [
-  { binding = "IMAGES", bucket_name = "miata-registry-images" }
-]
+
+[[env.production.r2_buckets]]
+binding = "IMAGES"
+bucket_name = "miata-registry-images"
