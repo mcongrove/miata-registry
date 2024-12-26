@@ -78,8 +78,8 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 
 const ConstructionBanner = () => (
 	<div className="bg-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
-		🚧 &nbsp; This project is in early development. Features may be
-		incomplete or change without notice.
+		🚧 &nbsp; This project is in early access. Features may be incomplete or
+		change without notice.
 	</div>
 );
 
@@ -134,7 +134,8 @@ export const Header = () => {
 					isActive={isActive('/registry')}
 				/>
 
-				{/* <Link
+				{/*
+				<Link
 					to="/resources/docs"
 					className={`text-sm ${
 						isActive('/resources')
@@ -143,7 +144,8 @@ export const Header = () => {
 					} transition-colors`}
 				>
 					Resources
-				</Link> */}
+				</Link>
+				*/}
 
 				<Dropdown
 					label="About"

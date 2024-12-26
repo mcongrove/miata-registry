@@ -33,9 +33,11 @@ export const Home = () => {
 
 						<button className="inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2">
 							The registry is now open!
-							<span className="text-brg font-medium">
-								Read more →
-							</span>
+							<Link to="/about">
+								<span className="text-brg font-medium">
+									Read more →
+								</span>
+							</Link>
 						</button>
 
 						<div className="flex flex-col gap-3">
