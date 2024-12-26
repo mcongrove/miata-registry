@@ -26,4 +26,5 @@ export type ApiError = {
 export type Bindings = {
 	DB: D1Database;
 	IMAGES: R2Bucket;
+	NODE_ENV: string;
 };

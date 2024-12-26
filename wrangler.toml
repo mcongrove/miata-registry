@@ -2,6 +2,9 @@ name = "miata-registry"
 main = "src/worker/index.ts"
 compatibility_date = "2024-01-01"
 
+# Default environment variables
+vars = { NODE_ENV = "production" }
+
 [[d1_databases]]
 binding = "DB"
 database_name = "registry"
@@ -9,6 +12,7 @@ database_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
 database_preview_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
 
 [env.development]
+vars = { NODE_ENV = "development" }
 [[env.development.d1_databases]]
 binding = "DB"
 database_name = "registry"
@@ -16,6 +20,7 @@ database_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
 database_preview_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
 
 [env.production]
+vars = { NODE_ENV = "production" }
 r2_buckets = [
   { binding = "IMAGES", bucket_name = "miata-registry-images" }
 ]

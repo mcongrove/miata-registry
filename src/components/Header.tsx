@@ -154,7 +154,7 @@ export const Header = () => {
 						// { label: 'News', to: '/news' },
 						{ label: 'Contributing', to: '/about#contribute' },
 						{ label: 'Contact us', to: '/about#contact' },
-						{ label: 'Submit a tip', to: '/about#contact' },
+						// { label: 'Submit a tip', to: '/tip' },
 					]}
 					isActive={isActive('/about')}
 				/>

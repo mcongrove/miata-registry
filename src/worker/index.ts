@@ -26,8 +26,27 @@ import type { Bindings } from './types';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// Enable CORS
-app.use('*', cors());
+app.use('*', async (c, next) => {
+	const ALLOWED_ORIGINS =
+		c.env.NODE_ENV !== 'development'
+			? ['https://miataregistry.com']
+			: ['https://miataregistry.com', 'http://localhost:5173'];
+
+	const origin = c.req.header('Origin');
+
+	if (c.env.NODE_ENV !== 'development') {
+		if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
+			return c.json({ error: 'Unauthorized' }, 403);
+		}
+	}
+
+	return cors({
+		origin: ALLOWED_ORIGINS,
+		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		maxAge: 86400, // 24 hours
+		credentials: true,
+	})(c, next);
+});
 
 // Basic test endpoint
 app.get('/', (c) => c.json({ status: 'ok' }));
