@@ -16,10 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from '../components/Button';
 import { Credit } from '../components/Credit';
 import { TimelineItem } from '../components/home/TimelineItem';
+import { Tooltip } from '../components/Tooltip';
 
 export const Home = () => {
 	return (
@@ -49,7 +51,11 @@ export const Home = () => {
 						</div>
 
 						<div className="flex items-center gap-4 text-sm">
-							<Button>Claim your Miata</Button>
+							<Tooltip content="Coming soon!">
+								<Button className="flex flex-col" disabled>
+									Claim your Miata
+								</Button>
+							</Tooltip>
 
 							<Button
 								variant="tertiary"
@@ -356,7 +362,9 @@ export const Home = () => {
 								these special cars for future generations.
 							</p>
 
-							<Button>Claim your Miata</Button>
+							<Tooltip content="Coming soon!">
+								<Button disabled>Claim your Miata</Button>
+							</Tooltip>
 
 							<div className="flex flex-col items-start gap-3 mt-8 pt-8 border-t border-brg-border text-sm">
 								<h3 className="flex gap-2 items-center text-brg-mid font-bold">
@@ -381,13 +389,15 @@ export const Home = () => {
 									detail helps build our registry.
 								</p>
 
-								<Button
-									variant="secondary"
-									withArrow
-									className="text-xs mt-2"
-								>
-									Submit a Tip
-								</Button>
+								<Link to="/about#contact">
+									<Button
+										variant="secondary"
+										withArrow
+										className="text-xs mt-2"
+									>
+										Submit a Tip
+									</Button>
+								</Link>
 							</div>
 						</div>
 					</div>

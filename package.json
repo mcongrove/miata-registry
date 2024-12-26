@@ -19,6 +19,7 @@
 		"worker:dev": "wrangler dev src/worker/index.ts --remote"
 	},
 	"dependencies": {
+		"@clerk/clerk-react": "^5.21.0",
 		"@cloudflare/workers-types": "^4.20241224.0",
 		"@emailjs/browser": "^4.4.1",
 		"@floating-ui/react": "^0.27.2",

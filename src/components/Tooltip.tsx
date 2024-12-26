@@ -31,12 +31,14 @@ type TooltipProps = {
 	children: React.ReactNode;
 	content: React.ReactNode;
 	placement?: Placement;
+	className?: string;
 };
 
 export const Tooltip = ({
 	children,
 	content,
 	placement = 'top',
+	className,
 }: TooltipProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const arrowRef = useRef(null);
@@ -53,7 +55,11 @@ export const Tooltip = ({
 
 	return (
 		<>
-			<div ref={refs.setReference} {...getReferenceProps()}>
+			<div
+				className="w-fit"
+				ref={refs.setReference}
+				{...getReferenceProps()}
+			>
 				{children}
 			</div>
 
@@ -62,13 +68,13 @@ export const Tooltip = ({
 					<div
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className="bg-brg-dark text-white px-2 py-1 rounded text-xs"
+						className={`bg-brg-dark text-white px-2 py-1 rounded text-xs ${className}`}
 					>
 						{content}
 
 						<div
 							ref={arrowRef}
-							className="absolute bg-brg-dark size-2 rotate-45 -z-10"
+							className={`absolute bg-brg-dark size-2 rotate-45 -z-10 ${className}`}
 							style={{
 								bottom: '-4px',
 								left: '50%',

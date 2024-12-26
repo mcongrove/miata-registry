@@ -18,6 +18,7 @@
 
 import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
+import { Tooltip } from './Tooltip';
 
 export const Footer = () => {
 	return (
@@ -107,27 +108,24 @@ export const Footer = () => {
 									</Link>
 								</li>
 								<li>
-									<Link
-										to="/register"
-										className="text-brg-mid hover:text-brg-light transition-colors"
+									<Tooltip
+										content="Coming soon!"
+										className="bg-black"
 									>
-										Register your Miata
-									</Link>
+										<Link
+											to="/register"
+											className="text-brg-mid hover:text-brg-light transition-colors pointer-events-none"
+										>
+											Register your Miata
+										</Link>
+									</Tooltip>
 								</li>
 								<li>
 									<Link
-										to="/tip"
+										to="/about#contact"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
 										Register someone else's Miata
-									</Link>
-								</li>
-								<li>
-									<Link
-										to="/registry#search"
-										className="text-brg-mid hover:text-brg-light transition-colors"
-									>
-										Search
 									</Link>
 								</li>
 								<li>

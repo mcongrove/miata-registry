@@ -16,9 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {
+	SignedIn,
+	SignedOut,
+	SignInButton,
+	UserButton,
+} from '@clerk/clerk-react';
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
-// import { Button } from './Button';
+import { Button } from './Button';
 
 interface DropdownProps {
 	label: string;
@@ -72,59 +78,45 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 
 const ConstructionBanner = () => (
 	<div className="bg-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
-		🚧 &nbsp; This project is under construction. Features may be incomplete
-		or change without notice.
+		🚧 &nbsp; This project is in early development. Features may be
+		incomplete or change without notice.
 	</div>
 );
 
 export const Header = () => {
 	const location = useLocation();
+	// const { user } = useUser();
 	const isHomePage = location.pathname === '/';
-	// const { user, loading } = useAuth();
 
-	// const handleSignIn = async () => {
-	// 	await signInWithGoogle();
-	// };
+	// console.log(user);
 
 	const isActive = (path: string) => {
 		return location.pathname.startsWith(path);
 	};
 
-	// const AuthSection = () => {
-	// 	if (loading) return null;
+	const AuthSection = () => (
+		<>
+			<SignedOut>
+				<SignInButton mode="modal">
+					{isHomePage ? (
+						<button className="block bg-brg text-white hover:bg-brg-dark rounded-lg transition-colors py-3 px-4 border-r border-brg-mid">
+							Sign In
+						</button>
+					) : (
+						<Button variant="tertiary">Sign In</Button>
+					)}
+				</SignInButton>
+			</SignedOut>
 
-	// 	return user ? (
-	// 		<UserMenu user={user} />
-	// 	) : (
-	// 		<>
-	// 			{isHomePage ? (
-	// 				<div className="flex items-center text-sm text-white">
-	// 					<button
-	// 						onClick={handleSignIn}
-	// 						className="block bg-brg hover:bg-brg-dark rounded-l-lg transition-colors py-3 px-4 border-r border-brg-mid"
-	// 					>
-	// 						Sign In
-	// 					</button>
-
-	// 					<button
-	// 						onClick={handleSignIn}
-	// 						className="bg-brg hover:bg-brg-dark rounded-r-lg transition-colors py-3 px-4"
-	// 					>
-	// 						Register
-	// 					</button>
-	// 				</div>
-	// 			) : (
-	// 				<div className="flex items-center text-sm gap-2">
-	// 					<Button variant="tertiary" onClick={handleSignIn}>
-	// 						Sign In
-	// 					</Button>
-
-	// 					<Button onClick={handleSignIn}>Register</Button>
-	// 				</div>
-	// 			)}
-	// 		</>
-	// 	);
-	// };
+			<SignedIn>
+				<UserButton
+					appearance={{
+						elements: { userButtonAvatarBox: 'size-9' },
+					}}
+				/>
+			</SignedIn>
+		</>
+	);
 
 	const NavLinks = () => (
 		<nav className="flex items-center justify-between w-full h-11">
@@ -137,7 +129,7 @@ export const Header = () => {
 							label: 'Browse the editions',
 							to: '/registry/editions',
 						},
-						{ label: 'Claim your Miata', to: '/register' },
+						// { label: 'Claim your Miata', to: '/register' },
 					]}
 					isActive={isActive('/registry')}
 				/>
@@ -160,7 +152,7 @@ export const Header = () => {
 						// { label: 'News', to: '/news' },
 						{ label: 'Contributing', to: '/about#contribute' },
 						{ label: 'Contact us', to: '/about#contact' },
-						{ label: 'Submit a tip', to: '/tip' },
+						{ label: 'Submit a tip', to: '/about#contact' },
 					]}
 					isActive={isActive('/about')}
 				/>
@@ -168,7 +160,7 @@ export const Header = () => {
 				<ConstructionBanner />
 			</div>
 
-			{/* <AuthSection /> */}
+			<AuthSection />
 		</nav>
 	);
 
