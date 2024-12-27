@@ -271,7 +271,7 @@ export const CarProfile = () => {
 										<img
 											src={`https://store.miataregistry.com/car/${car.edition.image_car_id}.jpg`}
 											alt={`${car.edition?.name} Edition Car`}
-											className={`w-full h-full object-cover opacity-0 transition-opacity duration-200 delay-[2000ms] grayscale`}
+											className={`w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale`}
 											onLoad={(e) => {
 												const img =
 													e.target as HTMLImageElement;
@@ -284,7 +284,7 @@ export const CarProfile = () => {
 															? 'opacity-70'
 															: 'opacity-100'
 													);
-												}, 2000);
+												}, 1000);
 											}}
 										/>
 									)}
