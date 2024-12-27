@@ -166,7 +166,7 @@ export const Footer = () => {
 										to="/legal"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
-										Legal
+										Privacy Policy and Terms
 									</Link>
 								</li>
 							</ul>

@@ -39,16 +39,15 @@ app.use('*', async (c, next) => {
 			return c.json({ error: 'Unauthorized' }, 403);
 		}
 	}
-
 	return cors({
 		origin: ALLOWED_ORIGINS,
 		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-		maxAge: 86400, // 24 hours
+		maxAge: 86400,
 		credentials: true,
 	})(c, next);
 });
 
-// Basic test endpoint
+// API test endpoint
 app.get('/', (c) => c.json({ status: 'ok' }));
 
 // Mount API routes

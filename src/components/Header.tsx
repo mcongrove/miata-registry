@@ -99,11 +99,13 @@ export const Header = () => {
 			<SignedOut>
 				<SignInButton mode="modal">
 					{isHomePage ? (
-						<button className="block bg-brg text-white hover:bg-brg-dark rounded-lg transition-colors py-3 px-4 border-r border-brg-mid">
+						<button className="block bg-brg text-sm h-11 text-white hover:bg-brg-dark rounded-lg transition-colors py-3 px-4 border-r border-brg-mid">
 							Sign In
 						</button>
 					) : (
-						<Button variant="tertiary">Sign In</Button>
+						<Button variant="tertiary" className="text-sm h-11">
+							Sign In
+						</Button>
 					)}
 				</SignInButton>
 			</SignedOut>
