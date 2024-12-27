@@ -24,11 +24,12 @@ import {
 } from '@clerk/clerk-react';
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
+import { useTipModal } from '../context/TipContext';
 import { Button } from './Button';
 
 interface DropdownProps {
 	label: string;
-	items: { label: string; to: string }[];
+	items: { label: string; to?: string; onClick?: () => void }[];
 	isActive?: boolean;
 }
 
@@ -57,19 +58,31 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 
 			<div className="absolute left-0 top-full invisible group-hover:visible">
 				<div className="mt-2 p-2 w-48 bg-white rounded-lg shadow-lg border border-brg-border">
-					{items.map((item) => (
-						<Link
-							key={item.to}
-							to={item.to}
-							className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-								location.pathname === item.to
-									? 'text-brg font-medium'
-									: 'text-brg-mid hover:text-brg hover:bg-brg-light'
-							}`}
-						>
-							{item.label}
-						</Link>
-					))}
+					{items.map((item, index) => {
+						const className = `block px-3 py-2 text-sm rounded-md transition-colors ${
+							item.to && location.pathname === item.to
+								? 'text-brg font-medium'
+								: 'text-brg-mid hover:text-brg hover:bg-brg-light'
+						}`;
+
+						return item.to ? (
+							<Link
+								key={item.to}
+								to={item.to}
+								className={className}
+							>
+								{item.label}
+							</Link>
+						) : (
+							<button
+								key={index}
+								onClick={item.onClick}
+								className={className}
+							>
+								{item.label}
+							</button>
+						);
+					})}
 				</div>
 			</div>
 		</div>
@@ -86,6 +99,7 @@ const ConstructionBanner = () => (
 export const Header = () => {
 	const location = useLocation();
 	// const { user } = useUser();
+	const { openTipModal } = useTipModal();
 	const isHomePage = location.pathname === '/';
 
 	// console.log(user);
@@ -132,6 +146,7 @@ export const Header = () => {
 							to: '/registry/editions',
 						},
 						// { label: 'Claim your Miata', to: '/register' },
+						{ label: 'Submit a tip', onClick: openTipModal },
 					]}
 					isActive={isActive('/registry')}
 				/>

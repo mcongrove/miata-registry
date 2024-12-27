@@ -18,9 +18,12 @@
 
 import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
+import { useTipModal } from '../context/TipContext';
 import { Tooltip } from './Tooltip';
 
 export const Footer = () => {
+	const { openTipModal } = useTipModal();
+
 	return (
 		<footer className="bg-brg-dark pt-16 pb-8">
 			<div className="container mx-auto">
@@ -121,12 +124,12 @@ export const Footer = () => {
 									</Tooltip>
 								</li>
 								<li>
-									<Link
-										to="/about#contact"
-										className="text-brg-mid hover:text-brg-light transition-colors"
+									<span
+										onClick={openTipModal}
+										className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"
 									>
 										Register someone else's Miata
-									</Link>
+									</span>
 								</li>
 								<li>
 									<Link

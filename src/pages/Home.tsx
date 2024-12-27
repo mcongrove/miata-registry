@@ -254,6 +254,7 @@ export const Home = () => {
 					</div>
 				</div>
 
+				{/*
 				<div className="container mx-auto flex flex-col gap-40 py-20">
 					<div>
 						<div className="text-center mb-12">
@@ -331,6 +332,7 @@ export const Home = () => {
 						</div>
 					</div>
 				</div>
+				*/}
 
 				<div className="bg-brg-light">
 					<div className="flex flex-row items-stretch">

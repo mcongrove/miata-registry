@@ -18,9 +18,11 @@
 
 import emailjs from '@emailjs/browser';
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
+import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
+import { useTipModal } from '../context/TipContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const getCountCodeCommits = async (owner: string, repo: string) => {
@@ -39,6 +41,7 @@ const getCountCodeCommits = async (owner: string, repo: string) => {
 };
 
 export const About = () => {
+	const { openTipModal } = useTipModal();
 	const [highlightedSection, setHighlightedSection] = useState<string | null>(
 		null
 	);
@@ -302,9 +305,12 @@ export const About = () => {
 							Miata, you can create an account and claim your
 							vehicle by providing documentation and photos. Know
 							of other limited edition Miatas in your area?{' '}
-							<Link to="/tip" className="underline">
+							<span
+								onClick={openTipModal}
+								className="underline cursor-pointer"
+							>
 								Submit a tip
-							</Link>{' '}
+							</span>{' '}
 							and our verification team will follow up. For
 							developers interested in improving the platform
 							itself, our codebase is open source on GitHub and we
@@ -325,15 +331,12 @@ export const About = () => {
 						<p className="text-sm text-brg-mid">
 							We would like to thank all the contributors who have
 							helped make the Miata Registry a success. Special
-							thanks to Bob Wilson, Sarah Chen, and Mike Rodriguez
-							from Miata.net for their extensive research and
-							documentation. We're grateful to the moderators at
-							MX5OC.com and Club Roadster for their support and
-							expertise. Thanks also to David Thompson, Jennifer
-							Park, and Carlos Mendoza for their valuable feedback
-							and code contributions, and to the countless
-							community members on Forum Mazda who have helped
-							verify and validate registry entries.
+							thanks to numerous forum members at Miata.net, the
+							BRG Miata Society and NA Miata Club on Facebook, and
+							the CTX Yatas club. Additional thanks Katla, Harper,
+							Kirsten, Garrett, Jesse, and the countless Miata and
+							car community members who have helped verify and
+							validate registry entries.
 						</p>
 					</div>
 
@@ -354,31 +357,34 @@ export const About = () => {
 								className="flex flex-col gap-4 mx-auto w-full max-w-2xl"
 								onSubmit={handleSubmit}
 							>
-								<TextField
-									id="name"
-									name="name"
-									label="Name"
-									placeholder="Name"
-									required
-								/>
+								<Field id="name" label="Name" required>
+									<TextField
+										id="name"
+										name="name"
+										placeholder="John Doe"
+										required
+									/>
+								</Field>
 
-								<TextField
-									id="email"
-									name="email"
-									label="Email"
-									type="email"
-									placeholder="email@example.com"
-									required
-								/>
+								<Field id="email" label="Email" required>
+									<TextField
+										id="email"
+										name="email"
+										type="email"
+										placeholder="email@example.com"
+										required
+									/>
+								</Field>
 
-								<TextField
-									id="message"
-									name="message"
-									label="Message"
-									type="textarea"
-									placeholder="Message"
-									required
-								/>
+								<Field id="message" label="Message" required>
+									<TextField
+										id="message"
+										name="message"
+										type="textarea"
+										placeholder="Message"
+										required
+									/>
+								</Field>
 
 								<button
 									type="submit"

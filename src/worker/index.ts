@@ -22,6 +22,7 @@ import carsRouter from './routes/cars';
 import editionsRouter from './routes/editions';
 import ownersRouter from './routes/owners';
 import statsRouter from './routes/stats';
+import tipsRouter from './routes/tips';
 import type { Bindings } from './types';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -55,5 +56,6 @@ app.route('/cars', carsRouter);
 app.route('/editions', editionsRouter);
 app.route('/owners', ownersRouter);
 app.route('/stats', statsRouter);
+app.route('/tips', tipsRouter);
 
 export default app;

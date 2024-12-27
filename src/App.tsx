@@ -26,6 +26,7 @@ import {
 } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { TipProvider } from './context/TipContext';
 import { About } from './pages/About';
 import { CarProfile } from './pages/Car';
 import { Editions } from './pages/Editions';
@@ -56,18 +57,23 @@ function Layout() {
 
 function App() {
 	return (
-		<BrowserRouter>
-			<Routes>
-				<Route element={<Layout />}>
-					<Route path="/" element={<Home />} />
-					<Route path="/about" element={<About />} />
-					<Route path="/legal" element={<Legal />} />
-					<Route path="/registry" element={<Registry />} />
-					<Route path="/registry/:id" element={<CarProfile />} />
-					<Route path="/registry/editions" element={<Editions />} />
-				</Route>
-			</Routes>
-		</BrowserRouter>
+		<TipProvider>
+			<BrowserRouter>
+				<Routes>
+					<Route element={<Layout />}>
+						<Route path="/" element={<Home />} />
+						<Route path="/about" element={<About />} />
+						<Route path="/legal" element={<Legal />} />
+						<Route path="/registry" element={<Registry />} />
+						<Route path="/registry/:id" element={<CarProfile />} />
+						<Route
+							path="/registry/editions"
+							element={<Editions />}
+						/>
+					</Route>
+				</Routes>
+			</BrowserRouter>
+		</TipProvider>
 	);
 }
 

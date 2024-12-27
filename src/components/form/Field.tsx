@@ -16,48 +16,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface TextFieldProps {
+interface FieldProps {
+	caption?: string;
+	children: React.ReactNode;
 	className?: string;
+	error?: string | null;
 	id: string;
-	name: string;
-	placeholder?: string;
+	label: string;
 	required?: boolean;
-	rows?: number;
-	type?: 'text' | 'email' | 'textarea';
 }
 
-export const TextFieldStyles = (className: string) => `
-		w-full rounded-lg border border-brg-light bg-white px-2.5 py-2 text-xs text-brg placeholder:text-brg-/50 ${className}
-	`;
-
-export const TextField = ({
+export const Field = ({
+	caption,
+	children,
 	className = '',
+	error,
 	id,
-	name,
-	placeholder,
+	label,
 	required = false,
-	rows = 4,
-	type = 'text',
-}: TextFieldProps) => (
-	<>
-		{type === 'textarea' ? (
-			<textarea
-				id={id}
-				name={name}
-				placeholder={placeholder}
-				rows={rows}
-				className={TextFieldStyles(className)}
-				required={required}
-			/>
-		) : (
-			<input
-				type={type}
-				id={id}
-				name={name}
-				placeholder={placeholder}
-				className={TextFieldStyles(className)}
-				required={required}
-			/>
-		)}
-	</>
+}: FieldProps) => (
+	<div className={`flex flex-col gap-1 ${className}`}>
+		<label htmlFor={id} className="text-sm font-medium text-brg">
+			<span>
+				{label} {required && <span className="text-red-500">*</span>}
+			</span>
+
+			{(caption || error) && (
+				<div className="flex justify-between items-start gap-2">
+					{caption && (
+						<span className="text-xs text-brg-border font-normal">
+							{caption}
+						</span>
+					)}
+
+					{error && (
+						<span className="text-xs text-red-500">{error}</span>
+					)}
+				</div>
+			)}
+		</label>
+
+		{children}
+	</div>
 );

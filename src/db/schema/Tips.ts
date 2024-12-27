@@ -16,8 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from './schema/CarOwners';
-export * from './schema/Cars';
-export * from './schema/Editions';
-export * from './schema/Owners';
-export * from './schema/Tips';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { TipStatus } from '../../types/Tip';
+
+export const Tips = sqliteTable('tips', {
+	createdAt: integer('created_at').notNull(),
+	edition: text('edition').notNull(),
+	id: text('id').primaryKey(),
+	information: text('information'),
+	location: text('location'),
+	ownerName: text('owner_name'),
+	sequenceNumber: text('sequence_number'),
+	status: text('status', { enum: ['pending', 'confirmed'] })
+		.notNull()
+		.default(TipStatus.PENDING),
+	updatedAt: integer('updated_at'),
+	vin: text('vin'),
+});
