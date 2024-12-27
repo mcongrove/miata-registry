@@ -33,21 +33,9 @@ try {
 		.map((record) => {
 			console.log('Processing record:', record);
 
-			return `INSERT INTO owners (
-    id,
-    name,
-    country,
-    state,
-    city
-) VALUES (
-    '${uuidv4()}',
-    ${record.name ? `'${record.name.replace(/'/g, "''")}'` : 'NULL'},
-    ${record.country ? `'${record.country}'` : 'NULL'},
-    ${record.state ? `'${record.state}'` : 'NULL'},
-    ${record.city ? `'${record.city}'` : 'NULL'}
-);`;
+			return `INSERT INTO owners (id,name,country,state,city) VALUES ('${uuidv4()}',${record.name ? `'${record.name.replace(/'/g, "''")}'` : 'NULL'},${record.country ? `'${record.country}'` : 'NULL'},${record.state ? `'${record.state}'` : 'NULL'},${record.city ? `'${record.city}'` : 'NULL'});`;
 		})
-		.join('\n\n');
+		.join('\n');
 
 	// Log SQL output length
 	console.log('Generated SQL length:', sql.length);

@@ -130,15 +130,37 @@ export const CarProfile = () => {
 				items.push({
 					name: owner.name || 'Unknown',
 					dateRange:
-						!startYear && !endYear
-							? ''
-							: index === 0
-								? `${startYear || 'Unknown'} – ${
-										car.destroyed
-											? 'Destruction'
-											: 'Present'
-									}`
-								: `${startYear || 'Unknown'} – ${endYear || 'Unknown'}`,
+						!startYear && !endYear ? (
+							''
+						) : index === 0 ? (
+							car.destroyed ? (
+								`${startYear || 'Unknown'} – Destruction`
+							) : (
+								<>
+									{`${startYear || 'Unknown'} – `}
+									<span className="inline-flex items-center gap-1 mb-1">
+										Present{' '}
+										<Tooltip content="Car may have been sold or transferred">
+											<svg
+												className="w-3.5 h-3.5 text-brg-mid cursor-help"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+												/>
+											</svg>
+										</Tooltip>
+									</span>
+								</>
+							)
+						) : (
+							`${startYear || 'Unknown'} – ${endYear || 'Unknown'}`
+						),
 					location: formatLocation({
 						city: owner.city,
 						state: owner.state,

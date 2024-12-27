@@ -49,19 +49,9 @@ const formatDate = (dateStr) => {
 const sql = records
 	.map(
 		(record) =>
-			`INSERT INTO car_owners (
-    car_id,
-    owner_id,
-    date_start,
-    date_end
-) VALUES (
-    '${record.car_id}',
-    '${record.owner_id}',
-    ${formatDate(record.date_start)},
-    ${formatDate(record.date_end)}
-);`
+			`INSERT INTO car_owners (car_id,owner_id,date_start,date_end) VALUES ('${record.car_id}','${record.owner_id}',${formatDate(record.date_start)},${formatDate(record.date_end)});`
 	)
-	.join('\n\n');
+	.join('\n');
 
 // Write to a file
 writeFileSync(sqlPath, sql);

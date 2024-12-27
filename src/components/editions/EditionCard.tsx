@@ -28,26 +28,38 @@ type EditionCardProps = {
 export const EditionCard = ({ edition }: EditionCardProps) => {
 	return (
 		<div className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light">
-			{edition.image_car_id && (
-				<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
+			<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
+				{edition.image_car_id ? (
+					<>
+						<Link
+							to={`/registry?filter=${encodeURIComponent(
+								`edition:${edition.year} ${edition.name}`
+							).replace(/%20/g, '+')}`}
+						>
+							<img
+								src={`https://store.miataregistry.com/car/${edition.image_car_id}.jpg`}
+								alt={edition.name}
+								className="w-full h-full object-cover"
+								loading="lazy"
+							/>
+						</Link>
+
+						<div className="absolute bottom-4 right-4">
+							<Credit
+								id={edition.image_car_id}
+								direction="left"
+							/>
+						</div>
+					</>
+				) : (
 					<Link
 						to={`/registry?filter=${encodeURIComponent(
 							`edition:${edition.year} ${edition.name}`
 						).replace(/%20/g, '+')}`}
-					>
-						<img
-							src={`https://store.miataregistry.com/car/${edition.image_car_id}.jpg`}
-							alt={edition.name}
-							className="w-full h-full object-cover"
-							loading="lazy"
-						/>
-					</Link>
-
-					<div className="absolute bottom-4 right-4">
-						<Credit id={edition.image_car_id} direction="left" />
-					</div>
-				</div>
-			)}
+						className="w-full h-full"
+					/>
+				)}
+			</div>
 
 			<Link
 				to={`/registry?filter=${encodeURIComponent(
