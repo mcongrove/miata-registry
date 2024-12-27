@@ -258,7 +258,6 @@ carsRouter.get('/:id', async (c) => {
 				manufacture_date: Cars.manufacture_date,
 				manufacture_city: Cars.manufacture_city,
 				manufacture_country: Cars.manufacture_country,
-
 				shipping_date: Cars.shipping_date,
 				shipping_city: Cars.shipping_city,
 				shipping_state: Cars.shipping_state,
@@ -277,9 +276,9 @@ carsRouter.get('/:id', async (c) => {
 					color: Editions.color,
 					generation: Editions.generation,
 					year: Editions.year,
-					totalProduced: Editions.total_produced,
+					total_produced: Editions.total_produced,
 					description: Editions.description,
-					imageCarId: Editions.image_car_id,
+					image_car_id: Editions.image_car_id,
 				},
 				current_owner_id: Cars.current_owner_id,
 				current_owner: {

@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { eq, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
-import { CarOwners, Cars, Owners } from '../../db/schema';
+import { Cars, Owners } from '../../db/schema';
 import type { Bindings } from '../types';
 
 const CACHE_TTL = {
@@ -53,8 +53,7 @@ statsRouter.get('/', async (c) => {
 
 		const [uniqueCountries] = await db
 			.select({ count: sql<number>`count(distinct country)` })
-			.from(Owners)
-			.innerJoin(CarOwners, eq(Owners.id, CarOwners.owner_id));
+			.from(Owners);
 
 		const stats = {
 			cars: totalCars.count,

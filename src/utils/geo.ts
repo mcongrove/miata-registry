@@ -24,6 +24,12 @@ export const countryCodeMap: { [key: string]: string } = {
 	MEXICO: 'MX',
 };
 
+export const countryNameMap: { [key: string]: string } = {
+	JP: 'Japan',
+	US: 'United States',
+	MX: 'Mexico',
+};
+
 export const formatLocation = (
 	location?: TLocation,
 	short: boolean = false

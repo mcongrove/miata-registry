@@ -25,7 +25,7 @@ import { usePageTitle } from '../hooks/usePageTitle';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
-import { formatLocation } from '../utils/geo';
+import { countryNameMap, formatLocation } from '../utils/geo';
 import { toPrettyDate, toTitleCase } from '../utils/global';
 
 interface MapLocation {
@@ -267,30 +267,43 @@ export const CarProfile = () => {
 						<div className="aspect-video w-full h-[550px] relative rounded-lg overflow-hidden">
 							{car ? (
 								<div className="w-full h-full bg-brg-light">
-									<img
-										src={`https://store.miataregistry.com/car/${car.id}.jpg`}
-										alt={`${car.edition?.name}`}
-										className="w-full h-full object-cover opacity-0"
-										onLoad={(e) => {
-											const img =
-												e.target as HTMLImageElement;
-											img.classList.add(
-												car.destroyed
-													? 'opacity-70'
-													: 'opacity-100'
-											);
-										}}
-										onError={(e) => {
-											if (car.edition?.image_car_id) {
+									{car.edition?.image_car_id && (
+										<img
+											src={`https://store.miataregistry.com/car/${car.edition.image_car_id}.jpg`}
+											alt={`${car.edition?.name} Edition Car`}
+											className={`w-full h-full object-cover opacity-0 transition-opacity duration-200 delay-[2000ms] grayscale`}
+											onLoad={(e) => {
 												const img =
 													e.target as HTMLImageElement;
-
-												img.src = `https://store.miataregistry.com/car/${car.edition?.image_car_id}.jpg`;
-
-												img.classList.add('grayscale');
-											}
-										}}
-									/>
+												setTimeout(() => {
+													img.classList.remove(
+														'opacity-0'
+													);
+													img.classList.add(
+														car.destroyed
+															? 'opacity-70'
+															: 'opacity-100'
+													);
+												}, 2000);
+											}}
+										/>
+									)}
+									{car.id && (
+										<img
+											src={`https://store.miataregistry.com/car/${car.id}.jpg`}
+											alt={`${car.edition?.name}`}
+											className={`absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-200`}
+											onLoad={(e) => {
+												const img =
+													e.target as HTMLImageElement;
+												img.classList.add(
+													car.destroyed
+														? 'opacity-70'
+														: 'opacity-100'
+												);
+											}}
+										/>
+									)}
 
 									{car.destroyed && (
 										<div className="absolute inset-0 overflow-hidden">
@@ -451,16 +464,22 @@ export const CarProfile = () => {
 												: false
 										}
 										locations={[
-											car?.manufacture_city
+											car?.manufacture_country
 												? {
 														name: 'Manufactured',
 														address: formatLocation(
 															{
-																city: car.manufacture_city,
+																city:
+																	car.manufacture_city ||
+																	'',
 																state: '',
 																country:
-																	car.manufacture_country ||
-																	'',
+																	car.manufacture_country
+																		? countryNameMap[
+																				car
+																					.manufacture_country
+																			]
+																		: '',
 															}
 														),
 													}

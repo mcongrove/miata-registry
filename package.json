@@ -14,6 +14,7 @@
 		"format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
 		"db:generate": "drizzle-kit generate:sqlite",
 		"db:push": "drizzle-kit push:sqlite",
+		"db:backup": "wrangler d1 export registry --remote --output=backups/registry-$(date +%s).sqlite",
 		"worker:build": "esbuild src/worker/index.ts --bundle --outfile=dist/worker.js --format=esm --platform=browser",
 		"worker:deploy": "npm run worker:build && npx wrangler deploy",
 		"worker:dev": "wrangler dev src/worker/index.ts --remote --env development"
