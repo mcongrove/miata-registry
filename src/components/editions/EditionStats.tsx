@@ -28,13 +28,15 @@ export const EditionStats = ({
 	showText = true,
 }: EditionStatsProps) => {
 	const inRegistryPercentage = Math.max(
-		(edition.in_registry ?? 0 / (edition.total_produced ?? 0)) * 100,
+		((edition.in_registry ?? 0) / (edition.total_produced ?? 0)) * 100,
 		3
 	);
 	const claimedPercentage = Math.max(
-		(edition.claimed ?? 0 / (edition.total_produced ?? 0)) * 100,
+		((edition.claimed ?? 0) / (edition.total_produced ?? 0)) * 100,
 		3
 	);
+
+	console.log(edition, inRegistryPercentage, claimedPercentage);
 
 	return (
 		<div className="w-full">
@@ -67,12 +69,12 @@ export const EditionStats = ({
 				<div className="w-full h-2 bg-brg-light rounded-full overflow-hidden">
 					<div className="relative h-full flex">
 						<div
-							className="absolute top-0 left-0 bg-brg-mid h-full z-20 rounded-r-full"
+							className="absolute top-0 left-0 bg-brg h-full z-20 rounded-r-full"
 							style={{ width: `${claimedPercentage}%` }}
 						/>
 
 						<div
-							className="absolute top-0 left-0 bg-brg-border h-full z-10 rounded-r-full"
+							className="absolute top-0 left-0 bg-brg-mid/50 h-full z-10 rounded-r-full"
 							style={{
 								width: `${inRegistryPercentage}%`,
 							}}
