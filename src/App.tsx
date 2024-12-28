@@ -46,13 +46,19 @@ function ScrollToTop() {
 }
 
 function Layout() {
+	const { pathname } = useLocation();
+
+	const isHomePage = pathname === '/';
+
 	return (
 		<div className="min-h-screen flex flex-col">
-			<div className="lg:hidden">
-				<MobileWarning />
-			</div>
+			{!isHomePage && (
+				<div className="lg:hidden">
+					<MobileWarning />
+				</div>
+			)}
 
-			<div className="hidden lg:block">
+			<div className={!isHomePage ? 'hidden lg:block' : ''}>
 				<ScrollToTop />
 				<Header />
 				<Outlet />

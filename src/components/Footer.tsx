@@ -26,10 +26,10 @@ export const Footer = () => {
 	const { openModal } = useModal();
 
 	return (
-		<footer className="bg-brg-dark pt-16 pb-8">
+		<footer className="bg-brg-dark p-10 lg:pt-16 pb-8">
 			<div className="container mx-auto">
-				<div className="flex gap-24 mb-16">
-					<div className="w-1/4">
+				<div className="flex flex-col lg:flex-row gap-10 lg:gap-24 mb-10 lg:mb-16">
+					<div className="lg:w-1/4">
 						<div className="flex flex-col gap-1.5 w-32 mb-6 text-brg-mid">
 							<Symbol className="w-full h-auto" />
 
@@ -38,7 +38,7 @@ export const Footer = () => {
 							</small>
 						</div>
 
-						<p className="text-brg-mid mb-8">
+						<p className="text-sm lg:text-base text-brg-mid mb-6">
 							A community-driven project documenting the history
 							of limited edition Mazda Miatas.
 						</p>
@@ -96,7 +96,7 @@ export const Footer = () => {
 						</div>
 					</div>
 
-					<div className="flex gap-16">
+					<div className="flex gap-8 lg:gap-16 text-sm lg:text-base">
 						<div>
 							<h3 className="font-medium text-white mb-4">
 								Registry

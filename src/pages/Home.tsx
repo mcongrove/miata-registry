@@ -29,33 +29,31 @@ export const Home = () => {
 
 	return (
 		<>
-			<header className="h-[90vh] flex bg-brg-light">
-				<div className="w-1/2 px-16 flex items-center ">
-					<div className="pr-40 flex flex-col gap-10">
-						<Symbol className="w-40 h-auto text-brg mb-6" />
+			<header className="lg:h-[90vh] flex bg-brg-light">
+				<div className="w-full md:w-2/3 lg:w-1/2 p-10 lg:p-16 pt-24 lg:pb-16 flex items-center">
+					<div className="md:pr-20 lg:pr-40 flex flex-col gap-6 lg:gap-10">
+						<Symbol className="w-32 lg:w-40 h-auto text-brg mb-6" />
 
-						<button className="inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2">
-							The registry is now open!
-							<Link to="/about">
-								<span className="text-brg font-medium">
-									Read more →
-								</span>
+						<div className="hidden md:inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2">
+							<span>The registry is now open!</span>
+							<Link to="/about" className="text-brg font-medium">
+								Read more →
 							</Link>
-						</button>
+						</div>
 
 						<div className="flex flex-col gap-3">
-							<h1 className="text-6xl font-medium text-brg">
+							<h1 className="text-2xl lg:text-6xl font-medium text-brg">
 								Welcome to the Miata Registry
 							</h1>
 
-							<p className="text-xl text-brg-mid">
+							<p className="text-md lg:text-xl text-brg-mid">
 								A community-driven project that aims to document
 								and preserve the history of limited edition
 								Mazda Miatas.
 							</p>
 						</div>
 
-						<div className="flex items-center gap-4 text-sm">
+						<div className="flex items-center gap-2 lg:gap-4 text-sm">
 							<Button onClick={() => openModal('register')}>
 								Claim your Miata
 							</Button>
@@ -71,7 +69,7 @@ export const Home = () => {
 					</div>
 				</div>
 
-				<div className="w-1/2 h-full relative">
+				<div className="w-1/2 h-full relative hidden lg:block">
 					<img
 						src="https://store.miataregistry.com/app/car/1991SE182.jpg"
 						alt="1991 British Racing Green #182"
@@ -97,7 +95,7 @@ export const Home = () => {
 
 			<main className="relative bg-white overflow-hidden">
 				<svg
-					className="absolute top-0 left-0 w-full h-[90vh] pointer-events-none"
+					className="hidden lg:block absolute top-0 left-0 w-full h-[90vh] pointer-events-none"
 					preserveAspectRatio="none"
 					viewBox="0 0 100 100"
 				>
@@ -130,7 +128,7 @@ export const Home = () => {
 
 				<div className="relative min-h-[500px]">
 					<div className="flex">
-						<div className="w-1/2">
+						<div className="hidden lg:block w-1/2">
 							<div className="container mx-auto">
 								<div className="relative">
 									<div className="absolute left-1/2 transform -translate-x-1/2 -top-24 h-full w-px bg-gradient-to-b from-transparent via-brg-border to-transparent"></div>
@@ -179,8 +177,8 @@ export const Home = () => {
 							</div>
 						</div>
 
-						<div className="w-1/2 p-24">
-							<h1 className="text-4xl font-bold text-brg mb-6">
+						<div className="lg:w-1/2 p-10 lg:p-24">
+							<h1 className="hidden lg:block text-4xl font-bold text-brg mb-6">
 								The Miata Registry
 							</h1>
 
@@ -204,7 +202,7 @@ export const Home = () => {
 								information and history.
 							</p>
 
-							<h2 className="text-2xl font-bold text-brg mb-4 mt-12">
+							<h2 className="text-lg lg:text-2xl font-bold text-brg mb-2 mt-8 lg:mb-4 lg:mt-12">
 								Built for Longevity
 							</h2>
 
@@ -228,7 +226,7 @@ export const Home = () => {
 								future generations of Miata enthusiasts.
 							</p>
 
-							<h2 className="text-2xl font-bold text-brg mb-4 mt-12">
+							<h2 className="text-lg lg:text-2xl font-bold text-brg mb-2 mt-8 lg:mb-4 lg:mt-12">
 								Every Edition Matters
 							</h2>
 
@@ -337,14 +335,14 @@ export const Home = () => {
 
 				<div className="bg-brg-light">
 					<div className="flex flex-row items-stretch">
-						<div className="w-1/3 relative">
+						<div className="hidden lg:block w-1/3 relative">
 							<img
 								src="https://store.miataregistry.com/app/car/about-3.jpg"
 								className="absolute inset-0 w-full h-full object-cover object-bottom scale-x-[-1]"
 							/>
 
 							<svg
-								className="absolute top-0 left-0 bottom-0 -right-px pointer-events-none"
+								className="absolute inset-0 right-[-1px] w-full h-full pointer-events-none"
 								preserveAspectRatio="none"
 								viewBox="0 0 100 100"
 							>
@@ -355,12 +353,12 @@ export const Home = () => {
 							</svg>
 						</div>
 
-						<div className="w-2/3 p-12">
-							<h2 className="text-4xl font-bold text-brg mb-4">
+						<div className="p-10 lg:w-2/3 lg:p-12">
+							<h2 className="text-xl lg:text-4xl font-bold text-brg mb-4">
 								Register your limited edition Miata
 							</h2>
 
-							<p className="text-brg-mid text-lg mb-8">
+							<p className="text-brg-mid lg:text-lg mb-8">
 								Help preserve Miata history by registering your
 								limited edition model. Every registration adds
 								to our collective knowledge and helps document
@@ -377,7 +375,7 @@ export const Home = () => {
 									Know of a limited edition Miata?
 								</h3>
 
-								<p className="text-brg-mid w-3/5">
+								<p className="text-brg-mid lg:w-3/5">
 									If you know someone with a limited edition
 									Miata or have spotted one, you can help by
 									submitting information about the car. Every

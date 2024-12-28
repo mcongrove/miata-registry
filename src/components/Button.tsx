@@ -42,7 +42,7 @@ export const Button = ({
 				: '';
 	const textColor =
 		variant === 'tertiary' ? 'text-brg hover:text-brg-mid' : 'text-white';
-	const buttonClassName = `group flex items-center ${bgColor} ${textColor} font-medium py-3 px-4 rounded-lg transition-colors ${className || ''}`;
+	const buttonClassName = `group flex items-center ${bgColor} ${textColor} font-medium text-sm lg:text-base py-2 px-3 lg:py-3 lg:px-4 rounded-lg transition-colors ${className || ''}`;
 
 	if (href) {
 		return (

@@ -98,11 +98,9 @@ const ConstructionBanner = () => (
 
 export const Header = () => {
 	const location = useLocation();
-	// const { user } = useUser();
 	const { openModal } = useModal();
-	const isHomePage = location.pathname === '/';
 
-	// console.log(user);
+	const isHomePage = location.pathname === '/';
 
 	const isActive = (path: string) => {
 		return location.pathname.startsWith(path);
@@ -182,7 +180,9 @@ export const Header = () => {
 					isActive={isActive('/about')}
 				/>
 
-				<ConstructionBanner />
+				<div className="hidden lg:block">
+					<ConstructionBanner />
+				</div>
 			</div>
 
 			<AuthSection />
@@ -193,7 +193,7 @@ export const Header = () => {
 		return (
 			<>
 				<header className="absolute top-0 left-0 right-0 z-50 h-20">
-					<div className="mx-auto py-6 px-16">
+					<div className="mx-auto py-6 px-10 lg:px-16">
 						<div className="flex items-center">
 							<NavLinks />
 						</div>

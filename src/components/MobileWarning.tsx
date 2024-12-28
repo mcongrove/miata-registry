@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 
 export function MobileWarning() {
@@ -23,7 +24,9 @@ export function MobileWarning() {
 		<div className="fixed inset-0 flex flex-col bg-brg-light">
 			<div className="flex-1 px-10 pt-16 flex">
 				<div className="w-full flex flex-col gap-4">
-					<Symbol className="w-32 h-auto text-brg mb-6" />
+					<Link to="/">
+						<Symbol className="w-32 h-auto text-brg mb-6" />
+					</Link>
 
 					<div className="flex flex-col gap-3">
 						<h1 className="text-2xl font-medium text-brg">
