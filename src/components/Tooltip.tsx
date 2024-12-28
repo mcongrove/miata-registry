@@ -18,9 +18,11 @@
 
 import {
 	arrow,
+	flip,
 	FloatingPortal,
 	offset,
 	Placement,
+	shift,
 	useFloating,
 	useHover,
 	useInteractions,
@@ -43,11 +45,16 @@ export const Tooltip = ({
 	const [isOpen, setIsOpen] = useState(false);
 	const arrowRef = useRef(null);
 
-	const { refs, floatingStyles, context } = useFloating({
+	const { refs, floatingStyles, context, middlewareData } = useFloating({
 		open: isOpen,
 		onOpenChange: setIsOpen,
 		placement,
-		middleware: [offset(8), arrow({ element: arrowRef })],
+		middleware: [
+			offset(8),
+			flip(),
+			shift({ padding: 8 }),
+			arrow({ element: arrowRef }),
+		],
 	});
 
 	const hover = useHover(context);
@@ -68,7 +75,7 @@ export const Tooltip = ({
 					<div
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className={`bg-brg-dark text-white px-2 py-1 rounded text-xs ${className}`}
+						className={`bg-brg-dark text-white px-2 py-1 rounded text-xs z-[52] ${className}`}
 					>
 						{content}
 
@@ -76,10 +83,12 @@ export const Tooltip = ({
 							ref={arrowRef}
 							className={`absolute bg-brg-dark size-2 rotate-45 -z-10 ${className}`}
 							style={{
-								bottom: '-4px',
-								left: '50%',
-								transform: 'translateX(-50%)',
-								clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+								position: 'absolute',
+								left: middlewareData.arrow?.x ?? '',
+								top: middlewareData.arrow?.y ?? '',
+								[context.placement.includes('top')
+									? 'bottom'
+									: 'top']: '-4px',
 							}}
 						/>
 					</div>

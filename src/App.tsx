@@ -26,6 +26,7 @@ import {
 } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { MobileWarning } from './components/MobileWarning';
 import { TipProvider } from './context/TipContext';
 import { About } from './pages/About';
 import { CarProfile } from './pages/Car';
@@ -47,10 +48,16 @@ function ScrollToTop() {
 function Layout() {
 	return (
 		<div className="min-h-screen flex flex-col">
-			<ScrollToTop />
-			<Header />
-			<Outlet />
-			<Footer />
+			<div className="lg:hidden">
+				<MobileWarning />
+			</div>
+
+			<div className="hidden lg:block">
+				<ScrollToTop />
+				<Header />
+				<Outlet />
+				<Footer />
+			</div>
 		</div>
 	);
 }

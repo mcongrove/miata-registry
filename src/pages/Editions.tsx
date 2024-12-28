@@ -17,6 +17,9 @@
  */
 
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '../components/Button';
+import { Tooltip } from '../components/Tooltip';
 import { EditionCard } from '../components/editions/EditionCard';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { TEdition } from '../types/Edition';
@@ -48,9 +51,33 @@ export const Editions = () => {
 
 	return (
 		<main className="flex-1 pt-20">
-			<div className="container mx-auto py-8">
-				<h1 className="text-2xl font-bold mb-6">
-					Limited Edition Models
+			<div className="container mx-auto py-8 flex flex-col gap-6">
+				<h1 className="flex items-center gap-2 justify-between text-2xl font-bold">
+					<span>Limited Edition Models</span>
+
+					<Tooltip
+						content={
+							<>
+								Production numbers may be inaccurate;
+								<br />
+								please contact us if you have information
+							</>
+						}
+					>
+						<svg
+							className="size-6 text-brg-mid cursor-help"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
+						</svg>
+					</Tooltip>
 				</h1>
 
 				<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -73,6 +100,40 @@ export const Editions = () => {
 							))}
 						</>
 					)}
+				</div>
+
+				<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg w-1/3 ml-auto">
+					<h3 className="flex gap-2 items-center text-brg-mid font-bold">
+						<svg
+							className="size-6 text-brg-mid"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fillRule="evenodd"
+								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+								clipRule="evenodd"
+							/>
+						</svg>
+						Have a great photo of your edition?
+					</h3>
+
+					<p className="text-brg-mid md:w-4/5 lg:w-full">
+						If you have a high-quality photo of your limited edition
+						Miata, you can nominate it to be the featured image for
+						the entire edition. Help make the registry more visually
+						appealing for everyone.
+					</p>
+
+					<Link to="/about#contact">
+						<Button
+							variant="secondary"
+							withArrow
+							className="text-xs mt-2"
+						>
+							Get in touch
+						</Button>
+					</Link>
 				</div>
 			</div>
 		</main>

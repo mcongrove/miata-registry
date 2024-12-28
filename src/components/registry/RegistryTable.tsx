@@ -143,12 +143,16 @@ export const RegistryTable = ({
 												style={{
 													backgroundColor:
 														colorMap[
-															car.edition?.color?.toLowerCase() ||
+															(
+																car.color ||
+																car.edition
+																	?.color
+															)?.toLowerCase() ||
 																''
 														] || '#DDD',
 												}}
 											/>
-											{car.edition?.color}
+											{car.color || car.edition?.color}
 										</div>
 									</td>
 									{car.sequence ? (

@@ -104,11 +104,13 @@ carsRouter.get('/', async (c) => {
 			.select({
 				id: Cars.id,
 				sequence: Cars.sequence,
+				color: Cars.color,
 				edition: {
 					year: Editions.year,
 					generation: Editions.generation,
 					name: Editions.name,
 					color: Editions.color,
+					total_produced: Editions.total_produced,
 				},
 				current_owner: {
 					id: Owners.id,

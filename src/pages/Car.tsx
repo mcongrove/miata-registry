@@ -142,7 +142,7 @@ export const CarProfile = () => {
 										Present{' '}
 										<Tooltip content="Car may have been sold or transferred">
 											<svg
-												className="w-3.5 h-3.5 text-brg-mid cursor-help"
+												className="size-3.5 text-brg-mid cursor-help"
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
@@ -374,7 +374,7 @@ export const CarProfile = () => {
 
 										<Tooltip content="Information retrieved based on VIN; may be inaccurate">
 											<svg
-												className="w-3.5 h-3.5 text-brg-mid cursor-help"
+												className="size-3.5 text-brg-mid cursor-help"
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"

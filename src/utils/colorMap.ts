@@ -18,12 +18,14 @@
 
 export const colorMap: Record<string, string> = {
 	black: '#000000',
+	'black mica': '#000000',
 	'brilliant black': '#000000',
 	'british racing green': '#2C4C3B',
 	'classic red': '#E2231A',
 	'crystal blue': '#00B0CA',
 	'emerald mica': '#024930',
 	'evolution orange': '#F0A500',
+	'lava orange': '#FF6600',
 	'laguna blue': '#2A4BA0',
 	'mahogany mica': '#4B273D',
 	'marina green mica': '#1B4D3E',
@@ -40,5 +42,6 @@ export const colorMap: Record<string, string> = {
 	'titanium gray metallic': '#6D6F64',
 	'twilight blue mica': '#1B365D',
 	various: '#CCCCCC',
+	'velocity red': '#FF0000',
 	white: '#FFFFFF',
 };

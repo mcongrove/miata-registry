@@ -20,6 +20,34 @@ The Miata Registry is a public platform where owners of special edition Mazda MX
 2. Add your limited edition Miata's details
 3. Connect with the community!
 
+## 🤝 Development
+
+To run the Miata Registry locally:
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-username/miata-registry.git
+    cd miata-registry
+    ```
+
+2. Install dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Create a `.dev.vars` and `.env` file in the root directory with your environment variables. Reach out to a maintainer to get the correct values.
+
+4. Start the development application and worker:
+
+    ```bash
+    npm run dev
+    npm run worker:dev
+    ```
+
+> **Note**: The local development environment connects to the production Cloudflare D1 database and R2 storage through local worker APIs. This ensures consistency between development and production environments while this project is in development.
+
 ## 🤝 Contributing
 
 We welcome contributions from the community! Whether it's adding new features, improving documentation, or reporting bugs, please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
