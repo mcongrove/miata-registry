@@ -184,12 +184,14 @@ carsRouter.get('/', async (c) => {
 			);
 			sortConditions.push(asc(Editions.year));
 		}
+
 		if (sortField !== 'name') {
 			sortConditions.push(
 				sql`CASE WHEN ${Editions.name} IS NULL THEN 1 ELSE 0 END`
 			);
 			sortConditions.push(asc(Editions.name));
 		}
+
 		if (sortField !== 'sequence') {
 			sortConditions.push(
 				sql`CASE WHEN ${Cars.sequence} IS NULL THEN 1 ELSE 0 END`
@@ -255,6 +257,7 @@ carsRouter.get('/:id', async (c) => {
 				vin: Cars.vin,
 				sequence: Cars.sequence,
 				destroyed: Cars.destroyed,
+				color: Cars.color,
 				manufacture_date: Cars.manufacture_date,
 				manufacture_city: Cars.manufacture_city,
 				manufacture_country: Cars.manufacture_country,
