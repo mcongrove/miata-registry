@@ -28,4 +28,5 @@ export interface Bindings {
 	IMAGES: R2Bucket;
 	NODE_ENV: string;
 	CACHE: KVNamespace;
+	RESEND_API_KEY: string;
 }

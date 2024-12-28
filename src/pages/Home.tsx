@@ -233,10 +233,10 @@ export const Home = () => {
 							</h2>
 
 							<p className="text-brg-mid">
-								While popular limited editions like the M
-								Edition are well documented, many lesser-known
-								limited runs have fascinating stories waiting to
-								be preserved.
+								While popular limited editions like the 2005
+								Mazdaspeed are well documented, many
+								lesser-known limited runs have fascinating
+								stories waiting to be preserved.
 							</p>
 
 							<p className="text-brg-mid mt-4">

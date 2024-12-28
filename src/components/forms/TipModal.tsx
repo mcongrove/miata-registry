@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import emailjs from '@emailjs/browser';
 import { useEffect, useState } from 'react';
 import { Button } from '../Button';
 import { Field } from '../form/Field';
@@ -82,25 +81,31 @@ export function TipModal({
 
 			if (!response.ok) {
 				const error = await response.json();
+
 				throw new Error(error.details || 'Failed to submit tip');
 			}
 
 			const { tipId } = await response.json();
 
-			await emailjs.send(
-				import.meta.env.VITE_EMAILJS_SERVICE_ID,
-				'template_ppq6jga',
+			await fetch(
+				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/email/tip`,
 				{
-					tipId,
-					edition: formData.get('edition'),
-					information: formData.get('information') || 'Not provided',
-					location: formData.get('location') || 'Not provided',
-					ownerName: formData.get('ownerName') || 'Not provided',
-					sequenceNumber:
-						formData.get('sequenceNumber') || 'Not provided',
-					vin: formData.get('vin') || 'Not provided',
-				},
-				import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						tipId,
+						edition: formData.get('edition'),
+						vin: formData.get('vin') || 'Not provided',
+						sequenceNumber:
+							formData.get('sequenceNumber') || 'Not provided',
+						ownerName: formData.get('ownerName') || 'Not provided',
+						location: formData.get('location') || 'Not provided',
+						information:
+							formData.get('information') || 'Not provided',
+					}),
+				}
 			);
 
 			setIsSuccess(true);

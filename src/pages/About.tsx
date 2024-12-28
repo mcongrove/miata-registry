@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import emailjs from '@emailjs/browser';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
 import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
@@ -102,12 +101,26 @@ export const About = () => {
 		setIsSubmitting(true);
 
 		try {
-			await emailjs.sendForm(
-				import.meta.env.VITE_EMAILJS_SERVICE_ID,
-				'template_juttm4b',
-				e.currentTarget,
-				import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+			const formData = new FormData(e.currentTarget);
+
+			const response = await fetch(
+				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/email/contact`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						name: formData.get('name'),
+						email: formData.get('email'),
+						message: formData.get('message'),
+					}),
+				}
 			);
+
+			if (!response.ok) {
+				throw new Error('Failed to send message');
+			}
 
 			setIsEmailSent(true);
 		} catch (error) {
@@ -140,10 +153,11 @@ export const About = () => {
 
 						<p className="text-xl text-brg-mid">
 							As the only comprehensive database of its kind, we
-							maintain detailed records of every limited edition
-							Miata ever produced. From rare editions to regional
-							exclusives, our registry brings together information
-							that has never before been collected in one place.
+							aim to maintain detailed records of every limited
+							edition Miata ever produced. From rare editions to
+							regional exclusives, our registry brings together
+							information that has never before been collected in
+							one place.
 						</p>
 					</div>
 
@@ -155,10 +169,16 @@ export const About = () => {
 						<p className="text-md text-brg-mid">
 							The Miata Registry was created at the end of 2024 by
 							Matthew Congrove, a Miata enthusiast, software
-							engineer, and owner of 1991 BRG #182. After
-							researching and documenting limited edition Miatas
-							across forums, social media, and car shows, he
-							recognized the need for a centralized database to
+							engineer, and owner of{' '}
+							<Link
+								to="/registry/63621393-a540-46b5-b9fe-9231fea2730f"
+								className="underline"
+							>
+								1991 BRG #182
+							</Link>
+							. After researching and finding limited edition
+							Miatas across forums, social media, and car shows,
+							he recognized the need for a centralized database to
 							preserve the history of these special cars. The
 							registry combines his passion for Miatas with modern
 							web technology to create an accessible, open source
@@ -237,10 +257,10 @@ export const About = () => {
 							AGPL-3.0 license. This means our code is freely
 							available for anyone to inspect, modify, and
 							improve. We believe this transparency is crucial for
-							a community resource - it ensures the project can
+							a community resource—it ensures the project can
 							continue to serve the Miata community regardless of
 							any individual's involvement. Whether you're a
-							developer wanting to contribute code, or an
+							developer wanting to contribute code or an
 							enthusiast interested in how we verify registry
 							entries, you can find everything about how we
 							operate on our{' '}
@@ -290,6 +310,11 @@ export const About = () => {
 							review and validation to maintain the accuracy and
 							trustworthiness of the information.
 						</p>
+
+						<p className="text-sm text-brg-mid">
+							If you find an error in our registry, please contact
+							us and we will review and update the entry.
+						</p>
 					</div>
 
 					<div id="contribute" className="flex flex-col gap-3">
@@ -311,13 +336,28 @@ export const About = () => {
 							>
 								Submit a tip
 							</span>{' '}
-							and our verification team will follow up. For
-							developers interested in improving the platform
-							itself, our codebase is open source on GitHub and we
-							welcome pull requests. Every contribution, whether
-							it's registering your own car or helping verify
-							others, makes the registry a more valuable resource
-							for the entire Miata community.
+							and our verification team will follow up.
+						</p>
+
+						<p className="text-sm text-brg-mid">
+							For developers interested in improving the platform
+							itself, our codebase is open source on{' '}
+							<a
+								href="https://github.com/mcongrove/miata-registry"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="underline"
+							>
+								GitHub
+							</a>{' '}
+							and we welcome pull requests.
+						</p>
+
+						<p className="text-sm text-brg-mid">
+							Every contribution, whether it's registering your
+							own car or helping verify others, makes the registry
+							a more valuable resource for the entire Miata
+							community.
 						</p>
 					</div>
 
@@ -331,12 +371,24 @@ export const About = () => {
 						<p className="text-sm text-brg-mid">
 							We would like to thank all the contributors who have
 							helped make the Miata Registry a success. Special
-							thanks to numerous forum members at Miata.net, the
-							BRG Miata Society and NA Miata Club on Facebook, and
-							the CTX Yatas club. Additional thanks Katla, Harper,
-							Kirsten, Garrett, Jesse, and the countless Miata and
-							car community members who have helped verify and
+							thanks to the owners and numerous forum members at
+							Miata.net, the BRG Miata Society and NA Miata Club
+							on Facebook. Additional thanks Katla, Harper,
+							Kirsten, Terri, and the countless Miata and car
+							community members who have helped verify and
 							validate registry entries.
+						</p>
+
+						<p className="text-sm text-brg-mid">
+							Much of the initial dataset was sourced from
+							registries maintained by All Roadster (Evolution
+							Orange), Barry Weyand (Laguna Blue), Justin Porter
+							(Sunburst Yellow), Bonnie Lutz (Sunburst Yellow),
+							Curtis Wiseman (Sunburst Yellow), Ed Menzenski (1991
+							SE), Chris Owens (10th Anniversary), and David
+							Gilbert (2001 SE). We'd like to thank them
+							especially for their contributions to the Miata
+							community.
 						</p>
 					</div>
 

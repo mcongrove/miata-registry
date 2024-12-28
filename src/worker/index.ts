@@ -20,6 +20,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import carsRouter from './routes/cars';
 import editionsRouter from './routes/editions';
+import emailRouter from './routes/email';
 import ownersRouter from './routes/owners';
 import statsRouter from './routes/stats';
 import tipsRouter from './routes/tips';
@@ -54,6 +55,7 @@ app.get('/', (c) => c.json({ status: 'ok' }));
 // Mount API routes
 app.route('/cars', carsRouter);
 app.route('/editions', editionsRouter);
+app.route('/email', emailRouter);
 app.route('/owners', ownersRouter);
 app.route('/stats', statsRouter);
 app.route('/tips', tipsRouter);
