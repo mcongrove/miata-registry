@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Map } from '../components/car/Map';
 import { TimelineItem } from '../components/car/TimelineItem';
+import { Icon } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { TCar } from '../types/Car';
@@ -130,37 +131,13 @@ export const CarProfile = () => {
 				items.push({
 					name: owner.name || 'Unknown',
 					dateRange:
-						!startYear && !endYear ? (
-							''
-						) : index === 0 ? (
-							car.destroyed ? (
-								`${startYear || 'Unknown'} – Destruction`
-							) : (
-								<>
-									{`${startYear || 'Unknown'} – `}
-									<span className="inline-flex items-center gap-1 mb-1">
-										Present{' '}
-										<Tooltip content="Car may have been sold or transferred">
-											<svg
-												className="size-3.5 text-brg-mid cursor-help"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-												/>
-											</svg>
-										</Tooltip>
-									</span>
-								</>
-							)
-						) : (
-							`${startYear || 'Unknown'} – ${endYear || 'Unknown'}`
-						),
+						!startYear && !endYear
+							? ''
+							: index === 0
+								? car.destroyed
+									? `${startYear || 'Unknown'} – Destruction`
+									: `${startYear || 'Unknown'} – Present`
+								: `${startYear || 'Unknown'} – ${endYear || 'Unknown'}`,
 					location: formatLocation({
 						city: owner.city,
 						state: owner.state,
@@ -372,19 +349,10 @@ export const CarProfile = () => {
 										</p>
 
 										<Tooltip content="Information retrieved based on VIN; may be inaccurate">
-											<svg
-												className="size-3.5 text-brg-mid cursor-help"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-												/>
-											</svg>
+											<Icon
+												name="info-circle"
+												className="!size-3.5 !text-brg-border"
+											/>
 										</Tooltip>
 									</div>
 									<p
@@ -614,7 +582,15 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						<div>{getTimelineItems()}</div>
+						<div className="flex flex-col gap-8">
+							<div>{getTimelineItems()}</div>
+
+							<p className="text-xs text-brg-border w-3/4">
+								The above information may only be accurate as of
+								a specific date, as it may have been imported
+								from a defunct registry.
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>
