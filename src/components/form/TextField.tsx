@@ -17,47 +17,44 @@
  */
 
 interface TextFieldProps {
-	className?: string;
+	defaultValue?: string;
 	id: string;
 	name: string;
-	placeholder?: string;
+	placeholder: string;
+	readOnly?: boolean;
 	required?: boolean;
-	rows?: number;
-	type?: 'text' | 'email' | 'textarea';
+	type: string;
 }
 
-export const TextFieldStyles = (className: string) => `
-		w-full rounded-lg border border-brg-light bg-white px-2.5 py-2 text-xs text-brg placeholder:text-brg-/50 ${className}
-	`;
-
-export const TextField = ({
-	className = '',
+export function TextField({
+	defaultValue,
 	id,
 	name,
 	placeholder,
-	required = false,
-	rows = 4,
-	type = 'text',
-}: TextFieldProps) => (
-	<>
-		{type === 'textarea' ? (
-			<textarea
-				id={id}
-				name={name}
-				placeholder={placeholder}
-				rows={rows}
-				className={TextFieldStyles(className)}
-				required={required}
-			/>
-		) : (
-			<input
-				type={type}
-				id={id}
-				name={name}
-				placeholder={placeholder}
-				className={TextFieldStyles(className)}
-				required={required}
-			/>
-		)}
-	</>
-);
+	readOnly,
+	required,
+	type,
+}: TextFieldProps) {
+	return type === 'textarea' ? (
+		<textarea
+			id={id}
+			name={name}
+			placeholder={placeholder}
+			defaultValue={defaultValue}
+			required={required}
+			className="w-full h-32 px-3 py-2 text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid"
+			readOnly={readOnly}
+		/>
+	) : (
+		<input
+			id={id}
+			name={name}
+			type={type}
+			placeholder={placeholder}
+			defaultValue={defaultValue}
+			required={required}
+			className="w-full px-3 py-2 text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid"
+			readOnly={readOnly}
+		/>
+	);
+}

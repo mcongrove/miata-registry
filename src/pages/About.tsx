@@ -21,7 +21,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
 import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
-import { useTipModal } from '../context/TipContext';
+import { useModal } from '../context/ModalContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 const getCountCodeCommits = async (owner: string, repo: string) => {
@@ -40,7 +40,7 @@ const getCountCodeCommits = async (owner: string, repo: string) => {
 };
 
 export const About = () => {
-	const { openTipModal } = useTipModal();
+	const { openModal } = useModal();
 	const [highlightedSection, setHighlightedSection] = useState<string | null>(
 		null
 	);
@@ -331,7 +331,7 @@ export const About = () => {
 							vehicle by providing documentation and photos. Know
 							of other limited edition Miatas in your area?{' '}
 							<span
-								onClick={openTipModal}
+								onClick={() => openModal('tip')}
 								className="underline cursor-pointer"
 							>
 								Submit a tip
@@ -413,6 +413,7 @@ export const About = () => {
 									<TextField
 										id="name"
 										name="name"
+										type="text"
 										placeholder="John Doe"
 										required
 									/>

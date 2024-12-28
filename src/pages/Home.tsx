@@ -22,9 +22,11 @@ import { Button } from '../components/Button';
 import { Credit } from '../components/Credit';
 import { TimelineItem } from '../components/home/TimelineItem';
 import { Icon } from '../components/Icon';
-import { Tooltip } from '../components/Tooltip';
+import { useModal } from '../context/ModalContext';
 
 export const Home = () => {
+	const { openModal } = useModal();
+
 	return (
 		<>
 			<header className="h-[90vh] flex bg-brg-light">
@@ -54,11 +56,9 @@ export const Home = () => {
 						</div>
 
 						<div className="flex items-center gap-4 text-sm">
-							<Tooltip content="Coming soon!">
-								<Button className="flex flex-col" disabled>
-									Claim your Miata
-								</Button>
-							</Tooltip>
+							<Button onClick={() => openModal('register')}>
+								Claim your Miata
+							</Button>
 
 							<Button
 								variant="tertiary"
@@ -367,9 +367,9 @@ export const Home = () => {
 								these special cars for future generations.
 							</p>
 
-							<Tooltip content="Coming soon!">
-								<Button disabled>Claim your Miata</Button>
-							</Tooltip>
+							<Button onClick={() => openModal('register')}>
+								Claim your Miata
+							</Button>
 
 							<div className="flex flex-col items-start gap-3 mt-8 pt-8 border-t border-brg-border text-sm">
 								<h3 className="flex gap-2 items-center text-brg-mid font-bold">

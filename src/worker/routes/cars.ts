@@ -103,6 +103,7 @@ carsRouter.get('/', async (c) => {
 		const baseQuery = db
 			.select({
 				id: Cars.id,
+				vin: Cars.vin,
 				sequence: Cars.sequence,
 				color: Cars.color,
 				edition: {

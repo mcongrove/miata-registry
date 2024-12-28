@@ -23,13 +23,21 @@ import { Icon } from '../Icon';
 import { Modal } from '../Modal';
 import { SelectStyles } from '../Select';
 
-export function TipModal({
-	isOpen,
-	onClose,
-}: {
+interface RegisterModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-}) {
+	prefilledData?: {
+		edition?: string;
+		vin?: string;
+		sequenceNumber?: string;
+	};
+}
+
+export function RegisterModal({
+	isOpen,
+	onClose,
+	prefilledData,
+}: RegisterModalProps) {
 	const [loading, setLoading] = useState(false);
 	const [editions, setEditions] = useState<string[]>([]);
 	const [isSuccess, setIsSuccess] = useState(false);
@@ -54,6 +62,25 @@ export function TipModal({
 
 		loadEditions();
 	}, []);
+
+	useEffect(() => {
+		if (
+			prefilledData?.edition &&
+			editions.includes(prefilledData.edition)
+		) {
+			const form = document.querySelector('form');
+
+			if (form) {
+				const editionSelect = form.querySelector(
+					'[name="edition"]'
+				) as HTMLSelectElement;
+
+				if (editionSelect) {
+					editionSelect.value = prefilledData.edition;
+				}
+			}
+		}
+	}, [editions, prefilledData]);
 
 	const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -157,7 +184,7 @@ export function TipModal({
 						<h2 className="text-2xl font-bold mb-2">Thank You!</h2>
 
 						<p className="text-brg-mid">
-							Your tip has been submitted successfully.
+							Your information has been submitted successfully.
 						</p>
 
 						<p className="text-brg-mid">
@@ -173,17 +200,38 @@ export function TipModal({
 		<Modal
 			isOpen={isOpen}
 			onClose={onClose}
-			title="Submit a Tip"
+			title={
+				prefilledData?.edition
+					? `Claim your Miata`
+					: 'Register your Miata'
+			}
 			action={{
 				text: 'Submit',
 				onClick: submitTip,
 				loading,
 			}}
 		>
+			<p className="text-brg-mid text-sm mb-6">
+				Until the self-
+				{prefilledData?.edition ? 'claim' : 'register'} feature is
+				available, please fill out the form below to{' '}
+				{prefilledData?.edition ? 'claim' : 'register'} your Miata.
+			</p>
+
 			<form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
 				<div className="space-y-4">
 					<Field id="edition" label="Edition" required>
-						{!showOtherInput ? (
+						{prefilledData?.edition ? (
+							<TextField
+								id="edition"
+								name="edition"
+								type="text"
+								placeholder="1992 M2-1002 Roadster"
+								defaultValue={prefilledData.edition}
+								required
+								readOnly
+							/>
+						) : !showOtherInput ? (
 							<select
 								className={SelectStyles(
 									false,
@@ -236,15 +284,19 @@ export function TipModal({
 								name="sequenceNumber"
 								type="text"
 								placeholder="182"
+								defaultValue={prefilledData?.sequenceNumber}
+								readOnly={!!prefilledData?.sequenceNumber}
 							/>
 						</Field>
 
-						<Field id="vin" label="VIN" className="w-full">
+						<Field id="vin" label="VIN" className="w-full" required>
 							<TextField
 								id="vin"
 								name="vin"
 								type="text"
 								placeholder="JM1NA3510M1221538"
+								defaultValue={prefilledData?.vin}
+								readOnly={!!prefilledData?.vin}
 							/>
 						</Field>
 					</div>
@@ -253,6 +305,7 @@ export function TipModal({
 						<Field
 							id="ownerName"
 							label="Owner Name"
+							required
 							className="w-64"
 						>
 							<TextField
@@ -266,6 +319,7 @@ export function TipModal({
 						<Field
 							id="location"
 							label="Location"
+							required
 							className="w-full"
 						>
 							<TextField
@@ -282,7 +336,7 @@ export function TipModal({
 							id="information"
 							name="information"
 							type="textarea"
-							placeholder="Any other information, like social media links, etc..."
+							placeholder="Any other information, like social media links, photo links, etc., which will help us associate you with your Miata."
 						/>
 					</Field>
 				</div>

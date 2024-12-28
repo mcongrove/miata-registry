@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useModal } from '../../context/ModalContext';
 import { TCar } from '../../types/Car';
 import { colorMap } from '../../utils/colorMap';
 
@@ -36,6 +37,7 @@ export const RegistryTable = ({
 	isLoading = false,
 }: RegistryTableProps) => {
 	const navigate = useNavigate();
+	const { openModal } = useModal();
 
 	const columns = [
 		{ header: 'Year', key: 'edition.year', width: 'w-20' },
@@ -180,12 +182,25 @@ export const RegistryTable = ({
 										{car.current_owner ? (
 											car.current_owner.name
 										) : (
-											<Link
-												to={`/claim/${car.id}`}
+											<button
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+
+													openModal('register', {
+														prefilledData: {
+															edition: `${car.edition?.year} ${car.edition?.name}`,
+															vin: car.vin || '',
+															sequenceNumber:
+																car.sequence?.toString() ||
+																'',
+														},
+													});
+												}}
 												className="text-brg-border hover:text-brg hover:underline relative z-0"
 											>
 												Claim
-											</Link>
+											</button>
 										)}
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">

@@ -24,7 +24,7 @@ import {
 } from '@clerk/clerk-react';
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
-import { useTipModal } from '../context/TipContext';
+import { useModal } from '../context/ModalContext';
 import { Button } from './Button';
 
 interface DropdownProps {
@@ -99,7 +99,7 @@ const ConstructionBanner = () => (
 export const Header = () => {
 	const location = useLocation();
 	// const { user } = useUser();
-	const { openTipModal } = useTipModal();
+	const { openModal } = useModal();
 	const isHomePage = location.pathname === '/';
 
 	// console.log(user);
@@ -145,8 +145,14 @@ export const Header = () => {
 							label: 'Browse the editions',
 							to: '/registry/editions',
 						},
-						// { label: 'Claim your Miata', to: '/register' },
-						{ label: 'Submit a tip', onClick: openTipModal },
+						{
+							label: 'Register your Miata',
+							onClick: () => openModal('register'),
+						},
+						{
+							label: 'Submit a tip',
+							onClick: () => openModal('tip'),
+						},
 					]}
 					isActive={isActive('/registry')}
 				/>

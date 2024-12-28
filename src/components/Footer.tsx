@@ -18,11 +18,10 @@
 
 import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
-import { useTipModal } from '../context/TipContext';
-import { Tooltip } from './Tooltip';
+import { useModal } from '../context/ModalContext';
 
 export const Footer = () => {
-	const { openTipModal } = useTipModal();
+	const { openModal } = useModal();
 
 	return (
 		<footer className="bg-brg-dark pt-16 pb-8">
@@ -111,21 +110,16 @@ export const Footer = () => {
 									</Link>
 								</li>
 								<li>
-									<Tooltip
-										content="Coming soon!"
-										className="!bg-black"
+									<span
+										onClick={() => openModal('register')}
+										className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"
 									>
-										<Link
-											to="/register"
-											className="text-brg-mid hover:text-brg-light transition-colors pointer-events-none"
-										>
-											Register your Miata
-										</Link>
-									</Tooltip>
+										Register your Miata
+									</span>
 								</li>
 								<li>
 									<span
-										onClick={openTipModal}
+										onClick={() => openModal('tip')}
 										className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"
 									>
 										Register someone else's Miata

@@ -27,7 +27,7 @@ import {
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { MobileWarning } from './components/MobileWarning';
-import { TipProvider } from './context/TipContext';
+import { ModalProvider } from './context/ModalContext';
 import { About } from './pages/About';
 import { CarProfile } from './pages/Car';
 import { Editions } from './pages/Editions';
@@ -64,7 +64,7 @@ function Layout() {
 
 function App() {
 	return (
-		<TipProvider>
+		<ModalProvider>
 			<BrowserRouter>
 				<Routes>
 					<Route element={<Layout />}>
@@ -80,7 +80,7 @@ function App() {
 					</Route>
 				</Routes>
 			</BrowserRouter>
-		</TipProvider>
+		</ModalProvider>
 	);
 }
 
