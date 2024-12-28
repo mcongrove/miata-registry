@@ -19,15 +19,45 @@
 import { TLocation } from '../types/Location';
 
 export const countryCodeMap: { [key: string]: string } = {
-	JAPAN: 'JP',
+	'CZECH REPUBLIC': 'CZ',
+	'UNITED KINGDOM': 'UK',
 	'UNITED STATES': 'US',
+	AUSTRALIA: 'AU',
+	BELGIUM: 'BE',
+	CANADA: 'CA',
+	DENMARK: 'DK',
+	FRANCE: 'FR',
+	GERMANY: 'DE',
+	ITALY: 'IT',
+	JAPAN: 'JP',
 	MEXICO: 'MX',
+	NETHERLANDS: 'NL',
+	NORWAY: 'NO',
+	POLAND: 'PL',
+	SENEGAL: 'SN',
+	SWEDEN: 'SE',
+	VENEZUELA: 'VE',
 };
 
 export const countryNameMap: { [key: string]: string } = {
+	AU: 'Australia',
+	BE: 'Belgium',
+	CA: 'Canada',
+	CZ: 'Czech Republic',
+	DE: 'Germany',
+	DK: 'Denmark',
+	FR: 'France',
+	IT: 'Italy',
 	JP: 'Japan',
-	US: 'United States',
 	MX: 'Mexico',
+	NL: 'Netherlands',
+	NO: 'Norway',
+	PL: 'Poland',
+	SE: 'Sweden',
+	SN: 'Senegal',
+	UK: 'United Kingdom',
+	US: 'United States',
+	VE: 'Venezuela',
 };
 
 export const formatLocation = (
