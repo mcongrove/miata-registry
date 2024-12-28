@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType = 'claim' | 'register' | 'tip';
+export type TModalType = 'claim' | 'export' | 'register' | 'tip';
 
 export interface TModalState {
 	type: TModalType | null;

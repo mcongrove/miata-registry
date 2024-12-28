@@ -21,6 +21,7 @@ import { cors } from 'hono/cors';
 import carsRouter from './routes/cars';
 import editionsRouter from './routes/editions';
 import emailRouter from './routes/email';
+import exportRouter from './routes/export';
 import ownersRouter from './routes/owners';
 import statsRouter from './routes/stats';
 import tipsRouter from './routes/tips';
@@ -41,6 +42,7 @@ app.use('*', async (c, next) => {
 			return c.json({ error: 'Unauthorized' }, 403);
 		}
 	}
+
 	return cors({
 		origin: ALLOWED_ORIGINS,
 		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -56,6 +58,7 @@ app.get('/', (c) => c.json({ status: 'ok' }));
 app.route('/cars', carsRouter);
 app.route('/editions', editionsRouter);
 app.route('/email', emailRouter);
+app.route('/export', exportRouter);
 app.route('/owners', ownersRouter);
 app.route('/stats', statsRouter);
 app.route('/tips', tipsRouter);

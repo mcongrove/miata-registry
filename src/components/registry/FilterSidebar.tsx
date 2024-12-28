@@ -142,14 +142,27 @@ export const FilterSidebar = ({
 				onChange={handleOptionChange}
 			/>
 
-			<FilterRadioGroup
-				title="Edition"
-				type="edition"
-				options={editionOptions}
-				activeValue={getActiveValue('edition')}
-				onClear={handleClear}
-				onChange={handleOptionChange}
-			/>
+			<div>
+				<FilterHeader
+					title="Edition"
+					onClear={() => handleClear('edition')}
+					hasActiveFilter={!!getActiveValue('edition')}
+				/>
+
+				<div className="p-4 pt-0">
+					<Select
+						value={getActiveValue('edition') || ''}
+						onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+							handleSelectChange(e.target.value, 'edition')
+						}
+						options={editionOptions.map((edition) => ({
+							value: edition,
+							label: edition,
+						}))}
+						placeholder="Select edition"
+					/>
+				</div>
+			</div>
 
 			<div>
 				<FilterHeader

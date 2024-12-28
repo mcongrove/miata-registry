@@ -17,6 +17,7 @@
  */
 
 import { createContext, ReactNode, useContext, useState } from 'react';
+import { ExportModal } from '../components/forms/ExportModal';
 import { RegisterModal } from '../components/forms/RegisterModal';
 import { TipModal } from '../components/forms/TipModal';
 import { TModalState, TModalType } from '../types/Modal';
@@ -42,9 +43,9 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 
 	const renderModal = () => {
 		switch (modalState.type) {
-			case 'tip':
+			case 'export':
 				return (
-					<TipModal
+					<ExportModal
 						isOpen={true}
 						onClose={closeModal}
 						{...modalState.props}
@@ -53,6 +54,14 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 			case 'register':
 				return (
 					<RegisterModal
+						isOpen={true}
+						onClose={closeModal}
+						{...modalState.props}
+					/>
+				);
+			case 'tip':
+				return (
+					<TipModal
 						isOpen={true}
 						onClose={closeModal}
 						{...modalState.props}

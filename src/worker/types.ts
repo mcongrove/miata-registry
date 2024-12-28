@@ -29,4 +29,6 @@ export interface Bindings {
 	NODE_ENV: string;
 	CACHE: KVNamespace;
 	RESEND_API_KEY: string;
+	CLERK_SECRET_KEY: string;
+	CLERK_PUBLISHABLE_KEY: string;
 }
