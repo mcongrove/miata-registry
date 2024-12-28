@@ -17,9 +17,10 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Button } from '../Button';
 import { Field } from '../form/Field';
 import { TextField } from '../form/TextField';
+import { Icon } from '../Icon';
+import { Modal } from '../Modal';
 import { SelectStyles } from '../Select';
 
 export function TipModal({
@@ -32,16 +33,7 @@ export function TipModal({
 	const [loading, setLoading] = useState(false);
 	const [editions, setEditions] = useState<string[]>([]);
 	const [isSuccess, setIsSuccess] = useState(false);
-
-	useEffect(() => {
-		if (isOpen) {
-			document.body.style.overflow = 'hidden';
-		}
-
-		return () => {
-			document.body.style.overflow = 'unset';
-		};
-	}, [isOpen]);
+	const [showOtherInput, setShowOtherInput] = useState(false);
 
 	useEffect(() => {
 		const loadEditions = async () => {
@@ -63,13 +55,20 @@ export function TipModal({
 		loadEditions();
 	}, []);
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
+		await submitTip();
+	};
+
+	const submitTip = async () => {
 		setLoading(true);
 
 		try {
-			const formData = new FormData(e.currentTarget);
+			const form = document.querySelector('form');
+			if (!form) return;
+
+			const formData = new FormData(form);
 
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
@@ -126,166 +125,168 @@ export function TipModal({
 		onClose();
 	};
 
-	if (!isOpen) return null;
+	if (isSuccess) {
+		return (
+			<Modal
+				isOpen={isOpen}
+				onClose={handleClose}
+				hideCancel
+				action={{
+					text: 'Close',
+					onClick: handleClose,
+				}}
+			>
+				<div className="flex flex-col items-center gap-6 pt-6">
+					<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
+						<svg
+							className="w-8 h-8 text-brg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M5 13l4 4L19 7"
+							/>
+						</svg>
+					</div>
+
+					<div className="text-center">
+						<h2 className="text-2xl font-bold mb-2">Thank You!</h2>
+
+						<p className="text-brg-mid">
+							Your tip has been submitted successfully.
+						</p>
+
+						<p className="text-brg-mid">
+							We'll review it and update the registry accordingly.
+						</p>
+					</div>
+				</div>
+			</Modal>
+		);
+	}
 
 	return (
-		<div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[51]">
-			<div className="flex flex-col gap-4 bg-white rounded-lg p-6 max-w-lg w-full">
-				{isSuccess ? (
-					<div className="flex flex-col items-center gap-6 py-8">
-						<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
-							<svg
-								className="w-8 h-8 text-brg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
+		<Modal
+			isOpen={isOpen}
+			onClose={onClose}
+			title="Submit a Tip"
+			action={{
+				text: 'Submit',
+				onClick: submitTip,
+				loading,
+			}}
+		>
+			<form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+				<div className="space-y-4">
+					<Field id="edition" label="Edition" required>
+						{!showOtherInput ? (
+							<select
+								className={SelectStyles(
+									false,
+									'',
+									'w-full border-brg-light'
+								)}
+								name="edition"
+								required
+								onChange={(e) => {
+									if (e.target.value === 'other') {
+										setShowOtherInput(true);
+									}
+								}}
 							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M5 13l4 4L19 7"
+								<option value="">Select an edition</option>
+								{editions.map((edition) => (
+									<option key={edition} value={edition}>
+										{edition}
+									</option>
+								))}
+								<option value="other">Other</option>
+							</select>
+						) : (
+							<div className="flex items-center gap-2">
+								<TextField
+									id="edition"
+									name="edition"
+									type="text"
+									placeholder="1992 M2-1002 Roadster"
+									required
 								/>
-							</svg>
-						</div>
-						<div className="text-center">
-							<h2 className="text-2xl font-bold mb-2">
-								Thank You!
-							</h2>
-							<p className="text-brg-mid">
-								Your tip has been submitted successfully. We'll
-								review it and update the registry accordingly.
-							</p>
-						</div>
-						<Button onClick={handleClose} className="text-sm">
-							Close
-						</Button>
-					</div>
-				) : (
-					<>
-						<h2 className="text-2xl font-bold">Submit a Tip</h2>
 
-						<form
-							onSubmit={handleSubmit}
-							className="flex flex-col gap-4"
+								<Icon
+									name="x"
+									className="!size-3.5"
+									onClick={() => setShowOtherInput(false)}
+								/>
+							</div>
+						)}
+					</Field>
+
+					<div className="flex justify-between gap-4">
+						<Field
+							id="sequenceNumber"
+							label="Sequence #"
+							className="w-32"
 						>
-							<div className="space-y-4">
-								<Field id="edition" label="Edition" required>
-									<select
-										className={SelectStyles(
-											false,
-											'',
-											'w-full border-brg-light'
-										)}
-										name="edition"
-										required
-									>
-										<option value="">
-											Select an edition
-										</option>
-										{editions.map((edition) => (
-											<option
-												key={edition}
-												value={edition}
-											>
-												{edition}
-											</option>
-										))}
-									</select>
-								</Field>
+							<TextField
+								id="sequenceNumber"
+								name="sequenceNumber"
+								type="text"
+								placeholder="182"
+							/>
+						</Field>
 
-								<div className="flex justify-between gap-4">
-									<Field
-										id="sequenceNumber"
-										label="Sequence #"
-										className="w-32"
-									>
-										<TextField
-											id="sequenceNumber"
-											name="sequenceNumber"
-											type="text"
-											placeholder="182"
-										/>
-									</Field>
+						<Field id="vin" label="VIN" className="w-full">
+							<TextField
+								id="vin"
+								name="vin"
+								type="text"
+								placeholder="JM1NA3510M1221538"
+							/>
+						</Field>
+					</div>
 
-									<Field
-										id="vin"
-										label="VIN"
-										className="w-full"
-									>
-										<TextField
-											id="vin"
-											name="vin"
-											type="text"
-											placeholder="JM1NA3510M1221538"
-										/>
-									</Field>
-								</div>
+					<div className="flex justify-between gap-4">
+						<Field
+							id="ownerName"
+							label="Owner Name"
+							className="w-64"
+						>
+							<TextField
+								id="ownerName"
+								name="ownerName"
+								type="text"
+								placeholder="John Doe"
+							/>
+						</Field>
 
-								<div className="flex justify-between gap-4">
-									<Field
-										id="ownerName"
-										label="Owner Name"
-										className="w-64"
-									>
-										<TextField
-											id="ownerName"
-											name="ownerName"
-											type="text"
-											placeholder="John Doe"
-										/>
-									</Field>
+						<Field
+							id="location"
+							label="Location"
+							className="w-full"
+						>
+							<TextField
+								id="location"
+								name="location"
+								type="text"
+								placeholder="City, State, Country"
+							/>
+						</Field>
+					</div>
 
-									<Field
-										id="location"
-										label="Location"
-										className="w-full"
-									>
-										<TextField
-											id="location"
-											name="location"
-											type="text"
-											placeholder="City, State, Country"
-										/>
-									</Field>
-								</div>
-
-								<Field
-									id="information"
-									label="Additional Information"
-								>
-									<TextField
-										id="information"
-										name="information"
-										type="textarea"
-										placeholder="Any other information, like social media links, etc..."
-									/>
-								</Field>
-							</div>
-
-							<div className="flex justify-end gap-2">
-								<Button
-									onClick={onClose}
-									variant="tertiary"
-									className={`text-brg-border text-sm ${
-										loading ? 'hidden' : ''
-									}`}
-								>
-									Cancel
-								</Button>
-
-								<Button
-									type="submit"
-									disabled={loading}
-									className="text-sm"
-								>
-									{loading ? 'Submitting...' : 'Submit Tip'}
-								</Button>
-							</div>
-						</form>
-					</>
-				)}
-			</div>
-		</div>
+					<Field id="information" label="Additional Information">
+						<TextField
+							id="information"
+							name="information"
+							type="textarea"
+							placeholder="Any other information, like social media links, etc..."
+						/>
+					</Field>
+				</div>
+			</form>
+		</Modal>
 	);
 }

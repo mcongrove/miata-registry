@@ -113,7 +113,7 @@ export const Footer = () => {
 								<li>
 									<Tooltip
 										content="Coming soon!"
-										className="bg-black"
+										className="!bg-black"
 									>
 										<Link
 											to="/register"
