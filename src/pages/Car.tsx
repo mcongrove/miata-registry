@@ -289,27 +289,26 @@ export const CarProfile = () => {
 						<div className="aspect-video w-full h-[550px] relative rounded-lg overflow-hidden">
 							{car ? (
 								<div className="w-full h-full bg-brg-light">
-									{car.edition?.image_car_id && (
-										<img
-											src={`https://store.miataregistry.com/car/${car.edition.image_car_id}.jpg`}
-											alt={`${car.edition?.name} Edition Car`}
-											className={`w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale`}
-											onLoad={(e) => {
-												const img =
-													e.target as HTMLImageElement;
-												setTimeout(() => {
-													img.classList.remove(
-														'opacity-0'
-													);
-													img.classList.add(
-														car.destroyed
-															? 'opacity-70'
-															: 'opacity-100'
-													);
-												}, 1000);
-											}}
-										/>
-									)}
+									<img
+										src={`https://store.miataregistry.com/${car.edition?.image_car_id ? `car/${car.edition?.image_car_id}` : `edition/${car.edition.id}`}.jpg`}
+										alt={`${car.edition?.name} Edition Car`}
+										className={`w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale`}
+										onLoad={(e) => {
+											const img =
+												e.target as HTMLImageElement;
+											setTimeout(() => {
+												img.classList.remove(
+													'opacity-0'
+												);
+												img.classList.add(
+													car.destroyed
+														? 'opacity-70'
+														: 'opacity-100'
+												);
+											}, 1000);
+										}}
+									/>
+
 									{car.id && (
 										<img
 											src={`https://store.miataregistry.com/car/${car.id}.jpg`}
