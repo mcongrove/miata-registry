@@ -267,7 +267,7 @@ export const CarProfile = () => {
 							{car ? (
 								<div className="w-full h-full bg-brg-light">
 									<img
-										src={`https://store.miataregistry.com/${car.edition?.image_car_id ? `car/${car.edition?.image_car_id}` : `edition/${car.edition.id}`}.jpg`}
+										src={`https://store.miataregistry.com/${car.edition?.image_car_id ? `car/${car.edition?.image_car_id}` : `edition/${car.edition?.id}`}.jpg`}
 										alt={`${car.edition?.name} Edition Car`}
 										className={`w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale`}
 										onLoad={(e) => {
