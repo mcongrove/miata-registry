@@ -1,21 +1,75 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Miata Registry</title>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Miata Registry" />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-            rel="stylesheet"
-        />
-    </head>
-    <body>
-        <div id="root"></div>
-        <script type="module" src="/src/main.tsx"></script>
-    </body>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Miata Registry</title>
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="author" href="/humans.txt" />
+		<link rel="canonical" href="https://miataregistry.com" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.png" />
+		<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+		<meta http-equiv="Content-Language" content="en" />
+		<meta property="og:locale" content="en_US" />
+		<meta
+			name="description"
+			content="A community-driven project documenting the history of limited edition Mazda Miatas."
+		/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="keywords"
+			content="Miata, Mazda, MX-5, limited edition, car registry, automotive"
+		/>
+		<meta name="robots" content="index, follow" />
+
+		<!-- Security -->
+		<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+		<meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+
+		<!-- Performance -->
+		<meta http-equiv="Cache-Control" content="public, max-age=31536000" />
+		<link rel="preconnect" href="https://store.miataregistry.com" />
+
+		<!-- PWA -->
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="apple-mobile-web-app-title" content="Miata Registry" />
+		<meta name="theme-color" content="#172E28" />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://miataregistry.com" />
+		<meta property="og:title" content="Miata Registry" />
+		<meta
+			property="og:description"
+			content="A community-driven project documenting the history of limited edition Mazda Miatas."
+		/>
+		<meta
+			property="og:image"
+			content="https://store.miataregistry.com/app/open-graph.jpg"
+		/>
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:url" content="https://miataregistry.com" />
+		<meta name="twitter:title" content="Miata Registry" />
+		<meta
+			name="twitter:description"
+			content="A community-driven project documenting the history of limited edition Mazda Miatas."
+		/>
+		<meta
+			name="twitter:image"
+			content="https://store.miataregistry.com/app/open-graph.jpg"
+		/>
+
+		<!-- Imports -->
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
 </html>
