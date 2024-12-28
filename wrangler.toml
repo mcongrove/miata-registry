@@ -2,6 +2,8 @@
 name = "miata-registry"
 main = "src/worker/index.ts"
 compatibility_date = "2024-01-01"
+send_metrics = false
+preserve_env = true
 
 # Global D1 Configuration
 [[d1_databases]]
