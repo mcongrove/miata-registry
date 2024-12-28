@@ -27,7 +27,7 @@ type EditionCardProps = {
 
 export const EditionCard = ({ edition }: EditionCardProps) => {
 	return (
-		<div className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light">
+		<div className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light cursor-pointer">
 			<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
 				{edition.image_car_id ? (
 					<>
@@ -56,7 +56,7 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 						to={`/registry?filter=${encodeURIComponent(
 							`edition:${edition.year} ${edition.name}`
 						).replace(/%20/g, '+')}`}
-						className="w-full h-full"
+						className="w-full h-full flex"
 					/>
 				)}
 			</div>
