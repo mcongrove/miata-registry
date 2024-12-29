@@ -217,21 +217,21 @@ export const CarProfile = () => {
 
 	return (
 		<main className="flex-1 pt-20 pb-16">
-			<div className="container mx-auto py-8">
+			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-					<div className="lg:col-span-8 space-y-6">
+					<div className="lg:col-span-8 space-y-8">
 						<div>
 							{car ? (
 								<>
-									<div className="flex items-start justify-between">
+									<div className="flex items-center justify-between gap-4">
 										<div>
-											<h2 className="text-4xl font-bold">
+											<h2 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
 												{car.edition?.year}{' '}
 												{car.edition?.name}
 											</h2>
 
 											{car.edition?.total_produced && (
-												<p className="text-md font-medium text-brg-border">
+												<p className="text-sm lg:text-base font-medium text-brg-border">
 													{car.sequence ? (
 														<>
 															No.{' '}
@@ -263,23 +263,26 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						<div className="aspect-video w-full h-[550px] relative rounded-lg overflow-hidden">
+						<div className="aspect-video w-screen lg:w-full h-96 lg:h-[550px] relative lg:rounded-lg overflow-hidden -mx-8 lg:m-0">
 							{car ? (
 								<div className="w-full h-full bg-brg-light">
 									<img
 										src={`https://store.miataregistry.com/${car.edition?.image_car_id ? `car/${car.edition?.image_car_id}` : `edition/${car.edition?.id}`}.jpg`}
 										alt={`${car.edition?.name} Edition Car`}
 										className={`w-full h-full object-cover opacity-0 transition-opacity duration-1000 grayscale`}
+										id="edition-image"
 										onLoad={(e) => {
 											const img =
 												e.target as HTMLImageElement;
+
 											setTimeout(() => {
 												img.classList.remove(
 													'opacity-0'
 												);
+
 												img.classList.add(
 													car.destroyed
-														? 'opacity-70'
+														? 'opacity-50'
 														: 'opacity-100'
 												);
 											}, 1000);
@@ -294,18 +297,28 @@ export const CarProfile = () => {
 											onLoad={(e) => {
 												const img =
 													e.target as HTMLImageElement;
+
 												img.classList.add(
 													car.destroyed
-														? 'opacity-70'
+														? 'opacity-50'
 														: 'opacity-100'
 												);
+
+												const editionImage =
+													document.getElementById(
+														'edition-image'
+													);
+
+												if (editionImage) {
+													editionImage.remove();
+												}
 											}}
 										/>
 									)}
 
 									{car.destroyed && (
 										<div className="absolute inset-0 overflow-hidden">
-											<div className="absolute top-1/2 left-1/2 w-[200%] h-4 bg-red-500/80 -translate-x-1/2 -translate-y-1/2 -rotate-[28deg]" />
+											<div className="absolute top-1/2 left-1/2 w-[200%] h-4 bg-red-700 -translate-x-1/2 -translate-y-1/2 -rotate-[28deg]" />
 										</div>
 									)}
 								</div>
@@ -315,11 +328,12 @@ export const CarProfile = () => {
 						</div>
 
 						<div className="bg-white rounded-lg overflow-hidden border border-brg-light">
-							<div className="grid grid-cols-2 md:grid-cols-3">
-								<div className="p-6 border-r border-brg-light">
+							<div className="grid grid-cols-1 md:grid-cols-3">
+								<div className="p-4 lg:p-6 md:border-r border-brg-light">
 									<p className="text-sm text-brg-mid mb-1">
 										Factory Color
 									</p>
+
 									{car ? (
 										<p className="font-medium">
 											{car.color || car.edition?.color}
@@ -329,10 +343,11 @@ export const CarProfile = () => {
 									)}
 								</div>
 
-								<div className="p-6 md:border-r border-brg-light">
+								<div className="p-4 lg:p-6 border-t md:border-t-0 md:border-r border-brg-light">
 									<p className="text-sm text-brg-mid mb-1">
 										VIN
 									</p>
+
 									{car ? (
 										<p className="font-medium font-mono pt-px">
 											{car.vin}
@@ -342,7 +357,7 @@ export const CarProfile = () => {
 									)}
 								</div>
 
-								<div className="p-6 border-r border-brg-light">
+								<div className="p-4 lg:p-6 border-t md:border-t-0 md:border-r border-brg-light">
 									<div className="flex items-center gap-1 mb-1">
 										<p className="text-sm text-brg-mid">
 											Engine
@@ -355,6 +370,7 @@ export const CarProfile = () => {
 											/>
 										</Tooltip>
 									</div>
+
 									<p
 										className={`font-medium ${!vinDetails ? 'animate-pulse bg-brg-light h-6 w-24 rounded' : formatEngineDetails(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
 									>
@@ -367,11 +383,17 @@ export const CarProfile = () => {
 							{(car?.sale_date ||
 								car?.sale_msrp ||
 								car?.sale_dealer_name) && (
-								<div className="flex flex-wrap gap-16 border-t border-brg-light p-6">
+								<div className="flex flex-wrap gap-3 lg:gap-16 border-t border-brg-light p-4 lg:p-6">
 									{car?.sale_msrp && (
-										<div>
+										<div className="w-full lg:w-auto">
 											<p className="text-sm text-brg-mid mb-1">
-												Original MSRP
+												Original{' '}
+												<span className="hidden lg:inline">
+													MSRP
+												</span>
+												<span className="inline lg:hidden">
+													Purchase
+												</span>
 											</p>
 
 											<p className="font-medium">
@@ -382,8 +404,8 @@ export const CarProfile = () => {
 									)}
 
 									{car?.sale_date && (
-										<div>
-											<p className="text-sm text-brg-mid mb-1">
+										<div className="w-full lg:w-auto">
+											<p className="text-sm text-brg-mid mb-1 hidden lg:block">
 												Purchase Date
 											</p>
 
@@ -394,8 +416,8 @@ export const CarProfile = () => {
 									)}
 
 									{car?.sale_dealer_name && (
-										<div>
-											<p className="text-sm text-brg-mid mb-1">
+										<div className="w-full lg:w-auto">
+											<p className="text-sm text-brg-mid mb-1 hidden lg:block">
 												Original Dealer
 											</p>
 
