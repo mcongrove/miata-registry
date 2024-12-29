@@ -188,7 +188,7 @@ export const Registry = () => {
 	return (
 		<div className="min-h-screen flex flex-col">
 			<main className="flex-1 flex pt-16 lg:pt-20 px-4 lg:px-0">
-				<div className="flex gap-8 flex-1 container mx-auto pt-8 pb-16">
+				<div className="flex gap-8 flex-1 container mx-auto pt-8 pb-2 lg:pb-16">
 					<FilterSidebar
 						activeFilters={activeFilters}
 						onFiltersChange={handleFiltersChange}

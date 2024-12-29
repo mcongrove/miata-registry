@@ -128,11 +128,17 @@ export const FilterSidebar = ({
 		};
 	}, [isOpen]);
 
+	const hasActiveFilters = activeFilters.length > 0;
+
+	const handleClearAll = () => {
+		onFiltersChange([]);
+	};
+
 	return (
 		<>
 			<div
 				className={`
-					fixed lg:relative inset-y-0 top-20 lg:top-0 left-0 z-50 w-64
+					fixed lg:relative inset-y-0 top-20 lg:top-0 left-0 z-50 lg:z-auto w-64
 					lg:translate-x-0 transition-transform duration-300 overflow-y-auto
 					max-h-[calc(100vh-5rem)] lg:max-h-full
 					${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -144,18 +150,14 @@ export const FilterSidebar = ({
 						<h2 className="text-sm font-semibold">Filters</h2>
 
 						<div className="flex items-center gap-1">
-							<button
-								onClick={() => {
-									setActiveFilters([]);
-
-									updateSearchParams({
-										filter: null,
-									});
-								}}
-								className="text-brg px-2 py-1 text-xs hover:text-red-700"
-							>
-								Clear All
-							</button>
+							{hasActiveFilters && (
+								<button
+									onClick={handleClearAll}
+									className="px-2 py-1 text-xs text-brg-mid hover:text-red-700"
+								>
+									Clear All
+								</button>
+							)}
 
 							<button
 								onClick={onClose}

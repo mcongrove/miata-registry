@@ -23,8 +23,8 @@ export const Legal = () => {
 
 	return (
 		<main className="flex-1 pt-20">
-			<div className="container mx-auto p-10 lg:py-8 text-sm">
-				<div className="prose prose-brg max-w-none">
+			<div className="container mx-auto p-8 lg:py-8 text-sm">
+				<div className="prose prose-h1:text-brg prose-h2:text-brg prose-h3:text-brg prose-h4:text-brg prose-h5:text-brg prose-h6:text-brg prose-p:text-brg prose-p:my-2 prose-a:text-brg prose-a:underline prose-a:hover:text-brg-mid prose-a:hover:underline prose-strong:text-brg prose-ul:text-brg prose-ol:text-brg prose-li:text-brg prose-li:list-disc prose-li:ml-4  prose-li:my-2 prose-li:marker:text-brg-mid prose-h2:mt-6 prose-h2:mb-3 prose-h3:mt-4 prose-hr:mt-8 prose-hr:mb-4 max-w-none">
 					<h1>Legal Information</h1>
 
 					<section>

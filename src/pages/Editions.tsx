@@ -28,7 +28,7 @@ import { TEdition } from '../types/Edition';
 export const Editions = () => {
 	const [editions, setEditions] = useState<TEdition[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [activeGeneration, setActiveGeneration] = useState<string>('all');
+	const [activeGeneration, setActiveGeneration] = useState<string>('NA');
 
 	usePageTitle('Editions');
 
@@ -38,6 +38,7 @@ export const Editions = () => {
 				const response = await fetch(
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/editions`
 				);
+
 				const editionsData = await response.json();
 
 				setEditions(editionsData);
@@ -78,19 +79,29 @@ export const Editions = () => {
 							</>
 						}
 					>
-						<Icon name="info-circle" className="cursor-help" />
+						<Icon
+							name="info-circle"
+							className="!size-4 lg:!size-5 cursor-help"
+						/>
 					</Tooltip>
 				</h1>
 
 				<div className="flex lg:hidden mb-6 overflow-x-auto">
-					<div className="flex gap-2 p-1 bg-brg-light rounded-lg w-full">
+					<div className="flex gap-2 p-1 bg-brg-light rounded-lg w-full relative">
+						<div
+							className="absolute transition-all w-[calc(25%_-_2px)] duration-200 ease-in-out h-[calc(100%-8px)] bg-white rounded-md shadow-sm"
+							style={{
+								transform: `translateX(${['NA', 'NB', 'NC', 'ND'].indexOf(activeGeneration) * 100}%)`,
+							}}
+						/>
+
 						{['NA', 'NB', 'NC', 'ND'].map((generation) => (
 							<button
 								key={generation}
 								onClick={() => setActiveGeneration(generation)}
-								className={`flex-1 px-4 py-2 text-sm rounded-md transition-colors ${
+								className={`relative flex-1 px-4 py-2 text-sm rounded-md transition-colors ${
 									activeGeneration === generation
-										? 'bg-white text-brg shadow-sm'
+										? 'text-brg'
 										: 'text-brg-mid hover:text-brg'
 								} disabled:text-brg-border/70`}
 								disabled={

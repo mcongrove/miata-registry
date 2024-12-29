@@ -52,7 +52,7 @@ export const PaginationControls = ({
 
 	return (
 		<div
-			className={`flex justify-between items-center text-sm ${
+			className={`flex justify-between items-center gap-2 text-sm ${
 				isLoading ? 'opacity-50 pointer-events-none' : ''
 			} ${className}`}
 		>

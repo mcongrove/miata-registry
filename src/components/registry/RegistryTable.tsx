@@ -59,7 +59,7 @@ export const RegistryTable = ({
 
 	return (
 		<div
-			className={`bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-170px)] lg:h-[calc(100vh-${
+			className={`bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-158px)] lg:h-[calc(100vh-${
 				isFiltered ? '280' : '236'
 			}px)]`}
 		>
@@ -70,7 +70,7 @@ export const RegistryTable = ({
 							{columns.map(({ header, key, width }) => (
 								<th
 									key={header}
-									className={`${width} px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light`}
+									className={`${width} px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light whitespace-nowrap`}
 									onClick={handleSort(key)}
 								>
 									<div className="flex items-center">

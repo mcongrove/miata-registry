@@ -26,7 +26,6 @@ import {
 } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
-import { MobileWarning } from './components/MobileWarning';
 import { ModalProvider } from './context/ModalContext';
 import { About } from './pages/About';
 import { CarProfile } from './pages/Car';
@@ -45,28 +44,16 @@ function ScrollToTop() {
 	return null;
 }
 
-function Layout() {
-	const { pathname } = useLocation();
-
-	const isHomePage = pathname === '/';
-
-	return (
-		<div className="min-h-screen flex flex-col">
-			{!isHomePage && (
-				<div className="lg:hidden">
-					<MobileWarning />
-				</div>
-			)}
-
-			<div className={!isHomePage ? 'hidden lg:block' : ''}>
-				<ScrollToTop />
-				<Header />
-				<Outlet />
-				<Footer />
-			</div>
+const Layout = () => (
+	<div className="min-h-screen flex flex-col">
+		<div>
+			<ScrollToTop />
+			<Header />
+			<Outlet />
+			<Footer />
 		</div>
-	);
-}
+	</div>
+);
 
 function App() {
 	return (
