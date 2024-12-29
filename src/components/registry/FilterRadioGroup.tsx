@@ -44,7 +44,7 @@ export const FilterRadioGroup = ({
 			hasActiveFilter={!!activeValue}
 		/>
 
-		<div className="space-y-2 max-h-44 overflow-y-auto p-4 pt-0 text-xs font-light">
+		<div className="space-y-2 max-h-44 overflow-y-auto py-4 px-2 pt-0 text-xs font-light">
 			{options.map((value) => (
 				<FilterLabel
 					key={value}

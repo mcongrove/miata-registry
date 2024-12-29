@@ -27,7 +27,7 @@ export const FilterHeader = ({
 	onClear,
 	hasActiveFilter,
 }: FilterHeaderProps) => (
-	<div className="flex justify-between items-center p-4 pb-3">
+	<div className="flex justify-between items-center p-3">
 		<h3 className="text-sm">{title}</h3>
 
 		{hasActiveFilter && (

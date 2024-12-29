@@ -30,7 +30,7 @@ interface PaginationControlsProps {
 }
 
 export const PaginationControls = ({
-	className,
+	className = '',
 	currentPage,
 	hasFilters = false,
 	isLoading = false,

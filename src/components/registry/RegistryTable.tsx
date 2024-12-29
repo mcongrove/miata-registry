@@ -23,18 +23,20 @@ import { colorMap } from '../../utils/colorMap';
 
 interface RegistryTableProps {
 	cars: TCar[];
+	isFiltered: boolean;
+	isLoading: boolean;
+	onSort: (column: string) => void;
 	sortColumn: string;
 	sortDirection: 'asc' | 'desc';
-	onSort: (column: string) => void;
-	isLoading: boolean;
 }
 
 export const RegistryTable = ({
 	cars,
+	isFiltered = false,
+	isLoading = false,
+	onSort,
 	sortColumn,
 	sortDirection,
-	onSort,
-	isLoading = false,
 }: RegistryTableProps) => {
 	const navigate = useNavigate();
 	const { openModal } = useModal();
@@ -56,7 +58,11 @@ export const RegistryTable = ({
 	};
 
 	return (
-		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-170px)] lg:h-[calc(100vh-268px)]">
+		<div
+			className={`bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-170px)] lg:h-[calc(100vh-${
+				isFiltered ? '280' : '236'
+			}px)]`}
+		>
 			<div className="overflow-auto h-full relative">
 				<table className="min-w-full border-collapse">
 					<thead>

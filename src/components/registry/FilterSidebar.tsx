@@ -18,6 +18,7 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { TFilterOption } from '../../types/Filters';
+import { Icon } from '../Icon';
 import { Select } from '../Select';
 import { FilterHeader } from './FilterHeader';
 import { FilterRadioGroup } from './FilterRadioGroup';
@@ -39,13 +40,19 @@ const getEditionNames = async () => {
 };
 
 interface FilterSidebarProps {
+	className?: string;
 	activeFilters: TFilterOption[];
 	onFiltersChange: (filters: TFilterOption[]) => void;
+	onClose?: () => void;
+	isOpen?: boolean;
 }
 
 export const FilterSidebar = ({
+	className = '',
 	activeFilters,
 	onFiltersChange,
+	onClose,
+	isOpen = false,
 }: FilterSidebarProps) => {
 	const currentYear = new Date().getFullYear();
 	const years = Array.from(
@@ -109,88 +116,170 @@ export const FilterSidebar = ({
 		handleOptionChange({ type, value });
 	};
 
+	useEffect(() => {
+		if (isOpen) {
+			document.body.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = 'unset';
+		}
+
+		return () => {
+			document.body.style.overflow = 'unset';
+		};
+	}, [isOpen]);
+
 	return (
-		<div className="flex flex-col w-64 h-full divide-y divide-brg-light border rounded-md border-brg-light sticky top-4">
-			<div>
-				<FilterHeader
-					title="Year"
-					onClear={() => handleClear('year')}
-					hasActiveFilter={!!getActiveValue('year')}
-				/>
+		<>
+			<div
+				className={`
+					fixed lg:relative inset-y-0 top-20 lg:top-0 left-0 z-50 w-64
+					lg:translate-x-0 transition-transform duration-300 overflow-y-auto
+					max-h-[calc(100vh-5rem)] lg:max-h-full
+					${isOpen ? 'translate-x-0' : '-translate-x-full'}
+					${className}
+				`}
+			>
+				<div className="flex flex-col h-full lg:border lg:rounded-md border-brg-light shadow-2xl lg:shadow-none bg-white">
+					<div className="lg:hidden flex items-center justify-between p-3 pr-4 border-b border-brg-light">
+						<h2 className="text-sm font-semibold">Filters</h2>
 
-				<div className="p-4 pt-0">
-					<Select
-						value={getActiveValue('year') || ''}
-						onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-							handleSelectChange(e.target.value, 'year')
-						}
-						options={years.map((year) => ({
-							value: String(year),
-							label: String(year),
-						}))}
-						placeholder="Select year"
-					/>
+						<button
+							onClick={onClose}
+							className="text-brg-mid hover:text-brg"
+						>
+							<Icon name="x" className="!size-4" />
+						</button>
+					</div>
+
+					<div className="flex-1 divide-y divide-brg-light">
+						<div>
+							<FilterHeader
+								title="Year"
+								onClear={() => handleClear('year')}
+								hasActiveFilter={!!getActiveValue('year')}
+							/>
+
+							<div className="p-4 pt-0">
+								<Select
+									value={getActiveValue('year') || ''}
+									onChange={(
+										e: ChangeEvent<HTMLSelectElement>
+									) =>
+										handleSelectChange(
+											e.target.value,
+											'year'
+										)
+									}
+									options={years.map((year) => ({
+										value: String(year),
+										label: String(year),
+									}))}
+									placeholder="Select year"
+								/>
+							</div>
+						</div>
+
+						<div>
+							<FilterHeader
+								title="Generation"
+								onClear={() => handleClear('generation')}
+								hasActiveFilter={!!getActiveValue('generation')}
+							/>
+
+							<div className="p-4 pt-0">
+								<Select
+									value={getActiveValue('generation') || ''}
+									onChange={(
+										e: ChangeEvent<HTMLSelectElement>
+									) =>
+										handleSelectChange(
+											e.target.value,
+											'generation'
+										)
+									}
+									options={['NA', 'NB', 'NC', 'ND'].map(
+										(gen) => ({
+											value: gen,
+											label: gen,
+										})
+									)}
+									placeholder="Select generation"
+								/>
+							</div>
+						</div>
+
+						<div>
+							<FilterHeader
+								title="Edition"
+								onClear={() => handleClear('edition')}
+								hasActiveFilter={!!getActiveValue('edition')}
+							/>
+
+							<div className="p-4 pt-0">
+								<Select
+									value={getActiveValue('edition') || ''}
+									onChange={(
+										e: ChangeEvent<HTMLSelectElement>
+									) =>
+										handleSelectChange(
+											e.target.value,
+											'edition'
+										)
+									}
+									options={editionOptions.map((edition) => ({
+										value: edition,
+										label: edition,
+									}))}
+									placeholder="Select edition"
+								/>
+							</div>
+						</div>
+
+						<div>
+							<FilterHeader
+								title="Country"
+								onClear={() => handleClear('country')}
+								hasActiveFilter={!!getActiveValue('country')}
+							/>
+
+							<div className="p-4 pt-0">
+								<Select
+									value={getActiveValue('country') || ''}
+									onChange={(
+										e: ChangeEvent<HTMLSelectElement>
+									) =>
+										handleSelectChange(
+											e.target.value,
+											'country'
+										)
+									}
+									options={countries}
+									placeholder="Select country"
+								/>
+							</div>
+						</div>
+
+						<FilterRadioGroup
+							title="Claim Status"
+							type="claimStatus"
+							options={['Claimed', 'Unclaimed']}
+							activeValue={getActiveValue('claimStatus')}
+							onClear={handleClear}
+							onChange={handleOptionChange}
+						/>
+					</div>
 				</div>
 			</div>
 
-			<FilterRadioGroup
-				title="Generation"
-				type="generation"
-				options={['NA', 'NB', 'NC', 'ND']}
-				activeValue={getActiveValue('generation')}
-				onClear={handleClear}
-				onChange={handleOptionChange}
-			/>
-
-			<div>
-				<FilterHeader
-					title="Edition"
-					onClear={() => handleClear('edition')}
-					hasActiveFilter={!!getActiveValue('edition')}
+			{/* Overlay for mobile */}
+			{onClose && (
+				<div
+					className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300
+						${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+					onClick={onClose}
+					aria-hidden="true"
 				/>
-
-				<div className="p-4 pt-0">
-					<Select
-						value={getActiveValue('edition') || ''}
-						onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-							handleSelectChange(e.target.value, 'edition')
-						}
-						options={editionOptions.map((edition) => ({
-							value: edition,
-							label: edition,
-						}))}
-						placeholder="Select edition"
-					/>
-				</div>
-			</div>
-
-			<div>
-				<FilterHeader
-					title="Country"
-					onClear={() => handleClear('country')}
-					hasActiveFilter={!!getActiveValue('country')}
-				/>
-
-				<div className="p-4 pt-0">
-					<Select
-						value={getActiveValue('country') || ''}
-						onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-							handleSelectChange(e.target.value, 'country')
-						}
-						options={countries}
-						placeholder="Select country"
-					/>
-				</div>
-			</div>
-
-			<FilterRadioGroup
-				title="Claim Status"
-				type="claimStatus"
-				options={['Claimed', 'Unclaimed']}
-				activeValue={getActiveValue('claimStatus')}
-				onClear={handleClear}
-				onChange={handleOptionChange}
-			/>
-		</div>
+			)}
+		</>
 	);
 };

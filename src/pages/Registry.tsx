@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Chip } from '../components/Chip';
+import { Icon } from '../components/Icon';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
@@ -63,6 +64,7 @@ export const Registry = () => {
 	const [cars, setCars] = useState<TCar[]>([]);
 	const [totalItems, setTotalItems] = useState(0);
 	const [totalPages, setTotalPages] = useState(1);
+	const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
 	usePageTitle('Cars');
 
@@ -106,6 +108,10 @@ export const Registry = () => {
 
 		loadCars();
 	}, [activeFilters, sortColumn, sortDirection, currentPage]);
+
+	useEffect(() => {
+		setIsFilterDrawerOpen(false);
+	}, [currentPage]);
 
 	const updateSearchParams = (
 		updates: Record<string, string | string[] | null>
@@ -181,14 +187,28 @@ export const Registry = () => {
 
 	return (
 		<div className="min-h-screen flex flex-col">
-			<main className="flex-1 flex pt-16 px-8 lg:pt-20 lg:px-0">
+			<main className="flex-1 flex pt-20 px-8 lg:px-0">
 				<div className="flex gap-8 flex-1 container mx-auto pt-8 pb-16">
 					<FilterSidebar
 						activeFilters={activeFilters}
 						onFiltersChange={handleFiltersChange}
+						onClose={() => setIsFilterDrawerOpen(false)}
+						isOpen={isFilterDrawerOpen}
 					/>
 
-					<div className="flex-1 flex flex-col">
+					<div className="flex-1 flex flex-col w-full">
+						<div className="lg:hidden mb-3">
+							<button
+								onClick={() => setIsFilterDrawerOpen(true)}
+								className="w-full flex items-center justify-center gap-2 p-2 text-sm text-brg-mid border border-brg-border rounded-lg transition-colors"
+							>
+								<Icon name="filter" className="!size-4" />
+								Filters{' '}
+								{activeFilters.length > 0 &&
+									`(${activeFilters.length})`}
+							</button>
+						</div>
+
 						{activeFilters.length > 0 && (
 							<div className="mb-3 flex gap-2 flex-wrap">
 								{activeFilters.map((filter) => {
@@ -244,39 +264,40 @@ export const Registry = () => {
 
 						<PaginationControls
 							currentPage={currentPage}
-							totalPages={totalPages}
+							hasFilters={activeFilters.length > 0}
+							isLoading={isLoading}
+							itemsPerPage={itemsPerPage}
 							onPageChange={(page) => {
 								setCurrentPage(page);
 								updateSearchParams({ page: page.toString() });
 							}}
 							totalItems={totalItems}
-							itemsPerPage={itemsPerPage}
-							hasFilters={activeFilters.length > 0}
-							isLoading={isLoading}
+							totalPages={totalPages}
 						/>
 
 						<div className="flex-1 my-3">
 							<RegistryTable
 								cars={isLoading ? [] : cars}
+								isFiltered={activeFilters.length > 0}
+								isLoading={isLoading}
+								onSort={handleSort}
 								sortColumn={sortColumn}
 								sortDirection={sortDirection}
-								onSort={handleSort}
-								isLoading={isLoading}
 							/>
 						</div>
 
 						<PaginationControls
-							className="hidden lg:block"
+							className="hidden lg:flex"
 							currentPage={currentPage}
-							totalPages={totalPages}
+							hasFilters={activeFilters.length > 0}
+							isLoading={isLoading}
+							itemsPerPage={itemsPerPage}
 							onPageChange={(page) => {
 								setCurrentPage(page);
 								updateSearchParams({ page: page.toString() });
 							}}
 							totalItems={totalItems}
-							itemsPerPage={itemsPerPage}
-							hasFilters={activeFilters.length > 0}
-							isLoading={isLoading}
+							totalPages={totalPages}
 						/>
 					</div>
 				</div>
