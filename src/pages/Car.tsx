@@ -216,7 +216,7 @@ export const CarProfile = () => {
 	};
 
 	return (
-		<main className="flex-1 pt-20 pb-16">
+		<main className="flex-1 pt-20 pb-0 lg:pb-16">
 			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 					<div className="lg:col-span-8 space-y-8">
@@ -443,7 +443,7 @@ export const CarProfile = () => {
 						</div>
 
 						{car?.edition?.description ? (
-							<div className="flex flex-col gap-4">
+							<div className="hidden lg:flex flex-col gap-4">
 								<h3 className="text-xl font-semibold">
 									About the {car.edition.year}{' '}
 									{car.edition.name.replace('Edition', '')}{' '}
@@ -614,6 +614,24 @@ export const CarProfile = () => {
 							</p>
 						</div>
 					</div>
+
+					{car?.edition?.description ? (
+						<div className="flex lg:hidden flex-col gap-4">
+							<h3 className="text-xl font-semibold">
+								About the {car.edition.year}{' '}
+								{car.edition.name.replace('Edition', '')}{' '}
+								Edition
+							</h3>
+
+							<div className="prose prose-brg max-w-none space-y-4">
+								{car?.edition?.description
+									?.split('\n')
+									.map((paragraph: string, index: number) => (
+										<p key={index}>{paragraph}</p>
+									))}
+							</div>
+						</div>
+					) : null}
 				</div>
 			</div>
 		</main>
