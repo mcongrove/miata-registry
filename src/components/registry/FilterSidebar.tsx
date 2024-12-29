@@ -143,12 +143,27 @@ export const FilterSidebar = ({
 					<div className="lg:hidden flex items-center justify-between p-3 pr-4 border-b border-brg-light">
 						<h2 className="text-sm font-semibold">Filters</h2>
 
-						<button
-							onClick={onClose}
-							className="text-brg-mid hover:text-brg"
-						>
-							<Icon name="x" className="!size-4" />
-						</button>
+						<div className="flex items-center gap-1">
+							<button
+								onClick={() => {
+									setActiveFilters([]);
+
+									updateSearchParams({
+										filter: null,
+									});
+								}}
+								className="text-brg px-2 py-1 text-xs hover:text-red-700"
+							>
+								Clear All
+							</button>
+
+							<button
+								onClick={onClose}
+								className="text-brg-mid hover:text-brg"
+							>
+								<Icon name="x" className="!size-4" />
+							</button>
+						</div>
 					</div>
 
 					<div className="flex-1 divide-y divide-brg-light">

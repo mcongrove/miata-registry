@@ -187,7 +187,7 @@ export const Registry = () => {
 
 	return (
 		<div className="min-h-screen flex flex-col">
-			<main className="flex-1 flex pt-20 px-8 lg:px-0">
+			<main className="flex-1 flex pt-16 lg:pt-20 px-4 lg:px-0">
 				<div className="flex gap-8 flex-1 container mx-auto pt-8 pb-16">
 					<FilterSidebar
 						activeFilters={activeFilters}
@@ -196,21 +196,9 @@ export const Registry = () => {
 						isOpen={isFilterDrawerOpen}
 					/>
 
-					<div className="flex-1 flex flex-col w-full">
-						<div className="lg:hidden mb-3">
-							<button
-								onClick={() => setIsFilterDrawerOpen(true)}
-								className="w-full flex items-center justify-center gap-2 p-2 text-sm text-brg-mid border border-brg-border rounded-lg transition-colors"
-							>
-								<Icon name="filter" className="!size-4" />
-								Filters{' '}
-								{activeFilters.length > 0 &&
-									`(${activeFilters.length})`}
-							</button>
-						</div>
-
+					<div className="flex flex-1 flex-col w-full">
 						{activeFilters.length > 0 && (
-							<div className="mb-3 flex gap-2 flex-wrap">
+							<div className="hidden lg:flex mb-3 gap-2 flex-wrap">
 								{activeFilters.map((filter) => {
 									const displayValue = filter.value;
 
@@ -262,18 +250,36 @@ export const Registry = () => {
 							</div>
 						)}
 
-						<PaginationControls
-							currentPage={currentPage}
-							hasFilters={activeFilters.length > 0}
-							isLoading={isLoading}
-							itemsPerPage={itemsPerPage}
-							onPageChange={(page) => {
-								setCurrentPage(page);
-								updateSearchParams({ page: page.toString() });
-							}}
-							totalItems={totalItems}
-							totalPages={totalPages}
-						/>
+						<div className="flex items-center gap-3">
+							<button
+								onClick={() => setIsFilterDrawerOpen(true)}
+								className={`lg:hidden flex items-center min-w-[34px] h-[34px] shrink-0 justify-center gap-2 py-2 pl-2 ${activeFilters.length ? 'pr-1' : 'pr-2'} text-xs text-brg-mid border border-brg-border rounded-lg transition-colors`}
+							>
+								<Icon name="filter" className="!size-3.5" />
+
+								{activeFilters.length > 0 && (
+									<span className="bg-brg-mid text-white rounded-md py-1 px-2">
+										{activeFilters.length}
+									</span>
+								)}
+							</button>
+
+							<PaginationControls
+								className="w-full"
+								currentPage={currentPage}
+								hasFilters={activeFilters.length > 0}
+								isLoading={isLoading}
+								itemsPerPage={itemsPerPage}
+								onPageChange={(page) => {
+									setCurrentPage(page);
+									updateSearchParams({
+										page: page.toString(),
+									});
+								}}
+								totalItems={totalItems}
+								totalPages={totalPages}
+							/>
+						</div>
 
 						<div className="flex-1 my-3">
 							<RegistryTable
