@@ -19,6 +19,6 @@
 export type TModalType = 'claim' | 'export' | 'register' | 'tip';
 
 export interface TModalState {
-	type: TModalType | null;
 	props?: Record<string, unknown>;
+	type: TModalType | null;
 }

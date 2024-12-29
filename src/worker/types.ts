@@ -18,6 +18,12 @@
 
 import { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
 
+declare module 'hono' {
+	interface ContextVariableMap {
+		userId: string;
+	}
+}
+
 export type ApiError = {
 	error: string;
 	details?: string;

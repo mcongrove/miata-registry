@@ -19,14 +19,40 @@
 import { eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
-import { Cars, Owners } from '../../db/schema';
+import { Cars, Editions, Owners } from '../../db/schema';
+import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
 const CACHE_TTL = {
+	CARS: 0, // None
 	COUNTRIES: 60 * 60 * 24 * 7, // 7 days
 };
 
 const ownersRouter = new Hono<{ Bindings: Bindings }>();
+
+ownersRouter.use('/cars', withAuth());
+
+ownersRouter.get('/cars', async (c) => {
+	const userId = c.get('userId');
+
+	const db = createDb(c.env.DB);
+
+	const cars = await db
+		.select({
+			id: Cars.id,
+			year: Editions.year,
+			edition: Editions.name,
+			sequence: Cars.sequence,
+			vin: Cars.vin,
+			destroyed: Cars.destroyed,
+		})
+		.from(Cars)
+		.innerJoin(Editions, eq(Cars.edition_id, Editions.id))
+		.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
+		.where(eq(Owners.user_id, userId));
+
+	return c.json(cars);
+});
 
 ownersRouter.get('/countries', async (c) => {
 	try {

@@ -102,22 +102,22 @@ carsRouter.get('/', async (c) => {
 		// Build the main query
 		const baseQuery = db
 			.select({
-				id: Cars.id,
-				vin: Cars.vin,
-				sequence: Cars.sequence,
 				color: Cars.color,
-				edition: {
-					year: Editions.year,
-					generation: Editions.generation,
-					name: Editions.name,
-					color: Editions.color,
-					total_produced: Editions.total_produced,
-				},
 				current_owner: {
+					country: Owners.country,
 					id: Owners.id,
 					name: Owners.name,
-					country: Owners.country,
 				},
+				edition: {
+					color: Editions.color,
+					generation: Editions.generation,
+					name: Editions.name,
+					total_produced: Editions.total_produced,
+					year: Editions.year,
+				},
+				id: Cars.id,
+				sequence: Cars.sequence,
+				vin: Cars.vin,
 				total: sql<number>`count(*) OVER()`,
 			})
 			.from(Cars)
@@ -256,43 +256,44 @@ carsRouter.get('/:id', async (c) => {
 
 		const [carData] = await db
 			.select({
-				id: Cars.id,
-				vin: Cars.vin,
-				sequence: Cars.sequence,
-				destroyed: Cars.destroyed,
 				color: Cars.color,
-				manufacture_date: Cars.manufacture_date,
+				current_owner_id: Cars.current_owner_id,
+				destroyed: Cars.destroyed,
+				edition_id: Cars.edition_id,
+				id: Cars.id,
 				manufacture_city: Cars.manufacture_city,
 				manufacture_country: Cars.manufacture_country,
-				shipping_date: Cars.shipping_date,
-				shipping_city: Cars.shipping_city,
-				shipping_state: Cars.shipping_state,
-				shipping_country: Cars.shipping_country,
-				shipping_vessel: Cars.shipping_vessel,
+				manufacture_date: Cars.manufacture_date,
 				sale_date: Cars.sale_date,
-				sale_msrp: Cars.sale_msrp,
-				sale_dealer_name: Cars.sale_dealer_name,
 				sale_dealer_city: Cars.sale_dealer_city,
-				sale_dealer_state: Cars.sale_dealer_state,
 				sale_dealer_country: Cars.sale_dealer_country,
-				edition_id: Cars.edition_id,
-				edition: {
-					id: Editions.id,
-					name: Editions.name,
-					color: Editions.color,
-					generation: Editions.generation,
-					year: Editions.year,
-					total_produced: Editions.total_produced,
-					description: Editions.description,
-					image_car_id: Editions.image_car_id,
-				},
-				current_owner_id: Cars.current_owner_id,
+				sale_dealer_name: Cars.sale_dealer_name,
+				sale_dealer_state: Cars.sale_dealer_state,
+				sale_msrp: Cars.sale_msrp,
+				sequence: Cars.sequence,
+				shipping_city: Cars.shipping_city,
+				shipping_country: Cars.shipping_country,
+				shipping_date: Cars.shipping_date,
+				shipping_state: Cars.shipping_state,
+				shipping_vessel: Cars.shipping_vessel,
+				vin: Cars.vin,
 				current_owner: {
+					city: Owners.city,
+					country: Owners.country,
 					id: Owners.id,
 					name: Owners.name,
-					country: Owners.country,
 					state: Owners.state,
-					city: Owners.city,
+					user_id: Owners.user_id,
+				},
+				edition: {
+					color: Editions.color,
+					description: Editions.description,
+					generation: Editions.generation,
+					id: Editions.id,
+					image_car_id: Editions.image_car_id,
+					name: Editions.name,
+					total_produced: Editions.total_produced,
+					year: Editions.year,
 				},
 			})
 			.from(Cars)
@@ -307,13 +308,13 @@ carsRouter.get('/:id', async (c) => {
 		// Get owner history in a separate query
 		const ownerHistory = await db
 			.select({
+				city: Owners.city,
+				country: Owners.country,
+				date_end: CarOwners.date_end,
+				date_start: CarOwners.date_start,
 				id: Owners.id,
 				name: Owners.name,
-				country: Owners.country,
 				state: Owners.state,
-				city: Owners.city,
-				date_start: CarOwners.date_start,
-				date_end: CarOwners.date_end,
 			})
 			.from(CarOwners)
 			.leftJoin(Owners, eq(CarOwners.owner_id, Owners.id))
@@ -362,13 +363,13 @@ carsRouter.get('/:id/summary', async (c) => {
 
 		const [car] = await db
 			.select({
-				year: Editions.year,
 				editionName: Editions.name,
 				sequence: Cars.sequence,
+				year: Editions.year,
 				current_owner: {
+					country: Owners.country,
 					name: Owners.name,
 					state: Owners.state,
-					country: Owners.country,
 				},
 			})
 			.from(Cars)

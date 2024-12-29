@@ -60,12 +60,12 @@ emailRouter.post('/tip', async (c) => {
 		const resend = new Resend(c.env.RESEND_API_KEY);
 
 		const {
-			tipId,
 			edition,
 			information,
 			location,
 			ownerName,
 			sequenceNumber,
+			tipId,
 			vin,
 		} = await c.req.json();
 

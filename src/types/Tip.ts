@@ -17,21 +17,21 @@
  */
 
 export const TipStatus = {
-	PENDING: 'pending',
 	CONFIRMED: 'confirmed',
+	PENDING: 'pending',
 } as const;
 
 export type TTipStatus = (typeof TipStatus)[keyof typeof TipStatus];
 
 export type TTip = {
-	id: string;
-	status: TTipStatus;
-	edition: string;
-	sequenceNumber?: string;
-	vin?: string;
-	ownerName?: string;
-	location?: string;
-	information?: string;
 	createdAt: number;
+	edition: string;
+	id: string;
+	information?: string;
+	location?: string;
+	ownerName?: string;
+	sequenceNumber?: string;
+	status: TTipStatus;
 	updatedAt?: number;
+	vin?: string;
 };

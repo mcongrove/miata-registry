@@ -42,6 +42,10 @@ export async function verifyAuth(c: Context<{ Bindings: Bindings }>) {
 			],
 		});
 
+		if (authResult.isSignedIn) {
+			c.set('userId', authResult.toAuth().userId);
+		}
+
 		return authResult.isSignedIn;
 	} catch (error) {
 		return false;

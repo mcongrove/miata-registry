@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useAuth } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
@@ -40,6 +41,7 @@ const getCountCodeCommits = async (owner: string, repo: string) => {
 };
 
 export const About = () => {
+	const { isSignedIn } = useAuth();
 	const { openModal } = useModal();
 	const [highlightedSection, setHighlightedSection] = useState<string | null>(
 		null
@@ -289,13 +291,27 @@ export const About = () => {
 
 						<p className="text-sm text-brg-mid">
 							In keeping with our commitment to transparency, all
-							registry data except personal login details is
-							freely available for public inspection. This
-							includes vehicle information, production numbers,
-							and historical documentation. We believe this
-							openness helps maintain accuracy and allows
+							registry data except personal login details is{' '}
+							{isSignedIn ? (
+								<span
+									className="underline cursor-pointer"
+									onClick={() => openModal('export')}
+								>
+									freely available for public inspection
+								</span>
+							) : (
+								'freely available for public inspection'
+							)}
+							. This includes vehicle information, production
+							numbers, and historical documentation. We believe
+							this openness helps maintain accuracy and allows
 							researchers and enthusiasts to build upon our
 							collective knowledge.
+						</p>
+
+						<p className="text-sm text-brg-mid">
+							You must be a registered user to download the entire
+							dataset as a precaution against misuse.
 						</p>
 					</div>
 

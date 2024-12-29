@@ -17,14 +17,14 @@
  */
 
 export type TEdition = {
-	id: string;
-	name: string;
+	claimed?: number;
 	color: string;
-	generation: string;
-	year: number;
-	total_produced?: number;
 	description?: string;
+	generation: string;
+	id: string;
 	image_car_id?: string;
 	in_registry?: number;
-	claimed?: number;
+	name: string;
+	total_produced?: number;
+	year: number;
 };

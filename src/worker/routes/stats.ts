@@ -38,28 +38,28 @@ statsRouter.get('/', async (c) => {
 
 		const db = createDb(c.env.DB);
 
-		const [totalCars] = await db
-			.select({ count: sql<number>`count(*)` })
-			.from(Cars);
-
 		const [carsWithOwners] = await db
 			.select({ count: sql<number>`count(*)` })
 			.from(Cars)
 			.where(sql`current_owner_id is not null`);
 
-		const [uniqueEditions] = await db
-			.select({ count: sql<number>`count(distinct edition_id)` })
+		const [totalCars] = await db
+			.select({ count: sql<number>`count(*)` })
 			.from(Cars);
 
 		const [uniqueCountries] = await db
 			.select({ count: sql<number>`count(distinct country)` })
 			.from(Owners);
 
+		const [uniqueEditions] = await db
+			.select({ count: sql<number>`count(distinct edition_id)` })
+			.from(Cars);
+
 		const stats = {
 			cars: totalCars.count,
 			claimedCars: carsWithOwners.count,
-			editions: uniqueEditions.count,
 			countries: uniqueCountries.count,
+			editions: uniqueEditions.count,
 		};
 
 		await c.env.CACHE.put('stats:all', JSON.stringify(stats), {

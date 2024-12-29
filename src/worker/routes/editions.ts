@@ -41,24 +41,24 @@ editionsRouter.get('/', async (c) => {
 
 		const editionsWithCounts = await db
 			.select({
-				id: Editions.id,
-				name: Editions.name,
-				color: Editions.color,
-				generation: Editions.generation,
-				year: Editions.year,
-				total_produced: Editions.total_produced,
-				image_car_id: Editions.image_car_id,
-				display_name:
-					sql<string>`CONCAT(${Editions.year}, ' ', ${Editions.name})`.as(
-						'display_name'
-					),
-				in_registry: sql<number>`COUNT(DISTINCT ${Cars.id})`.as(
-					'in_registry'
-				),
 				claimed:
 					sql<number>`COUNT(DISTINCT CASE WHEN ${Cars.current_owner_id} IS NOT NULL THEN ${Cars.id} END)`.as(
 						'claimed'
 					),
+				color: Editions.color,
+				display_name:
+					sql<string>`CONCAT(${Editions.year}, ' ', ${Editions.name})`.as(
+						'display_name'
+					),
+				generation: Editions.generation,
+				id: Editions.id,
+				image_car_id: Editions.image_car_id,
+				in_registry: sql<number>`COUNT(DISTINCT ${Cars.id})`.as(
+					'in_registry'
+				),
+				name: Editions.name,
+				total_produced: Editions.total_produced,
+				year: Editions.year,
 			})
 			.from(Editions)
 			.leftJoin(Cars, eq(Cars.edition_id, Editions.id))

@@ -17,16 +17,17 @@
  */
 
 export type TOwner = {
+	city?: string;
+	country?: string;
 	id: string;
 	name?: string;
-	country?: string;
 	state?: string;
-	city?: string;
+	user_id?: string;
 };
 
 export type TCarOwner = TOwner & {
 	car_id: string;
-	owner_id: string;
-	date_start?: string;
 	date_end?: string;
+	date_start?: string;
+	owner_id: string;
 };

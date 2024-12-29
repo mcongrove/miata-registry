@@ -16,7 +16,7 @@
 		"db:push": "drizzle-kit push:sqlite",
 		"db:backup": "wrangler d1 export registry --remote --output=backups/registry-$(date +%s).sqlite",
 		"worker:build": "esbuild src/worker/index.ts --bundle --outfile=dist/worker.js --format=esm --platform=browser",
-		"worker:deploy": "npm run worker:build && npx wrangler deploy",
+		"worker:deploy": "npm run worker:build && npx wrangler deploy --keep-vars",
 		"worker:dev": "wrangler dev src/worker/index.ts --remote --env development"
 	},
 	"dependencies": {

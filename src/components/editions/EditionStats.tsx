@@ -36,8 +36,6 @@ export const EditionStats = ({
 		3
 	);
 
-	console.log(edition, inRegistryPercentage, claimedPercentage);
-
 	return (
 		<div className="w-full">
 			<div className="text-sm text-brg-mid space-y-2">

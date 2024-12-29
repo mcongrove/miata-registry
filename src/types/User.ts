@@ -17,23 +17,16 @@
  */
 
 export interface TUser {
-	id: string;
-	emailAddresses: {
-		emailAddress: string;
-	}[];
-	externalAccounts: {
-		id: string;
-		provider: string;
-	}[];
-	firstName: string;
-	lastName: string;
-	fullName: string;
-	primaryEmailAddress: {
-		emailAddress: string;
-	};
-	imageUrl: string;
-	hasImage: boolean;
-	lastSignInAt: string;
-	updatedAt: string;
 	createdAt: string;
+	emailAddresses: { emailAddress: string }[];
+	externalAccounts: { id: string; provider: string }[];
+	firstName: string;
+	fullName: string;
+	hasImage: boolean;
+	id: string;
+	imageUrl: string;
+	lastName: string;
+	lastSignInAt: string;
+	primaryEmailAddress: { emailAddress: string };
+	updatedAt: string;
 }

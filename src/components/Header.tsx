@@ -22,10 +22,12 @@ import {
 	SignInButton,
 	UserButton,
 } from '@clerk/clerk-react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { useModal } from '../context/ModalContext';
 import { Button } from './Button';
+import { Icon } from './Icon';
 
 interface DropdownProps {
 	label: string;
@@ -89,6 +91,107 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	);
 };
 
+const CarsList = () => {
+	const [isLoading, setIsLoading] = useState(true);
+	const [cars, setCars] = useState<
+		Array<{
+			id: string;
+			year: number;
+			edition: string;
+			sequence: number | null;
+			vin: string | null;
+			destroyed: boolean;
+		}>
+	>([]);
+
+	useEffect(() => {
+		const fetchCars = async () => {
+			try {
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/cars`,
+					{
+						credentials: 'include',
+					}
+				);
+
+				if (!response.ok) throw new Error('Failed to fetch cars');
+
+				const data = await response.json();
+
+				setCars(data);
+			} catch (error) {
+				console.error('Error fetching cars:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchCars();
+	}, []);
+
+	if (isLoading) {
+		return <p className="text-[#B6B6B6] text-[13px]">Loading...</p>;
+	}
+
+	if (cars.length === 0) {
+		return (
+			<p className="text-[#B6B6B6] text-[13px]">
+				You haven't claimed any cars yet.
+			</p>
+		);
+	}
+
+	return (
+		<>
+			{cars.map((car) => (
+				<>
+					<Link
+						key={car.id}
+						to={`/registry/${car.id}`}
+						className={`${
+							car.destroyed ? 'text-[#EF4444]' : 'text-[#212126]'
+						} text-[13px] group flex flex-col cursor-pointer mb-1 py-1.5 px-2.5 -mx-2.5 rounded-md hover:bg-[#F7F7F7] transition-colors`}
+					>
+						<div className="flex items-center gap-1">
+							<span
+								className={`whitespace-nowrap ${car.destroyed ? 'line-through' : ''}`}
+							>
+								{car.year} {car.edition}
+								{car.sequence ? ` #${car.sequence}` : ''}
+							</span>
+
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								stroke="#2F3037"
+								viewBox="0 0 20 20"
+								className="size-4 group-hover:opacity-50 opacity-0 -translate-x-2 group-hover:translate-x-0 transition-all"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M3.3 10h13.4m-5-5 5 5-5 5"
+								></path>
+							</svg>
+						</div>
+
+						<div
+							className={`w-fit ${
+								car.destroyed
+									? 'text-[#747686]/50'
+									: 'text-[#747686]'
+							}`}
+						>
+							{car.vin}
+						</div>
+					</Link>
+				</>
+			))}
+		</>
+	);
+};
+
 const ConstructionBanner = () => (
 	<div className="bg-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
 		🚧 &nbsp; This project is in early access. Features may be incomplete or
@@ -127,7 +230,41 @@ export const Header = () => {
 					appearance={{
 						elements: { userButtonAvatarBox: 'size-9' },
 					}}
-				/>
+				>
+					<UserButton.MenuItems>
+						<UserButton.Action
+							label="My Cars"
+							labelIcon={
+								<Icon
+									name="car"
+									className="!size-3.5 !text-[#616161]"
+								/>
+							}
+							open="cars"
+						/>
+					</UserButton.MenuItems>
+
+					<UserButton.UserProfilePage
+						label="My Cars"
+						labelIcon={
+							<Icon
+								name="car"
+								className="!size-3.5 !text-[#2F3037]"
+							/>
+						}
+						url="cars"
+					>
+						<>
+							<h1 className="mb-4 text-[#212126] leading-6 text-[17px] font-bold">
+								My Cars
+							</h1>
+
+							<div className="border-t border-black/[0.07] py-4 flex flex-col">
+								<CarsList />
+							</div>
+						</>
+					</UserButton.UserProfilePage>
+				</UserButton>
 			</SignedIn>
 		</>
 	);

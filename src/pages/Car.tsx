@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useAuth } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Map } from '../components/car/Map';
 import { TimelineItem } from '../components/car/TimelineItem';
-import { Icon } from '../components/Icon';
+import { Icon, IconName } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { TCar } from '../types/Car';
@@ -54,8 +55,40 @@ export const getVinDetails = async (vin: string, year: number) => {
 	}
 };
 
+const EditButton = ({
+	className,
+	color = 'text-brg-mid',
+	disabled = false,
+	icon,
+	text,
+}: {
+	className?: string;
+	color?: string;
+	disabled?: boolean;
+	icon: string;
+	text: string;
+}) => {
+	return (
+		<div
+			className={`flex flex-col items-center justify-center p-3 gap-2 text-xs font-medium ${color} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-brg-light/30'}`}
+		>
+			<Icon
+				name={icon as IconName}
+				className={`!size-5 ${color} ${className} ${disabled ? 'opacity-50' : ''}`}
+			/>
+
+			<span
+				className={`whitespace-nowrap ${disabled ? 'opacity-50' : ''}`}
+			>
+				{text}
+			</span>
+		</div>
+	);
+};
+
 export const CarProfile = () => {
 	const { id } = useParams();
+	const { userId } = useAuth();
 	const [car, setCar] = useState<TCar | null>(null);
 	const [vinDetails, setVinDetails] = useState<any>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
@@ -263,7 +296,7 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						<div className="aspect-video w-screen lg:w-full h-96 lg:h-[550px] relative lg:rounded-lg overflow-hidden -mx-8 lg:m-0">
+						<div className="aspect-video w-screen lg:w-full h-72 md:h-96 lg:h-[550px] relative lg:rounded-lg overflow-hidden lg:m-0 max-lg:relative max-lg:left-1/2 max-lg:w-dvw max-lg:max-w-none max-lg:-translate-x-1/2">
 							{car ? (
 								<div className="w-full h-full bg-brg-light">
 									<img
@@ -465,6 +498,38 @@ export const CarProfile = () => {
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
+						{car?.current_owner?.user_id === userId && (
+							<div className="hidden md:grid grid-cols-4 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
+								<EditButton
+									className="scale-90"
+									color="!text-gray-700"
+									icon="edit"
+									text="Edit Car"
+								/>
+
+								<EditButton
+									className="scale-110"
+									color="!text-green-700"
+									icon="sold"
+									text="Sold"
+								/>
+
+								<EditButton
+									className="scale-110"
+									color="!text-red-700"
+									icon="destroyed"
+									text="Destroyed"
+								/>
+
+								<EditButton
+									color="!text-gray-500"
+									disabled
+									icon="qr"
+									text="Get QR Code"
+								/>
+							</div>
+						)}
+
 						<div className="bg-white rounded-lg border border-brg-light overflow-hidden">
 							<div className="aspect-[16/9] w-full relative">
 								{car ? (

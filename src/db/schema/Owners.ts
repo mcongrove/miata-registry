@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { text, sqliteTable } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const Owners = sqliteTable('owners', {
 	city: text('city'),
@@ -24,4 +24,5 @@ export const Owners = sqliteTable('owners', {
 	id: text('id').primaryKey(),
 	name: text('name'),
 	state: text('state'),
+	user_id: text('user_id'),
 });

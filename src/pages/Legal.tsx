@@ -32,9 +32,9 @@ export const Legal = () => {
 						<p>
 							Miata Registry is licensed under the GNU Affero
 							General Public License v3.0 (AGPL-3.0). This means
-							the software is free to use, modify, and distribute,
-							but any modifications must also be made available
-							under the same license terms.
+							the software and dataset is free to use, modify, and
+							distribute, but any modifications must also be made
+							available under the same license terms.
 						</p>
 						<a
 							href="https://www.gnu.org/licenses/agpl-3.0.en.html"

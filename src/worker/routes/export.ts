@@ -25,13 +25,13 @@ import type { Bindings } from '../types';
 
 const exportRouter = new Hono<{ Bindings: Bindings }>();
 
-// Add auth middleware to protect the route
 exportRouter.use('*', withAuth());
 
 const objectsToCSV = (data: any[]) => {
 	if (data.length === 0) return '';
 
 	const headers = Object.keys(data[0]);
+
 	const csvRows = [
 		headers.join(','),
 		...data.map((row) =>
