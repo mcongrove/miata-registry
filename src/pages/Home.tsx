@@ -342,7 +342,7 @@ export const Home = () => {
 							/>
 
 							<svg
-								className="absolute inset-0 right-[-1px] w-full h-full pointer-events-none"
+								className="absolute inset-0 w-[calc(100%_-_1px)] h-full pointer-events-none"
 								preserveAspectRatio="none"
 								viewBox="0 0 100 100"
 							>
@@ -353,7 +353,7 @@ export const Home = () => {
 							</svg>
 						</div>
 
-						<div className="p-8 lg:w-2/3 lg:p-12">
+						<div className="p-8 lg:w-2/3 lg:p-12 -ml-px bg-brg-light z-10">
 							<h2 className="text-xl lg:text-4xl font-bold text-brg mb-4">
 								Register your limited edition Miata
 							</h2>
