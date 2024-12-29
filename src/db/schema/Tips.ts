@@ -20,16 +20,17 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { TipStatus } from '../../types/Tip';
 
 export const Tips = sqliteTable('tips', {
-	createdAt: integer('created_at').notNull(),
+	created_at: integer('created_at').notNull(),
 	edition: text('edition').notNull(),
 	id: text('id').primaryKey(),
 	information: text('information'),
 	location: text('location'),
-	ownerName: text('owner_name'),
-	sequenceNumber: text('sequence_number'),
+	owner_name: text('owner_name'),
+	sequence_number: text('sequence_number'),
 	status: text('status', { enum: ['pending', 'confirmed'] })
 		.notNull()
 		.default(TipStatus.PENDING),
-	updatedAt: integer('updated_at'),
+	updated_at: integer('updated_at'),
+	user_id: text('user_id'),
 	vin: text('vin'),
 });

@@ -24,14 +24,15 @@ export const TipStatus = {
 export type TTipStatus = (typeof TipStatus)[keyof typeof TipStatus];
 
 export type TTip = {
-	createdAt: number;
+	created_at: number;
 	edition: string;
 	id: string;
 	information?: string;
 	location?: string;
-	ownerName?: string;
-	sequenceNumber?: string;
+	owner_name?: string;
+	sequence_number?: string;
 	status: TTipStatus;
-	updatedAt?: number;
+	updated_at?: number;
+	user_id?: string;
 	vin?: string;
 };

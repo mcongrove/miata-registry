@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useAuth, useClerk } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Field } from '../form/Field';
 import { TextField } from '../form/TextField';
@@ -38,6 +39,8 @@ export function RegisterModal({
 	onClose,
 	prefilledData,
 }: RegisterModalProps) {
+	const { isSignedIn, userId } = useAuth();
+	const { openSignIn } = useClerk();
 	const [loading, setLoading] = useState(false);
 	const [editions, setEditions] = useState<string[]>([]);
 	const [isSuccess, setIsSuccess] = useState(false);
@@ -152,6 +155,52 @@ export function RegisterModal({
 		onClose();
 	};
 
+	if (!isSignedIn) {
+		return (
+			<Modal
+				isOpen={isOpen}
+				onClose={handleClose}
+				action={{
+					text: 'Sign In',
+					onClick: () => {
+						handleClose();
+						openSignIn({});
+					},
+				}}
+			>
+				<div className="flex flex-col items-center gap-6 py-6">
+					<div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
+						<svg
+							className="w-8 h-8 text-red-500"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</div>
+
+					<div className="text-center">
+						<h2 className="text-2xl font-bold mb-2">
+							Account Required
+						</h2>
+
+						<p className="text-brg-mid">
+							Please sign in to{' '}
+							{prefilledData?.edition ? 'claim' : 'register'} your
+							Miata.
+						</p>
+					</div>
+				</div>
+			</Modal>
+		);
+	}
+
 	if (isSuccess) {
 		return (
 			<Modal
@@ -219,6 +268,15 @@ export function RegisterModal({
 			</p>
 
 			<form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+				{isSignedIn && (
+					<input
+						id="userId"
+						name="userId"
+						type="hidden"
+						value={userId}
+					/>
+				)}
+
 				<div className="space-y-4">
 					<Field id="edition" label="Edition" required>
 						{prefilledData?.edition ? (

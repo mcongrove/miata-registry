@@ -32,13 +32,14 @@ tipsRouter.post('/', async (c) => {
 		const db = createDb(c.env.DB);
 
 		await db.insert(Tips).values({
-			createdAt: Date.now(),
+			created_at: Date.now(),
 			edition: formData.get('edition') as string,
 			id: tipId,
 			information: (formData.get('information') as string) || null,
 			location: (formData.get('location') as string) || null,
-			ownerName: (formData.get('ownerName') as string) || null,
-			sequenceNumber: (formData.get('sequenceNumber') as string) || null,
+			owner_name: (formData.get('ownerName') as string) || null,
+			sequence_number: (formData.get('sequenceNumber') as string) || null,
+			user_id: (formData.get('userId') as string) || null,
 			vin: (formData.get('vin') as string) || null,
 		});
 
