@@ -133,17 +133,17 @@ export const About = () => {
 	};
 
 	return (
-		<main className="flex-1 pt-44 pb-16 flex flex-col gap-16">
-			<div className="container flex mx-auto">
-				<div className="flex flex-col gap-16 z-10 w-1/2">
-					<div id="introduction" className="flex flex-col gap-3">
-						<h1 className="text-6xl font-medium text-brg">
+		<main className="flex-1 px-8 pt-28 lg:pt-44 lg:px-0 pb-16 flex flex-col gap-16">
+			<div className="container mx-auto flex flex-col gap-8 lg:gap-0 lg:flex-row">
+				<div className="flex flex-col gap-8 lg:gap-16 z-10 lg:w-1/2">
+					<div id="introduction" className="flex flex-col gap-4">
+						<h1 className="text-4xl lg:text-6xl font-medium text-brg">
 							About the
 							<br />
 							Miata Registry
 						</h1>
 
-						<p className="text-xl text-brg-mid">
+						<p className="text-md lg:text-xl text-brg-mid">
 							Welcome to the definitive source for tracking and
 							discovering limited edition Mazda Miatas. Our
 							community-driven registry helps enthusiasts
@@ -151,7 +151,7 @@ export const About = () => {
 							for these special vehicles.
 						</p>
 
-						<p className="text-xl text-brg-mid">
+						<p className="text-md lg:text-xl text-brg-mid">
 							As the only comprehensive database of its kind, we
 							aim to maintain detailed records of every limited
 							edition Miata ever produced. From rare editions to
@@ -187,23 +187,23 @@ export const About = () => {
 					</div>
 				</div>
 
-				<div className="flex items-center justify-center w-1/2">
-					<div className="relative size-[544px]">
+				<div className="flex items-center justify-center lg:w-1/2">
+					<div className="relative w-full h-96 lg:w-[544px]">
 						<img
 							src="https://store.miataregistry.com/app/car/about-1.jpg"
-							className="absolute right-60 top-0 size-64 rounded-lg object-cover shadow-xl bg-brg-light"
+							className="absolute left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-2.jpg"
-							className="absolute right-0 top-24 size-72 rounded-lg object-cover shadow-xl bg-brg-light"
+							className="absolute right-0 top-24 size-40 lg:right-0 lg:top-24 lg:size-72 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-3.jpg"
-							className="absolute right-40 top-72 w-96 h-64 rounded-lg object-cover shadow-xl bg-brg-light"
+							className="absolute top-44 left-0 w-64 h-48 lg:right-40 lg:top-72 lg:w-96 lg:h-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 					</div>
@@ -211,14 +211,17 @@ export const About = () => {
 			</div>
 
 			<div className="container mx-auto">
-				<div id="statistics" className="flex flex-col gap-12 py-24">
+				<div
+					id="statistics"
+					className="flex flex-col gap-12 py-0 lg:py-24"
+				>
 					<h2
 						className={`text-3xl font-medium text-center ${getHighlightClass('statistics')}`}
 					>
 						Registry Statistics
 					</h2>
 
-					<div className="grid grid-cols-5 gap-8">
+					<div className="grid grid-cols-2 lg:grid-cols-5 gap-4 gap-y-6 lg:gap-8">
 						<StatisticItem
 							value={stats?.cars ?? 0}
 							label="Total Vehicles"
@@ -237,6 +240,7 @@ export const About = () => {
 						/>
 						<StatisticItem
 							value={Promise.resolve(commitCount)}
+							className="col-span-2 lg:col-span-1"
 							label="Code Releases"
 						/>
 					</div>
@@ -244,7 +248,7 @@ export const About = () => {
 			</div>
 
 			<div className="container mx-auto">
-				<div className="grid grid-cols-3 gap-16">
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16">
 					<div id="open-source" className="flex flex-col gap-3">
 						<h2
 							className={`text-xl font-medium ${getHighlightClass('open-source')}`}

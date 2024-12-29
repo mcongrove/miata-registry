@@ -62,8 +62,8 @@ export const Editions = () => {
 
 	return (
 		<main className="flex-1 pt-20">
-			<div className="container mx-auto py-8">
-				<h1 className="flex items-center gap-2 justify-between text-3xl font-bold mb-8">
+			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
+				<h1 className="flex items-center gap-2 justify-between text-2xl lg:text-3xl font-bold mb-4 lg:mb-8">
 					<span>Limited Edition Models</span>
 
 					<Tooltip
@@ -80,7 +80,7 @@ export const Editions = () => {
 				</h1>
 
 				{isLoading ? (
-					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 						{[...Array(4)].map((_, index) => (
 							<div
 								key={index}
@@ -89,7 +89,7 @@ export const Editions = () => {
 						))}
 					</div>
 				) : (
-					<div className="flex flex-col gap-12">
+					<div className="flex flex-col gap-8 lg:gap-12">
 						{['NA', 'NB', 'NC', 'ND'].map((generation) => {
 							const yearRanges = {
 								NA: '1989 – 1997',
@@ -103,9 +103,9 @@ export const Editions = () => {
 									0 && (
 									<section
 										key={generation}
-										className="flex flex-col gap-6"
+										className="flex flex-col gap-6 lg:gap-6"
 									>
-										<h2 className="text-2xl font-bold text-brg-dark">
+										<h2 className="text-xl lg:text-2xl font-bold text-brg-dark">
 											{generation} Generation{' '}
 											<span className="text-brg-border font-normal">
 												{
@@ -115,7 +115,8 @@ export const Editions = () => {
 												}
 											</span>
 										</h2>
-										<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+										<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
 											{editionsByGeneration[
 												generation
 											]?.map((edition) => (

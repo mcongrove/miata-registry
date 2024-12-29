@@ -23,6 +23,7 @@ import {
 	offset,
 	Placement,
 	shift,
+	useClick,
 	useFloating,
 	useHover,
 	useInteractions,
@@ -58,7 +59,11 @@ export const Tooltip = ({
 	});
 
 	const hover = useHover(context);
-	const { getReferenceProps } = useInteractions([hover]);
+	const click = useClick(context, {
+		ignoreMouse: true,
+	});
+
+	const { getReferenceProps } = useInteractions([hover, click]);
 
 	return (
 		<>

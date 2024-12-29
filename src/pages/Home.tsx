@@ -30,7 +30,7 @@ export const Home = () => {
 	return (
 		<>
 			<header className="lg:h-[90vh] flex bg-brg-light">
-				<div className="w-full md:w-2/3 lg:w-1/2 p-10 lg:p-16 pt-24 lg:pb-16 flex items-center">
+				<div className="w-full md:w-2/3 lg:w-1/2 p-8 lg:p-16 pt-24 lg:pb-16 flex items-center">
 					<div className="md:pr-20 lg:pr-40 flex flex-col gap-6 lg:gap-10">
 						<Symbol className="w-32 lg:w-40 h-auto text-brg mb-6" />
 
@@ -177,7 +177,7 @@ export const Home = () => {
 							</div>
 						</div>
 
-						<div className="lg:w-1/2 p-10 lg:p-24">
+						<div className="lg:w-1/2 p-8 lg:p-24">
 							<h1 className="hidden lg:block text-4xl font-bold text-brg mb-6">
 								The Miata Registry
 							</h1>
@@ -353,12 +353,12 @@ export const Home = () => {
 							</svg>
 						</div>
 
-						<div className="p-10 lg:w-2/3 lg:p-12">
+						<div className="p-8 lg:w-2/3 lg:p-12">
 							<h2 className="text-xl lg:text-4xl font-bold text-brg mb-4">
 								Register your limited edition Miata
 							</h2>
 
-							<p className="text-brg-mid lg:text-lg mb-8">
+							<p className="text-brg-mid lg:text-lg mb-6 lg:mb-8">
 								Help preserve Miata history by registering your
 								limited edition model. Every registration adds
 								to our collective knowledge and helps document

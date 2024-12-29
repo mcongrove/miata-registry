@@ -19,11 +19,16 @@
 import { useEffect, useState } from 'react';
 
 interface StatisticItemProps {
-	value: number | Promise<number>;
+	className?: string;
 	label: string;
+	value: number | Promise<number>;
 }
 
-export const StatisticItem = ({ value, label }: StatisticItemProps) => {
+export const StatisticItem = ({
+	className,
+	label,
+	value,
+}: StatisticItemProps) => {
 	const [count, setCount] = useState<number | null>(null);
 	const [loading, setLoading] = useState(true);
 
@@ -40,11 +45,11 @@ export const StatisticItem = ({ value, label }: StatisticItemProps) => {
 	}, [value]);
 
 	return (
-		<div className="flex flex-col items-center gap-2">
+		<div className={`flex flex-col items-center gap-2 ${className}`}>
 			{loading || !count ? (
 				<div className="h-12 w-16 bg-brg-light animate-pulse rounded" />
 			) : (
-				<span className="text-5xl font-medium text-brg tracking-tight">
+				<span className="text-4xl lg:text-5xl font-medium text-brg tracking-tight">
 					{count.toLocaleString()}
 				</span>
 			)}

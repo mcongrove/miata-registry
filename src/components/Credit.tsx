@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatLocation } from '../utils/geo';
+import { Icon } from './Icon';
 
 interface CreditProps {
 	className?: string;
@@ -74,6 +75,7 @@ const CreditText = ({
 
 export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 	const [car, setCar] = useState<CarSummary | null>(null);
+	const [isExpanded, setIsExpanded] = useState(false);
 
 	useEffect(() => {
 		const loadCar = async () => {
@@ -96,6 +98,7 @@ export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 				setCar(data);
 			} catch (error) {
 				console.error('Error loading car summary:', error);
+
 				setCar(null);
 			}
 		};
@@ -103,23 +106,42 @@ export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 		loadCar();
 	}, [id]);
 
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			const target = e.target as HTMLElement;
+			if (!target.closest(`[data-credit-id="${id}"]`)) {
+				setIsExpanded(false);
+			}
+		};
+
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
+	}, [id]);
+
+	const handleClick = (e: React.MouseEvent) => {
+		if (window.matchMedia('(hover: none)').matches) {
+			if (!isExpanded) {
+				e.preventDefault();
+				setIsExpanded(true);
+			}
+		}
+	};
+
 	return (
 		<Link
 			to={`/registry/${id}`}
-			className={`group flex items-center h-10 opacity-60 hover:opacity-100 ${className}`}
+			onClick={handleClick}
+			data-credit-id={id}
+			className={`group flex items-center h-10 opacity-60 hover:opacity-100 ${
+				isExpanded ? 'opacity-100' : ''
+			} ${className}`}
 		>
 			{direction === 'left' && (
 				<CreditText car={car} direction={direction} />
 			)}
 
 			<div className="bg-white p-3 rounded-full z-20 relative">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					className="size-4 text-brg"
-					viewBox="0 0 512 512"
-				>
-					<path d="M135.2 117.4L109.1 192l293.8 0-26.1-74.6C372.3 104.6 360.2 96 346.6 96L165.4 96c-13.6 0-25.7 8.6-30.2 21.4zM39.6 196.8L74.8 96.3C88.3 57.8 124.6 32 165.4 32l181.2 0c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2l0 144 0 48c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-48L96 400l0 48c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32l0-48L0 256c0-26.7 16.4-49.6 39.6-59.2zM128 288a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z" />
-				</svg>
+				<Icon name="car" className="!size-4 text-brg" />
 			</div>
 
 			{direction === 'right' && (
