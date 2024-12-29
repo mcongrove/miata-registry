@@ -19,23 +19,25 @@
 import { Select } from '../Select';
 
 interface PaginationControlsProps {
+	className?: string;
 	currentPage: number;
 	hasFilters: boolean;
-	totalPages: number;
+	isLoading?: boolean;
+	itemsPerPage: number;
 	onPageChange: (page: number) => void;
 	totalItems: number;
-	itemsPerPage: number;
-	isLoading?: boolean;
+	totalPages: number;
 }
 
 export const PaginationControls = ({
+	className,
 	currentPage,
 	hasFilters = false,
-	totalPages,
+	isLoading = false,
+	itemsPerPage,
 	onPageChange,
 	totalItems,
-	itemsPerPage,
-	isLoading = false,
+	totalPages,
 }: PaginationControlsProps) => {
 	const start = (currentPage - 1) * itemsPerPage + 1;
 	const end = Math.min(currentPage * itemsPerPage, totalItems);
@@ -52,7 +54,7 @@ export const PaginationControls = ({
 		<div
 			className={`flex justify-between items-center text-sm ${
 				isLoading ? 'opacity-50 pointer-events-none' : ''
-			}`}
+			} ${className}`}
 		>
 			<div className="text-brg-mid text-xs">
 				{totalItems > 0 ? (

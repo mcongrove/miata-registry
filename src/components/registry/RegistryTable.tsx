@@ -56,7 +56,7 @@ export const RegistryTable = ({
 	};
 
 	return (
-		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-268px)]">
+		<div className="bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-170px)] lg:h-[calc(100vh-268px)]">
 			<div className="overflow-auto h-full relative">
 				<table className="min-w-full border-collapse">
 					<thead>

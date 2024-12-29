@@ -55,10 +55,8 @@ export const Registry = () => {
 	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
 		const urlSortDir = searchParams.get('sortDir') as 'asc' | 'desc';
 
-		// If there's a sort direction in the URL, use it
 		if (urlSortDir) return urlSortDir;
 
-		// Otherwise, always use 'asc' since we're defaulting to year
 		return 'asc';
 	});
 	const [isLoading, setIsLoading] = useState(true);
@@ -183,7 +181,7 @@ export const Registry = () => {
 
 	return (
 		<div className="min-h-screen flex flex-col">
-			<main className="flex-1 flex pt-20">
+			<main className="flex-1 flex pt-16 px-8 lg:pt-20 lg:px-0">
 				<div className="flex gap-8 flex-1 container mx-auto pt-8 pb-16">
 					<FilterSidebar
 						activeFilters={activeFilters}
@@ -194,7 +192,6 @@ export const Registry = () => {
 						{activeFilters.length > 0 && (
 							<div className="mb-3 flex gap-2 flex-wrap">
 								{activeFilters.map((filter) => {
-									// Format the filter value for display
 									const displayValue = filter.value;
 
 									return (
@@ -229,6 +226,7 @@ export const Registry = () => {
 										/>
 									);
 								})}
+
 								<button
 									onClick={() => {
 										setActiveFilters([]);
@@ -268,6 +266,7 @@ export const Registry = () => {
 						</div>
 
 						<PaginationControls
+							className="hidden lg:block"
 							currentPage={currentPage}
 							totalPages={totalPages}
 							onPageChange={(page) => {
