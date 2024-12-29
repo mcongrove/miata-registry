@@ -28,6 +28,7 @@ import { TEdition } from '../types/Edition';
 export const Editions = () => {
 	const [editions, setEditions] = useState<TEdition[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [activeGeneration, setActiveGeneration] = useState<string>('all');
 
 	usePageTitle('Editions');
 
@@ -53,8 +54,11 @@ export const Editions = () => {
 	const editionsByGeneration = editions.reduce(
 		(acc, edition) => {
 			const gen = edition.generation.toUpperCase();
+
 			if (!acc[gen]) acc[gen] = [];
+
 			acc[gen].push(edition);
+
 			return acc;
 		},
 		{} as Record<string, TEdition[]>
@@ -63,9 +67,8 @@ export const Editions = () => {
 	return (
 		<main className="flex-1 pt-20">
 			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
-				<h1 className="flex items-center gap-2 justify-between text-2xl lg:text-3xl font-bold mb-4 lg:mb-8">
+				<h1 className="flex items-center gap-2 justify-between text-2xl lg:text-3xl font-bold mb-4">
 					<span>Limited Edition Models</span>
-
 					<Tooltip
 						content={
 							<>
@@ -78,6 +81,27 @@ export const Editions = () => {
 						<Icon name="info-circle" className="cursor-help" />
 					</Tooltip>
 				</h1>
+
+				<div className="flex lg:hidden mb-6 overflow-x-auto">
+					<div className="flex gap-2 p-1 bg-brg-light rounded-lg w-full">
+						{['NA', 'NB', 'NC', 'ND'].map((generation) => (
+							<button
+								key={generation}
+								onClick={() => setActiveGeneration(generation)}
+								className={`flex-1 px-4 py-2 text-sm rounded-md transition-colors ${
+									activeGeneration === generation
+										? 'bg-white text-brg shadow-sm'
+										: 'text-brg-mid hover:text-brg'
+								} disabled:text-brg-border/70`}
+								disabled={
+									!editionsByGeneration[generation]?.length
+								}
+							>
+								{generation}
+							</button>
+						))}
+					</div>
+				</div>
 
 				{isLoading ? (
 					<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -97,6 +121,13 @@ export const Editions = () => {
 								NC: '2006 – 2015',
 								ND: '2016 – Present',
 							};
+
+							if (
+								activeGeneration !== generation &&
+								window.innerWidth < 1024
+							) {
+								return null;
+							}
 
 							return (
 								editionsByGeneration[generation]?.length >
@@ -133,8 +164,8 @@ export const Editions = () => {
 					</div>
 				)}
 
-				<div className="flex justify-between items-start mt-16 gap-12">
-					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg w-1/2">
+				<div className="flex flex-col lg:flex-row justify-between items-start mt-8 lg:mt-16 gap-4 lg:gap-12">
+					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
 						<h3 className="flex gap-2 items-center text-brg-mid font-bold">
 							<Icon name="question-circle" />
 							Are these ChatGPT photos?
@@ -149,7 +180,7 @@ export const Editions = () => {
 						</p>
 					</div>
 
-					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg w-1/2">
+					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
 						<h3 className="flex gap-2 items-center text-brg-mid font-bold">
 							<Icon name="info-circle" />
 							Have a great photo of your edition?
