@@ -18,9 +18,18 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { ExportModal } from '../components/forms/ExportModal';
+import { NewsModal } from '../components/forms/NewsModal';
 import { RegisterModal } from '../components/forms/RegisterModal';
 import { TipModal } from '../components/forms/TipModal';
 import { TModalState, TModalType } from '../types/Modal';
+
+const MODAL_COMPONENTS: Record<TModalType, React.ComponentType<any>> = {
+	claim: RegisterModal,
+	export: ExportModal,
+	news: NewsModal,
+	register: RegisterModal,
+	tip: TipModal,
+};
 
 type ModalContextType = {
 	openModal: (type: TModalType, props?: Record<string, unknown>) => void;
@@ -42,34 +51,17 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 	};
 
 	const renderModal = () => {
-		switch (modalState.type) {
-			case 'export':
-				return (
-					<ExportModal
-						isOpen={true}
-						onClose={closeModal}
-						{...modalState.props}
-					/>
-				);
-			case 'register':
-				return (
-					<RegisterModal
-						isOpen={true}
-						onClose={closeModal}
-						{...modalState.props}
-					/>
-				);
-			case 'tip':
-				return (
-					<TipModal
-						isOpen={true}
-						onClose={closeModal}
-						{...modalState.props}
-					/>
-				);
-			default:
-				return null;
-		}
+		if (!modalState.type) return null;
+
+		const ModalComponent = MODAL_COMPONENTS[modalState.type];
+
+		return (
+			<ModalComponent
+				isOpen={true}
+				onClose={closeModal}
+				{...modalState.props}
+			/>
+		);
 	};
 
 	return (

@@ -22,25 +22,23 @@ import { Button } from './Button';
 import { Icon } from './Icon';
 
 interface ModalProps {
+	action?: { text: string; onClick: () => void; loading?: boolean };
+	allowClickOut?: boolean;
+	children: ReactNode;
+	hideCancel?: boolean;
 	isOpen: boolean;
 	onClose: () => void;
 	title?: string;
-	children: ReactNode;
-	action?: {
-		text: string;
-		onClick: () => void;
-		loading?: boolean;
-	};
-	hideCancel?: boolean;
 }
 
 export function Modal({
+	action,
+	allowClickOut = false,
+	children,
+	hideCancel,
 	isOpen,
 	onClose,
 	title,
-	children,
-	action,
-	hideCancel,
 }: ModalProps) {
 	useEffect(() => {
 		if (isOpen) {
@@ -54,10 +52,17 @@ export function Modal({
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[51]">
-			<div className="flex flex-col bg-white rounded-lg max-w-lg w-full">
+		<div
+			className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[51]"
+			onClick={(e) => {
+				if (allowClickOut && e.target === e.currentTarget) {
+					onClose();
+				}
+			}}
+		>
+			<div className="flex flex-col bg-white rounded-lg max-w-lg w-full max-h-[90vh]">
 				{title && (
-					<h2 className="flex items-center justify-between text-xl font-bold bg-brg-light/70 px-6 py-4 rounded-t-lg border-b border-brg-border/50">
+					<h2 className="flex items-center justify-between text-xl font-bold bg-brg-light/70 px-6 py-4 gap-10 rounded-t-lg border-b border-brg-border/50">
 						{title}
 
 						<Icon
@@ -68,7 +73,7 @@ export function Modal({
 					</h2>
 				)}
 
-				<div className="p-6">{children}</div>
+				<div className="px-6 pt-6 mb-6 overflow-y-auto">{children}</div>
 
 				<div
 					className={twMerge(

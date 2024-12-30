@@ -65,9 +65,10 @@ function App() {
 			afterSignOutUrl="/"
 		>
 			<CSP />
+
 			<GoogleMapsProvider>
-				<ModalProvider>
-					<BrowserRouter>
+				<BrowserRouter>
+					<ModalProvider>
 						<Routes>
 							<Route element={<Layout />}>
 								<Route path="/" element={<Home />} />
@@ -87,8 +88,8 @@ function App() {
 								/>
 							</Route>
 						</Routes>
-					</BrowserRouter>
-				</ModalProvider>
+					</ModalProvider>
+				</BrowserRouter>
 			</GoogleMapsProvider>
 		</ClerkProvider>
 	);

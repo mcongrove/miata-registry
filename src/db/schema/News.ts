@@ -16,9 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType = 'claim' | 'export' | 'news' | 'register' | 'tip';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export interface TModalState {
-	props?: Record<string, unknown>;
-	type: TModalType | null;
-}
+export const News = sqliteTable('news', {
+	body: text('body').notNull(),
+	created_at: integer('created_at').notNull(),
+	featured: integer('featured').notNull().default(0),
+	id: text('id').primaryKey(),
+	published: integer('published').notNull().default(0),
+	title_short: text('title_short').notNull(),
+	title: text('title').notNull(),
+});

@@ -357,7 +357,6 @@ export const CarProfile = () => {
 
 									{car.id && (
 										<img
-											fetchPriority="high"
 											src={`https://store.miataregistry.com/car/${car.id}.jpg`}
 											alt={`${car.edition?.name}`}
 											className={`absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-200`}
@@ -517,7 +516,7 @@ export const CarProfile = () => {
 									Edition
 								</h3>
 
-								<div className="prose prose-brg max-w-none space-y-4">
+								<div className="prose max-w-none">
 									{car?.edition?.description
 										?.split('\n')
 										.map(
@@ -682,7 +681,7 @@ export const CarProfile = () => {
 								Edition
 							</h3>
 
-							<div className="prose prose-brg max-w-none space-y-4">
+							<div className="prose max-w-none space-y-4">
 								{car?.edition?.description
 									?.split('\n')
 									.map((paragraph: string, index: number) => (

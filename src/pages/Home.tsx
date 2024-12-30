@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from '../components/Button';
 import { Credit } from '../components/Credit';
@@ -27,6 +27,13 @@ import { usePageMeta } from '../hooks/usePageMeta';
 
 export const Home = () => {
 	const { openModal } = useModal();
+	const [isLoading, setIsLoading] = useState(true);
+	const [featuredNews, setFeaturedNews] = useState<{
+		title: string;
+		title_short: string;
+		body: string;
+		created_at: number;
+	} | null>(null);
 
 	usePageMeta({
 		path: '/',
@@ -35,6 +42,26 @@ export const Home = () => {
 			'A community-driven project documenting the history of limited edition Mazda Miatas.',
 	});
 
+	useEffect(() => {
+		const fetchFeaturedNews = async () => {
+			try {
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/news/featured`
+				);
+
+				const data = await response.json();
+
+				setFeaturedNews(data);
+			} catch (error) {
+				console.error('Error fetching featured news:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchFeaturedNews();
+	}, []);
+
 	return (
 		<>
 			<header className="lg:h-[90vh] flex bg-brg-light">
@@ -42,12 +69,25 @@ export const Home = () => {
 					<div className="md:pr-20 lg:pr-40 flex flex-col gap-6 lg:gap-10">
 						<Symbol className="w-32 lg:w-48 h-auto text-brg mb-6" />
 
-						<div className="hidden md:inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2">
-							<span>The registry is now open!</span>
-							<Link to="/about" className="text-brg font-medium">
-								Read more →
-							</Link>
-						</div>
+						{isLoading ? (
+							<div className="hidden md:block w-64 h-[38px] rounded-full bg-brg-border/30 animate-pulse" />
+						) : (
+							featuredNews && (
+								<div
+									className="hidden md:inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2 cursor-pointer"
+									onClick={() =>
+										openModal('news', {
+											news: featuredNews,
+										})
+									}
+								>
+									<span>{featuredNews.title_short}</span>
+									<span className="text-brg font-medium">
+										Read more →
+									</span>
+								</div>
+							)
+						)}
 
 						<div className="flex flex-col gap-3">
 							<h1 className="text-2xl lg:text-6xl font-medium text-brg">
@@ -79,7 +119,6 @@ export const Home = () => {
 
 				<div className="w-1/2 h-full relative hidden lg:block">
 					<img
-						fetchPriority="high"
 						src="https://store.miataregistry.com/app/car/1991SE182.jpg"
 						alt="1991 British Racing Green #182"
 						className="w-full h-full object-cover object-left"
