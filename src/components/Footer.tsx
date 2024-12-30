@@ -45,7 +45,7 @@ export const Footer = () => {
 
 						<div className="flex gap-4">
 							<a
-								href="https://instagram.com"
+								href="https://www.instagram.com/miataregistry/"
 								className="text-brg-mid hover:text-brg-light transition-colors"
 							>
 								<svg
