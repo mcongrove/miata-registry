@@ -19,5 +19,6 @@
 export * from './schema/CarOwners';
 export * from './schema/Cars';
 export * from './schema/Editions';
+export * from './schema/News';
 export * from './schema/Owners';
 export * from './schema/Tips';

@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useModal } from '../../context/ModalContext';
 import { Field } from '../form/Field';
 import { Location } from '../form/Location';
 import { SelectStyles } from '../form/Select';
@@ -31,10 +32,12 @@ export function TipModal({
 	isOpen: boolean;
 	onClose: () => void;
 }) {
+	const { openModal } = useModal();
 	const [loading, setLoading] = useState(false);
 	const [editions, setEditions] = useState<string[]>([]);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [showOtherInput, setShowOtherInput] = useState(false);
+	const [isOwner, setIsOwner] = useState(false);
 
 	useEffect(() => {
 		const loadEditions = async () => {
@@ -125,6 +128,12 @@ export function TipModal({
 		onClose();
 	};
 
+	const handleRegister = () => {
+		onClose();
+
+		openModal('register');
+	};
+
 	if (isSuccess) {
 		return (
 			<Modal
@@ -174,122 +183,159 @@ export function TipModal({
 			isOpen={isOpen}
 			onClose={onClose}
 			title="Submit a Tip"
-			action={{
-				text: 'Submit',
-				onClick: () => handleSubmit(),
-				loading,
-			}}
+			action={
+				!isOwner
+					? {
+							text: 'Submit',
+							onClick: () => handleSubmit(),
+							loading,
+						}
+					: {
+							text: 'Register',
+							onClick: () => handleRegister(),
+						}
+			}
 		>
-			<form
-				id="tipForm"
-				onSubmit={handleSubmit}
-				className="flex flex-col gap-4"
-			>
-				<div className="space-y-4">
-					<Field id="edition" label="Edition" required>
-						{!showOtherInput ? (
-							<select
-								className={SelectStyles(
-									false,
-									'',
-									'w-full border-brg-light text-sm'
+			<div className="flex flex-col gap-4">
+				<label className="flex items-center gap-2 text-sm text-brg-mid">
+					<input
+						type="checkbox"
+						checked={isOwner}
+						onChange={(e) => setIsOwner(e.target.checked)}
+						className="rounded border-brg-light text-brg -mt-px"
+					/>
+					I am the owner of this vehicle
+				</label>
+
+				{isOwner ? (
+					<div className="bg-brg/5 rounded-lg p-4 text-sm text-brg-mid">
+						Please use the Register form for cars you own
+					</div>
+				) : (
+					<form
+						id="tipForm"
+						onSubmit={handleSubmit}
+						className={`flex flex-col gap-4 ${
+							isOwner ? 'opacity-50 pointer-events-none' : ''
+						}`}
+					>
+						<div className="space-y-4">
+							<Field id="edition" label="Edition" required>
+								{!showOtherInput ? (
+									<select
+										className={SelectStyles(
+											false,
+											'',
+											'w-full border-brg-light text-sm'
+										)}
+										name="edition"
+										required
+										onChange={(e) => {
+											if (e.target.value === 'other') {
+												setShowOtherInput(true);
+											}
+										}}
+									>
+										<option value="">
+											Select an edition
+										</option>
+										{editions.map((edition) => (
+											<option
+												key={edition}
+												value={edition}
+											>
+												{edition}
+											</option>
+										))}
+										<option value="other">Other</option>
+									</select>
+								) : (
+									<div className="flex items-center gap-2">
+										<TextField
+											id="edition"
+											name="edition"
+											type="text"
+											placeholder="1992 M2-1002 Roadster"
+											required
+										/>
+
+										<Icon
+											name="x"
+											className="size-3.5"
+											onClick={() =>
+												setShowOtherInput(false)
+											}
+										/>
+									</div>
 								)}
-								name="edition"
-								required
-								onChange={(e) => {
-									if (e.target.value === 'other') {
-										setShowOtherInput(true);
-									}
-								}}
-							>
-								<option value="">Select an edition</option>
-								{editions.map((edition) => (
-									<option key={edition} value={edition}>
-										{edition}
-									</option>
-								))}
-								<option value="other">Other</option>
-							</select>
-						) : (
-							<div className="flex items-center gap-2">
-								<TextField
-									id="edition"
-									name="edition"
-									type="text"
-									placeholder="1992 M2-1002 Roadster"
-									required
-								/>
+							</Field>
 
-								<Icon
-									name="x"
-									className="size-3.5"
-									onClick={() => setShowOtherInput(false)}
-								/>
+							<div className="flex justify-between gap-4">
+								<Field
+									id="sequenceNumber"
+									label="Sequence #"
+									className="w-32"
+								>
+									<TextField
+										id="sequenceNumber"
+										name="sequenceNumber"
+										type="text"
+										placeholder="182"
+									/>
+								</Field>
+
+								<Field id="vin" label="VIN" className="w-full">
+									<TextField
+										id="vin"
+										name="vin"
+										type="text"
+										placeholder="JM1NA3510M1221538"
+									/>
+								</Field>
 							</div>
-						)}
-					</Field>
 
-					<div className="flex justify-between gap-4">
-						<Field
-							id="sequenceNumber"
-							label="Sequence #"
-							className="w-32"
-						>
-							<TextField
-								id="sequenceNumber"
-								name="sequenceNumber"
-								type="text"
-								placeholder="182"
-							/>
-						</Field>
+							<div className="flex justify-between gap-4">
+								<Field
+									id="ownerName"
+									label="Owner Name"
+									className="w-64"
+								>
+									<TextField
+										id="ownerName"
+										name="ownerName"
+										type="text"
+										placeholder="John Doe"
+									/>
+								</Field>
 
-						<Field id="vin" label="VIN" className="w-full">
-							<TextField
-								id="vin"
-								name="vin"
-								type="text"
-								placeholder="JM1NA3510M1221538"
-							/>
-						</Field>
-					</div>
+								<Field
+									id="location"
+									label="Location"
+									className="w-full"
+								>
+									<Location
+										id="location"
+										name="location"
+										placeholder="City, Country"
+									/>
+								</Field>
+							</div>
 
-					<div className="flex justify-between gap-4">
-						<Field
-							id="ownerName"
-							label="Owner Name"
-							className="w-64"
-						>
-							<TextField
-								id="ownerName"
-								name="ownerName"
-								type="text"
-								placeholder="John Doe"
-							/>
-						</Field>
-
-						<Field
-							id="location"
-							label="Location"
-							className="w-full"
-						>
-							<Location
-								id="location"
-								name="location"
-								placeholder="City, Country"
-							/>
-						</Field>
-					</div>
-
-					<Field id="information" label="Additional Information">
-						<TextField
-							id="information"
-							name="information"
-							type="textarea"
-							placeholder="Any other information, like social media links, etc..."
-						/>
-					</Field>
-				</div>
-			</form>
+							<Field
+								id="information"
+								label="Additional Information"
+							>
+								<TextField
+									id="information"
+									name="information"
+									type="textarea"
+									placeholder="Any other information, like social media links, etc..."
+								/>
+							</Field>
+						</div>
+					</form>
+				)}
+			</div>
 		</Modal>
 	);
 }

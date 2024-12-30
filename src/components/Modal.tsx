@@ -22,7 +22,12 @@ import { Button } from './Button';
 import { Icon } from './Icon';
 
 interface ModalProps {
-	action?: { text: string; onClick: () => void; loading?: boolean };
+	action?: {
+		disabled?: boolean;
+		loading?: boolean;
+		onClick: () => void;
+		text: string;
+	};
 	allowClickOut?: boolean;
 	children: ReactNode;
 	hideCancel?: boolean;
@@ -97,7 +102,7 @@ export function Modal({
 					{action && (
 						<Button
 							onClick={action.onClick}
-							disabled={action.loading}
+							disabled={action.loading || action.disabled}
 							className="text-sm"
 						>
 							{action.loading ? 'Loading...' : action.text}

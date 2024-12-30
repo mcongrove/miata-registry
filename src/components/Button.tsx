@@ -32,20 +32,23 @@ export const Button = ({
 	withArrow = false,
 	variant = 'primary',
 	href,
+	disabled,
 	...props
 }: ButtonProps) => {
 	const buttonClassName = twMerge(
 		'group flex items-center font-medium text-sm lg:text-base py-2 px-3 lg:py-3 lg:px-4 rounded-lg transition-colors',
 		variant === 'primary'
-			? 'bg-brg hover:bg-brg/90'
+			? 'bg-brg hover:bg-brg/90 disabled:bg-brg/50 disabled:cursor-not-allowed'
 			: variant === 'secondary'
-				? 'bg-brg-mid hover:bg-brg-mid/90'
+				? 'bg-brg-mid hover:bg-brg-mid/90 disabled:bg-brg-mid/50 disabled:cursor-not-allowed'
 				: '',
-		variant === 'tertiary' ? 'text-brg hover:text-brg-mid' : 'text-white',
+		variant === 'tertiary'
+			? 'text-brg hover:text-brg-mid disabled:text-brg/50 disabled:cursor-not-allowed'
+			: 'text-white',
 		className
 	);
 
-	if (href) {
+	if (href && !disabled) {
 		return (
 			<Link to={href} className={buttonClassName}>
 				{children}
@@ -59,7 +62,12 @@ export const Button = ({
 	}
 
 	return (
-		<button onClick={onClick} className={buttonClassName} {...props}>
+		<button
+			onClick={onClick}
+			className={buttonClassName}
+			disabled={disabled}
+			{...props}
+		>
 			{children}
 			{withArrow && (
 				<span className="ml-2 transform group-hover:translate-x-1 transition-transform">

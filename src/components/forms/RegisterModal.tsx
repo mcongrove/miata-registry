@@ -167,6 +167,7 @@ export function RegisterModal({
 						openSignIn({});
 					},
 				}}
+				allowClickOut
 			>
 				<div className="flex flex-col items-center gap-6 py-6">
 					<div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
@@ -185,15 +186,18 @@ export function RegisterModal({
 						</svg>
 					</div>
 
-					<div className="text-center">
-						<h2 className="text-2xl font-bold mb-2">
-							Account Required
-						</h2>
+					<div className="flex flex-col gap-2 items-center text-center">
+						<h2 className="text-2xl font-bold">Account Required</h2>
 
 						<p className="text-brg-mid">
 							Please sign in to{' '}
 							{prefilledData?.edition ? 'claim' : 'register'} your
 							Miata.
+						</p>
+
+						<p className="text-brg-mid w-80">
+							This ensures you can edit your car's information in
+							the future.
 						</p>
 					</div>
 				</div>

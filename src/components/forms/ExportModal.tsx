@@ -129,6 +129,7 @@ export function ExportModal({
 				onClick: submitDownload,
 				loading,
 			}}
+			allowClickOut
 		>
 			<div className="flex flex-col gap-4 text-brg-mid text-sm">
 				<p className="text-brg">
