@@ -293,7 +293,7 @@ export const CarProfile = () => {
 	return (
 		<main className="flex-1 pt-20 pb-0 lg:pb-16">
 			<div className="container mx-auto px-8 py-6 lg:p-0 lg:py-8">
-				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 					<div className="lg:col-span-8 space-y-6 lg:space-y-8">
 						<div>
 							{car ? (
