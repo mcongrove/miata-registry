@@ -27,6 +27,7 @@ const tipsRouter = new Hono<{ Bindings: Bindings }>();
 tipsRouter.post('/', async (c) => {
 	try {
 		const formData = await c.req.formData();
+
 		const tipId = uuid();
 
 		const db = createDb(c.env.DB);

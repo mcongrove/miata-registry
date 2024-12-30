@@ -26,6 +26,7 @@ import {
 } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { GoogleMapsProvider } from './context/GoogleMapsContext';
 import { ModalProvider } from './context/ModalContext';
 import { About } from './pages/About';
 import { CarProfile } from './pages/Car';
@@ -57,23 +58,28 @@ const Layout = () => (
 
 function App() {
 	return (
-		<ModalProvider>
-			<BrowserRouter>
-				<Routes>
-					<Route element={<Layout />}>
-						<Route path="/" element={<Home />} />
-						<Route path="/about" element={<About />} />
-						<Route path="/legal" element={<Legal />} />
-						<Route path="/registry" element={<Registry />} />
-						<Route path="/registry/:id" element={<CarProfile />} />
-						<Route
-							path="/registry/editions"
-							element={<Editions />}
-						/>
-					</Route>
-				</Routes>
-			</BrowserRouter>
-		</ModalProvider>
+		<GoogleMapsProvider>
+			<ModalProvider>
+				<BrowserRouter>
+					<Routes>
+						<Route element={<Layout />}>
+							<Route path="/" element={<Home />} />
+							<Route path="/about" element={<About />} />
+							<Route path="/legal" element={<Legal />} />
+							<Route path="/registry" element={<Registry />} />
+							<Route
+								path="/registry/:id"
+								element={<CarProfile />}
+							/>
+							<Route
+								path="/registry/editions"
+								element={<Editions />}
+							/>
+						</Route>
+					</Routes>
+				</BrowserRouter>
+			</ModalProvider>
+		</GoogleMapsProvider>
 	);
 }
 

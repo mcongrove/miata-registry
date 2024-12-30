@@ -32,7 +32,7 @@ export const Home = () => {
 			<header className="lg:h-[90vh] flex bg-brg-light">
 				<div className="w-full md:w-2/3 lg:w-1/2 p-8 lg:p-16 pt-24 lg:pb-16 flex items-center">
 					<div className="md:pr-20 lg:pr-40 flex flex-col gap-6 lg:gap-10">
-						<Symbol className="w-32 lg:w-40 h-auto text-brg mb-6" />
+						<Symbol className="w-32 lg:w-48 h-auto text-brg mb-6" />
 
 						<div className="hidden md:inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2">
 							<span>The registry is now open!</span>
@@ -183,13 +183,12 @@ export const Home = () => {
 							</h1>
 
 							<p className="text-brg-mid">
-								Welcome to the Miata Registry, a
-								community-driven database dedicated to tracking
-								and preserving the history of limited edition
-								Mazda Miatas. Our mission is to document these
-								unique vehicles and help enthusiasts connect
-								with rare and significant editions from across
-								the Miata's storied history.
+								We're a community-driven database dedicated to
+								tracking and preserving the history of limited
+								edition Mazda Miatas. Our mission is to document
+								these unique vehicles and help enthusiasts
+								connect with rare and significant editions from
+								across the Miata's storied history.
 							</p>
 
 							<p className="text-brg-mid mt-4">
@@ -240,7 +239,7 @@ export const Home = () => {
 							<p className="text-brg-mid mt-4">
 								Our system can track any unique variant, from
 								large international releases to small
-								dealer-specific runs, documenting their
+								region-specific runs, documenting their
 								features, numbers, and significance.
 							</p>
 
@@ -335,10 +334,10 @@ export const Home = () => {
 
 				<div className="bg-brg-light">
 					<div className="flex flex-row items-stretch">
-						<div className="hidden lg:block w-1/3 relative">
+						<div className="hidden lg:block w-1/3 relative overflow-hidden">
 							<img
-								src="https://store.miataregistry.com/app/car/about-3.jpg"
-								className="absolute inset-0 w-full h-full object-cover object-bottom scale-x-[-1]"
+								src="https://store.miataregistry.com/app/car/about-4.jpg"
+								className="absolute inset-0 w-full h-full object-cover object-bottom scale-110"
 							/>
 
 							<svg
@@ -365,7 +364,10 @@ export const Home = () => {
 								these special cars for future generations.
 							</p>
 
-							<Button onClick={() => openModal('register')}>
+							<Button
+								withArrow
+								onClick={() => openModal('register')}
+							>
 								Claim your Miata
 							</Button>
 

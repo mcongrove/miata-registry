@@ -18,10 +18,11 @@
 
 import { useEffect, useState } from 'react';
 import { Field } from '../form/Field';
+import { Location } from '../form/Location';
+import { SelectStyles } from '../form/Select';
 import { TextField } from '../form/TextField';
 import { Icon } from '../Icon';
 import { Modal } from '../Modal';
-import { SelectStyles } from '../Select';
 
 export function TipModal({
 	isOpen,
@@ -268,11 +269,10 @@ export function TipModal({
 							label="Location"
 							className="w-full"
 						>
-							<TextField
+							<Location
 								id="location"
 								name="location"
-								type="text"
-								placeholder="City, State, Country"
+								placeholder="City, Country"
 							/>
 						</Field>
 					</div>

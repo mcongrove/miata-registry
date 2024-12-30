@@ -193,7 +193,7 @@ export const About = () => {
 					<div className="relative w-full h-96 lg:w-[544px]">
 						<img
 							src="https://store.miataregistry.com/app/car/about-1.jpg"
-							className="absolute left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light"
+							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
 						/>
 

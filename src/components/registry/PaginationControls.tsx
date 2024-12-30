@@ -17,7 +17,7 @@
  */
 
 import { twMerge } from 'tailwind-merge';
-import { Select } from '../Select';
+import { Select } from '../form/Select';
 
 interface PaginationControlsProps {
 	className?: string;

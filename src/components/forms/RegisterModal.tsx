@@ -19,10 +19,10 @@
 import { useAuth, useClerk } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Field } from '../form/Field';
+import { SelectStyles } from '../form/Select';
 import { TextField } from '../form/TextField';
 import { Icon } from '../Icon';
 import { Modal } from '../Modal';
-import { SelectStyles } from '../Select';
 
 interface RegisterModalProps {
 	isOpen: boolean;

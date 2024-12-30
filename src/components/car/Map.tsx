@@ -16,13 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-	GoogleMap,
-	Marker,
-	Polyline,
-	useJsApiLoader,
-} from '@react-google-maps/api';
+import { GoogleMap, Marker, Polyline } from '@react-google-maps/api';
 import { useEffect, useState } from 'react';
+import { useGoogleMaps } from '../../context/GoogleMapsContext';
 import { TMapLocation } from '../../types/Location';
 
 interface MarkerData {
@@ -37,10 +33,7 @@ export const Map = ({
 	locations?: (TMapLocation | null)[];
 	hasOwners: boolean;
 }) => {
-	const { isLoaded } = useJsApiLoader({
-		id: 'google-map-script',
-		googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-	});
+	const { isLoaded } = useGoogleMaps();
 	const [markers, setMarkers] = useState<MarkerData[]>([]);
 
 	useEffect(() => {
