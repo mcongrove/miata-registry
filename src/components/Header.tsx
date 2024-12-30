@@ -353,6 +353,8 @@ export const Header = () => {
 					<div className="flex items-center">
 						<Link to="/" className="mr-8 lg:mr-12">
 							<Symbol className="w-16 h-auto text-brg" />
+
+							<span className="sr-only">Miata Registry</span>
 						</Link>
 
 						<NavLinks />

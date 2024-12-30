@@ -48,7 +48,6 @@ export const Footer = () => {
 								href="https://instagram.com"
 								className="text-brg-mid hover:text-brg-light transition-colors"
 							>
-								<span className="sr-only">Instagram</span>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 448 512"
@@ -59,13 +58,14 @@ export const Footer = () => {
 										fill="currentColor"
 									/>
 								</svg>
+
+								<span className="sr-only">Instagram</span>
 							</a>
 
 							<a
 								href="https://github.com/mcongrove/miata-registry"
 								className="text-brg-mid hover:text-brg-light transition-colors"
 							>
-								<span className="sr-only">GitHub</span>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 496 512"
@@ -76,6 +76,8 @@ export const Footer = () => {
 										fill="currentColor"
 									/>
 								</svg>
+
+								<span className="sr-only">GitHub</span>
 							</a>
 						</div>
 					</div>

@@ -101,10 +101,13 @@ export const PaginationControls = ({
 					>
 						<polyline points="6 9 12 15 18 9"></polyline>
 					</svg>
+
+					<span className="sr-only">Previous page</span>
 				</button>
 
 				<div className="w-16">
 					<Select
+						id="pagination-select"
 						value={currentPage}
 						disabled={totalPages <= 1}
 						className="disabled:opacity-30 disabled:cursor-not-allowed"
@@ -138,6 +141,8 @@ export const PaginationControls = ({
 					>
 						<polyline points="6 9 12 15 18 9"></polyline>
 					</svg>
+
+					<span className="sr-only">Next page</span>
 				</button>
 			</div>
 		</div>

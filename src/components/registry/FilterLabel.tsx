@@ -20,21 +20,25 @@ import { twMerge } from 'tailwind-merge';
 import { TFilterOption, TFilterType } from '../../types/Filters';
 
 interface FilterLabelProps {
-	value: string;
-	type: TFilterType;
+	id: string;
 	isSelected: boolean;
 	onChange: (option: TFilterOption) => void;
+	type: TFilterType;
+	value: string;
 }
 
 export const FilterLabel = ({
-	value,
-	type,
+	id,
 	isSelected,
 	onChange,
+	type,
+	value,
 }: FilterLabelProps) => (
-	<label className="flex items-center space-x-2 cursor-pointer">
+	<label htmlFor={id} className="flex items-center space-x-2 cursor-pointer">
 		<input
+			id={id}
 			type="radio"
+			name={type}
 			className="hidden"
 			checked={isSelected}
 			onChange={() => {

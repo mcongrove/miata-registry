@@ -37,7 +37,7 @@ export const FilterRadioGroup = ({
 	onClear,
 	onChange,
 }: FilterRadioGroupProps) => (
-	<div>
+	<fieldset>
 		<FilterHeader
 			title={title}
 			onClear={() => onClear(type)}
@@ -48,6 +48,7 @@ export const FilterRadioGroup = ({
 			{options.map((value) => (
 				<FilterLabel
 					key={value}
+					id={`${type}-${value}`}
 					value={value}
 					type={type}
 					isSelected={activeValue === value}
@@ -55,5 +56,5 @@ export const FilterRadioGroup = ({
 				/>
 			))}
 		</div>
-	</div>
+	</fieldset>
 );

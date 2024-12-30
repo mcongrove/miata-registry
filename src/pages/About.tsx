@@ -200,18 +200,21 @@ export const About = () => {
 							src="https://store.miataregistry.com/app/car/about-1.jpg"
 							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
+							alt="Miata in a valley"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-2.jpg"
 							className="absolute right-0 top-24 size-40 lg:right-0 lg:top-24 lg:size-72 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
+							alt="Miata in a field at dusk"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-3.jpg"
 							className="absolute top-44 left-0 w-64 h-48 lg:right-40 lg:top-72 lg:w-96 lg:h-64 rounded-lg object-cover shadow-xl bg-brg-light"
 							loading="lazy"
+							alt="A group of Miatas in a field"
 						/>
 					</div>
 				</div>

@@ -36,47 +36,32 @@ export const usePageMeta = ({ title, description, path }: PageMetaProps) => {
 	useEffect(() => {
 		document.title = metaTitle;
 
-		const canonicalElement = document.querySelector(
-			'link[rel="canonical"]'
-		);
-		const metaDescElement = document.querySelector(
-			'meta[name="description"]'
-		);
-		const ogDescElement = document.querySelector(
-			'meta[property="og:description"]'
-		);
-		const ogTitleElement = document.querySelector(
-			'meta[property="og:title"]'
-		);
-		const ogUrlElement = document.querySelector('meta[property="og:url"]');
-		const twitterDescElement = document.querySelector(
-			'meta[name="twitter:description"]'
-		);
-		const twitterTitleElement = document.querySelector(
-			'meta[name="twitter:title"]'
-		);
-		const twitterUrlElement = document.querySelector(
-			'meta[name="twitter:url"]'
-		);
+		const updateMetaTag = (
+			selector: string,
+			content: string,
+			attr?: string
+		) => {
+			let element = document.querySelector(selector);
 
-		if (canonicalElement) canonicalElement.setAttribute('href', metaUrl);
-		if (metaDescElement)
-			metaDescElement.setAttribute('content', metaDescription);
-		if (ogTitleElement) ogTitleElement.setAttribute('content', metaTitle);
-		if (twitterTitleElement)
-			twitterTitleElement.setAttribute('content', metaTitle);
-		if (ogDescElement)
-			ogDescElement.setAttribute('content', metaDescription);
-		if (twitterDescElement)
-			twitterDescElement.setAttribute('content', metaDescription);
-		if (ogUrlElement) ogUrlElement.setAttribute('content', metaUrl);
-		if (twitterUrlElement)
-			twitterUrlElement.setAttribute('content', metaUrl);
+			if (!element) {
+				element = document.createElement('meta');
+
+				element.setAttribute(attr || 'content', content);
+
+				document.head.appendChild(element);
+			}
+
+			element.setAttribute(attr || 'content', content);
+		};
+
+		// Update standard meta tags
+		updateMetaTag('meta[name="description"]', metaDescription);
+		updateMetaTag('meta[property="og:title"]', metaTitle);
+		updateMetaTag('meta[property="og:description"]', metaDescription);
+		updateMetaTag('meta[property="og:url"]', metaUrl);
+		updateMetaTag('meta[name="twitter:title"]', metaTitle);
+		updateMetaTag('meta[name="twitter:description"]', metaDescription);
+		updateMetaTag('meta[name="twitter:url"]', metaUrl);
+		updateMetaTag('link[rel="canonical"]', metaUrl, 'href');
 	}, [metaTitle, metaDescription, metaUrl]);
-
-	return {
-		metaTitle,
-		metaUrl,
-		metaDescription,
-	};
 };

@@ -27,14 +27,14 @@ export const CSP = () => {
 		const devCSP = import.meta.env.DEV ? ' http://localhost:*' : '';
 
 		meta.content = `
-			default-src 'self'${devCSP}; 
-			script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.clerk.accounts.dev${devCSP}; 
-			worker-src 'self' blob:${devCSP}; 
-			connect-src 'self' *.googleapis.com *.clerk.accounts.dev https://api.miataregistry.com https://store.miataregistry.com https://api.github.com${devCSP}; 
-			img-src 'self' data: *.googleapis.com *.gstatic.com *.clerk.com https://store.miataregistry.com${devCSP}; 
-			style-src 'self' 'unsafe-inline' *.googleapis.com *.gstatic.com${devCSP}; 
-			font-src 'self' *.gstatic.com${devCSP};
-			frame-src 'self' *.clerk.accounts.dev${devCSP};
+			default-src 'self' ${devCSP}; 
+			script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.clerk.accounts.dev ${devCSP}; 
+			worker-src 'self' blob: ${devCSP}; 
+			connect-src 'self' *.googleapis.com *.clerk.accounts.dev https://api.miataregistry.com https://store.miataregistry.com https://api.github.com vpic.nhtsa.dot.gov ${devCSP}; 
+			img-src 'self' data: *.googleapis.com *.gstatic.com *.clerk.com https://store.miataregistry.com ${devCSP}; 
+			style-src 'self' 'unsafe-inline' *.googleapis.com *.gstatic.com ${devCSP}; 
+			font-src 'self' *.gstatic.com ${devCSP};
+			frame-src 'self' *.clerk.accounts.dev ${devCSP};
 		`
 			.replace(/\s+/g, ' ')
 			.trim();

@@ -96,8 +96,7 @@ export const CarProfile = () => {
 		title: car
 			? `${car.edition?.year} ${car.edition?.name}${car.sequence ? ` #${car.sequence}` : ''}`
 			: '',
-		description:
-			'About the Miata Registry, a community-driven project documenting the history of limited edition Mazda Miatas.',
+		description: car ? car.edition?.description?.split('\n')[0] : '',
 	});
 
 	const manufactureLocation = car?.manufacture_country

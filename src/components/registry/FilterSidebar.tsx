@@ -173,10 +173,12 @@ export const FilterSidebar = ({
 								title="Year"
 								onClear={() => handleClear('year')}
 								hasActiveFilter={!!getActiveValue('year')}
+								id="field-year"
 							/>
 
 							<div className="p-4 pt-0">
 								<Select
+									id="field-year"
 									value={getActiveValue('year') || ''}
 									onChange={(
 										e: ChangeEvent<HTMLSelectElement>
@@ -200,10 +202,12 @@ export const FilterSidebar = ({
 								title="Generation"
 								onClear={() => handleClear('generation')}
 								hasActiveFilter={!!getActiveValue('generation')}
+								id="field-generation"
 							/>
 
 							<div className="p-4 pt-0">
 								<Select
+									id="field-generation"
 									value={getActiveValue('generation') || ''}
 									onChange={(
 										e: ChangeEvent<HTMLSelectElement>
@@ -226,6 +230,7 @@ export const FilterSidebar = ({
 
 						<div>
 							<FilterHeader
+								id="field-edition"
 								title="Edition"
 								onClear={() => handleClear('edition')}
 								hasActiveFilter={!!getActiveValue('edition')}
@@ -233,6 +238,7 @@ export const FilterSidebar = ({
 
 							<div className="p-4 pt-0">
 								<Select
+									id="field-edition"
 									value={getActiveValue('edition') || ''}
 									onChange={(
 										e: ChangeEvent<HTMLSelectElement>
@@ -256,10 +262,12 @@ export const FilterSidebar = ({
 								title="Country"
 								onClear={() => handleClear('country')}
 								hasActiveFilter={!!getActiveValue('country')}
+								id="field-country"
 							/>
 
 							<div className="p-4 pt-0">
 								<Select
+									id="field-country"
 									value={getActiveValue('country') || ''}
 									onChange={(
 										e: ChangeEvent<HTMLSelectElement>
