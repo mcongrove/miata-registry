@@ -292,9 +292,9 @@ export const CarProfile = () => {
 
 	return (
 		<main className="flex-1 pt-20 pb-0 lg:pb-16">
-			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
+			<div className="container mx-auto px-8 py-6 lg:p-0 lg:py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-					<div className="lg:col-span-8 space-y-8">
+					<div className="lg:col-span-8 space-y-6 lg:space-y-8">
 						<div>
 							{car ? (
 								<>
@@ -401,27 +401,6 @@ export const CarProfile = () => {
 								<div className="w-full h-full bg-brg-light animate-pulse" />
 							)}
 						</div>
-
-						{car && car?.current_owner?.user_id !== userId && (
-							<Button
-								onClick={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-
-									openModal('register', {
-										prefilledData: {
-											edition: `${car.edition?.year} ${car.edition?.name}`,
-											vin: car.vin || '',
-											sequenceNumber:
-												car.sequence?.toString() || '',
-										},
-									});
-								}}
-								className="md:hidden w-full justify-center text-sm"
-							>
-								Claim this Car
-							</Button>
-						)}
 
 						<div className="bg-white rounded-lg overflow-hidden border border-brg-light">
 							<div className="grid grid-cols-1 md:grid-cols-3">
@@ -612,7 +591,7 @@ export const CarProfile = () => {
 											},
 										});
 									}}
-									className="hidden md:block ml-auto text-sm"
+									className="w-full md:w-auto justify-center md:flex ml-auto text-sm"
 								>
 									Claim this Car
 								</Button>
