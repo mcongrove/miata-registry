@@ -155,10 +155,10 @@ export const CarProfile = () => {
 		if (timelineOwners.length > 0) {
 			timelineOwners.forEach((owner: TCarOwner, index: number) => {
 				const startYear = owner.date_start
-					? new Date(owner.date_start).getFullYear()
+					? new Date(owner.date_start).getUTCFullYear()
 					: '';
 				const endYear = owner.date_end
-					? new Date(owner.date_end).getFullYear()
+					? new Date(owner.date_end).getUTCFullYear()
 					: '';
 
 				items.push({
@@ -182,20 +182,29 @@ export const CarProfile = () => {
 		}
 
 		// Dealer
-		if (car.sale_dealer_name) {
+		if (car.sale_dealer_country || car.sale_dealer_name) {
 			items.push({
-				name: car.sale_dealer_name,
+				name: (
+					<>
+						Sold{' '}
+						{car.sale_dealer_name && (
+							<span className="text-brg-border">
+								by {car.sale_dealer_name}
+							</span>
+						)}
+					</>
+				),
 				dateRange: toPrettyDate(car.sale_date || ''),
 				location: formatLocation({
-					city: car.sale_dealer_city,
-					state: car.sale_dealer_state,
+					city: car.sale_dealer_city || '',
+					state: car.sale_dealer_state || '',
 					country: car.sale_dealer_country || '',
 				}),
 			});
 		}
 
 		// Shipping
-		if (car.shipping_vessel) {
+		if (car.shipping_date || car.shipping_country || car.shipping_vessel) {
 			items.push({
 				name: car.shipping_vessel ? (
 					<>
@@ -531,13 +540,15 @@ export const CarProfile = () => {
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
-						{car?.current_owner?.user_id === userId ? (
+						{import.meta.env.DEV &&
+						car?.current_owner?.user_id === userId ? (
 							<div className="hidden md:grid grid-cols-4 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
 								<EditButton
 									className="scale-90"
 									color="text-gray-700"
 									icon="edit"
 									text="Edit Car"
+									disabled
 								/>
 
 								<EditButton
@@ -545,6 +556,7 @@ export const CarProfile = () => {
 									color="text-green-700"
 									icon="sold"
 									text="Sold"
+									disabled
 								/>
 
 								<EditButton
@@ -552,13 +564,14 @@ export const CarProfile = () => {
 									color="text-red-700"
 									icon="destroyed"
 									text="Destroyed"
+									disabled
 								/>
 
 								<EditButton
 									color="text-gray-500"
-									disabled
 									icon="qr"
 									text="Get QR Code"
+									disabled
 								/>
 							</div>
 						) : (
