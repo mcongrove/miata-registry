@@ -98,6 +98,14 @@ export const Footer = () => {
 									</Link>
 								</li>
 								<li>
+									<Link
+										to="/registry/editions"
+										className="text-brg-mid hover:text-brg-light transition-colors"
+									>
+										Browse Editions
+									</Link>
+								</li>
+								<li>
 									<span
 										onClick={() => openModal('register')}
 										className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"

@@ -193,6 +193,7 @@ export const FilterSidebar = ({
 										label: String(year),
 									}))}
 									placeholder="Select year"
+									className="md:!text-xs"
 								/>
 							</div>
 						</div>
@@ -224,6 +225,7 @@ export const FilterSidebar = ({
 										})
 									)}
 									placeholder="Select generation"
+									className="md:!text-xs"
 								/>
 							</div>
 						</div>
@@ -253,6 +255,7 @@ export const FilterSidebar = ({
 										label: edition,
 									}))}
 									placeholder="Select edition"
+									className="md:!text-xs"
 								/>
 							</div>
 						</div>
@@ -279,6 +282,7 @@ export const FilterSidebar = ({
 									}
 									options={countries}
 									placeholder="Select country"
+									className="md:!text-xs"
 								/>
 							</div>
 						</div>

@@ -62,7 +62,9 @@ export const RegistryTable = ({
 		<div
 			className={twMerge(
 				'bg-white rounded-md border border-brg-light text-brg overflow-hidden',
-				isFiltered ? 'lg:h-[calc(100vh-280' : 'lg:h-[calc(100vh-236'
+				isFiltered
+					? 'lg:h-[calc(100vh_-_280px)]'
+					: 'lg:h-[calc(100vh_-_236px)]'
 			)}
 		>
 			<div className="overflow-auto h-full relative">

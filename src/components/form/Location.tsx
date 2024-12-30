@@ -105,7 +105,7 @@ export function Location({
 			required={required}
 			value={inputValue}
 			onChange={(e) => setInputValue(e.target.value)}
-			className="w-full px-3 py-2 text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid"
+			className="w-full px-3 py-2 !text-[16px] md:!text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid"
 		/>
 	);
 }
