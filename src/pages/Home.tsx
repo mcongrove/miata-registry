@@ -346,6 +346,7 @@ export const Home = () => {
 							<img
 								src="https://store.miataregistry.com/app/car/about-4.jpg"
 								className="absolute inset-0 w-full h-full object-cover object-bottom scale-110"
+								alt="Miata at the Golden Gate Bridge"
 							/>
 
 							<svg

@@ -33,8 +33,8 @@ export function TimelineItem({
 }: TimelineItemProps) {
 	const content = (
 		<>
-			<div className="text-sm text-brg-mid">{year}</div>
-			<h3 className="text-2xl font-medium text-brg">{title}</h3>
+			<p className="text-sm text-brg-mid">{year}</p>
+			<div className="text-2xl font-medium text-brg">{title}</div>
 			<p className="text-brg-mid">{units} units</p>
 		</>
 	);

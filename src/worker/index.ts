@@ -52,7 +52,7 @@ app.use('*', async (c, next) => {
 });
 
 // API test endpoint
-app.get('/', (c) => c.json({ status: 'ok' }));
+app.get('/', (c) => c.json({ error: 'Not Found' }, 404));
 
 // Mount API routes
 app.route('/cars', carsRouter);
