@@ -1,6 +1,13 @@
 # Allow all crawlers
 User-agent: *
-Allow: /
+
+# Blocked paths and domains
+Disallow: /claim/
+Disallow: https://store.miataregistry.com/
+Disallow: https://api.miataregistry.com/
+
+# Preferred domain
+Host: miataregistry.com
 
 # Sitemap location
 Sitemap: https://miataregistry.com/sitemap.xml 
