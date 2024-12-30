@@ -402,6 +402,27 @@ export const CarProfile = () => {
 							)}
 						</div>
 
+						{car && car?.current_owner?.user_id !== userId && (
+							<Button
+								onClick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+
+									openModal('register', {
+										prefilledData: {
+											edition: `${car.edition?.year} ${car.edition?.name}`,
+											vin: car.vin || '',
+											sequenceNumber:
+												car.sequence?.toString() || '',
+										},
+									});
+								}}
+								className="md:hidden w-full justify-center text-sm"
+							>
+								Claim this Car
+							</Button>
+						)}
+
 						<div className="bg-white rounded-lg overflow-hidden border border-brg-light">
 							<div className="grid grid-cols-1 md:grid-cols-3">
 								<div className="p-4 lg:p-6 md:border-r border-brg-light">
@@ -591,7 +612,7 @@ export const CarProfile = () => {
 											},
 										});
 									}}
-									className="ml-auto text-sm"
+									className="hidden md:block ml-auto text-sm"
 								>
 									Claim this Car
 								</Button>

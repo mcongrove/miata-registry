@@ -27,7 +27,7 @@ type EditionCardProps = {
 
 export const EditionCard = ({ edition }: EditionCardProps) => {
 	return (
-		<div className="block bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light cursor-pointer">
+		<div className="bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light cursor-pointer h-full flex flex-col">
 			<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
 				<Link
 					to={`/registry?filter=${encodeURIComponent(
@@ -52,7 +52,7 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 				to={`/registry?filter=${encodeURIComponent(
 					`edition:${edition.year} ${edition.name}`
 				).replace(/%20/g, '+')}`}
-				className="flex flex-col gap-4 p-4"
+				className="flex flex-col gap-4 p-4 flex-1"
 			>
 				<div className="flex flex-col">
 					<p className="text-xs text-brg-mid">

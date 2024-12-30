@@ -162,7 +162,7 @@ export const Editions = () => {
 											</span>
 										</h2>
 
-										<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+										<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-fr">
 											{editionsByGeneration[
 												generation
 											]?.map((edition) => (
