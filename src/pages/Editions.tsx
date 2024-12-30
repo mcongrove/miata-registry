@@ -22,7 +22,7 @@ import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
 import { EditionCard } from '../components/editions/EditionCard';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { TEdition } from '../types/Edition';
 
 export const Editions = () => {
@@ -30,7 +30,11 @@ export const Editions = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeGeneration, setActiveGeneration] = useState<string>('NA');
 
-	usePageTitle('Editions');
+	usePageMeta({
+		path: '/registry/editions',
+		title: 'Editions',
+		description: 'A list of all limited edition Mazda Miatas.',
+	});
 
 	useEffect(() => {
 		const loadEditions = async () => {

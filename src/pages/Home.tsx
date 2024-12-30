@@ -23,9 +23,17 @@ import { Credit } from '../components/Credit';
 import { TimelineItem } from '../components/home/TimelineItem';
 import { Icon } from '../components/Icon';
 import { useModal } from '../context/ModalContext';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export const Home = () => {
 	const { openModal } = useModal();
+
+	usePageMeta({
+		path: '/',
+		title: 'Miata Registry',
+		description:
+			'A community-driven project documenting the history of limited edition Mazda Miatas.',
+	});
 
 	return (
 		<>

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ClerkProvider } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import {
 	BrowserRouter,
@@ -58,28 +59,36 @@ const Layout = () => (
 
 function App() {
 	return (
-		<GoogleMapsProvider>
-			<ModalProvider>
-				<BrowserRouter>
-					<Routes>
-						<Route element={<Layout />}>
-							<Route path="/" element={<Home />} />
-							<Route path="/about" element={<About />} />
-							<Route path="/legal" element={<Legal />} />
-							<Route path="/registry" element={<Registry />} />
-							<Route
-								path="/registry/:id"
-								element={<CarProfile />}
-							/>
-							<Route
-								path="/registry/editions"
-								element={<Editions />}
-							/>
-						</Route>
-					</Routes>
-				</BrowserRouter>
-			</ModalProvider>
-		</GoogleMapsProvider>
+		<ClerkProvider
+			publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+			afterSignOutUrl="/"
+		>
+			<GoogleMapsProvider>
+				<ModalProvider>
+					<BrowserRouter>
+						<Routes>
+							<Route element={<Layout />}>
+								<Route path="/" element={<Home />} />
+								<Route path="/about" element={<About />} />
+								<Route path="/legal" element={<Legal />} />
+								<Route
+									path="/registry"
+									element={<Registry />}
+								/>
+								<Route
+									path="/registry/:id"
+									element={<CarProfile />}
+								/>
+								<Route
+									path="/registry/editions"
+									element={<Editions />}
+								/>
+							</Route>
+						</Routes>
+					</BrowserRouter>
+				</ModalProvider>
+			</GoogleMapsProvider>
+		</ClerkProvider>
 	);
 }
 

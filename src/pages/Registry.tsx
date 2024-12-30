@@ -23,7 +23,7 @@ import { Icon } from '../components/Icon';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TFilterOption, TFilterType } from '../types/Filters';
 
@@ -66,7 +66,11 @@ export const Registry = () => {
 	const [totalPages, setTotalPages] = useState(1);
 	const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
-	usePageTitle('Cars');
+	usePageMeta({
+		path: '/registry',
+		title: 'Cars',
+		description: 'A list of all Mazda Miatas in the Miata Registry.',
+	});
 
 	useEffect(() => {
 		const loadCars = async () => {

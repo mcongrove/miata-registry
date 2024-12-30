@@ -23,7 +23,7 @@ import { StatisticItem } from '../components/about/StatisticItem';
 import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
 import { useModal } from '../context/ModalContext';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const getCountCodeCommits = async (owner: string, repo: string) => {
 	const response = await fetch(
@@ -57,7 +57,12 @@ export const About = () => {
 		countries: number;
 	} | null>(null);
 
-	usePageTitle('About');
+	usePageMeta({
+		path: '/about',
+		title: 'About',
+		description:
+			'About the Miata Registry, a community-driven project documenting the history of limited edition Mazda Miatas.',
+	});
 
 	useEffect(() => {
 		Promise.all([

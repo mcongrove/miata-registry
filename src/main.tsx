@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ClerkProvider } from '@clerk/clerk-react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -24,11 +23,6 @@ import './index.css';
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<ClerkProvider
-			publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-			afterSignOutUrl="/"
-		>
-			<App />
-		</ClerkProvider>
+		<App />
 	</StrictMode>
 );

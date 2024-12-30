@@ -25,7 +25,7 @@ import { TimelineItem } from '../components/car/TimelineItem';
 import { Icon, IconName } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
 import { useModal } from '../context/ModalContext';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
@@ -91,11 +91,14 @@ export const CarProfile = () => {
 	const [vinDetails, setVinDetails] = useState<any>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
 
-	usePageTitle(
-		car
+	usePageMeta({
+		path: `/registry/${id}`,
+		title: car
 			? `${car.edition?.year} ${car.edition?.name}${car.sequence ? ` #${car.sequence}` : ''}`
-			: ''
-	);
+			: '',
+		description:
+			'About the Miata Registry, a community-driven project documenting the history of limited edition Mazda Miatas.',
+	});
 
 	const manufactureLocation = car?.manufacture_country
 		? formatLocation({
