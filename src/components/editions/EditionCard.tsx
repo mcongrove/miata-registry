@@ -38,7 +38,6 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 						src={`https://store.miataregistry.com/${edition.image_car_id ? `car/${edition.image_car_id}` : `edition/${edition.id}`}.jpg`}
 						alt={edition.name}
 						className="w-full h-full object-cover"
-						loading="lazy"
 					/>
 				</Link>
 

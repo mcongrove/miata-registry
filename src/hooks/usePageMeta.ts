@@ -63,5 +63,42 @@ export const usePageMeta = ({ title, description, path }: PageMetaProps) => {
 		updateMetaTag('meta[name="twitter:description"]', metaDescription);
 		updateMetaTag('meta[name="twitter:url"]', metaUrl);
 		updateMetaTag('link[rel="canonical"]', metaUrl, 'href');
+
+		// Add preload for hero image on home page
+		if (path === '/') {
+			const preloadLink = document.createElement('link');
+
+			preloadLink.rel = 'preload';
+			preloadLink.fetchPriority = 'high';
+			preloadLink.as = 'image';
+			preloadLink.href =
+				'https://store.miataregistry.com/app/car/1991SE182.jpg';
+			preloadLink.type = 'image/jpeg';
+
+			document.head.appendChild(preloadLink);
+
+			return () => {
+				document.head.removeChild(preloadLink);
+			};
+		}
+
+		// Add preload for car image on registry detail pages
+		const registryMatch = path?.match(/^\/registry\/(.+)$/);
+
+		if (registryMatch) {
+			const preloadLink = document.createElement('link');
+
+			preloadLink.rel = 'preload';
+			preloadLink.fetchPriority = 'high';
+			preloadLink.as = 'image';
+			preloadLink.href = `https://store.miataregistry.com/car/${registryMatch[1]}.jpg`;
+			preloadLink.type = 'image/jpeg';
+
+			document.head.appendChild(preloadLink);
+
+			return () => {
+				document.head.removeChild(preloadLink);
+			};
+		}
 	}, [metaTitle, metaDescription, metaUrl]);
 };
