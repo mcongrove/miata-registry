@@ -19,6 +19,7 @@
 import { useAuth, useClerk } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Field } from '../form/Field';
+import { Location } from '../form/Location';
 import { SelectStyles } from '../form/Select';
 import { TextField } from '../form/TextField';
 import { Icon } from '../Icon';
@@ -85,20 +86,19 @@ export function RegisterModal({
 		}
 	}, [editions, prefilledData]);
 
-	const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+		if (e) {
+			e.preventDefault();
+		}
 
-		await submitTip();
-	};
-
-	const submitTip = async () => {
 		setLoading(true);
 
 		try {
-			const form = document.querySelector('form');
+			const form = document.querySelector('form#registerForm');
+
 			if (!form) return;
 
-			const formData = new FormData(form);
+			const formData = new FormData(form as HTMLFormElement);
 
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
@@ -256,7 +256,7 @@ export function RegisterModal({
 			}
 			action={{
 				text: 'Submit',
-				onClick: submitTip,
+				onClick: () => handleSubmit(),
 				loading,
 			}}
 		>
@@ -267,7 +267,11 @@ export function RegisterModal({
 				{prefilledData?.edition ? 'claim' : 'register'} your Miata.
 			</p>
 
-			<form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+			<form
+				id="registerForm"
+				onSubmit={handleSubmit}
+				className="flex flex-col gap-4"
+			>
 				{isSignedIn && (
 					<input
 						id="userId"
@@ -380,11 +384,10 @@ export function RegisterModal({
 							required
 							className="w-full"
 						>
-							<TextField
+							<Location
 								id="location"
 								name="location"
-								type="text"
-								placeholder="City, State, Country"
+								placeholder="City, Country"
 							/>
 						</Field>
 					</div>

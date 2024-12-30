@@ -174,7 +174,7 @@ export const Footer = () => {
 							href="https://mattcongrove.com"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-brg-mid"
+							className="text-brg-mid underline"
 						>
 							Matthew Congrove
 						</a>
@@ -183,7 +183,7 @@ export const Footer = () => {
 							href="https://github.com/mcongrove/miata-registry"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-brg-mid"
+							className="text-brg-mid underline"
 						>
 							Source code
 						</a>{' '}
@@ -192,7 +192,7 @@ export const Footer = () => {
 							href="https://www.gnu.org/licenses/agpl-3.0.en.html"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-brg-mid"
+							className="text-brg-mid underline"
 						>
 							AGPL-3
 						</a>

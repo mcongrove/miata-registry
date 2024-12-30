@@ -56,20 +56,19 @@ export function TipModal({
 		loadEditions();
 	}, []);
 
-	const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+		if (e) {
+			e.preventDefault();
+		}
 
-		await submitTip();
-	};
-
-	const submitTip = async () => {
 		setLoading(true);
 
 		try {
-			const form = document.querySelector('form');
+			const form = document.querySelector('form#tipForm');
+
 			if (!form) return;
 
-			const formData = new FormData(form);
+			const formData = new FormData(form as HTMLFormElement);
 
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
@@ -177,11 +176,15 @@ export function TipModal({
 			title="Submit a Tip"
 			action={{
 				text: 'Submit',
-				onClick: submitTip,
+				onClick: () => handleSubmit(),
 				loading,
 			}}
 		>
-			<form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+			<form
+				id="tipForm"
+				onSubmit={handleSubmit}
+				className="flex flex-col gap-4"
+			>
 				<div className="space-y-4">
 					<Field id="edition" label="Edition" required>
 						{!showOtherInput ? (

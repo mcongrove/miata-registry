@@ -25,6 +25,7 @@ import {
 	Routes,
 	useLocation,
 } from 'react-router-dom';
+import { CSP } from './components/CSP';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { GoogleMapsProvider } from './context/GoogleMapsContext';
@@ -63,6 +64,7 @@ function App() {
 			publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
 			afterSignOutUrl="/"
 		>
+			<CSP />
 			<GoogleMapsProvider>
 				<ModalProvider>
 					<BrowserRouter>
