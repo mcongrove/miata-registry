@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { twMerge } from 'tailwind-merge';
 import { TFilterOption, TFilterType } from '../../types/Filters';
 
 interface FilterLabelProps {
@@ -45,9 +46,10 @@ export const FilterLabel = ({
 		/>
 
 		<div
-			className={`size-3 rounded-full border ${
+			className={twMerge(
+				'size-3 rounded-full border',
 				isSelected ? 'bg-brg border-brg' : 'bg-white border-brg-border'
-			}`}
+			)}
 		/>
 
 		<span>{value}</span>

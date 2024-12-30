@@ -18,6 +18,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { twMerge } from 'tailwind-merge';
 import { formatLocation } from '../utils/geo';
 import { Icon } from './Icon';
 
@@ -46,10 +47,19 @@ const CreditText = ({
 	direction: 'left' | 'right';
 }) => (
 	<div
-		className={`flex items-center overflow-hidden bg-white w-0 h-10 z-10 group-hover:w-auto ${direction === 'left' ? 'rounded-l-full -mr-5' : 'rounded-r-full -ml-5'}`}
+		className={twMerge(
+			'flex items-center overflow-hidden bg-white w-0 h-10 z-10 group-hover:w-auto',
+			direction === 'left'
+				? 'rounded-l-full -mr-5'
+				: 'rounded-r-full -ml-5'
+		)}
 	>
 		<div
-			className={`text-brg py-2 ${direction === 'left' ? 'pr-5 pl-4' : 'pl-5 pr-4'} whitespace-nowrap text-[10px]`}
+			className={twMerge(
+				'text-brg py-2',
+				direction === 'left' ? 'pr-5 pl-4' : 'pl-5 pr-4',
+				'whitespace-nowrap text-[10px]'
+			)}
 		>
 			<p>
 				{car?.year} {car?.editionName}
@@ -132,16 +142,18 @@ export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 			to={`/registry/${id}`}
 			onClick={handleClick}
 			data-credit-id={id}
-			className={`group flex items-center h-10 opacity-60 hover:opacity-100 ${
-				isExpanded ? 'opacity-100' : ''
-			} ${className}`}
+			className={twMerge(
+				'group flex items-center h-10 opacity-60 hover:opacity-100',
+				isExpanded ? 'opacity-100' : '',
+				className
+			)}
 		>
 			{direction === 'left' && (
 				<CreditText car={car} direction={direction} />
 			)}
 
 			<div className="bg-white p-3 rounded-full z-20 relative">
-				<Icon name="car" className="!size-4 text-brg" />
+				<Icon name="car" className="size-4 text-brg" />
 			</div>
 
 			{direction === 'right' && (

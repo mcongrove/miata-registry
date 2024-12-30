@@ -29,6 +29,7 @@ import {
 	useInteractions,
 } from '@floating-ui/react';
 import { useRef, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 type TooltipProps = {
 	children: React.ReactNode;
@@ -80,13 +81,19 @@ export const Tooltip = ({
 					<div
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className={`bg-brg-dark text-white px-2 py-1 rounded text-xs z-[52] ${className}`}
+						className={twMerge(
+							'bg-brg-dark text-white px-2 py-1 rounded text-xs z-[52]',
+							className
+						)}
 					>
 						{content}
 
 						<div
 							ref={arrowRef}
-							className={`absolute bg-brg-dark size-2 rotate-45 -z-10 ${className}`}
+							className={twMerge(
+								'absolute bg-brg-dark size-2 rotate-45 -z-10',
+								className
+							)}
 							style={{
 								position: 'absolute',
 								left: middlewareData.arrow?.x ?? '',

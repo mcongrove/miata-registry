@@ -18,7 +18,7 @@
 
 import { ButtonHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
-
+import { twMerge } from 'tailwind-merge';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	withArrow?: boolean;
 	variant?: 'primary' | 'secondary' | 'tertiary';
@@ -34,15 +34,16 @@ export const Button = ({
 	href,
 	...props
 }: ButtonProps) => {
-	const bgColor =
+	const buttonClassName = twMerge(
+		'group flex items-center font-medium text-sm lg:text-base py-2 px-3 lg:py-3 lg:px-4 rounded-lg transition-colors',
 		variant === 'primary'
 			? 'bg-brg hover:bg-brg/90'
 			: variant === 'secondary'
 				? 'bg-brg-mid hover:bg-brg-mid/90'
-				: '';
-	const textColor =
-		variant === 'tertiary' ? 'text-brg hover:text-brg-mid' : 'text-white';
-	const buttonClassName = `group flex items-center ${bgColor} ${textColor} font-medium text-sm lg:text-base py-2 px-3 lg:py-3 lg:px-4 rounded-lg transition-colors ${className || ''}`;
+				: '',
+		variant === 'tertiary' ? 'text-brg hover:text-brg-mid' : 'text-white',
+		className
+	);
 
 	if (href) {
 		return (

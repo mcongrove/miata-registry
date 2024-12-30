@@ -70,7 +70,6 @@ export const Map = ({
 				},
 				[]
 			);
-			console.log(markers);
 
 			setMarkers(markers);
 		};

@@ -17,6 +17,7 @@
  */
 
 import { ReactNode, useEffect } from 'react';
+import { twMerge } from 'tailwind-merge';
 import { Button } from './Button';
 import { Icon } from './Icon';
 
@@ -70,15 +71,19 @@ export function Modal({
 				<div className="p-6">{children}</div>
 
 				<div
-					className={`flex gap-2 px-6 pb-6 ${hideCancel ? 'justify-center' : 'justify-end'}`}
+					className={twMerge(
+						'flex gap-2 px-6 pb-6',
+						hideCancel ? 'justify-center' : 'justify-end'
+					)}
 				>
 					{!hideCancel && (
 						<Button
 							onClick={onClose}
 							variant="tertiary"
-							className={`text-brg-border text-sm ${
+							className={twMerge(
+								'text-brg-border text-sm',
 								action?.loading ? 'hidden' : ''
-							}`}
+							)}
 						>
 							Cancel
 						</Button>

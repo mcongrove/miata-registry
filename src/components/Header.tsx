@@ -24,6 +24,7 @@ import {
 } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { twMerge } from 'tailwind-merge';
 import Symbol from '../assets/symbol.svg?react';
 import { useModal } from '../context/ModalContext';
 import { Button } from './Button';
@@ -148,13 +149,17 @@ const CarsList = () => {
 					<Link
 						key={car.id}
 						to={`/registry/${car.id}`}
-						className={`${
+						className={twMerge(
+							'text-[13px] group flex flex-col cursor-pointer mb-1 py-1.5 px-2.5 -mx-2.5 rounded-md hover:bg-[#F7F7F7] transition-colors',
 							car.destroyed ? 'text-[#EF4444]' : 'text-[#212126]'
-						} text-[13px] group flex flex-col cursor-pointer mb-1 py-1.5 px-2.5 -mx-2.5 rounded-md hover:bg-[#F7F7F7] transition-colors`}
+						)}
 					>
 						<div className="flex items-center gap-1">
 							<span
-								className={`whitespace-nowrap ${car.destroyed ? 'line-through' : ''}`}
+								className={twMerge(
+									'whitespace-nowrap',
+									car.destroyed ? 'line-through' : ''
+								)}
 							>
 								{car.year} {car.edition}
 								{car.sequence ? ` #${car.sequence}` : ''}
@@ -177,11 +182,12 @@ const CarsList = () => {
 						</div>
 
 						<div
-							className={`w-fit ${
+							className={twMerge(
+								'w-fit',
 								car.destroyed
 									? 'text-[#747686]/50'
 									: 'text-[#747686]'
-							}`}
+							)}
 						>
 							{car.vin}
 						</div>
@@ -237,7 +243,7 @@ export const Header = () => {
 							labelIcon={
 								<Icon
 									name="car"
-									className="!size-3.5 !text-[#616161]"
+									className="size-3.5 text-[#616161]"
 								/>
 							}
 							open="cars"
@@ -249,7 +255,7 @@ export const Header = () => {
 						labelIcon={
 							<Icon
 								name="car"
-								className="!size-3.5 !text-[#2F3037]"
+								className="size-3.5 text-[#2F3037]"
 							/>
 						}
 						url="cars"

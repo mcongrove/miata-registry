@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface StatisticItemProps {
 	className?: string;
@@ -45,7 +46,7 @@ export const StatisticItem = ({
 	}, [value]);
 
 	return (
-		<div className={`flex flex-col items-center gap-2 ${className}`}>
+		<div className={twMerge('flex flex-col items-center gap-2', className)}>
 			{loading || !count ? (
 				<div className="h-12 w-16 bg-brg-light animate-pulse rounded" />
 			) : (

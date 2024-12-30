@@ -81,7 +81,7 @@ export const Editions = () => {
 					>
 						<Icon
 							name="info-circle"
-							className="!size-4 lg:!size-5 cursor-help"
+							className="size-4 lg:!size-5 cursor-help"
 						/>
 					</Tooltip>
 				</h1>

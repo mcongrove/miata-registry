@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { twMerge } from 'tailwind-merge';
+
 export type IconName =
 	| 'car'
 	| 'destroyed'
@@ -35,7 +37,11 @@ interface IconProps {
 }
 
 export function Icon({ name, className, onClick }: IconProps) {
-	const combinedClassName = `size-5 text-brg-mid ${onClick ? 'cursor-pointer' : ''} ${className}`;
+	const combinedClassName = twMerge(
+		'size-5 text-brg-mid',
+		onClick ? 'cursor-pointer' : '',
+		className
+	);
 
 	switch (name) {
 		case 'car':

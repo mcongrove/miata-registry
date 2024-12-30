@@ -19,10 +19,12 @@
 import { useAuth } from '@clerk/clerk-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Button } from '../components/Button';
 import { Map } from '../components/car/Map';
 import { TimelineItem } from '../components/car/TimelineItem';
 import { Icon, IconName } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
+import { useModal } from '../context/ModalContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
@@ -84,6 +86,7 @@ const EditButton = ({
 export const CarProfile = () => {
 	const { id } = useParams();
 	const { userId } = useAuth();
+	const { openModal } = useModal();
 	const [car, setCar] = useState<TCar | null>(null);
 	const [vinDetails, setVinDetails] = useState<any>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
@@ -427,7 +430,7 @@ export const CarProfile = () => {
 										<Tooltip content="Information retrieved based on VIN; may be inaccurate">
 											<Icon
 												name="info-circle"
-												className="!size-3.5 !text-brg-border"
+												className="size-3.5 text-brg-border"
 											/>
 										</Tooltip>
 									</div>
@@ -526,36 +529,58 @@ export const CarProfile = () => {
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
-						{car?.current_owner?.user_id === userId && (
+						{car?.current_owner?.user_id === userId ? (
 							<div className="hidden md:grid grid-cols-4 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
 								<EditButton
 									className="scale-90"
-									color="!text-gray-700"
+									color="text-gray-700"
 									icon="edit"
 									text="Edit Car"
 								/>
 
 								<EditButton
 									className="scale-110"
-									color="!text-green-700"
+									color="text-green-700"
 									icon="sold"
 									text="Sold"
 								/>
 
 								<EditButton
 									className="scale-110"
-									color="!text-red-700"
+									color="text-red-700"
 									icon="destroyed"
 									text="Destroyed"
 								/>
 
 								<EditButton
-									color="!text-gray-500"
+									color="text-gray-500"
 									disabled
 									icon="qr"
 									text="Get QR Code"
 								/>
 							</div>
+						) : (
+							car && (
+								<Button
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+
+										openModal('register', {
+											prefilledData: {
+												edition: `${car.edition?.year} ${car.edition?.name}`,
+												vin: car.vin || '',
+												sequenceNumber:
+													car.sequence?.toString() ||
+													'',
+											},
+										});
+									}}
+									className="ml-auto text-sm"
+								>
+									Claim this Car
+								</Button>
+							)
 						)}
 
 						<div className="bg-white rounded-lg border border-brg-light overflow-hidden">

@@ -17,6 +17,7 @@
  */
 
 import { ChangeEvent, useEffect, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import { TFilterOption } from '../../types/Filters';
 import { Icon } from '../Icon';
 import { Select } from '../Select';
@@ -137,13 +138,11 @@ export const FilterSidebar = ({
 	return (
 		<>
 			<div
-				className={`
-					fixed lg:relative inset-y-0 top-20 lg:top-0 left-0 z-50 lg:z-auto w-64
-					lg:translate-x-0 transition-transform duration-300 overflow-y-auto
-					max-h-[calc(100vh-5rem)] lg:max-h-full
-					${isOpen ? 'translate-x-0' : '-translate-x-full'}
-					${className}
-				`}
+				className={twMerge(
+					'fixed lg:relative inset-y-0 top-20 lg:top-0 left-0 z-50 lg:z-auto w-64 lg:translate-x-0 transition-transform duration-300 overflow-y-auto max-h-[calc(100vh-5rem)] lg:max-h-full',
+					isOpen ? 'translate-x-0' : '-translate-x-full',
+					className
+				)}
 			>
 				<div className="flex flex-col h-full lg:border lg:rounded-md border-brg-light shadow-2xl lg:shadow-none bg-white">
 					<div className="lg:hidden flex items-center justify-between p-3 pr-4 border-b border-brg-light">
@@ -163,7 +162,7 @@ export const FilterSidebar = ({
 								onClick={onClose}
 								className="text-brg-mid hover:text-brg"
 							>
-								<Icon name="x" className="!size-4" />
+								<Icon name="x" className="size-4" />
 							</button>
 						</div>
 					</div>
@@ -291,8 +290,10 @@ export const FilterSidebar = ({
 			{/* Overlay for mobile */}
 			{onClose && (
 				<div
-					className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300
-						${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+					className={twMerge(
+						'fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300',
+						isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+					)}
 					onClick={onClose}
 					aria-hidden="true"
 				/>

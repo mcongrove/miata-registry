@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { twMerge } from 'tailwind-merge';
+
 interface TimelineItemProps {
 	name?: string | React.ReactNode;
 	dateRange?: string | React.ReactNode;
@@ -35,21 +37,34 @@ export const TimelineItem = ({
 		<div className="relative flex gap-6">
 			<div className="relative">
 				<div
-					className={`size-3 ${isActive ? 'bg-brg' : 'bg-brg-border'} rounded-full mt-1.5 relative z-10`}
+					className={twMerge(
+						'size-3 rounded-full mt-1.5 relative z-10',
+						isActive ? 'bg-brg' : 'bg-brg-border'
+					)}
 				/>
 				<div
-					className={`
-						absolute w-0.5 bg-brg-light top-3 left-[5px]
-						${showConnector ? 'h-full' : 'h-0'}
-					`}
+					className={twMerge(
+						'absolute w-0.5 bg-brg-light top-3 left-[5px]',
+						showConnector ? 'h-full' : 'h-0'
+					)}
 				/>
 			</div>
 
 			<div
-				className={`space-y-0.5 flex-1 ${showConnector ? 'pb-3 lg:pb-6' : ''}`}
+				className={twMerge(
+					'space-y-0.5 flex-1',
+					showConnector ? 'pb-3 lg:pb-6' : ''
+				)}
 			>
 				<p
-					className={`font-medium ${!name ? 'text-brg-border' : !isActive ? 'text-brg-mid' : ''}`}
+					className={twMerge(
+						'font-medium',
+						!name
+							? 'text-brg-border'
+							: !isActive
+								? 'text-brg-mid'
+								: ''
+					)}
 				>
 					{name || 'Unknown'}
 				</p>

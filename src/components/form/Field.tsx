@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { twMerge } from 'tailwind-merge';
+
 interface FieldProps {
 	caption?: string;
 	children: React.ReactNode;
@@ -35,7 +37,7 @@ export const Field = ({
 	label,
 	required = false,
 }: FieldProps) => (
-	<div className={`flex flex-col gap-1 ${className}`}>
+	<div className={twMerge('flex flex-col gap-1', className)}>
 		<label htmlFor={id} className="text-sm font-medium text-brg">
 			<span>
 				{label} {required && <span className="text-red-500">*</span>}

@@ -17,6 +17,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { twMerge } from 'tailwind-merge';
 import { useModal } from '../../context/ModalContext';
 import { TCar } from '../../types/Car';
 import { colorMap } from '../../utils/colorMap';
@@ -59,9 +60,10 @@ export const RegistryTable = ({
 
 	return (
 		<div
-			className={`bg-white rounded-md border border-brg-light text-brg overflow-hidden h-[calc(100vh-158px)] lg:h-[calc(100vh-${
-				isFiltered ? '280' : '236'
-			}px)]`}
+			className={twMerge(
+				'bg-white rounded-md border border-brg-light text-brg overflow-hidden',
+				isFiltered ? 'lg:h-[calc(100vh-280' : 'lg:h-[calc(100vh-236'
+			)}
 		>
 			<div className="overflow-auto h-full relative">
 				<table className="min-w-full border-collapse">
@@ -70,7 +72,10 @@ export const RegistryTable = ({
 							{columns.map(({ header, key, width }) => (
 								<th
 									key={header}
-									className={`${width} px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light whitespace-nowrap`}
+									className={twMerge(
+										width,
+										'px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light whitespace-nowrap'
+									)}
 									onClick={handleSort(key)}
 								>
 									<div className="flex items-center">
@@ -214,7 +219,10 @@ export const RegistryTable = ({
 											<span className="flex items-center gap-2">
 												<img
 													src={`https://flagcdn.com/16x12/${car.current_owner?.country.toLowerCase()}.png`}
-													alt={`${car.current_owner?.country} flag`}
+													alt={
+														car.current_owner
+															?.country
+													}
 													className="w-4 h-3"
 												/>
 												{new Intl.DisplayNames(['en'], {

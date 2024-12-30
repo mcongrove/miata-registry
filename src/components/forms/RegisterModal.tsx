@@ -294,7 +294,7 @@ export function RegisterModal({
 								className={SelectStyles(
 									false,
 									'',
-									'w-full border-brg-light !text-sm'
+									'w-full border-brg-light text-sm'
 								)}
 								name="edition"
 								required
@@ -324,7 +324,7 @@ export function RegisterModal({
 
 								<Icon
 									name="x"
-									className="!size-3.5"
+									className="size-3.5"
 									onClick={() => setShowOtherInput(false)}
 								/>
 							</div>

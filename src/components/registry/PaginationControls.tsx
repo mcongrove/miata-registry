@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { twMerge } from 'tailwind-merge';
 import { Select } from '../Select';
 
 interface PaginationControlsProps {
@@ -52,9 +53,11 @@ export const PaginationControls = ({
 
 	return (
 		<div
-			className={`flex justify-between items-center gap-2 text-sm ${
-				isLoading ? 'opacity-50 pointer-events-none' : ''
-			} ${className}`}
+			className={twMerge(
+				'flex justify-between items-center gap-2 text-sm',
+				isLoading ? 'opacity-50 pointer-events-none' : '',
+				className
+			)}
 		>
 			<div className="text-brg-mid text-xs">
 				{totalItems > 0 ? (

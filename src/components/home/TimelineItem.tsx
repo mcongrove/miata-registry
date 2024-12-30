@@ -16,40 +16,45 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { twMerge } from 'tailwind-merge';
+
 interface TimelineItemProps {
-    year: string;
-    title: string;
-    units: string;
-    position: 'left' | 'right';
+	year: string;
+	title: string;
+	units: string;
+	position: 'left' | 'right';
 }
 
 export function TimelineItem({
-    year,
-    title,
-    units,
-    position,
+	year,
+	title,
+	units,
+	position,
 }: TimelineItemProps) {
-    const content = (
-        <>
-            <div className="text-sm text-brg-mid">{year}</div>
-            <h3 className="text-2xl font-medium text-brg">{title}</h3>
-            <p className="text-brg-mid">{units} units</p>
-        </>
-    );
+	const content = (
+		<>
+			<div className="text-sm text-brg-mid">{year}</div>
+			<h3 className="text-2xl font-medium text-brg">{title}</h3>
+			<p className="text-brg-mid">{units} units</p>
+		</>
+	);
 
-    return (
-        <div className="relative flex items-center">
-            <div
-                className={`w-1/2 ${position === 'left' ? 'pr-16 text-right' : ''}`}
-            >
-                {position === 'left' && content}
-            </div>
+	return (
+		<div className="relative flex items-center">
+			<div
+				className={twMerge(
+					'w-1/2',
+					position === 'left' ? 'pr-16 text-right' : ''
+				)}
+			>
+				{position === 'left' && content}
+			</div>
 
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-brg rounded-full" />
+			<div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-brg rounded-full" />
 
-            <div className={`w-1/2 ${position === 'right' ? 'pl-16' : ''}`}>
-                {position === 'right' && content}
-            </div>
-        </div>
-    );
+			<div className={`w-1/2 ${position === 'right' ? 'pl-16' : ''}`}>
+				{position === 'right' && content}
+			</div>
+		</div>
+	);
 }
