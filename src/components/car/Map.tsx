@@ -23,69 +23,60 @@ import {
 	useJsApiLoader,
 } from '@react-google-maps/api';
 import { useEffect, useState } from 'react';
-
-interface Location {
-	name: string;
-	address: string;
-}
-
-interface MapProps {
-	locations: Location[];
-	hasOwners: boolean;
-}
+import { TMapLocation } from '../../types/Location';
 
 interface MarkerData {
 	name: string;
 	position: google.maps.LatLngLiteral;
 }
 
-export const Map = ({ locations, hasOwners = false }: MapProps) => {
-	const [markers, setMarkers] = useState<MarkerData[]>([]);
+export const Map = ({
+	locations,
+	hasOwners = false,
+}: {
+	locations?: (TMapLocation | null)[];
+	hasOwners: boolean;
+}) => {
 	const { isLoaded } = useJsApiLoader({
 		id: 'google-map-script',
 		googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 	});
+	const [markers, setMarkers] = useState<MarkerData[]>([]);
 
 	useEffect(() => {
-		const geocodeLocations = async () => {
-			const validLocations = locations.filter((loc) =>
-				loc.address?.trim()
+		const markLocations = async () => {
+			if (!locations) return;
+
+			const validLocations = locations.filter(
+				(location): location is TMapLocation => location !== null
 			);
 
-			const geocoded = await Promise.all(
-				validLocations.map(async (loc) => {
-					try {
-						const response = await fetch(
-							`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-								loc.address
-							)}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
-						);
-						const data = await response.json();
+			const markers = validLocations.reduce(
+				(acc: MarkerData[], location: TMapLocation) => {
+					const lastMarker = acc[acc.length - 1];
 
-						if (data.results?.[0]?.geometry?.location) {
-							const position = data.results[0].geometry.location;
-
-							return {
-								name: loc.name,
-								position: position,
-							};
-						}
-					} catch (error) {
-						console.error('Geocoding error:', error);
+					if (lastMarker && lastMarker.name === location.name) {
+						return acc;
 					}
-					return null;
-				})
-			);
 
-			const validMarkers = geocoded.filter(
-				(m): m is MarkerData => m !== null
+					acc.push({
+						name: location.name || '',
+						position: {
+							lat: location.latitude || 0,
+							lng: location.longitude || 0,
+						},
+					});
+					return acc;
+				},
+				[]
 			);
+			console.log(markers);
 
-			setMarkers(validMarkers);
+			setMarkers(markers);
 		};
 
 		if (isLoaded) {
-			geocodeLocations();
+			markLocations();
 		}
 	}, [locations, isLoaded]);
 

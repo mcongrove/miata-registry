@@ -17,7 +17,7 @@
  */
 
 import { useAuth } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Map } from '../components/car/Map';
 import { TimelineItem } from '../components/car/TimelineItem';
@@ -27,13 +27,8 @@ import { usePageTitle } from '../hooks/usePageTitle';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
-import { countryNameMap, formatLocation } from '../utils/geo';
+import { country, formatLocation, state } from '../utils/geo';
 import { toPrettyDate, toTitleCase } from '../utils/global';
-
-interface MapLocation {
-	name: string;
-	address: string;
-}
 
 export const getVinDetails = async (vin: string, year: number) => {
 	try {
@@ -247,6 +242,39 @@ export const CarProfile = () => {
 			/>
 		));
 	};
+
+	const mapLocations = useMemo(() => {
+		if (!car) return [];
+
+		return [
+			car.manufacture_country ? country(car.manufacture_country) : null,
+			car.shipping_state
+				? state(car.shipping_state)
+				: car.shipping_country
+					? country(car.shipping_country as any)
+					: null,
+			car.sale_dealer_state
+				? state(car.sale_dealer_state)
+				: car.sale_dealer_country
+					? country(car.sale_dealer_country as any)
+					: null,
+			...timelineOwners
+				.slice()
+				.reverse()
+				.map((owner) =>
+					owner.state
+						? state(owner.state)
+						: owner.country
+							? country(owner.country as any)
+							: null
+				),
+		].filter((location) => location !== null);
+	}, [
+		car?.manufacture_country,
+		car?.sale_dealer_state,
+		car?.sale_dealer_country,
+		timelineOwners,
+	]);
 
 	return (
 		<main className="flex-1 pt-20 pb-0 lg:pb-16">
@@ -539,69 +567,7 @@ export const CarProfile = () => {
 												? car.owner_history.length > 0
 												: false
 										}
-										locations={[
-											car?.manufacture_country
-												? {
-														name: 'Manufactured',
-														address: formatLocation(
-															{
-																city:
-																	car.manufacture_city ||
-																	'',
-																state: '',
-																country:
-																	car.manufacture_country
-																		? countryNameMap[
-																				car
-																					.manufacture_country
-																			]
-																		: '',
-															}
-														),
-													}
-												: null,
-											car?.sale_dealer_name
-												? {
-														name: car.sale_dealer_name,
-														address: formatLocation(
-															{
-																city: car.sale_dealer_city,
-																state: car.sale_dealer_state,
-																country:
-																	car.sale_dealer_country ||
-																	'',
-															}
-														),
-													}
-												: null,
-											...timelineOwners
-												.slice()
-												.reverse()
-												.map((owner) =>
-													owner.city
-														? {
-																name:
-																	owner.name ||
-																	'Unknown Owner',
-																address:
-																	formatLocation(
-																		{
-																			city: owner.city,
-																			state: owner.state,
-																			country:
-																				owner.country ||
-																				'',
-																		}
-																	),
-															}
-														: null
-												),
-										].filter(
-											(
-												location
-											): location is MapLocation =>
-												location !== null
-										)}
+										locations={mapLocations}
 									/>
 								) : (
 									<div className="w-full h-full bg-brg-light animate-pulse" />

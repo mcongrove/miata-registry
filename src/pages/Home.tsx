@@ -382,15 +382,14 @@ export const Home = () => {
 									detail helps build our registry.
 								</p>
 
-								<Link to="/about#contact">
-									<Button
-										variant="secondary"
-										withArrow
-										className="text-xs mt-2"
-									>
-										Submit a Tip
-									</Button>
-								</Link>
+								<Button
+									variant="secondary"
+									withArrow
+									className="text-xs mt-2"
+									onClick={() => openModal('tip')}
+								>
+									Submit a Tip
+								</Button>
 							</div>
 						</div>
 					</div>

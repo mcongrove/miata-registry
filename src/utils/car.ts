@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { countryCodeMap } from './geo';
+import { countryNameToCode } from './geo';
 import { toTitleCase } from './global';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,8 +50,7 @@ export const formatPlantLocation = (details: any) => {
 		? toTitleCase(details?.PlantCity?.toLowerCase())
 		: '';
 
-	const country =
-		countryCodeMap[details?.PlantCountry] || details?.PlantCountry;
+	const country = countryNameToCode(details?.PlantCountry);
 
 	return city && country ? `${city}, ${country}` : '';
 };

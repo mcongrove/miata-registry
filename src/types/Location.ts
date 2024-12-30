@@ -21,3 +21,9 @@ export type TLocation = {
 	country: string;
 	state?: string;
 };
+
+export type TMapLocation = {
+	name: string;
+	latitude: number;
+	longitude: number;
+};
