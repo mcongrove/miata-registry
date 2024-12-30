@@ -16,14 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useEffect, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from '../components/Button';
 import { Credit } from '../components/Credit';
-import { TimelineItem } from '../components/home/TimelineItem';
 import { Icon } from '../components/Icon';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+
+const TimelineItem = lazy(() =>
+	import('../components/home/TimelineItem').then((module) => ({
+		default: module.TimelineItem,
+	}))
+);
 
 export const Home = () => {
 	const { openModal } = useModal();

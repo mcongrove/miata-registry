@@ -17,11 +17,9 @@
  */
 
 import { useAuth } from '@clerk/clerk-react';
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
-import { Map } from '../components/car/Map';
-import { TimelineItem } from '../components/car/TimelineItem';
 import { Icon, IconName } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
 import { useModal } from '../context/ModalContext';
@@ -31,6 +29,16 @@ import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
 import { country, formatLocation, state } from '../utils/geo';
 import { toPrettyDate, toTitleCase } from '../utils/global';
+
+const Map = lazy(() =>
+	import('../components/car/Map').then((module) => ({ default: module.Map }))
+);
+
+const TimelineItem = lazy(() =>
+	import('../components/car/TimelineItem').then((module) => ({
+		default: module.TimelineItem,
+	}))
+);
 
 export const getVinDetails = async (vin: string, year: number) => {
 	try {

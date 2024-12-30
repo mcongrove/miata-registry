@@ -16,20 +16,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { createContext, ReactNode, useContext, useState } from 'react';
-import { ExportModal } from '../components/forms/ExportModal';
-import { NewsModal } from '../components/forms/NewsModal';
-import { RegisterModal } from '../components/forms/RegisterModal';
-import { TipModal } from '../components/forms/TipModal';
+import {
+	createContext,
+	lazy,
+	ReactNode,
+	Suspense,
+	useContext,
+	useState,
+} from 'react';
 import { TModalState, TModalType } from '../types/Modal';
 
-const MODAL_COMPONENTS: Record<TModalType, React.ComponentType<any>> = {
-	claim: RegisterModal,
-	export: ExportModal,
-	news: NewsModal,
-	register: RegisterModal,
-	tip: TipModal,
-};
+const MODAL_COMPONENTS = {
+	register: lazy(() =>
+		import('../components/forms/RegisterModal').then((module) => ({
+			default: module.RegisterModal,
+		}))
+	),
+	export: lazy(() =>
+		import('../components/forms/ExportModal').then((module) => ({
+			default: module.ExportModal,
+		}))
+	),
+	tip: lazy(() =>
+		import('../components/forms/TipModal').then((module) => ({
+			default: module.TipModal,
+		}))
+	),
+	news: lazy(() =>
+		import('../components/forms/NewsModal').then((module) => ({
+			default: module.NewsModal,
+		}))
+	),
+} as const;
+
+type TModalComponentKeys = keyof typeof MODAL_COMPONENTS;
 
 type ModalContextType = {
 	openModal: (type: TModalType, props?: Record<string, unknown>) => void;
@@ -53,14 +73,23 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 	const renderModal = () => {
 		if (!modalState.type) return null;
 
-		const ModalComponent = MODAL_COMPONENTS[modalState.type];
+		const ModalComponent =
+			MODAL_COMPONENTS[modalState.type as TModalComponentKeys];
 
 		return (
-			<ModalComponent
-				isOpen={true}
-				onClose={closeModal}
-				{...modalState.props}
-			/>
+			<Suspense
+				fallback={
+					<div className="w-full h-full flex items-center justify-center">
+						Loading...
+					</div>
+				}
+			>
+				<ModalComponent
+					isOpen={true}
+					onClose={closeModal}
+					{...modalState.props}
+				/>
+			</Suspense>
 		);
 	};
 

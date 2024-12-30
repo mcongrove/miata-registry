@@ -17,7 +17,7 @@
  */
 
 import { ClerkProvider } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import {
 	BrowserRouter,
 	Outlet,
@@ -30,12 +30,27 @@ import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { GoogleMapsProvider } from './context/GoogleMapsContext';
 import { ModalProvider } from './context/ModalContext';
-import { About } from './pages/About';
-import { CarProfile } from './pages/Car';
-import { Editions } from './pages/Editions';
 import { Home } from './pages/Home';
-import { Legal } from './pages/Legal';
-import { Registry } from './pages/Registry';
+
+const About = lazy(() =>
+	import('./pages/About').then((module) => ({ default: module.About }))
+);
+
+const CarProfile = lazy(() =>
+	import('./pages/Car').then((module) => ({ default: module.CarProfile }))
+);
+
+const Editions = lazy(() =>
+	import('./pages/Editions').then((module) => ({ default: module.Editions }))
+);
+
+const Legal = lazy(() =>
+	import('./pages/Legal').then((module) => ({ default: module.Legal }))
+);
+
+const Registry = lazy(() =>
+	import('./pages/Registry').then((module) => ({ default: module.Registry }))
+);
 
 function ScrollToTop() {
 	const { pathname } = useLocation();
@@ -49,14 +64,14 @@ function ScrollToTop() {
 
 const Layout = () => (
 	<div className="min-h-screen flex flex-col">
-		<div>
-			<ScrollToTop />
-			<Header />
-			<Outlet />
-			<Footer />
-		</div>
+		<ScrollToTop />
+		<Header />
+		<Outlet />
+		<Footer />
 	</div>
 );
+
+const Fallback = () => <div className="min-h-screen" />;
 
 function App() {
 	return (
@@ -72,19 +87,45 @@ function App() {
 						<Routes>
 							<Route element={<Layout />}>
 								<Route path="/" element={<Home />} />
-								<Route path="/about" element={<About />} />
-								<Route path="/legal" element={<Legal />} />
+								<Route
+									path="/about"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<About />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/legal"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Legal />
+										</Suspense>
+									}
+								/>
 								<Route
 									path="/registry"
-									element={<Registry />}
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Registry />
+										</Suspense>
+									}
 								/>
 								<Route
 									path="/registry/:id"
-									element={<CarProfile />}
+									element={
+										<Suspense fallback={<Fallback />}>
+											<CarProfile />
+										</Suspense>
+									}
 								/>
 								<Route
 									path="/registry/editions"
-									element={<Editions />}
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Editions />
+										</Suspense>
+									}
 								/>
 							</Route>
 						</Routes>

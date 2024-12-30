@@ -20,6 +20,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
+import { Button } from '../components/Button';
 import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
 import { useModal } from '../context/ModalContext';
@@ -140,7 +141,7 @@ export const About = () => {
 	};
 
 	return (
-		<main className="flex-1 px-8 pt-28 lg:pt-44 lg:px-0 pb-16 flex flex-col gap-16">
+		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-16">
 			<div className="container mx-auto flex flex-col gap-8 lg:gap-0 lg:flex-row">
 				<div className="flex flex-col gap-8 lg:gap-16 z-10 lg:w-1/2">
 					<div id="introduction" className="flex flex-col gap-4">
@@ -464,15 +465,15 @@ export const About = () => {
 									/>
 								</Field>
 
-								<button
+								<Button
 									type="submit"
 									disabled={isSubmitting}
-									className="mt-2 rounded-lg bg-brg px-6 py-2 text-sm font-medium text-white hover:bg-brg-dark disabled:opacity-50 disabled:cursor-not-allowed"
+									className="w-fit ml-auto"
 								>
 									{isSubmitting
 										? 'Sending...'
 										: 'Send Message'}
-								</button>
+								</Button>
 							</form>
 						)}
 					</div>
