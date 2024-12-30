@@ -357,6 +357,7 @@ export const CarProfile = () => {
 
 									{car.id && (
 										<img
+											fetchPriority="high"
 											src={`https://store.miataregistry.com/car/${car.id}.jpg`}
 											alt={`${car.edition?.name}`}
 											className={`absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-200`}
