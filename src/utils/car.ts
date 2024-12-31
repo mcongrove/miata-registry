@@ -26,7 +26,7 @@ export const formatEngineDetails = (details: any) => {
 		: '';
 
 	const cylinders = details.EngineCylinders
-		? `${details.EngineCylinders}-cylinder`
+		? `${details.EngineCylinders}-cyl`
 		: '';
 
 	const configuration =
@@ -36,7 +36,7 @@ export const formatEngineDetails = (details: any) => {
 
 	const horsepower = details.EngineHP
 		? details.EngineHP_to
-			? `${details.EngineHP}-${details.EngineHP_to}hp`
+			? `${details.EngineHP}–${details.EngineHP_to}hp`
 			: `${details.EngineHP}hp`
 		: '';
 
@@ -55,10 +55,8 @@ export const formatPlantLocation = (details: any) => {
 	// Default to Japan for Mazda VINs starting with JM1
 	const isJapaneseMazda = details?.VIN?.startsWith('JM1');
 
-	const city = details?.PlantCity
-		? toTitleCase(details?.PlantCity?.toLowerCase())
-		: '';
-	const state = details?.PlantState || '';
+	const city = details?.PlantCity ? toTitleCase(details?.PlantCity) : '';
+	const state = details?.PlantState ? toTitleCase(details?.PlantState) : '';
 	const country = details?.PlantCountry
 		? countryNameToCode(details?.PlantCountry)
 		: isJapaneseMazda

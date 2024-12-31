@@ -268,6 +268,11 @@ export const CarProfile = () => {
 
 		return [
 			vinDetails?.VIN?.startsWith('JM1') ? country('JP') : null,
+			vinDetails?.PlantCountry
+				? country(vinDetails.PlantCountry)
+				: vinDetails?.VIN?.startsWith('JM1')
+					? country('JP')
+					: null,
 			car.shipping_state
 				? state(car.shipping_state)
 				: car.shipping_country

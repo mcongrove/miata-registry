@@ -41,12 +41,12 @@ export const toPrettyDate = (
 		}
 
 		const isMidnight =
-			date.getUTCHours() === 0 &&
-			date.getUTCMinutes() === 0 &&
-			date.getUTCSeconds() === 0;
+			date.getHours() === 0 &&
+			date.getMinutes() === 0 &&
+			date.getSeconds() === 0;
 
 		return date.toLocaleString('en-US', {
-			timeZone: 'UTC',
+			timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 			month: 'long',
 			day: 'numeric',
 			year: 'numeric',
