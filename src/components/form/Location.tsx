@@ -17,28 +17,38 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { TLocation } from '../../types/Location';
+import { TAddress } from '../../types/Location';
 
 interface LocationProps {
 	id: string;
 	name: string;
-	placeholder: string;
+	placeholder?: string;
 	required?: boolean;
-	onLocationSelect?: (location: TLocation) => void;
+	fullAddress?: boolean;
+	value?: string;
+	onLocationSelect?: (location: string) => void;
 }
 
 export function Location({
 	id,
 	name,
-	placeholder,
+	placeholder = '',
 	required,
+	fullAddress = false,
+	value,
 	onLocationSelect,
 }: LocationProps) {
+	const [inputValue, setInputValue] = useState(value || '');
 	const inputRef = useRef<HTMLInputElement>(null);
 	const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(
 		null
 	);
-	const [inputValue, setInputValue] = useState('');
+
+	useEffect(() => {
+		if (value !== undefined) {
+			setInputValue(value);
+		}
+	}, [value]);
 
 	useEffect(() => {
 		if (!inputRef.current) return;
@@ -46,8 +56,8 @@ export function Location({
 		autocompleteRef.current = new window.google.maps.places.Autocomplete(
 			inputRef.current,
 			{
-				types: ['(cities)'],
-				fields: ['address_components'],
+				types: fullAddress ? ['address'] : ['(cities)'],
+				fields: ['address_components', 'formatted_address'],
 			}
 		);
 
@@ -56,33 +66,45 @@ export function Location({
 
 			if (!place?.address_components) return;
 
-			const components = place.address_components;
-			const location: TLocation = { country: '' };
+			let formattedLocation: string;
 
-			components.forEach((component) => {
-				const types = component.types;
+			if (fullAddress) {
+				formattedLocation = place.formatted_address || '';
+			} else {
+				const components = place.address_components;
+				const location: TAddress = { country: '' };
 
-				if (types.includes('locality')) {
-					location.city = component.long_name;
-				} else if (types.includes('administrative_area_level_1')) {
-					location.state = component.short_name;
-				} else if (types.includes('country')) {
-					location.country = component.short_name;
-				}
-			});
+				components.forEach((component) => {
+					const types = component.types;
 
-			const formattedLocation = [
-				location.city,
-				location.state,
-				location.country,
-			]
-				.filter(Boolean)
-				.join(', ');
+					if (types.includes('street_number')) {
+						location.streetNumber = component.long_name;
+					} else if (types.includes('route')) {
+						location.street = component.long_name;
+					} else if (types.includes('locality')) {
+						location.city = component.long_name;
+					} else if (types.includes('administrative_area_level_1')) {
+						location.state = component.short_name;
+					} else if (types.includes('country')) {
+						location.country = component.short_name;
+					} else if (types.includes('postal_code')) {
+						location.postalCode = component.long_name;
+					}
+				});
+
+				formattedLocation = [
+					location.city,
+					location.state,
+					location.country,
+				]
+					.filter(Boolean)
+					.join(', ');
+			}
 
 			setInputValue(formattedLocation);
 
-			if (onLocationSelect) {
-				onLocationSelect(location);
+			if (onLocationSelect && formattedLocation) {
+				onLocationSelect(formattedLocation);
 			}
 		});
 
@@ -93,7 +115,7 @@ export function Location({
 				);
 			}
 		};
-	}, [onLocationSelect]);
+	}, [onLocationSelect, fullAddress]);
 
 	return (
 		<input

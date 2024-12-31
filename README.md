@@ -1,26 +1,26 @@
 # Miata Registry
 
-A community-driven database of limited edition Mazda Miatas from around the world. Document and preserve the history of these special vehicles while connecting with other enthusiasts.
+A community-driven project that aims to document and preserve the history of limited edition Mazda Miatas.
 
 ## 🚗 About
 
-The Miata Registry is a public platform where owners of special edition Mazda MX-5/Miata models can register and document their vehicles. This registry helps preserve these cars' histories and builds a valuable resource for the community.
+The Miata Registry is a public platform where owners of limited edition Mazda Miatas can register and document their vehicles. This registry helps preserve these cars' histories and builds a valuable resource for the community.
 
 ## 🌟 Why Register?
 
--   Help preserve the history of special edition Miatas
--   Connect with other owners of rare editions
+-   Help preserve the history of limited edition Miatas
+-   Connect with other owners of limited editions
 -   Verify authenticity of limited edition models
 -   Track vehicles as they change hands over time
 -   Contribute to the community's knowledge base
 
 ## 🚀 Getting Started
 
-1. Create an account at [miataregistry.com](https://miataregistry.com)
+1. Create an account at [MiataRegistry.com](https://miataregistry.com)
 2. Add your limited edition Miata's details
 3. Connect with the community!
 
-## 🤝 Development
+## 🧑‍💻 Development
 
 To run the Miata Registry locally:
 
@@ -46,7 +46,7 @@ To run the Miata Registry locally:
     npm run worker:dev
     ```
 
-> **Note**: The local development environment connects to the production Cloudflare D1 database and R2 storage through local worker APIs. This ensures consistency between development and production environments while this project is in development.
+> **Note**: The local development environment connects to the production Cloudflare D1 database, KV cache, and R2 storage through local worker APIs. This ensures consistency between development and production environments while this project is in development.
 
 ## 🤝 Contributing
 

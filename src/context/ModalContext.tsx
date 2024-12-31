@@ -27,24 +27,29 @@ import {
 import { TModalState, TModalType } from '../types/Modal';
 
 const MODAL_COMPONENTS = {
-	register: lazy(() =>
-		import('../components/forms/RegisterModal').then((module) => ({
-			default: module.RegisterModal,
-		}))
-	),
 	export: lazy(() =>
-		import('../components/forms/ExportModal').then((module) => ({
+		import('../modals/ExportModal').then((module) => ({
 			default: module.ExportModal,
 		}))
 	),
-	tip: lazy(() =>
-		import('../components/forms/TipModal').then((module) => ({
-			default: module.TipModal,
+	news: lazy(() =>
+		import('../modals/NewsModal').then((module) => ({
+			default: module.NewsModal,
 		}))
 	),
-	news: lazy(() =>
-		import('../components/forms/NewsModal').then((module) => ({
-			default: module.NewsModal,
+	qr: lazy(() =>
+		import('../modals/QrModal').then((module) => ({
+			default: module.QrModal,
+		}))
+	),
+	register: lazy(() =>
+		import('../modals/RegisterModal').then((module) => ({
+			default: module.RegisterModal,
+		}))
+	),
+	tip: lazy(() =>
+		import('../modals/TipModal').then((module) => ({
+			default: module.TipModal,
 		}))
 	),
 } as const;

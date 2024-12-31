@@ -47,6 +47,8 @@ export const Footer = () => {
 							<a
 								href="https://www.instagram.com/miataregistry/"
 								className="text-brg-mid hover:text-brg-light transition-colors"
+								target="_blank"
+								rel="noopener noreferrer"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -65,6 +67,8 @@ export const Footer = () => {
 							<a
 								href="https://github.com/mcongrove/miata-registry"
 								className="text-brg-mid hover:text-brg-light transition-colors"
+								target="_blank"
+								rel="noopener noreferrer"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"

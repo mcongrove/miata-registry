@@ -18,7 +18,7 @@
 
 import { useAuth } from '@clerk/clerk-react';
 import { useState } from 'react';
-import { Modal } from '../Modal';
+import { Modal } from '../components/Modal';
 
 export function ExportModal({
 	isOpen,
@@ -89,6 +89,7 @@ export function ExportModal({
 					text: 'Close',
 					onClick: handleClose,
 				}}
+				allowClickOut
 			>
 				<div className="flex flex-col items-center gap-6 pt-6">
 					<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">

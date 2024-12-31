@@ -16,6 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+export type TAddress = {
+	city?: string;
+	country: string;
+	postalCode?: string;
+	state?: string;
+	street?: string;
+	streetNumber?: string;
+};
+
 export type TLocation = {
 	city?: string;
 	country: string;
@@ -23,7 +32,7 @@ export type TLocation = {
 };
 
 export type TMapLocation = {
-	name: string;
 	latitude: number;
 	longitude: number;
+	name: string;
 };

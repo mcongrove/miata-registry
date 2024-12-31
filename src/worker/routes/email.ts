@@ -100,4 +100,37 @@ emailRouter.post('/tip', async (c) => {
 	}
 });
 
+emailRouter.post('/sticker', async (c) => {
+	try {
+		const resend = new Resend(c.env.RESEND_API_KEY);
+
+		const { quantity, address, carId } = await c.req.json();
+
+		await resend.emails.send({
+			from: 'Miata Registry <support@miataregistry.com>',
+			to: 'mattcongrove@gmail.com',
+			subject: 'Miata Registry: Sticker Request',
+			html: `
+				<h2>Registry Sticker Request</h2>
+				<p><strong>Car ID:</strong> ${carId}</p>
+				<p><strong>Quantity:</strong> ${quantity} sticker(s)</p>
+				<p><strong>Shipping Address:</strong> ${address}</p>
+			`,
+		});
+
+		return c.json({ success: true });
+	} catch (error) {
+		console.error('Error sending sticker request email:', error);
+
+		return c.json(
+			{
+				error: 'Failed to send email',
+				details:
+					error instanceof Error ? error.message : 'Unknown error',
+			},
+			500
+		);
+	}
+});
+
 export default emailRouter;

@@ -18,12 +18,12 @@
 
 import { useAuth, useClerk } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
-import { Field } from '../form/Field';
-import { Location } from '../form/Location';
-import { SelectStyles } from '../form/Select';
-import { TextField } from '../form/TextField';
-import { Icon } from '../Icon';
-import { Modal } from '../Modal';
+import { Field } from '../components/form/Field';
+import { Location } from '../components/form/Location';
+import { SelectStyles } from '../components/form/Select';
+import { TextField } from '../components/form/TextField';
+import { Icon } from '../components/Icon';
+import { Modal } from '../components/Modal';
 
 interface RegisterModalProps {
 	isOpen: boolean;
@@ -215,6 +215,7 @@ export function RegisterModal({
 					text: 'Close',
 					onClick: handleClose,
 				}}
+				allowClickOut
 			>
 				<div className="flex flex-col items-center gap-6 pt-6">
 					<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
@@ -301,7 +302,6 @@ export function RegisterModal({
 							<select
 								className={SelectStyles(
 									false,
-									'',
 									'w-full border-brg-light text-sm'
 								)}
 								name="edition"
@@ -311,8 +311,11 @@ export function RegisterModal({
 										setShowOtherInput(true);
 									}
 								}}
+								defaultValue=""
 							>
-								<option value="">Select an edition</option>
+								<option value="" disabled>
+									Select an edition
+								</option>
 								{editions.map((edition) => (
 									<option key={edition} value={edition}>
 										{edition}

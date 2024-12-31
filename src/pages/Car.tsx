@@ -65,17 +65,20 @@ const EditButton = ({
 	color = 'text-brg-mid',
 	disabled = false,
 	icon,
+	onClick,
 	text,
 }: {
 	className?: string;
 	color?: string;
 	disabled?: boolean;
 	icon: string;
+	onClick?: () => void;
 	text: string;
 }) => {
 	return (
 		<div
 			className={`flex flex-col items-center justify-center p-3 gap-2 text-xs font-medium ${color} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-brg-light/30'}`}
+			onClick={onClick}
 		>
 			<Icon
 				name={icon as IconName}
@@ -579,7 +582,11 @@ export const CarProfile = () => {
 									color="text-gray-500"
 									icon="qr"
 									text="Get QR Code"
-									disabled
+									onClick={() => {
+										openModal('qr', {
+											car,
+										});
+									}}
 								/>
 							</div>
 						) : (

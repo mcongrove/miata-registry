@@ -17,7 +17,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Modal } from '../Modal';
+import { Modal } from '../components/Modal';
 
 interface NewsModalProps {
 	isOpen: boolean;

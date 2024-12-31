@@ -30,6 +30,7 @@ interface ModalProps {
 	};
 	allowClickOut?: boolean;
 	children: ReactNode;
+	className?: string;
 	hideCancel?: boolean;
 	isOpen: boolean;
 	onClose: () => void;
@@ -40,6 +41,7 @@ export function Modal({
 	action,
 	allowClickOut = false,
 	children,
+	className,
 	hideCancel,
 	isOpen,
 	onClose,
@@ -65,7 +67,12 @@ export function Modal({
 				}
 			}}
 		>
-			<div className="flex flex-col bg-white rounded-lg max-w-lg w-full max-h-[90vh]">
+			<div
+				className={twMerge(
+					'flex flex-col bg-white rounded-lg max-w-lg w-full max-h-[90vh]',
+					className
+				)}
+			>
 				{title && (
 					<h2 className="flex items-center justify-between text-xl font-bold bg-brg-light/70 px-6 py-4 gap-10 rounded-t-lg border-b border-brg-border/50">
 						{title}
@@ -80,35 +87,37 @@ export function Modal({
 
 				<div className="px-6 pt-6 mb-6 overflow-y-auto">{children}</div>
 
-				<div
-					className={twMerge(
-						'flex gap-2 px-6 pb-6',
-						hideCancel ? 'justify-center' : 'justify-end'
-					)}
-				>
-					{!hideCancel && (
-						<Button
-							onClick={onClose}
-							variant="tertiary"
-							className={twMerge(
-								'text-brg-border text-sm',
-								action?.loading ? 'hidden' : ''
-							)}
-						>
-							Cancel
-						</Button>
-					)}
+				{(action || !hideCancel) && (
+					<div
+						className={twMerge(
+							'flex gap-2 px-6 pb-6',
+							hideCancel ? 'justify-center' : 'justify-end'
+						)}
+					>
+						{!hideCancel && (
+							<Button
+								onClick={onClose}
+								variant="tertiary"
+								className={twMerge(
+									'text-brg-border text-sm',
+									action?.loading ? 'hidden' : ''
+								)}
+							>
+								Cancel
+							</Button>
+						)}
 
-					{action && (
-						<Button
-							onClick={action.onClick}
-							disabled={action.loading || action.disabled}
-							className="text-sm"
-						>
-							{action.loading ? 'Loading...' : action.text}
-						</Button>
-					)}
-				</div>
+						{action && (
+							<Button
+								onClick={action.onClick}
+								disabled={action.loading || action.disabled}
+								className="text-sm"
+							>
+								{action.loading ? 'Loading...' : action.text}
+							</Button>
+						)}
+					</div>
+				)}
 			</div>
 		</div>
 	);
