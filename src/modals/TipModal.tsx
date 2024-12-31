@@ -203,7 +203,7 @@ export function TipModal({
 						type="checkbox"
 						checked={isOwner}
 						onChange={(e) => setIsOwner(e.target.checked)}
-						className="rounded border-brg-light text-brg -mt-px"
+						className="-mt-px"
 					/>
 					I am the owner of this vehicle
 				</label>
@@ -330,7 +330,7 @@ export function TipModal({
 									id="information"
 									name="information"
 									type="textarea"
-									placeholder="Any other information, like social media links, etc..."
+									placeholder="Any other information, like social media links, etc."
 								/>
 							</Field>
 						</div>

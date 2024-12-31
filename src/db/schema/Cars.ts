@@ -21,7 +21,6 @@ import { Editions } from './Editions';
 import { Owners } from './Owners';
 
 export const Cars = sqliteTable('cars', {
-	color: text('color').notNull(),
 	current_owner_id: text('current_owner_id').references(() => Owners.id),
 	destroyed: integer('destroyed', { mode: 'boolean' }).default(false),
 	edition_id: text('edition_id')

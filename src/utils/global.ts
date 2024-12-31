@@ -41,9 +41,7 @@ export const toPrettyDate = (
 		}
 
 		const isMidnight =
-			date.getHours() === 0 &&
-			date.getMinutes() === 0 &&
-			date.getSeconds() === 0;
+			timestamp.toString().split('T')[1] === '00:00:00.000Z';
 
 		return date.toLocaleString('en-US', {
 			timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,

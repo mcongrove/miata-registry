@@ -20,7 +20,6 @@ import { TEdition } from './Edition';
 import { TCarOwner, TOwner } from './Owner';
 
 export type TCar = {
-	color: string;
 	current_owner_id?: string;
 	current_owner?: TOwner;
 	destroyed?: boolean;

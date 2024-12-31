@@ -69,7 +69,7 @@ export function Modal({
 		>
 			<div
 				className={twMerge(
-					'flex flex-col bg-white rounded-lg max-w-lg w-full max-h-[90vh]',
+					'flex flex-col bg-white rounded-lg max-w-lg w-full max-h-[80vh]',
 					className
 				)}
 			>

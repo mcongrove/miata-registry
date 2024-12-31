@@ -102,7 +102,6 @@ carsRouter.get('/', async (c) => {
 		// Build the main query
 		const baseQuery = db
 			.select({
-				color: Cars.color,
 				current_owner: {
 					country: Owners.country,
 					id: Owners.id,
@@ -256,7 +255,6 @@ carsRouter.get('/:id', async (c) => {
 
 		const [carData] = await db
 			.select({
-				color: Cars.color,
 				current_owner_id: Cars.current_owner_id,
 				destroyed: Cars.destroyed,
 				edition_id: Cars.edition_id,

@@ -43,6 +43,16 @@ export const formatLocation = (
 	return parts.join(', ');
 };
 
+export const parseLocation = (location: string): TLocation => {
+	const parts = location.split(', ');
+
+	return {
+		city: parts[0],
+		state: parts[1],
+		country: parts[2],
+	};
+};
+
 export const countryNameToCode = (country: string): string => {
 	switch (country) {
 		case 'UNITED STATES':

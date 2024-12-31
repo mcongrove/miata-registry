@@ -228,6 +228,7 @@ export function QrModal({
 								name="address"
 								fullAddress
 								required
+								placeholder="Enter a location"
 								value={selectedLocation}
 								onLocationSelect={(location) =>
 									setSelectedLocation(location)

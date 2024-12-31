@@ -422,7 +422,7 @@ export const CarProfile = () => {
 
 									{car ? (
 										<p className="font-medium">
-											{car.color || car.edition?.color}
+											{car.edition?.color}
 										</p>
 									) : (
 										<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
@@ -553,33 +553,21 @@ export const CarProfile = () => {
 					<div className="lg:col-span-4 space-y-6">
 						{import.meta.env.DEV &&
 						car?.current_owner?.user_id === userId ? (
-							<div className="hidden md:grid grid-cols-4 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
+							<div className="hidden w-fit ml-auto md:grid grid-cols-2 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
 								<EditButton
 									className="scale-90"
-									color="text-gray-700"
+									color="text-brg-mid"
 									icon="edit"
 									text="Edit Car"
-									disabled
+									onClick={() => {
+										openModal('carEdit', {
+											car,
+										});
+									}}
 								/>
 
 								<EditButton
-									className="scale-110"
-									color="text-green-700"
-									icon="sold"
-									text="Sold"
-									disabled
-								/>
-
-								<EditButton
-									className="scale-110"
-									color="text-red-700"
-									icon="destroyed"
-									text="Destroyed"
-									disabled
-								/>
-
-								<EditButton
-									color="text-gray-500"
+									color="text-brg-mid"
 									icon="qr"
 									text="Get QR Code"
 									onClick={() => {

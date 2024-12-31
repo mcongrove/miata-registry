@@ -27,6 +27,11 @@ import {
 import { TModalState, TModalType } from '../types/Modal';
 
 const MODAL_COMPONENTS = {
+	carEdit: lazy(() =>
+		import('../modals/CarEditModal').then((module) => ({
+			default: module.CarEditModal,
+		}))
+	),
 	export: lazy(() =>
 		import('../modals/ExportModal').then((module) => ({
 			default: module.ExportModal,

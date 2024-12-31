@@ -20,6 +20,9 @@ interface TextFieldProps {
 	defaultValue?: string;
 	id: string;
 	name: string;
+	onChange?: (
+		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => void;
 	placeholder: string;
 	readOnly?: boolean;
 	required?: boolean;
@@ -30,6 +33,7 @@ export function TextField({
 	defaultValue,
 	id,
 	name,
+	onChange,
 	placeholder,
 	readOnly,
 	required,
@@ -42,7 +46,8 @@ export function TextField({
 			placeholder={placeholder}
 			defaultValue={defaultValue}
 			required={required}
-			className="w-full h-32 px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid"
+			onChange={onChange}
+			className="w-full h-32 px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg [&:not([value])]:!text-[#9CA3AF]"
 			readOnly={readOnly}
 		/>
 	) : (
@@ -53,8 +58,9 @@ export function TextField({
 			placeholder={placeholder}
 			defaultValue={defaultValue}
 			required={required}
-			className="w-full px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid"
+			className={`w-full px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg [&:not([value])]:!text-[#9CA3AF]`}
 			readOnly={readOnly}
+			onChange={onChange}
 		/>
 	);
 }
