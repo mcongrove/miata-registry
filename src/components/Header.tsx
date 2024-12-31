@@ -270,6 +270,8 @@ export const Header = () => {
 							</div>
 						</>
 					</UserButton.UserProfilePage>
+
+					<UserButton.UserProfilePage label="security" />
 				</UserButton>
 			</SignedIn>
 		</>
