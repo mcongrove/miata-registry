@@ -110,14 +110,9 @@ export const CarProfile = () => {
 		description: car ? car.edition?.description?.split('\n')[0] : '',
 	});
 
-	const manufactureLocation = car?.manufacture_country
-		? formatLocation({
-				country: car.manufacture_country,
-				city: car.manufacture_city,
-			})
-		: vinDetails
-			? formatPlantLocation(vinDetails)
-			: '';
+	const manufactureLocation = useMemo(() => {
+		return vinDetails ? formatPlantLocation(vinDetails) : null;
+	}, [vinDetails]);
 
 	useEffect(() => {
 		const loadCar = async () => {
@@ -157,7 +152,7 @@ export const CarProfile = () => {
 		loadCar();
 	}, [id]);
 
-	const getTimelineItems = () => {
+	const timelineItems = useMemo(() => {
 		if (!car) return [];
 
 		const items = [];
@@ -237,7 +232,7 @@ export const CarProfile = () => {
 		}
 
 		// Factory
-		if (manufactureLocation) {
+		if (vinDetails && manufactureLocation) {
 			items.push({
 				name: vinDetails?.Manufacturer ? (
 					<>
@@ -266,13 +261,13 @@ export const CarProfile = () => {
 				showConnector={index !== lastValidIndex}
 			/>
 		));
-	};
+	}, [car, timelineOwners, vinDetails, manufactureLocation]);
 
 	const mapLocations = useMemo(() => {
-		if (!car) return [];
+		if (!car || !vinDetails) return [];
 
 		return [
-			car.manufacture_country ? country(car.manufacture_country) : null,
+			vinDetails?.VIN?.startsWith('JM1') ? country('JP') : null,
 			car.shipping_state
 				? state(car.shipping_state)
 				: car.shipping_country
@@ -295,7 +290,7 @@ export const CarProfile = () => {
 				),
 		].filter((location) => location !== null);
 	}, [
-		car?.manufacture_country,
+		vinDetails,
 		car?.sale_dealer_state,
 		car?.sale_dealer_country,
 		timelineOwners,
@@ -691,7 +686,7 @@ export const CarProfile = () => {
 						</div>
 
 						<div className="flex flex-col gap-8">
-							<div>{getTimelineItems()}</div>
+							<div>{timelineItems}</div>
 
 							<p className="text-xs text-brg-border w-3/4">
 								The above information may only be accurate as of

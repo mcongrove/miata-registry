@@ -27,8 +27,6 @@ export type TCar = {
 	edition_id: string;
 	edition?: TEdition;
 	id: string;
-	manufacture_city?: string;
-	manufacture_country?: string;
 	manufacture_date?: string;
 	owner_history?: TCarOwner[];
 	sale_date?: string;

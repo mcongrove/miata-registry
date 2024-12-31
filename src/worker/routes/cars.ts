@@ -261,8 +261,6 @@ carsRouter.get('/:id', async (c) => {
 				destroyed: Cars.destroyed,
 				edition_id: Cars.edition_id,
 				id: Cars.id,
-				manufacture_city: Cars.manufacture_city,
-				manufacture_country: Cars.manufacture_country,
 				manufacture_date: Cars.manufacture_date,
 				sale_date: Cars.sale_date,
 				sale_dealer_city: Cars.sale_dealer_city,

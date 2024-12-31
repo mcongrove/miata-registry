@@ -28,8 +28,6 @@ export const Cars = sqliteTable('cars', {
 		.notNull()
 		.references(() => Editions.id),
 	id: text('id').primaryKey(),
-	manufacture_city: text('manufacture_city'),
-	manufacture_country: text('manufacture_country'),
 	manufacture_date: text('manufacture_date'),
 	sale_date: text('sale_date'),
 	sale_dealer_city: text('sale_dealer_city'),

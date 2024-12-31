@@ -34,7 +34,11 @@ export const formatEngineDetails = (details: any) => {
 			? 'Inline'
 			: details.EngineConfiguration;
 
-	const horsepower = details.EngineHP ? `${details.EngineHP}hp` : '';
+	const horsepower = details.EngineHP
+		? details.EngineHP_to
+			? `${details.EngineHP}-${details.EngineHP_to}hp`
+			: `${details.EngineHP}hp`
+		: '';
 
 	return (
 		[displacement, configuration, cylinders, horsepower]
@@ -46,11 +50,20 @@ export const formatEngineDetails = (details: any) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatPlantLocation = (details: any) => {
+	if (!details) return '';
+
+	// Default to Japan for Mazda VINs starting with JM1
+	const isJapaneseMazda = details?.VIN?.startsWith('JM1');
+
 	const city = details?.PlantCity
 		? toTitleCase(details?.PlantCity?.toLowerCase())
 		: '';
+	const state = details?.PlantState || '';
+	const country = details?.PlantCountry
+		? countryNameToCode(details?.PlantCountry)
+		: isJapaneseMazda
+			? 'JP'
+			: '';
 
-	const country = countryNameToCode(details?.PlantCountry);
-
-	return city && country ? `${city}, ${country}` : '';
+	return [city, state, country].filter(Boolean).join(', ');
 };
