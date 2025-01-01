@@ -23,7 +23,7 @@ import {
 	useAuth,
 	UserButton,
 } from '@clerk/clerk-react';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TOwner } from '../../types/Owner';
 import { handleApiError } from '../../utils/global';
@@ -65,7 +65,7 @@ export function Clerk() {
 	const isHomePage = location.pathname === '/';
 
 	const fetchOwnerData = async () => {
-		if (!userId) return;
+		if (!userId || ownerData.owner.id) return;
 
 		try {
 			const response = await fetch(
@@ -74,8 +74,6 @@ export function Clerk() {
 					credentials: 'include',
 				}
 			);
-
-			if (!response.ok) throw new Error('Failed to fetch owner data');
 
 			const data = await response.json();
 
@@ -86,10 +84,6 @@ export function Clerk() {
 			setIsLoading(false);
 		}
 	};
-
-	useEffect(() => {
-		fetchOwnerData();
-	}, [userId]);
 
 	return (
 		<>
@@ -107,106 +101,114 @@ export function Clerk() {
 				</SignInButton>
 			</SignedOut>
 
-			<SignedIn>
-				<UserButton
-					appearance={{
-						elements: { userButtonAvatarBox: 'size-9' },
-					}}
-				>
-					<UserButton.MenuItems>
-						<UserButton.Action
+			<div onClick={fetchOwnerData}>
+				<SignedIn>
+					<UserButton
+						appearance={{
+							elements: { userButtonAvatarBox: 'size-9' },
+						}}
+					>
+						<UserButton.MenuItems>
+							<UserButton.Action
+								label="Profile"
+								labelIcon={
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										fill="currentColor"
+										viewBox="0 0 16 16"
+									>
+										<path
+											fill-rule="evenodd"
+											clip-rule="evenodd"
+											d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-2.585 2.894c.154.25.107.568-.083.792A5.675 5.675 0 0 1 8 13.688a5.675 5.675 0 0 1-4.332-2.002c-.19-.224-.237-.543-.083-.792.087-.14.189-.271.306-.392.46-.469 1.087-.986 1.703-1.102.514-.097.899.056 1.298.214.331.132.673.267 1.108.267.435 0 .777-.135 1.108-.267.4-.158.784-.31 1.298-.214.616.116 1.243.633 1.703 1.102.117.12.22.252.306.392ZM8 8.919c1.329 0 2.406-1.559 2.406-2.888a2.406 2.406 0 1 0-4.812 0C5.594 7.361 6.67 8.92 8 8.92Z"
+											fill="currentColor"
+										></path>
+									</svg>
+								}
+								open="profile"
+							/>
+
+							<UserButton.Action
+								label="My Cars"
+								labelIcon={
+									<Icon
+										name="car"
+										className="size-3.5 text-[#616161]"
+									/>
+								}
+								open="cars"
+							/>
+						</UserButton.MenuItems>
+
+						<UserButton.UserProfilePage label="account" />
+
+						<UserButton.UserProfilePage
 							label="Profile"
 							labelIcon={
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="currentColor"
-									viewBox="0 0 16 16"
-								>
-									<path
-										fill-rule="evenodd"
-										clip-rule="evenodd"
-										d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-2.585 2.894c.154.25.107.568-.083.792A5.675 5.675 0 0 1 8 13.688a5.675 5.675 0 0 1-4.332-2.002c-.19-.224-.237-.543-.083-.792.087-.14.189-.271.306-.392.46-.469 1.087-.986 1.703-1.102.514-.097.899.056 1.298.214.331.132.673.267 1.108.267.435 0 .777-.135 1.108-.267.4-.158.784-.31 1.298-.214.616.116 1.243.633 1.703 1.102.117.12.22.252.306.392ZM8 8.919c1.329 0 2.406-1.559 2.406-2.888a2.406 2.406 0 1 0-4.812 0C5.594 7.361 6.67 8.92 8 8.92Z"
-										fill="currentColor"
-									></path>
-								</svg>
+								<Icon
+									name="user"
+									className="size-3.5 text-[#2F3037]"
+								/>
 							}
-							open="profile"
-						/>
+							url="profile"
+						>
+							<>
+								<h1 className="mb-4 text-[#212126] leading-6 text-[17px] font-bold">
+									Profile Settings
+								</h1>
 
-						<UserButton.Action
+								<div className="border-t border-black/[0.07] flex flex-col h-full">
+									{isLoading ? (
+										<LoadingIndicator />
+									) : (
+										<Suspense
+											fallback={<LoadingIndicator />}
+										>
+											<ClerkProfile
+												owner={ownerData.owner}
+												onUpdate={fetchOwnerData}
+											/>
+										</Suspense>
+									)}
+								</div>
+							</>
+						</UserButton.UserProfilePage>
+
+						<UserButton.UserProfilePage
 							label="My Cars"
 							labelIcon={
 								<Icon
 									name="car"
-									className="size-3.5 text-[#616161]"
+									className="size-3.5 text-[#2F3037]"
 								/>
 							}
-							open="cars"
-						/>
-					</UserButton.MenuItems>
+							url="cars"
+						>
+							<>
+								<h1 className="mb-4 text-[#212126] leading-6 text-[17px] font-bold">
+									My Cars
+								</h1>
 
-					<UserButton.UserProfilePage label="account" />
+								<div className="border-t border-black/[0.07] py-4 flex flex-col">
+									{isLoading ? (
+										<LoadingIndicator />
+									) : (
+										<Suspense
+											fallback={<LoadingIndicator />}
+										>
+											<ClerkMyCars
+												cars={ownerData.cars}
+											/>
+										</Suspense>
+									)}
+								</div>
+							</>
+						</UserButton.UserProfilePage>
 
-					<UserButton.UserProfilePage
-						label="Profile"
-						labelIcon={
-							<Icon
-								name="user"
-								className="size-3.5 text-[#2F3037]"
-							/>
-						}
-						url="profile"
-					>
-						<>
-							<h1 className="mb-4 text-[#212126] leading-6 text-[17px] font-bold">
-								Profile Settings
-							</h1>
-
-							<div className="border-t border-black/[0.07] flex flex-col h-full">
-								{isLoading ? (
-									<LoadingIndicator />
-								) : (
-									<Suspense fallback={<LoadingIndicator />}>
-										<ClerkProfile
-											owner={ownerData.owner}
-											onUpdate={fetchOwnerData}
-										/>
-									</Suspense>
-								)}
-							</div>
-						</>
-					</UserButton.UserProfilePage>
-
-					<UserButton.UserProfilePage
-						label="My Cars"
-						labelIcon={
-							<Icon
-								name="car"
-								className="size-3.5 text-[#2F3037]"
-							/>
-						}
-						url="cars"
-					>
-						<>
-							<h1 className="mb-4 text-[#212126] leading-6 text-[17px] font-bold">
-								My Cars
-							</h1>
-
-							<div className="border-t border-black/[0.07] py-4 flex flex-col">
-								{isLoading ? (
-									<LoadingIndicator />
-								) : (
-									<Suspense fallback={<LoadingIndicator />}>
-										<ClerkMyCars cars={ownerData.cars} />
-									</Suspense>
-								)}
-							</div>
-						</>
-					</UserButton.UserProfilePage>
-
-					<UserButton.UserProfilePage label="security" />
-				</UserButton>
-			</SignedIn>
+						<UserButton.UserProfilePage label="security" />
+					</UserButton>
+				</SignedIn>
+			</div>
 		</>
 	);
 }
