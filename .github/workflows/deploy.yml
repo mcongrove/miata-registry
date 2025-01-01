@@ -5,10 +5,14 @@ on:
         branches:
             - main
         paths:
+            - '.github/workflows/deploy.yml'
+            - '.dev.vars.example' # We added a new key
+            - '.env.production.example' # We added a new key
+            - 'src/db/**'
+            - 'src/types/**'
+            - 'src/utils/**'
             - 'src/worker/**'
             - 'wrangler.toml'
-            - '.github/workflows/deploy.yml'
-            - '.dev.vars.example'
 
 jobs:
     deploy:
@@ -38,4 +42,4 @@ jobs:
               env:
                   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-              run: npm run worker:deploy:prod
+              run: npm run worker:deploy

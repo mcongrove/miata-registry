@@ -7,8 +7,6 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
-		"worker:deploy:prod": "wrangler deploy --env production",
-		"worker:deploy:dev": "wrangler deploy --env development",
 		"seed": "NODE_OPTIONS=\"--loader ts-node/esm\" node --experimental-specifier-resolution=node scripts/seedDatabase.ts",
 		"lint": "eslint .",
 		"format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
