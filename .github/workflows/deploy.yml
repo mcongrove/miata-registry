@@ -5,14 +5,14 @@ on:
         branches:
             - main
         paths:
+            - '.dev.vars.example'
+            - '.env.production.example'
             - '.github/workflows/deploy.yml'
-            - '.dev.vars.example' # We added a new key
-            - '.env.production.example' # We added a new key
-			- 'package.json'
             - 'src/db/**'
             - 'src/types/**'
             - 'src/utils/**'
             - 'src/worker/**'
+			- 'package.json'
             - 'wrangler.toml'
 
 jobs:
