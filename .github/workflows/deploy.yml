@@ -7,12 +7,18 @@ on:
         paths:
             - 'src/worker/**'
             - 'wrangler.toml'
+            - '.github/workflows/deploy.yml'
 
 jobs:
     deploy:
         runs-on: ubuntu-latest
         name: Deploy
         steps:
+            - name: Debugging - Print GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+
             - uses: actions/checkout@v4
 
             - name: Setup Node.js
