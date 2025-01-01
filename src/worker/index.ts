@@ -32,6 +32,10 @@ import type { Bindings } from './types';
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.use('*', async (c, next) => {
+	if (c.req.path.startsWith('/webhooks')) {
+		return next();
+	}
+
 	const ALLOWED_ORIGINS =
 		c.env.NODE_ENV !== 'development'
 			? ['https://miataregistry.com']

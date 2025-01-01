@@ -58,7 +58,12 @@ webhooksRouter.post('/clerk', async (c) => {
 			);
 		}
 
-		const secretBytes = Buffer.from(webhookSecret.split('_')[1], 'base64');
+		const secretBytes = new Uint8Array(
+			atob(webhookSecret.split('_')[1])
+				.split('')
+				.map((char) => char.charCodeAt(0))
+		);
+
 		const key = await crypto.subtle.importKey(
 			'raw',
 			secretBytes,
@@ -72,7 +77,10 @@ webhooksRouter.post('/clerk', async (c) => {
 			new TextEncoder().encode(signedContent)
 		);
 		const expectedSignature = btoa(
-			String.fromCharCode(...new Uint8Array(signature))
+			String.fromCharCode.apply(
+				null,
+				Array.from(new Uint8Array(signature))
+			)
 		);
 		const signatures = svix_signature
 			.split(' ')
