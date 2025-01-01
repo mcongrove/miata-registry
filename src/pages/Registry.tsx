@@ -77,7 +77,6 @@ export const Registry = () => {
 			setIsLoading(true);
 
 			try {
-				// Build query parameters
 				const params = new URLSearchParams({
 					page: currentPage.toString(),
 					pageSize: itemsPerPage.toString(),
@@ -85,7 +84,6 @@ export const Registry = () => {
 					sortDirection,
 				});
 
-				// Add filters if present
 				if (activeFilters.length > 0) {
 					params.set('filters', JSON.stringify(activeFilters));
 				}
@@ -137,7 +135,6 @@ export const Registry = () => {
 		setSearchParams(newParams);
 	};
 
-	// Update handlers to persist state in URL
 	const handleSort = (column: string) => {
 		if (column !== sortColumn) {
 			setSortColumn(column);

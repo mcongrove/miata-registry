@@ -22,15 +22,19 @@ import { Modal } from '../components/Modal';
 interface NewsModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	news?: {
-		title: string;
-		title_short: string;
-		body: string;
-		created_at: number;
+	props: {
+		news: {
+			title: string;
+			title_short: string;
+			body: string;
+			created_at: number;
+		};
 	};
 }
 
-export function NewsModal({ isOpen, onClose, news }: NewsModalProps) {
+export function NewsModal({ isOpen, onClose, props }: NewsModalProps) {
+	const news = props.news;
+
 	if (!news) {
 		return null;
 	}

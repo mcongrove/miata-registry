@@ -42,15 +42,12 @@ statsRouter.get('/', async (c) => {
 			.select({ count: sql<number>`count(*)` })
 			.from(Cars)
 			.where(sql`current_owner_id is not null`);
-
 		const [totalCars] = await db
 			.select({ count: sql<number>`count(*)` })
 			.from(Cars);
-
 		const [uniqueCountries] = await db
 			.select({ count: sql<number>`count(distinct country)` })
 			.from(Owners);
-
 		const [uniqueEditions] = await db
 			.select({ count: sql<number>`count(distinct edition_id)` })
 			.from(Cars);

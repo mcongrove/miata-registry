@@ -18,8 +18,17 @@
 
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
+import { Resend } from 'resend';
 import { createDb } from '../../db';
-import { CarOwners, Cars, Editions, Owners } from '../../db/schema';
+import {
+	CarOwners,
+	CarOwnersPending,
+	Cars,
+	CarsPending,
+	Editions,
+	Owners,
+} from '../../db/schema';
+import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
 const CACHE_TTL = {
@@ -30,15 +39,11 @@ const CACHE_TTL = {
 
 const carsRouter = new Hono<{ Bindings: Bindings }>();
 
-// Get cars list with filtering, sorting, and pagination
 carsRouter.get('/', async (c) => {
 	try {
-		const db = createDb(c.env.DB);
 		const params = c.req.query();
 		const filters = params.filters ? JSON.parse(params.filters) : [];
 		const page = parseInt(params.page || '1');
-
-		// Only cache if there are no filters and we're on page 1
 		const shouldCache = filters.length === 0 && page === 1;
 
 		if (shouldCache) {
@@ -50,12 +55,11 @@ carsRouter.get('/', async (c) => {
 			}
 		}
 
-		// Parse query parameters
+		const db = createDb(c.env.DB);
+
 		const sortColumn = params.sortColumn || 'edition.year';
 		const sortDirection = (params.sortDirection || 'asc') as 'asc' | 'desc';
 		const pageSize = Math.min(parseInt(params.pageSize || '50'), 50);
-
-		// Build conditions first
 		const conditions = [];
 
 		for (const filter of filters) {
@@ -99,7 +103,6 @@ carsRouter.get('/', async (c) => {
 			}
 		}
 
-		// Build the main query
 		const baseQuery = db
 			.select({
 				current_owner: {
@@ -123,20 +126,17 @@ carsRouter.get('/', async (c) => {
 			.leftJoin(Editions, eq(Cars.edition_id, Editions.id))
 			.leftJoin(Owners, eq(Cars.current_owner_id, Owners.id));
 
-		// Apply filters if they exist
 		const filteredQuery =
 			conditions.length > 0
 				? baseQuery.where(and(...conditions))
 				: baseQuery;
 
-		// Build sort conditions
 		const sortConditions = [];
 		const sortField = sortColumn.includes('.')
 			? sortColumn.split('.')[1]
 			: sortColumn;
 		const sortFn = sortDirection === 'desc' ? desc : asc;
 
-		// Primary sort (if specified)
 		switch (sortField) {
 			case 'year':
 				sortConditions.push(
@@ -179,7 +179,6 @@ carsRouter.get('/', async (c) => {
 				break;
 		}
 
-		// Secondary sorts
 		if (sortField !== 'year') {
 			sortConditions.push(
 				sql`CASE WHEN ${Editions.year} IS NULL THEN 1 ELSE 0 END`
@@ -201,13 +200,11 @@ carsRouter.get('/', async (c) => {
 			sortConditions.push(asc(Cars.sequence));
 		}
 
-		// Apply sorting and pagination
 		const offset = (page - 1) * pageSize;
 		const cars = await filteredQuery
 			.orderBy(...sortConditions)
 			.limit(pageSize)
 			.offset(offset);
-
 		const total = cars[0]?.total ?? 0;
 
 		const result = {
@@ -218,9 +215,9 @@ carsRouter.get('/', async (c) => {
 			totalPages: Math.ceil(total / pageSize),
 		};
 
-		// Only cache if conditions are met
 		if (shouldCache) {
 			const cacheKey = `cars:list:${JSON.stringify(params)}`;
+
 			await c.env.CACHE.put(cacheKey, JSON.stringify(result), {
 				expirationTtl: CACHE_TTL.CARS_LIST,
 			});
@@ -229,6 +226,7 @@ carsRouter.get('/', async (c) => {
 		return c.json(result);
 	} catch (error) {
 		console.error('Error fetching cars:', error);
+
 		return c.json(
 			{
 				error: 'Internal server error',
@@ -240,18 +238,17 @@ carsRouter.get('/', async (c) => {
 	}
 });
 
-// Get single car
 carsRouter.get('/:id', async (c) => {
 	try {
-		const db = createDb(c.env.DB);
 		const id = c.req.param('id');
 		const cacheKey = `cars:details:${id}`;
-
 		const cached = await c.env.CACHE.get(cacheKey);
 
 		if (cached) {
 			return c.json(JSON.parse(cached));
 		}
+
+		const db = createDb(c.env.DB);
 
 		const [carData] = await db
 			.select({
@@ -298,10 +295,9 @@ carsRouter.get('/:id', async (c) => {
 			.where(eq(Cars.id, id));
 
 		if (!carData) {
-			return c.json({ error: 'Car not found' }, 404);
+			return c.json({ error: 'Not found' }, 404);
 		}
 
-		// Get owner history in a separate query
 		const ownerHistory = await db
 			.select({
 				city: Owners.city,
@@ -344,18 +340,17 @@ carsRouter.get('/:id', async (c) => {
 	}
 });
 
-// Get single car summary
 carsRouter.get('/:id/summary', async (c) => {
 	try {
-		const db = createDb(c.env.DB);
 		const id = c.req.param('id');
 		const cacheKey = `cars:summary:${id}`;
-
 		const cached = await c.env.CACHE.get(cacheKey);
 
 		if (cached) {
 			return c.json(JSON.parse(cached));
 		}
+
+		const db = createDb(c.env.DB);
 
 		const [car] = await db
 			.select({
@@ -374,7 +369,7 @@ carsRouter.get('/:id/summary', async (c) => {
 			.where(eq(Cars.id, id));
 
 		if (!car) {
-			return c.json({ error: 'Car not found' }, 404);
+			return c.json({ error: 'Not found' }, 404);
 		}
 
 		await c.env.CACHE.put(cacheKey, JSON.stringify(car), {
@@ -384,6 +379,130 @@ carsRouter.get('/:id/summary', async (c) => {
 		return c.json(car);
 	} catch (error: unknown) {
 		console.error('Error fetching car summary:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error ? error.message : 'Unknown error',
+			},
+			500
+		);
+	}
+});
+
+carsRouter.post('/:id', withAuth(), async (c) => {
+	try {
+		const db = createDb(c.env.DB);
+		const id = c.req.param('id');
+		const userId = c.get('userId');
+		const body = await c.req.json();
+
+		const [existing] = await db
+			.select({
+				car: {
+					current_owner_id: Cars.current_owner_id,
+					destroyed: Cars.destroyed,
+					edition_id: Cars.edition_id,
+					id: Cars.id,
+					manufacture_date: Cars.manufacture_date,
+					sale_date: Cars.sale_date,
+					sale_dealer_city: Cars.sale_dealer_city,
+					sale_dealer_country: Cars.sale_dealer_country,
+					sale_dealer_name: Cars.sale_dealer_name,
+					sale_dealer_state: Cars.sale_dealer_state,
+					sale_msrp: Cars.sale_msrp,
+					sequence: Cars.sequence,
+					shipping_city: Cars.shipping_city,
+					shipping_country: Cars.shipping_country,
+					shipping_date: Cars.shipping_date,
+					shipping_state: Cars.shipping_state,
+					shipping_vessel: Cars.shipping_vessel,
+					vin: Cars.vin,
+				},
+				owner: {
+					car_id: CarOwners.car_id,
+					date_end: CarOwners.date_end,
+					date_start: CarOwners.date_start,
+					owner_id: CarOwners.owner_id,
+				},
+			})
+			.from(Cars)
+			.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
+			.innerJoin(
+				CarOwners,
+				and(
+					eq(Cars.id, CarOwners.car_id),
+					eq(Cars.current_owner_id, CarOwners.owner_id),
+					sql`${CarOwners.date_end} IS NULL`
+				)
+			)
+			.where(and(eq(Cars.id, id), eq(Owners.user_id, userId)));
+
+		if (!existing || !existing.car || !existing.owner) {
+			return c.json({ error: 'Unauthorized' }, 403);
+		}
+
+		await db.insert(CarsPending).values({
+			...existing.car,
+			id: crypto.randomUUID(),
+			car_id: existing.car.id,
+			created_at: Date.now(),
+			current_owner_id: body.owner_date_end
+				? null
+				: existing.car.current_owner_id,
+			destroyed: body.destroyed,
+			manufacture_date: `${body.manufacture_date}T00:00:00.000Z`,
+			sale_date: `${body.sale_date}T00:00:00.000Z`,
+			sale_dealer_city: body.sale_dealer_location?.city,
+			sale_dealer_country: body.sale_dealer_location?.country,
+			sale_dealer_name: body.sale_dealer_name,
+			sale_dealer_state: body.sale_dealer_location?.state,
+			sale_msrp: body.sale_msrp,
+			sequence: body.sequence,
+			shipping_city: body.shipping_location?.city,
+			shipping_country: body.shipping_location?.country,
+			shipping_date: `${body.shipping_date}T00:00:00.000Z`,
+			shipping_state: body.shipping_location?.state,
+			shipping_vessel: body.shipping_vessel,
+			status: 'pending',
+		});
+
+		const ownershipChanged =
+			existing.owner.date_start?.split('T')[0] !==
+				body.owner_date_start ||
+			existing.owner.date_end?.split('T')[0] !== body.owner_date_end;
+
+		if (ownershipChanged) {
+			await db.insert(CarOwnersPending).values({
+				car_id: id,
+				created_at: Date.now(),
+				date_end: body.owner_date_end
+					? `${body.owner_date_end}T00:00:00.000Z`
+					: null,
+				date_start: `${body.owner_date_start}T00:00:00.000Z`,
+				id: crypto.randomUUID(),
+				owner_id: existing.owner.owner_id,
+				status: 'pending',
+			});
+		}
+
+		const resend = new Resend(c.env.RESEND_API_KEY);
+
+		await resend.emails.send({
+			from: 'Miata Registry <support@miataregistry.com>',
+			to: 'mattcongrove@gmail.com',
+			subject: 'Miata Registry: New Car Change Request',
+			html: `
+				<h2>New Change Request</h2>
+				<p><strong>Car ID:</strong> ${existing.car.id}</p>
+				${ownershipChanged ? `<p><strong>Owner ID:</strong> ${existing.owner.owner_id}</p>` : ''}
+			`,
+		});
+
+		return c.json({ success: true });
+	} catch (error: unknown) {
+		console.error('Error updating car:', error);
 
 		return c.json(
 			{

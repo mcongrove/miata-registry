@@ -75,13 +75,26 @@ const Fallback = () => <div className="min-h-screen" />;
 
 function App() {
 	return (
-		<ClerkProvider
-			publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-			afterSignOutUrl="/"
-		>
-			<CSP />
+		<GoogleMapsProvider>
+			<ClerkProvider
+				publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+				afterSignOutUrl="/"
+				localization={{
+					userButton: {
+						action__manageAccount: 'Account Settings',
+					},
+					userProfile: {
+						start: {
+							headerTitle__account: 'Account Settings',
+						},
+						navbar: {
+							account: 'Account',
+						},
+					},
+				}}
+			>
+				<CSP />
 
-			<GoogleMapsProvider>
 				<BrowserRouter>
 					<ModalProvider>
 						<Routes>
@@ -131,8 +144,8 @@ function App() {
 						</Routes>
 					</ModalProvider>
 				</BrowserRouter>
-			</GoogleMapsProvider>
-		</ClerkProvider>
+			</ClerkProvider>
+		</GoogleMapsProvider>
 	);
 }
 

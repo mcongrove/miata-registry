@@ -17,7 +17,9 @@
  */
 
 export * from './schema/CarOwners';
+export * from './schema/CarOwnersPending';
 export * from './schema/Cars';
+export * from './schema/CarsPending';
 export * from './schema/Editions';
 export * from './schema/News';
 export * from './schema/Owners';

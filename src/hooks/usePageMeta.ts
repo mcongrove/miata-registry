@@ -54,7 +54,6 @@ export const usePageMeta = ({ title, description, path }: PageMetaProps) => {
 			element.setAttribute(attr || 'content', content);
 		};
 
-		// Update standard meta tags
 		updateMetaTag('meta[name="description"]', metaDescription);
 		updateMetaTag('meta[property="og:title"]', metaTitle);
 		updateMetaTag('meta[property="og:description"]', metaDescription);
@@ -64,7 +63,6 @@ export const usePageMeta = ({ title, description, path }: PageMetaProps) => {
 		updateMetaTag('meta[name="twitter:url"]', metaUrl);
 		updateMetaTag('link[rel="canonical"]', metaUrl, 'href');
 
-		// Add preload for hero image on home page
 		if (path === '/') {
 			const preloadLink = document.createElement('link');
 
@@ -82,7 +80,6 @@ export const usePageMeta = ({ title, description, path }: PageMetaProps) => {
 			};
 		}
 
-		// Add preload for car image on registry detail pages
 		const registryMatch = path?.match(/^\/registry\/(.+)$/);
 
 		if (registryMatch) {

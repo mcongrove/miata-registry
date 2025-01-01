@@ -44,7 +44,7 @@ export const toPrettyDate = (
 			timestamp.toString().split('T')[1] === '00:00:00.000Z';
 
 		return date.toLocaleString('en-US', {
-			timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+			timeZone: 'UTC',
 			month: 'long',
 			day: 'numeric',
 			year: 'numeric',

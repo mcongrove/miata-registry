@@ -439,7 +439,6 @@ export const About = () => {
 									<TextField
 										id="name"
 										name="name"
-										type="text"
 										placeholder="John Doe"
 										required
 									/>

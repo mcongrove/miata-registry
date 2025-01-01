@@ -87,29 +87,6 @@ export function TipModal({
 				throw new Error(error.details || 'Failed to submit tip');
 			}
 
-			const { tipId } = await response.json();
-
-			await fetch(
-				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/email/tip`,
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						tipId,
-						edition: formData.get('edition'),
-						vin: formData.get('vin') || 'Not provided',
-						sequenceNumber:
-							formData.get('sequenceNumber') || 'Not provided',
-						ownerName: formData.get('ownerName') || 'Not provided',
-						location: formData.get('location') || 'Not provided',
-						information:
-							formData.get('information') || 'Not provided',
-					}),
-				}
-			);
-
 			setIsSuccess(true);
 		} catch (error) {
 			alert(
@@ -255,7 +232,6 @@ export function TipModal({
 										<TextField
 											id="edition"
 											name="edition"
-											type="text"
 											placeholder="1992 M2-1002 Roadster"
 											required
 										/>
@@ -280,7 +256,6 @@ export function TipModal({
 									<TextField
 										id="sequenceNumber"
 										name="sequenceNumber"
-										type="text"
 										placeholder="182"
 									/>
 								</Field>
@@ -289,7 +264,6 @@ export function TipModal({
 									<TextField
 										id="vin"
 										name="vin"
-										type="text"
 										placeholder="JM1NA3510M1221538"
 									/>
 								</Field>
@@ -304,7 +278,6 @@ export function TipModal({
 									<TextField
 										id="ownerName"
 										name="ownerName"
-										type="text"
 										placeholder="John Doe"
 									/>
 								</Field>

@@ -16,51 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-interface TextFieldProps {
-	defaultValue?: string;
-	id: string;
-	name: string;
-	onChange?: (
-		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-	) => void;
-	placeholder: string;
-	readOnly?: boolean;
-	required?: boolean;
-	type: string;
-}
+import { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 
-export function TextField({
-	defaultValue,
-	id,
-	name,
-	onChange,
-	placeholder,
-	readOnly,
-	required,
-	type,
-}: TextFieldProps) {
+type BaseTextFieldProps = {
+	type?: 'date' | 'email' | 'number' | 'textarea' | 'text';
+};
+
+type InputProps = BaseTextFieldProps & InputHTMLAttributes<HTMLInputElement>;
+type TextAreaProps = BaseTextFieldProps &
+	TextareaHTMLAttributes<HTMLTextAreaElement>;
+
+type TextFieldProps = InputProps | TextAreaProps;
+
+export function TextField({ type = 'text', ...props }: TextFieldProps) {
+	const baseClassName =
+		'w-full px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg placeholder-[#9CA3AF]';
+
 	return type === 'textarea' ? (
 		<textarea
-			id={id}
-			name={name}
-			placeholder={placeholder}
-			defaultValue={defaultValue}
-			required={required}
-			onChange={onChange}
-			className="w-full h-32 px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg [&:not([value])]:!text-[#9CA3AF]"
-			readOnly={readOnly}
+			className={`${baseClassName} h-32`}
+			{...(props as TextareaHTMLAttributes<HTMLTextAreaElement>)}
 		/>
 	) : (
 		<input
-			id={id}
-			name={name}
 			type={type}
-			placeholder={placeholder}
-			defaultValue={defaultValue}
-			required={required}
-			className={`w-full px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg [&:not([value])]:!text-[#9CA3AF]`}
-			readOnly={readOnly}
-			onChange={onChange}
+			className={baseClassName}
+			{...(props as InputHTMLAttributes<HTMLInputElement>)}
 		/>
 	);
 }

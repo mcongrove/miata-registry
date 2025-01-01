@@ -24,34 +24,61 @@ import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
 const CACHE_TTL = {
-	CARS: 0, // None
-	COUNTRIES: 60 * 60 * 24 * 7, // 7 days
+	OWNER_DETAILS: 0, // None
+	OWNER_COUNTRIES: 60 * 60 * 24 * 7, // 7 days
 };
 
 const ownersRouter = new Hono<{ Bindings: Bindings }>();
 
-ownersRouter.use('/cars', withAuth());
+ownersRouter.get('/:id', withAuth(), async (c) => {
+	try {
+		const userId = c.get('userId');
+		const ownerId = c.req.param('id');
 
-ownersRouter.get('/cars', async (c) => {
-	const userId = c.get('userId');
+		if (userId !== ownerId) {
+			return c.json({ error: 'Unauthorized' }, 403);
+		}
 
-	const db = createDb(c.env.DB);
+		const db = createDb(c.env.DB);
 
-	const cars = await db
-		.select({
-			id: Cars.id,
-			year: Editions.year,
-			edition: Editions.name,
-			sequence: Cars.sequence,
-			vin: Cars.vin,
-			destroyed: Cars.destroyed,
-		})
-		.from(Cars)
-		.innerJoin(Editions, eq(Cars.edition_id, Editions.id))
-		.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
-		.where(eq(Owners.user_id, userId));
+		const ownerData = await db
+			.select({
+				cars: {
+					id: Cars.id,
+					year: Editions.year,
+					edition: Editions.name,
+					sequence: Cars.sequence,
+					vin: Cars.vin,
+					destroyed: Cars.destroyed,
+				},
+				owner: {
+					name: Owners.name,
+					city: Owners.city,
+					state: Owners.state,
+					country: Owners.country,
+				},
+			})
+			.from(Cars)
+			.innerJoin(Editions, eq(Cars.edition_id, Editions.id))
+			.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
+			.where(eq(Owners.user_id, ownerId));
 
-	return c.json(cars);
+		const cars = ownerData.map((row) => row.cars);
+		const location = ownerData[0]?.owner || null;
+
+		return c.json({ cars, location });
+	} catch (error) {
+		console.error('Error fetching owner data:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error ? error.message : 'Unknown error',
+			},
+			500
+		);
+	}
 });
 
 ownersRouter.get('/countries', async (c) => {
@@ -75,7 +102,7 @@ ownersRouter.get('/countries', async (c) => {
 		const countryList = countries.map((row) => row.country);
 
 		await c.env.CACHE.put('owners:countries', JSON.stringify(countryList), {
-			expirationTtl: CACHE_TTL.COUNTRIES,
+			expirationTtl: CACHE_TTL.OWNER_COUNTRIES,
 		});
 
 		return c.json(countryList);

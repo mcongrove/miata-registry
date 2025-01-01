@@ -17,26 +17,29 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import { TAddress } from '../../types/Location';
 
 interface LocationProps {
+	className?: string;
+	fullAddress?: boolean;
 	id: string;
 	name: string;
+	onLocationSelect?: (location: string) => void;
 	placeholder?: string;
 	required?: boolean;
-	fullAddress?: boolean;
 	value?: string;
-	onLocationSelect?: (location: string) => void;
 }
 
 export function Location({
+	className,
+	fullAddress = false,
 	id,
 	name,
+	onLocationSelect,
 	placeholder = '',
 	required,
-	fullAddress = false,
 	value,
-	onLocationSelect,
 }: LocationProps) {
 	const [inputValue, setInputValue] = useState(value || '');
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -127,7 +130,10 @@ export function Location({
 			required={required}
 			value={inputValue}
 			onChange={(e) => setInputValue(e.target.value)}
-			className="w-full px-3 py-2 !text-[16px] md:!text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid"
+			className={twMerge(
+				'w-full px-3 py-2 !text-[16px] md:!text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid',
+				className
+			)}
 		/>
 	);
 }

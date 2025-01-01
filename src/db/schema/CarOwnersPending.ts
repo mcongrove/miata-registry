@@ -16,15 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType =
-	| 'carEdit'
-	| 'export'
-	| 'news'
-	| 'qr'
-	| 'register'
-	| 'tip';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export interface TModalState {
-	props?: any;
-	type: TModalType | null;
-}
+export const CarOwnersPending = sqliteTable('car_owners_pending', {
+	car_id: text('car_id').notNull(),
+	created_at: integer('created_at').notNull(),
+	date_end: text('date_end'),
+	date_start: text('date_start'),
+	id: text('id').primaryKey(),
+	owner_id: text('owner_id').notNull(),
+	status: text('status', { enum: ['pending', 'approved', 'rejected'] })
+		.notNull()
+		.default('pending'),
+});

@@ -7,3 +7,11 @@
 		@apply text-brg;
 	}
 }
+
+.cl-modalBackdrop,
+.cl-modalContent {
+	z-index: 999 !important;
+}
+.pac-container {
+	z-index: 1000 !important;
+}

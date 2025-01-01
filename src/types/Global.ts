@@ -16,15 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType =
-	| 'carEdit'
-	| 'export'
-	| 'news'
-	| 'qr'
-	| 'register'
-	| 'tip';
+import { TCar } from './Car';
+import { TCarOwner } from './Owner';
 
-export interface TModalState {
-	props?: any;
-	type: TModalType | null;
-}
+export type TPending = {
+	car_id: string;
+	status: 'pending' | 'approved' | 'rejected';
+	created_at: number;
+};
+
+export type TCarPending = TCar & TPending;
+export type TCarOwnerPending = TCarOwner & TPending;

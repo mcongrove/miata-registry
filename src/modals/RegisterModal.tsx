@@ -28,24 +28,23 @@ import { Modal } from '../components/Modal';
 interface RegisterModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	prefilledData?: {
-		edition?: string;
-		vin?: string;
-		sequenceNumber?: string;
+	props?: {
+		prefilledData?: {
+			edition?: string;
+			vin?: string;
+			sequenceNumber?: string;
+		};
 	};
 }
 
-export function RegisterModal({
-	isOpen,
-	onClose,
-	prefilledData,
-}: RegisterModalProps) {
+export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 	const { isSignedIn, userId } = useAuth();
 	const { openSignIn } = useClerk();
 	const [loading, setLoading] = useState(false);
 	const [editions, setEditions] = useState<string[]>([]);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [showOtherInput, setShowOtherInput] = useState(false);
+	const prefilledData = props?.prefilledData;
 
 	useEffect(() => {
 		const loadEditions = async () => {
@@ -113,29 +112,6 @@ export function RegisterModal({
 
 				throw new Error(error.details || 'Failed to submit tip');
 			}
-
-			const { tipId } = await response.json();
-
-			await fetch(
-				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/email/tip`,
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						tipId,
-						edition: formData.get('edition'),
-						vin: formData.get('vin') || 'Not provided',
-						sequenceNumber:
-							formData.get('sequenceNumber') || 'Not provided',
-						ownerName: formData.get('ownerName') || 'Not provided',
-						location: formData.get('location') || 'Not provided',
-						information:
-							formData.get('information') || 'Not provided',
-					}),
-				}
-			);
 
 			setIsSuccess(true);
 		} catch (error) {
@@ -292,7 +268,6 @@ export function RegisterModal({
 							<TextField
 								id="edition"
 								name="edition"
-								type="text"
 								placeholder="1992 M2-1002 Roadster"
 								defaultValue={prefilledData.edition}
 								required
@@ -328,7 +303,6 @@ export function RegisterModal({
 								<TextField
 									id="edition"
 									name="edition"
-									type="text"
 									placeholder="1992 M2-1002 Roadster"
 									required
 								/>
@@ -351,7 +325,6 @@ export function RegisterModal({
 							<TextField
 								id="sequenceNumber"
 								name="sequenceNumber"
-								type="text"
 								placeholder="182"
 								defaultValue={prefilledData?.sequenceNumber}
 								readOnly={!!prefilledData?.sequenceNumber}
@@ -362,7 +335,6 @@ export function RegisterModal({
 							<TextField
 								id="vin"
 								name="vin"
-								type="text"
 								placeholder="JM1NA3510M1221538"
 								defaultValue={prefilledData?.vin}
 								readOnly={!!prefilledData?.vin}
@@ -373,21 +345,20 @@ export function RegisterModal({
 					<div className="flex justify-between gap-4">
 						<Field
 							id="ownerName"
-							label="Owner Name"
+							label="Your Name"
 							required
 							className="w-64"
 						>
 							<TextField
 								id="ownerName"
 								name="ownerName"
-								type="text"
 								placeholder="John Doe"
 							/>
 						</Field>
 
 						<Field
 							id="location"
-							label="Location"
+							label="Your Location"
 							required
 							className="w-full"
 						>

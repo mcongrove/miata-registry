@@ -68,7 +68,6 @@ export const countryNameToCode = (country: string): string => {
 	}
 };
 
-// Convert enum to const object for better type safety
 export const Countries = {
 	AD: { latitude: 42.546245, longitude: 1.601554, name: 'Andorra' },
 	AE: {

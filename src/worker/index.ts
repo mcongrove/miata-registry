@@ -52,10 +52,8 @@ app.use('*', async (c, next) => {
 	})(c, next);
 });
 
-// API test endpoint
 app.get('/', (c) => c.json({ error: 'Not Found' }, 404));
 
-// Mount API routes
 app.route('/cars', carsRouter);
 app.route('/editions', editionsRouter);
 app.route('/email', emailRouter);

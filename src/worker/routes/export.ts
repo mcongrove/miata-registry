@@ -25,8 +25,6 @@ import type { Bindings } from '../types';
 
 const exportRouter = new Hono<{ Bindings: Bindings }>();
 
-exportRouter.use('*', withAuth());
-
 const objectsToCSV = (data: any[]) => {
 	if (data.length === 0) return '';
 
@@ -50,11 +48,10 @@ const objectsToCSV = (data: any[]) => {
 	return csvRows.join('\n');
 };
 
-exportRouter.get('/', async (c) => {
+exportRouter.get('/', withAuth(), async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 
-		// Fetch data from all tables
 		const carOwners = await db.select().from(CarOwners);
 		const cars = await db.select().from(Cars);
 		const editions = await db.select().from(Editions);
@@ -62,7 +59,6 @@ exportRouter.get('/', async (c) => {
 		const owners = await db.select().from(Owners);
 		const tips = await db.select().from(Tips);
 
-		// Convert to CSVs
 		const carOwnersCSV = objectsToCSV(carOwners);
 		const carsCSV = objectsToCSV(cars);
 		const editionsCSV = objectsToCSV(editions);
@@ -70,7 +66,6 @@ exportRouter.get('/', async (c) => {
 		const ownersCSV = objectsToCSV(owners);
 		const tipsCSV = objectsToCSV(tips);
 
-		// Create ZIP file
 		const zip = new JSZip();
 
 		zip.file('car_owners.csv', carOwnersCSV);
@@ -82,7 +77,6 @@ exportRouter.get('/', async (c) => {
 
 		const zipBlob = await zip.generateAsync({ type: 'blob' });
 
-		// Set response headers
 		c.header('Content-Type', 'application/zip');
 		c.header(
 			'Content-Disposition',

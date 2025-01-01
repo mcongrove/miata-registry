@@ -17,6 +17,7 @@
  */
 
 import { Hono } from 'hono';
+import { Resend } from 'resend';
 import { v4 as uuid } from 'uuid';
 import { createDb } from '../../db';
 import { Tips } from '../../db/schema';
@@ -27,9 +28,7 @@ const tipsRouter = new Hono<{ Bindings: Bindings }>();
 tipsRouter.post('/', async (c) => {
 	try {
 		const formData = await c.req.formData();
-
 		const tipId = uuid();
-
 		const db = createDb(c.env.DB);
 
 		await db.insert(Tips).values({
@@ -42,6 +41,24 @@ tipsRouter.post('/', async (c) => {
 			sequence_number: (formData.get('sequenceNumber') as string) || null,
 			user_id: (formData.get('userId') as string) || null,
 			vin: (formData.get('vin') as string) || null,
+		});
+
+		const resend = new Resend(c.env.RESEND_API_KEY);
+
+		await resend.emails.send({
+			from: 'Miata Registry <support@miataregistry.com>',
+			to: 'mattcongrove@gmail.com',
+			subject: 'Miata Registry: Tip Form',
+			html: `
+                <h2>Registry Tip</h2>
+                <p><strong>Tip ID:</strong> ${tipId}</p>
+                <p><strong>Edition:</strong> ${formData.get('edition')}</p>
+                <p><strong>VIN:</strong> ${formData.get('vin') || 'Not provided'}</p>
+                <p><strong>Sequence Number:</strong> ${formData.get('sequenceNumber') || 'Not provided'}</p>
+                <p><strong>Owner Name:</strong> ${formData.get('ownerName') || 'Not provided'}</p>
+                <p><strong>Location:</strong> ${formData.get('location') || 'Not provided'}</p>
+                <p><strong>Information:</strong> ${formData.get('information') || 'Not provided'}</p>
+            `,
 		});
 
 		return c.json({ success: true, tipId });

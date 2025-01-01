@@ -97,7 +97,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 				<ModalComponent
 					isOpen={true}
 					onClose={closeModal}
-					{...modalState.props}
+					props={modalState.props}
 				/>
 			</Suspense>
 		);
