@@ -30,7 +30,7 @@ export const usePageMeta = ({ title, description, path }: PageMetaProps) => {
 		'A community-driven project documenting the history of limited edition Mazda Miatas.';
 
 	const metaTitle = title ? `${title} – Miata Registry` : 'Miata Registry';
-	const metaUrl = path ? `${baseUrl}${path}` : baseUrl;
+	const metaUrl = path ? `${baseUrl}${path.replace(/\/$/, '')}` : baseUrl;
 	const metaDescription = description || defaultDescription;
 
 	useEffect(() => {
