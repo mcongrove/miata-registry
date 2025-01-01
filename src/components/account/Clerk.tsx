@@ -23,129 +23,35 @@ import {
 	useAuth,
 	UserButton,
 } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { twMerge } from 'tailwind-merge';
-// import { formatLocation } from '../../utils/geo';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { TOwner } from '../../types/Owner';
+import { handleApiError } from '../../utils/global';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
-// import { Location } from '../form/Location';
 
-// const ProfileSettings = ({
-// 	location,
-// 	onLocationSelect,
-// }: {
-// 	location: { city: string; state: string; country: string } | null;
-// 	onLocationSelect: (location: any) => void;
-// }) => {
-// 	return (
-// 		<div className="flex gap-6 py-4 h-full">
-// 			<div className="w-44 py-1.5 shrink-0">
-// 				<p className="text-[#212126] font-medium text-[13px] py-2">
-// 					Location
-// 				</p>
-// 			</div>
+const ClerkMyCars = lazy(() =>
+	import('./ClerkMyCars').then((module) => ({
+		default: module.ClerkMyCars,
+	}))
+);
 
-// 			<div className="h-full w-full pt-1.5 pb-1.5">
-// 				<Location
-// 					id="location"
-// 					name="location"
-// 					placeholder="Enter a location"
-// 					className="text-[#212126] md:!text-[13px] border-[#E1E1E1] focus:border-[#A2A2A2] focus:ring-[3px] focus:ring-[#E3E3E3] transition-all"
-// 					value={location ? formatLocation(location) : ''}
-// 					onLocationSelect={onLocationSelect}
-// 				/>
-// 			</div>
-// 		</div>
-// 	);
-// };
+const ClerkProfile = lazy(() =>
+	import('./ClerkProfile').then((module) => ({
+		default: module.ClerkProfile,
+	}))
+);
 
-const CarsList = ({
-	cars,
-	isLoading,
-}: {
-	cars: Array<{
-		id: string;
-		year: number;
-		edition: string;
-		sequence: number | null;
-		vin: string | null;
-		destroyed: boolean;
-	}>;
-	isLoading: boolean;
-}) => {
-	if (isLoading) {
-		return <p className="text-[#B6B6B6] text-[13px]">Loading...</p>;
-	}
-
-	if (cars.length === 0) {
-		return (
-			<p className="text-[#B6B6B6] text-[13px]">
-				You haven't claimed any cars yet.
-			</p>
-		);
-	}
-
-	return (
-		<>
-			{cars.map((car) => (
-				<Link
-					key={car.id}
-					to={`/registry/${car.id}`}
-					className={twMerge(
-						'text-[13px] group flex flex-col cursor-pointer mb-1 py-1.5 px-2.5 -mx-2.5 rounded-md hover:bg-[#F7F7F7] transition-colors',
-						car.destroyed ? 'text-[#EF4444]' : 'text-[#212126]'
-					)}
-				>
-					<div className="flex items-center gap-1">
-						<span
-							className={twMerge(
-								'whitespace-nowrap',
-								car.destroyed ? 'line-through' : ''
-							)}
-						>
-							{car.year} {car.edition}
-							{car.sequence ? ` #${car.sequence}` : ''}
-						</span>
-
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							stroke="#2F3037"
-							viewBox="0 0 20 20"
-							className="size-4 group-hover:opacity-50 opacity-0 -translate-x-2 group-hover:translate-x-0 transition-all"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M3.3 10h13.4m-5-5 5 5-5 5"
-							></path>
-						</svg>
-					</div>
-
-					<div
-						className={twMerge(
-							'w-fit',
-							car.destroyed
-								? 'text-[#747686]/50'
-								: 'text-[#747686]'
-						)}
-					>
-						{car.vin}
-					</div>
-				</Link>
-			))}
-		</>
-	);
-};
+const LoadingIndicator = () => (
+	<p className="text-[#B6B6B6] text-[13px]">Loading...</p>
+);
 
 export function Clerk() {
 	const location = useLocation();
 	const { userId } = useAuth();
 	const [isLoading, setIsLoading] = useState(true);
 	const [ownerData, setOwnerData] = useState<{
-		location: { city: string; state: string; country: string } | null;
+		owner: TOwner;
 		cars: Array<{
 			id: string;
 			year: number;
@@ -154,34 +60,34 @@ export function Clerk() {
 			vin: string | null;
 			destroyed: boolean;
 		}>;
-	}>({ location: null, cars: [] });
+	}>({ owner: { id: '' }, cars: [] });
 
 	const isHomePage = location.pathname === '/';
 
+	const fetchOwnerData = async () => {
+		if (!userId) return;
+
+		try {
+			const response = await fetch(
+				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/${userId}`,
+				{
+					credentials: 'include',
+				}
+			);
+
+			if (!response.ok) throw new Error('Failed to fetch owner data');
+
+			const data = await response.json();
+
+			setOwnerData(data);
+		} catch (error) {
+			handleApiError(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		const fetchOwnerData = async () => {
-			if (!userId) return;
-
-			try {
-				const response = await fetch(
-					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/${userId}`,
-					{
-						credentials: 'include',
-					}
-				);
-
-				if (!response.ok) throw new Error('Failed to fetch owner data');
-
-				const data = await response.json();
-
-				setOwnerData(data);
-			} catch (error) {
-				console.error('Error fetching owner data:', error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
 		fetchOwnerData();
 	}, [userId]);
 
@@ -208,16 +114,24 @@ export function Clerk() {
 					}}
 				>
 					<UserButton.MenuItems>
-						{/* <UserButton.Action
-							label="Profile Settings"
+						<UserButton.Action
+							label="Profile"
 							labelIcon={
-								<Icon
-									name="user"
-									className="size-3.5 text-[#616161]"
-								/>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="currentColor"
+									viewBox="0 0 16 16"
+								>
+									<path
+										fill-rule="evenodd"
+										clip-rule="evenodd"
+										d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-2.585 2.894c.154.25.107.568-.083.792A5.675 5.675 0 0 1 8 13.688a5.675 5.675 0 0 1-4.332-2.002c-.19-.224-.237-.543-.083-.792.087-.14.189-.271.306-.392.46-.469 1.087-.986 1.703-1.102.514-.097.899.056 1.298.214.331.132.673.267 1.108.267.435 0 .777-.135 1.108-.267.4-.158.784-.31 1.298-.214.616.116 1.243.633 1.703 1.102.117.12.22.252.306.392ZM8 8.919c1.329 0 2.406-1.559 2.406-2.888a2.406 2.406 0 1 0-4.812 0C5.594 7.361 6.67 8.92 8 8.92Z"
+										fill="currentColor"
+									></path>
+								</svg>
 							}
 							open="profile"
-						/> */}
+						/>
 
 						<UserButton.Action
 							label="My Cars"
@@ -233,7 +147,7 @@ export function Clerk() {
 
 					<UserButton.UserProfilePage label="account" />
 
-					{/* <UserButton.UserProfilePage
+					<UserButton.UserProfilePage
 						label="Profile"
 						labelIcon={
 							<Icon
@@ -249,15 +163,19 @@ export function Clerk() {
 							</h1>
 
 							<div className="border-t border-black/[0.07] flex flex-col h-full">
-								<ProfileSettings
-									location={ownerData.location}
-									onLocationSelect={(location) =>
-										console.log(location)
-									}
-								/>
+								{isLoading ? (
+									<LoadingIndicator />
+								) : (
+									<Suspense fallback={<LoadingIndicator />}>
+										<ClerkProfile
+											owner={ownerData.owner}
+											onUpdate={fetchOwnerData}
+										/>
+									</Suspense>
+								)}
 							</div>
 						</>
-					</UserButton.UserProfilePage> */}
+					</UserButton.UserProfilePage>
 
 					<UserButton.UserProfilePage
 						label="My Cars"
@@ -275,10 +193,13 @@ export function Clerk() {
 							</h1>
 
 							<div className="border-t border-black/[0.07] py-4 flex flex-col">
-								<CarsList
-									cars={ownerData.cars}
-									isLoading={isLoading}
-								/>
+								{isLoading ? (
+									<LoadingIndicator />
+								) : (
+									<Suspense fallback={<LoadingIndicator />}>
+										<ClerkMyCars cars={ownerData.cars} />
+									</Suspense>
+								)}
 							</div>
 						</>
 					</UserButton.UserProfilePage>

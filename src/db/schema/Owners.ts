@@ -16,12 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { blob, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const Owners = sqliteTable('owners', {
 	city: text('city'),
 	country: text('country'),
 	id: text('id').primaryKey(),
+	links: blob('links', { mode: 'json' }).$type<{
+		instagram: string | null;
+	}>(),
 	name: text('name'),
 	state: text('state'),
 	user_id: text('user_id'),

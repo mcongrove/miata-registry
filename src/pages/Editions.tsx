@@ -179,7 +179,31 @@ export const Editions = () => {
 					</div>
 				)}
 
-				<div className="flex flex-col lg:flex-row justify-between items-start mt-8 lg:mt-16 gap-4 lg:gap-12">
+				<div className="flex flex-col lg:flex-row justify-between items-stretch mt-8 lg:mt-16 gap-4 lg:gap-12">
+					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
+						<h3 className="flex gap-2 items-center text-brg-mid font-bold">
+							<Icon name="question-circle" />
+							Don't see your edition?
+						</h3>
+
+						<p className="text-brg-mid md:w-4/5 lg:w-full">
+							We pulled our list of limited edition Miatas from
+							publicly available datasets, so we may be missing a
+							few. If you know of an edition that isn't listed,
+							please reach out.
+						</p>
+
+						<Link to="/about#contact">
+							<Button
+								variant="secondary"
+								withArrow
+								className="text-xs mt-2"
+							>
+								Let us know
+							</Button>
+						</Link>
+					</div>
+
 					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
 						<h3 className="flex gap-2 items-center text-brg-mid font-bold">
 							<Icon name="question-circle" />

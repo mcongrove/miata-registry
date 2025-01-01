@@ -17,9 +17,11 @@
  */
 
 import { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 type BaseTextFieldProps = {
 	type?: 'date' | 'email' | 'number' | 'textarea' | 'text';
+	className?: string;
 };
 
 type InputProps = BaseTextFieldProps & InputHTMLAttributes<HTMLInputElement>;
@@ -28,19 +30,23 @@ type TextAreaProps = BaseTextFieldProps &
 
 type TextFieldProps = InputProps | TextAreaProps;
 
-export function TextField({ type = 'text', ...props }: TextFieldProps) {
+export function TextField({
+	className,
+	type = 'text',
+	...props
+}: TextFieldProps) {
 	const baseClassName =
 		'w-full px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg placeholder-[#9CA3AF]';
 
 	return type === 'textarea' ? (
 		<textarea
-			className={`${baseClassName} h-32`}
+			className={twMerge(baseClassName, 'h-32', className)}
 			{...(props as TextareaHTMLAttributes<HTMLTextAreaElement>)}
 		/>
 	) : (
 		<input
 			type={type}
-			className={baseClassName}
+			className={twMerge(baseClassName, className)}
 			{...(props as InputHTMLAttributes<HTMLInputElement>)}
 		/>
 	);

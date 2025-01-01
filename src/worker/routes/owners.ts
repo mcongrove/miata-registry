@@ -33,10 +33,16 @@ const ownersRouter = new Hono<{ Bindings: Bindings }>();
 ownersRouter.get('/:id', withAuth(), async (c) => {
 	try {
 		const userId = c.get('userId');
-		const ownerId = c.req.param('id');
+		const ownerUserId = c.req.param('id');
 
-		if (userId !== ownerId) {
-			return c.json({ error: 'Unauthorized' }, 403);
+		if (userId !== ownerUserId) {
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				403
+			);
 		}
 
 		const db = createDb(c.env.DB);
@@ -44,31 +50,102 @@ ownersRouter.get('/:id', withAuth(), async (c) => {
 		const ownerData = await db
 			.select({
 				cars: {
-					id: Cars.id,
-					year: Editions.year,
+					destroyed: Cars.destroyed,
 					edition: Editions.name,
+					id: Cars.id,
 					sequence: Cars.sequence,
 					vin: Cars.vin,
-					destroyed: Cars.destroyed,
+					year: Editions.year,
 				},
 				owner: {
-					name: Owners.name,
 					city: Owners.city,
-					state: Owners.state,
 					country: Owners.country,
+					id: Owners.id,
+					links: sql<string>`json(${Owners.links})`,
+					name: Owners.name,
+					state: Owners.state,
+					user_id: Owners.user_id,
 				},
 			})
 			.from(Cars)
 			.innerJoin(Editions, eq(Cars.edition_id, Editions.id))
 			.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
-			.where(eq(Owners.user_id, ownerId));
+			.where(eq(Owners.user_id, ownerUserId));
 
 		const cars = ownerData.map((row) => row.cars);
-		const location = ownerData[0]?.owner || null;
+		const owner = {
+			...ownerData[0].owner,
+			links: ownerData[0].owner.links
+				? JSON.parse(ownerData[0].owner.links)
+				: null,
+		};
 
-		return c.json({ cars, location });
+		return c.json({ cars, owner });
 	} catch (error) {
 		console.error('Error fetching owner data:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
+ownersRouter.post('/:id', withAuth(), async (c) => {
+	try {
+		const userId = c.get('userId');
+		const ownerUserId = c.req.param('id');
+		const body = await c.req.json();
+
+		if (userId !== ownerUserId) {
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				403
+			);
+		}
+
+		const db = createDb(c.env.DB);
+		const linksJson = JSON.stringify({
+			instagram: body.links?.instagram || null,
+		});
+
+		const [updatedOwner] = await db
+			.update(Owners)
+			.set({
+				city: body.location?.city || null,
+				state: body.location?.state || null,
+				country: body.location?.country || null,
+				links: sql`json(${linksJson})`,
+			})
+			.where(eq(Owners.user_id, ownerUserId))
+			.returning({ id: Owners.id });
+
+		const ownedCars = await db
+			.select({ id: Cars.id })
+			.from(Cars)
+			.where(eq(Cars.current_owner_id, updatedOwner.id));
+
+		await Promise.all([
+			...ownedCars
+				.map((car) => [
+					c.env.CACHE.delete(`cars:details:${car.id}`),
+					c.env.CACHE.delete(`cars:summary:${car.id}`),
+				])
+				.flat(),
+		]);
+
+		return c.json({ success: true });
+	} catch (error) {
+		console.error('Error updating owner:', error);
 
 		return c.json(
 			{

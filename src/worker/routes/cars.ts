@@ -524,6 +524,11 @@ carsRouter.post('/:id', withAuth(), async (c) => {
 			`,
 		});
 
+		await Promise.all([
+			c.env.CACHE.delete(`cars:details:${id}`),
+			c.env.CACHE.delete(`cars:summary:${id}`),
+		]);
+
 		return c.json({ success: true });
 	} catch (error: unknown) {
 		console.error('Error updating car:', error);

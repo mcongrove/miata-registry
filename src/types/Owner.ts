@@ -20,6 +20,9 @@ export type TOwner = {
 	city?: string;
 	country?: string;
 	id: string;
+	links?: {
+		instagram?: string;
+	};
 	name?: string;
 	state?: string;
 	user_id?: string;

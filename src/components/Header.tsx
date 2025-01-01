@@ -140,10 +140,8 @@ export const Header = () => {
 					label="About"
 					items={[
 						{ label: 'About the Registry', to: '/about' },
-						// { label: 'News', to: '/news' },
 						{ label: 'Contributing', to: '/about#contribute' },
 						{ label: 'Contact us', to: '/about#contact' },
-						// { label: 'Submit a tip', to: '/tip' },
 					]}
 					isActive={isActive('/about')}
 				/>
