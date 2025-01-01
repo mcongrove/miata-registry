@@ -12,7 +12,7 @@ on:
             - 'src/types/**'
             - 'src/utils/**'
             - 'src/worker/**'
-			- 'package.json'
+            - 'package.json'
             - 'wrangler.toml'
 
 jobs:
