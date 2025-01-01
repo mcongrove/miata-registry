@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { SelectStyles } from '../components/form/Select';
@@ -24,6 +25,7 @@ import { TextField } from '../components/form/TextField';
 import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
 import { useModal } from '../context/ModalContext';
+import { handleApiError } from '../utils/global';
 
 export function TipModal({
 	isOpen,
@@ -34,8 +36,9 @@ export function TipModal({
 }) {
 	const { openModal } = useModal();
 	const [loading, setLoading] = useState(false);
-	const [editions, setEditions] = useState<string[]>([]);
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [formError, setFormError] = useState<string | null>(null);
+	const [editions, setEditions] = useState<string[]>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
 	const [isOwner, setIsOwner] = useState(false);
 
@@ -65,6 +68,7 @@ export function TipModal({
 		}
 
 		setLoading(true);
+		setFormError(null);
 
 		try {
 			const form = document.querySelector('form#tipForm');
@@ -89,11 +93,8 @@ export function TipModal({
 
 			setIsSuccess(true);
 		} catch (error) {
-			alert(
-				error instanceof Error
-					? error.message
-					: 'Failed to submit tip. Please try again.'
-			);
+			handleApiError(error);
+			setFormError('Failed to submit form. Please try again.');
 		} finally {
 			setLoading(false);
 		}
@@ -175,6 +176,11 @@ export function TipModal({
 			}
 		>
 			<div className="flex flex-col gap-4">
+				<ErrorBanner
+					error={formError}
+					onDismiss={() => setFormError(null)}
+				/>
+
 				<label className="flex items-center gap-2 text-sm text-brg-mid">
 					<input
 						type="checkbox"

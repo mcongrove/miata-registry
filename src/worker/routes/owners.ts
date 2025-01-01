@@ -74,7 +74,9 @@ ownersRouter.get('/:id', withAuth(), async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);
@@ -113,7 +115,9 @@ ownersRouter.get('/countries', async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);

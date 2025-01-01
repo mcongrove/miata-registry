@@ -19,11 +19,13 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { Button } from '../components/Button';
+import { ErrorBanner } from '../components/ErrorBanner';
 import { Modal } from '../components/Modal';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { Select, SelectStyles } from '../components/form/Select';
 import { TCar } from '../types/Car';
+import { handleApiError } from '../utils/global';
 
 export function QrModal({
 	car,
@@ -37,6 +39,7 @@ export function QrModal({
 	const [showStickerForm, setShowStickerForm] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [formError, setFormError] = useState<string | null>(null);
 	const [quantity, setQuantity] = useState('1');
 	const [selectedLocation, setSelectedLocation] = useState('');
 
@@ -98,6 +101,7 @@ export function QrModal({
 		}
 
 		setLoading(true);
+		setFormError(null);
 
 		try {
 			const form = document.querySelector('form#stickerForm');
@@ -123,7 +127,8 @@ export function QrModal({
 
 			setIsSuccess(true);
 		} catch (error) {
-			alert('Failed to submit request. Please try again.');
+			handleApiError(error);
+			setFormError('Failed to submit form. Please try again.');
 		} finally {
 			setLoading(false);
 		}
@@ -193,8 +198,13 @@ export function QrModal({
 			}
 		>
 			{showStickerForm ? (
-				<div>
-					<p className="text-brg-mid text-sm mb-6">
+				<div className="flex flex-col gap-4">
+					<ErrorBanner
+						error={formError}
+						onDismiss={() => setFormError(null)}
+					/>
+
+					<p className="text-brg-mid text-sm">
 						Please provide your shipping details for your Miata
 						Registry window sticker. Stickers are free for for a
 						limited time, including shipping worldwide!

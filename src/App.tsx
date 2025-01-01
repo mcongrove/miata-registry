@@ -18,6 +18,7 @@
 
 import { ClerkProvider } from '@clerk/clerk-react';
 import { lazy, Suspense, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import {
 	BrowserRouter,
 	Outlet,
@@ -94,6 +95,7 @@ function App() {
 				}}
 			>
 				<CSP />
+				<Toaster />
 
 				<BrowserRouter>
 					<ModalProvider>

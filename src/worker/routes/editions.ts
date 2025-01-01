@@ -83,7 +83,9 @@ editionsRouter.get('/', async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);
@@ -125,7 +127,9 @@ editionsRouter.get('/names', async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);

@@ -40,7 +40,13 @@ app.use('*', async (c, next) => {
 
 	if (c.env.NODE_ENV !== 'development') {
 		if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
-			return c.json({ error: 'Unauthorized' }, 403);
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				401
+			);
 		}
 	}
 

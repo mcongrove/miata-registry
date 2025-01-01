@@ -91,7 +91,9 @@ exportRouter.get('/', withAuth(), async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);

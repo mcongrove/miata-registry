@@ -18,6 +18,7 @@
 
 import { useAuth } from '@clerk/clerk-react';
 import { useState } from 'react';
+import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { TextField } from '../components/form/TextField';
@@ -25,6 +26,7 @@ import { Modal } from '../components/Modal';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { formatLocation, parseLocation } from '../utils/geo';
+import { handleApiError } from '../utils/global';
 
 interface CarEditModalProps {
 	isOpen: boolean;
@@ -40,6 +42,7 @@ export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
 	const { isSignedIn, userId, getToken } = useAuth();
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [formError, setFormError] = useState<string | null>(null);
 	const [warningSequence, setWarningSequence] = useState(false);
 	const [warningOwnerDateEnd, setWarningOwnerDateEnd] = useState(false);
 	const car = props.car;
@@ -62,6 +65,7 @@ export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
 		}
 
 		setLoading(true);
+		setFormError(null);
 
 		try {
 			const form = document.querySelector('form#carEditForm');
@@ -129,11 +133,8 @@ export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
 
 			setIsSuccess(true);
 		} catch (error) {
-			alert(
-				error instanceof Error
-					? error.message
-					: 'Failed to update car. Please try again.'
-			);
+			handleApiError(error);
+			setFormError('Failed to submit form. Please try again.');
 		} finally {
 			setLoading(false);
 		}
@@ -204,6 +205,11 @@ export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
 				className="flex flex-col gap-4"
 			>
 				<input type="hidden" name="userId" value={userId} />
+
+				<ErrorBanner
+					error={formError}
+					onDismiss={() => setFormError(null)}
+				/>
 
 				<div className="flex flex-col gap-2">
 					<h4 className="text-md font-semibold -mt-1">

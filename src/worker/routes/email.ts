@@ -47,7 +47,9 @@ emailRouter.post('/contact', async (c) => {
 			{
 				error: 'Failed to send email',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);
@@ -79,7 +81,9 @@ emailRouter.post('/sticker', async (c) => {
 			{
 				error: 'Failed to send email',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);

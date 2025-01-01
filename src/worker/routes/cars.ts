@@ -231,7 +231,9 @@ carsRouter.get('/', async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);
@@ -295,7 +297,13 @@ carsRouter.get('/:id', async (c) => {
 			.where(eq(Cars.id, id));
 
 		if (!carData) {
-			return c.json({ error: 'Not found' }, 404);
+			return c.json(
+				{
+					error: 'Not found',
+					details: "The requested car wasn't found",
+				},
+				404
+			);
 		}
 
 		const ownerHistory = await db
@@ -333,7 +341,9 @@ carsRouter.get('/:id', async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);
@@ -369,7 +379,13 @@ carsRouter.get('/:id/summary', async (c) => {
 			.where(eq(Cars.id, id));
 
 		if (!car) {
-			return c.json({ error: 'Not found' }, 404);
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "The requested car wasn't found",
+				},
+				404
+			);
 		}
 
 		await c.env.CACHE.put(cacheKey, JSON.stringify(car), {
@@ -384,7 +400,9 @@ carsRouter.get('/:id/summary', async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);
@@ -440,7 +458,13 @@ carsRouter.post('/:id', withAuth(), async (c) => {
 			.where(and(eq(Cars.id, id), eq(Owners.user_id, userId)));
 
 		if (!existing || !existing.car || !existing.owner) {
-			return c.json({ error: 'Unauthorized' }, 403);
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				403
+			);
 		}
 
 		await db.insert(CarsPending).values({
@@ -508,7 +532,9 @@ carsRouter.post('/:id', withAuth(), async (c) => {
 			{
 				error: 'Internal server error',
 				details:
-					error instanceof Error ? error.message : 'Unknown error',
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
 			},
 			500
 		);

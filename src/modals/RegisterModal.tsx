@@ -18,12 +18,14 @@
 
 import { useAuth, useClerk } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
+import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
+import { handleApiError } from '../utils/global';
 
 interface RegisterModalProps {
 	isOpen: boolean;
@@ -41,8 +43,9 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 	const { isSignedIn, userId } = useAuth();
 	const { openSignIn } = useClerk();
 	const [loading, setLoading] = useState(false);
-	const [editions, setEditions] = useState<string[]>([]);
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [formError, setFormError] = useState<string | null>(null);
+	const [editions, setEditions] = useState<string[]>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
 	const prefilledData = props?.prefilledData;
 
@@ -91,6 +94,7 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 		}
 
 		setLoading(true);
+		setFormError(null);
 
 		try {
 			const form = document.querySelector('form#registerForm');
@@ -115,11 +119,8 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 
 			setIsSuccess(true);
 		} catch (error) {
-			alert(
-				error instanceof Error
-					? error.message
-					: 'Failed to submit tip. Please try again.'
-			);
+			handleApiError(error);
+			setFormError('Failed to submit form. Please try again.');
 		} finally {
 			setLoading(false);
 		}
@@ -241,145 +242,157 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 				loading,
 			}}
 		>
-			<p className="text-brg-mid text-sm mb-6">
-				Until the self-
-				{prefilledData?.edition ? 'claim' : 'register'} feature is
-				available, please fill out the form below to{' '}
-				{prefilledData?.edition ? 'claim' : 'register'} your Miata.
-			</p>
+			<div className="flex flex-col gap-4">
+				<p className="text-brg-mid text-sm">
+					Until the self-
+					{prefilledData?.edition ? 'claim' : 'register'} feature is
+					available, please fill out the form below to{' '}
+					{prefilledData?.edition ? 'claim' : 'register'} your Miata.
+				</p>
 
-			<form
-				id="registerForm"
-				onSubmit={handleSubmit}
-				className="flex flex-col gap-4"
-			>
-				{isSignedIn && (
-					<input
-						id="userId"
-						name="userId"
-						type="hidden"
-						value={userId}
-					/>
-				)}
+				<ErrorBanner
+					error={formError}
+					onDismiss={() => setFormError(null)}
+				/>
 
-				<div className="space-y-4">
-					<Field id="edition" label="Edition" required>
-						{prefilledData?.edition ? (
-							<TextField
-								id="edition"
-								name="edition"
-								placeholder="1992 M2-1002 Roadster"
-								defaultValue={prefilledData.edition}
-								required
-								readOnly
-							/>
-						) : !showOtherInput ? (
-							<select
-								className={SelectStyles(
-									false,
-									'w-full border-brg-light text-sm'
-								)}
-								name="edition"
-								required
-								onChange={(e) => {
-									if (e.target.value === 'other') {
-										setShowOtherInput(true);
-									}
-								}}
-								defaultValue=""
-							>
-								<option value="" disabled>
-									Select an edition
-								</option>
-								{editions.map((edition) => (
-									<option key={edition} value={edition}>
-										{edition}
-									</option>
-								))}
-								<option value="other">Other</option>
-							</select>
-						) : (
-							<div className="flex items-center gap-2">
+				<form
+					id="registerForm"
+					onSubmit={handleSubmit}
+					className="flex flex-col gap-4"
+				>
+					{isSignedIn && (
+						<input
+							id="userId"
+							name="userId"
+							type="hidden"
+							value={userId}
+						/>
+					)}
+
+					<div className="space-y-4">
+						<Field id="edition" label="Edition" required>
+							{prefilledData?.edition ? (
 								<TextField
 									id="edition"
 									name="edition"
 									placeholder="1992 M2-1002 Roadster"
+									defaultValue={prefilledData.edition}
 									required
+									readOnly
 								/>
+							) : !showOtherInput ? (
+								<select
+									className={SelectStyles(
+										false,
+										'w-full border-brg-light text-sm'
+									)}
+									name="edition"
+									required
+									onChange={(e) => {
+										if (e.target.value === 'other') {
+											setShowOtherInput(true);
+										}
+									}}
+									defaultValue=""
+								>
+									<option value="" disabled>
+										Select an edition
+									</option>
+									{editions.map((edition) => (
+										<option key={edition} value={edition}>
+											{edition}
+										</option>
+									))}
+									<option value="other">Other</option>
+								</select>
+							) : (
+								<div className="flex items-center gap-2">
+									<TextField
+										id="edition"
+										name="edition"
+										placeholder="1992 M2-1002 Roadster"
+										required
+									/>
 
-								<Icon
-									name="x"
-									className="size-3.5"
-									onClick={() => setShowOtherInput(false)}
-								/>
-							</div>
-						)}
-					</Field>
+									<Icon
+										name="x"
+										className="size-3.5"
+										onClick={() => setShowOtherInput(false)}
+									/>
+								</div>
+							)}
+						</Field>
 
-					<div className="flex justify-between gap-4">
-						<Field
-							id="sequenceNumber"
-							label="Sequence #"
-							className="w-32"
-						>
-							<TextField
+						<div className="flex justify-between gap-4">
+							<Field
 								id="sequenceNumber"
-								name="sequenceNumber"
-								placeholder="182"
-								defaultValue={prefilledData?.sequenceNumber}
-								readOnly={!!prefilledData?.sequenceNumber}
-							/>
-						</Field>
+								label="Sequence #"
+								className="w-32"
+							>
+								<TextField
+									id="sequenceNumber"
+									name="sequenceNumber"
+									placeholder="182"
+									defaultValue={prefilledData?.sequenceNumber}
+									readOnly={!!prefilledData?.sequenceNumber}
+								/>
+							</Field>
 
-						<Field id="vin" label="VIN" className="w-full" required>
-							<TextField
+							<Field
 								id="vin"
-								name="vin"
-								placeholder="JM1NA3510M1221538"
-								defaultValue={prefilledData?.vin}
-								readOnly={!!prefilledData?.vin}
-							/>
-						</Field>
-					</div>
+								label="VIN"
+								className="w-full"
+								required
+							>
+								<TextField
+									id="vin"
+									name="vin"
+									placeholder="JM1NA3510M1221538"
+									defaultValue={prefilledData?.vin}
+									readOnly={!!prefilledData?.vin}
+								/>
+							</Field>
+						</div>
 
-					<div className="flex justify-between gap-4">
-						<Field
-							id="ownerName"
-							label="Your Name"
-							required
-							className="w-64"
-						>
-							<TextField
+						<div className="flex justify-between gap-4">
+							<Field
 								id="ownerName"
-								name="ownerName"
-								placeholder="John Doe"
-							/>
-						</Field>
+								label="Your Name"
+								required
+								className="w-64"
+							>
+								<TextField
+									id="ownerName"
+									name="ownerName"
+									placeholder="John Doe"
+								/>
+							</Field>
 
-						<Field
-							id="location"
-							label="Your Location"
-							required
-							className="w-full"
-						>
-							<Location
+							<Field
 								id="location"
-								name="location"
-								placeholder="City, Country"
+								label="Your Location"
+								required
+								className="w-full"
+							>
+								<Location
+									id="location"
+									name="location"
+									placeholder="City, Country"
+								/>
+							</Field>
+						</div>
+
+						<Field id="information" label="Additional Information">
+							<TextField
+								id="information"
+								name="information"
+								type="textarea"
+								placeholder="Any other information, like social media links, photo links, etc., which will help us associate you with your Miata."
 							/>
 						</Field>
 					</div>
-
-					<Field id="information" label="Additional Information">
-						<TextField
-							id="information"
-							name="information"
-							type="textarea"
-							placeholder="Any other information, like social media links, photo links, etc., which will help us associate you with your Miata."
-						/>
-					</Field>
-				</div>
-			</form>
+				</form>
+			</div>
 		</Modal>
 	);
 }

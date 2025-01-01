@@ -29,9 +29,11 @@
 		"qrcode.react": "^4.2.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
+		"react-hot-toast": "^2.5.1",
 		"react-router-dom": "^7.1.0",
 		"resend": "^4.0.1",
-		"tailwindcss": "^3.4.10"
+		"tailwindcss": "^3.4.10",
+		"uuid": "^11.0.3"
 	},
 	"devDependencies": {
 		"@tailwindcss/typography": "^0.5.15",
@@ -52,7 +54,6 @@
 		"terser": "^5.37.0",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.7.2",
-		"uuid": "^11.0.3",
 		"vite": "^5.4.1",
 		"vite-plugin-svgr": "^4.3.0",
 		"wrangler": "^3.99.0"

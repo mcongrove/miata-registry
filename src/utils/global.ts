@@ -16,6 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import toast from 'react-hot-toast';
+
+export const handleApiError = (error: unknown) => {
+	const message =
+		error instanceof Error ? error.message : 'An unexpected error occurred';
+
+	toast.error(message, {
+		duration: 4000,
+		position: 'top-center',
+	});
+};
+
 export const toTitleCase = (str: string): string => {
 	if (!str) return '';
 

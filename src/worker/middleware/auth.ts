@@ -60,7 +60,13 @@ export function withAuth() {
 		const isAuthenticated = await verifyAuth(c);
 
 		if (!isAuthenticated) {
-			return c.json({ error: 'Unauthorized' }, 401);
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				401
+			);
 		}
 
 		await next();
