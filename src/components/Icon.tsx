@@ -29,6 +29,7 @@ export type IconName =
 	| 'question-circle'
 	| 'sold'
 	| 'user'
+	| 'warning'
 	| 'x';
 
 interface IconProps {
@@ -181,6 +182,20 @@ export function Icon({ name, className, onClick }: IconProps) {
 				>
 					<path
 						d="M399 384.2C376.9 345.8 335.4 320 288 320l-64 0c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"
+						fill="currentColor"
+					/>
+				</svg>
+			);
+		case 'warning':
+			return (
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 512 512"
+					className={combinedClassName}
+					onClick={onClick}
+				>
+					<path
+						d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"
 						fill="currentColor"
 					/>
 				</svg>

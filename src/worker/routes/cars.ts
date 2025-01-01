@@ -290,6 +290,11 @@ carsRouter.get('/:id', async (c) => {
 					total_produced: Editions.total_produced,
 					year: Editions.year,
 				},
+				has_pending_changes: sql<number>`EXISTS (
+					SELECT 1 FROM cars_pending 
+					WHERE car_id = ${id} 
+					AND status = 'pending'
+				)`.as('has_pending_changes'),
 			})
 			.from(Cars)
 			.leftJoin(Editions, eq(Cars.edition_id, Editions.id))
@@ -326,6 +331,7 @@ carsRouter.get('/:id', async (c) => {
 
 		const result = {
 			...carData,
+			has_pending_changes: Boolean(carData.has_pending_changes),
 			owner_history: ownerHistory,
 		};
 

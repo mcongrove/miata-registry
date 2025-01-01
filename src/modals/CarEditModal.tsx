@@ -35,6 +35,7 @@ interface CarEditModalProps {
 		car: TCar & {
 			owner_history?: TCarOwner[];
 		};
+		onUpdate: () => void;
 	};
 }
 
@@ -132,6 +133,8 @@ export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
 			}
 
 			setIsSuccess(true);
+
+			props.onUpdate();
 		} catch (error) {
 			handleApiError(error);
 			setFormError('Failed to submit form. Please try again.');
@@ -191,7 +194,7 @@ export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
 	return isSignedIn ? (
 		<Modal
 			isOpen={isOpen}
-			onClose={onClose}
+			onClose={handleClose}
 			title="Edit Car Details"
 			action={{
 				text: 'Save Changes',

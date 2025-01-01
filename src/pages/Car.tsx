@@ -19,6 +19,7 @@
 import { useAuth } from '@clerk/clerk-react';
 import { lazy, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { twMerge } from 'tailwind-merge';
 import { Button } from '../components/Button';
 import { Icon, IconName } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
@@ -28,7 +29,7 @@ import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
 import { country, formatLocation, state } from '../utils/geo';
-import { toPrettyDate, toTitleCase } from '../utils/global';
+import { handleApiError, toPrettyDate, toTitleCase } from '../utils/global';
 
 const Map = lazy(() =>
 	import('../components/car/Map').then((module) => ({ default: module.Map }))
@@ -77,7 +78,13 @@ const EditButton = ({
 }) => {
 	return (
 		<div
-			className={`flex flex-col items-center justify-center p-3 gap-2 text-xs font-medium ${color} ${disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-brg-light/30'}`}
+			className={twMerge(
+				'flex flex-col items-center justify-center p-3 gap-2 text-xs font-medium',
+				color,
+				disabled
+					? 'cursor-not-allowed pointer-events-none'
+					: 'cursor-pointer hover:bg-brg-light/30'
+			)}
 			onClick={onClick}
 		>
 			<Icon
@@ -144,8 +151,7 @@ export const CarProfile = () => {
 					setVinDetails(details);
 				}
 			} catch (error) {
-				console.error('Error loading car:', error);
-				setCar(null);
+				handleApiError(error);
 			}
 		};
 
@@ -553,29 +559,53 @@ export const CarProfile = () => {
 					<div className="lg:col-span-4 space-y-6">
 						{import.meta.env.DEV &&
 						car?.current_owner?.user_id === userId ? (
-							<div className="hidden w-fit ml-auto md:grid grid-cols-2 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
-								<EditButton
-									className="scale-90"
-									color="text-brg-mid"
-									icon="edit"
-									text="Edit Car"
-									onClick={() => {
-										openModal('carEdit', {
-											car,
-										});
-									}}
-								/>
+							<div className="flex items-center justify-between gap-6">
+								{car?.has_pending_changes && (
+									<p className="text-sm text-brg flex items-center gap-2">
+										<Icon
+											name="warning"
+											className="size-4 text-yellow-500"
+										/>{' '}
+										This car has pending changes.
+									</p>
+								)}
 
-								<EditButton
-									color="text-brg-mid"
-									icon="qr"
-									text="Get QR Code"
-									onClick={() => {
-										openModal('qr', {
-											car,
-										});
-									}}
-								/>
+								<div className="hidden w-fit ml-auto md:grid grid-cols-2 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
+									<EditButton
+										className="scale-90"
+										color="text-brg-mid"
+										icon="edit"
+										text="Edit Car"
+										disabled={car?.has_pending_changes}
+										onClick={() => {
+											openModal('carEdit', {
+												car,
+												onUpdate: () => {
+													setCar((prev) => {
+														if (!prev) return null;
+
+														return {
+															...prev,
+															has_pending_changes:
+																true,
+														};
+													});
+												},
+											});
+										}}
+									/>
+
+									<EditButton
+										color="text-brg-mid"
+										icon="qr"
+										text="Get QR Code"
+										onClick={() => {
+											openModal('qr', {
+												car,
+											});
+										}}
+									/>
+								</div>
 							</div>
 						) : (
 							car && (

@@ -123,7 +123,7 @@ export function ExportModal({
 	return (
 		<Modal
 			isOpen={isOpen}
-			onClose={onClose}
+			onClose={handleClose}
 			title="Export Registry Dataset"
 			action={{
 				text: 'I Agree',

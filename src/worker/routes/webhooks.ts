@@ -71,20 +71,24 @@ webhooksRouter.post('/clerk', async (c) => {
 			false,
 			['sign']
 		);
+
 		const signature = await crypto.subtle.sign(
 			'HMAC',
 			key,
 			new TextEncoder().encode(signedContent)
 		);
+
 		const expectedSignature = btoa(
 			String.fromCharCode.apply(
 				null,
 				Array.from(new Uint8Array(signature))
 			)
 		);
+
 		const signatures = svix_signature
 			.split(' ')
 			.map((sig) => sig.split(',')[1]);
+
 		const isValidSignature = signatures.some(
 			(sig) => sig === expectedSignature
 		);

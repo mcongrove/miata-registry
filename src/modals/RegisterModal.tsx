@@ -230,7 +230,7 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 	return (
 		<Modal
 			isOpen={isOpen}
-			onClose={onClose}
+			onClose={handleClose}
 			title={
 				prefilledData?.edition
 					? `Claim your Miata`

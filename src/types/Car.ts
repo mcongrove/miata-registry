@@ -25,6 +25,7 @@ export type TCar = {
 	destroyed?: boolean;
 	edition_id: string;
 	edition?: TEdition;
+	has_pending_changes?: boolean;
 	id: string;
 	manufacture_date?: string;
 	owner_history?: TCarOwner[];

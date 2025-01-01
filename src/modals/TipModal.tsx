@@ -160,7 +160,7 @@ export function TipModal({
 	return (
 		<Modal
 			isOpen={isOpen}
-			onClose={onClose}
+			onClose={handleClose}
 			title="Submit a Tip"
 			action={
 				!isOwner
