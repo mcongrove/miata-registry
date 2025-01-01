@@ -8,6 +8,7 @@ on:
             - 'src/worker/**'
             - 'wrangler.toml'
             - '.github/workflows/deploy.yml'
+            - '.dev.vars.example'
 
 jobs:
     deploy:
