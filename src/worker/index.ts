@@ -26,6 +26,7 @@ import newsRouter from './routes/news';
 import ownersRouter from './routes/owners';
 import statsRouter from './routes/stats';
 import tipsRouter from './routes/tips';
+import webhooksRouter from './routes/webhooks';
 import type { Bindings } from './types';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -68,5 +69,6 @@ app.route('/news', newsRouter);
 app.route('/owners', ownersRouter);
 app.route('/stats', statsRouter);
 app.route('/tips', tipsRouter);
+app.route('/webhooks', webhooksRouter);
 
 export default app;
