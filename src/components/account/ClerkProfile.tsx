@@ -47,6 +47,7 @@ export const ClerkProfile = ({
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
 		setIsSubmitting(true);
 		setError(null);
 		setSuccess(false);

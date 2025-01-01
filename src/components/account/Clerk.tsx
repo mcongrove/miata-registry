@@ -48,7 +48,7 @@ const LoadingIndicator = () => (
 
 export function Clerk() {
 	const location = useLocation();
-	const { userId } = useAuth();
+	const { getToken, userId } = useAuth();
 	const [isLoading, setIsLoading] = useState(true);
 	const [ownerData, setOwnerData] = useState<{
 		owner: TOwner;
@@ -68,10 +68,15 @@ export function Clerk() {
 		if (!userId || ownerData.owner.id) return;
 
 		try {
+			const token = await getToken();
+
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/${userId}`,
 				{
-					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
 				}
 			);
 

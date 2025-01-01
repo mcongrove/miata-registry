@@ -72,6 +72,10 @@ ownersRouter.get('/:id', withAuth(), async (c) => {
 			.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
 			.where(eq(Owners.user_id, ownerUserId));
 
+		if (!ownerData.length) {
+			return c.json({ cars: [], owner: { id: '' } });
+		}
+
 		const cars = ownerData.map((row) => row.cars);
 		const owner = {
 			...ownerData[0].owner,
