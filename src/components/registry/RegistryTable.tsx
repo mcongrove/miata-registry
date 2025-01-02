@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useModal } from '../../context/ModalContext';
 import { TCar } from '../../types/Car';
-import { colorMap } from '../../utils/colorMap';
+import { colorMap } from '../../utils/car';
 
 interface RegistryTableProps {
 	cars: TCar[];

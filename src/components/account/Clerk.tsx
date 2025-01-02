@@ -26,7 +26,7 @@ import {
 import { lazy, Suspense, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TOwner } from '../../types/Owner';
-import { handleApiError } from '../../utils/global';
+import { handleApiError } from '../../utils/common';
 import { Button } from '../Button';
 
 const ClerkMyCars = lazy(() =>

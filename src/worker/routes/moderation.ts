@@ -23,7 +23,7 @@ import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
 import { CarsPending } from '../../db/schema/CarsPending';
-import { TModerationStats } from '../../types/Global';
+import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
 import { Bindings } from '../types';
 

@@ -21,8 +21,8 @@ import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import Instagram from '../../assets/logos/instagram.svg?react';
 import { TOwner } from '../../types/Owner';
-import { formatLocation, parseLocation } from '../../utils/geo';
-import { handleApiError } from '../../utils/global';
+import { handleApiError } from '../../utils/common';
+import { formatLocation, parseLocation } from '../../utils/location';
 import { Location } from '../form/Location';
 import { TextField } from '../form/TextField';
 

@@ -17,7 +17,7 @@
  */
 
 import { twMerge } from 'tailwind-merge';
-import { TModerationStats } from '../../types/Global';
+import { TModerationStats } from '../../types/Common';
 
 type StatsProps = {
 	stats: TModerationStats;

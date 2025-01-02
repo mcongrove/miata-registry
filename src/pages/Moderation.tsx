@@ -24,9 +24,9 @@ import { PendingItem } from '../components/moderation/PendingItem';
 import { Stats } from '../components/moderation/Stats';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar, TCarPending } from '../types/Car';
-import { TModerationStats } from '../types/Global';
+import { TModerationStats } from '../types/Common';
 import { TCarOwner, TCarOwnerPending } from '../types/Owner';
-import { handleApiError } from '../utils/global';
+import { handleApiError } from '../utils/common';
 
 export const Moderation = () => {
 	const { user, isLoaded } = useUser();

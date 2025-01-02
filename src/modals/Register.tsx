@@ -24,7 +24,7 @@ import { Location } from '../components/form/Location';
 import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
-import { handleApiError } from '../utils/global';
+import { handleApiError } from '../utils/common';
 
 interface RegisterProps {
 	isOpen: boolean;

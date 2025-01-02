@@ -25,7 +25,7 @@ import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { Select, SelectStyles } from '../components/form/Select';
 import { TCar } from '../types/Car';
-import { handleApiError } from '../utils/global';
+import { handleApiError } from '../utils/common';
 
 export function QrCode({
 	isOpen,

@@ -19,7 +19,7 @@
 import { useAuth } from '@clerk/clerk-react';
 import imageCompression from 'browser-image-compression';
 import { useState } from 'react';
-import { handleApiError } from '../../utils/global';
+import { handleApiError } from '../../utils/common';
 
 interface PhotoUploadProps {
 	carId: string;

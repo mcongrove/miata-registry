@@ -24,7 +24,7 @@ import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { useModal } from '../context/ModalContext';
-import { handleApiError } from '../utils/global';
+import { handleApiError } from '../utils/common';
 
 export function Tip({
 	isOpen,

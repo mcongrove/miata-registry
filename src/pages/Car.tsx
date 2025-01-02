@@ -28,8 +28,8 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
-import { country, formatLocation, state } from '../utils/geo';
-import { handleApiError, toPrettyDate, toTitleCase } from '../utils/global';
+import { handleApiError, toPrettyDate, toTitleCase } from '../utils/common';
+import { country, formatLocation, state } from '../utils/location';
 
 const Map = lazy(() =>
 	import('../components/car/Map').then((module) => ({ default: module.Map }))
@@ -584,20 +584,20 @@ export const CarProfile = () => {
 
 					<div className="lg:col-span-4 space-y-6">
 						{car?.current_owner?.user_id === userId ? (
-							<div className="flex items-center justify-between gap-6">
+							<div className="flex items-center justify-end gap-6">
 								{car?.has_pending_changes && (
 									<p className="text-sm text-brg flex items-center gap-2">
 										<i className="fa-solid fa-fw fa-triangle-exclamation text-base text-yellow-500" />{' '}
-										This car has pending changes.
+										This car has pending changes
 									</p>
 								)}
 
-								<div className="hidden w-fit ml-auto md:grid grid-cols-2 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
+								<div className="hidden md:grid grid-cols-2 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
 									<EditButton
 										color="text-brg-mid"
 										icon="fa-pen-to-square"
 										text="Edit Car"
-										// disabled={car?.has_pending_changes}
+										disabled={car?.has_pending_changes}
 										onClick={() => {
 											openModal('carEdit', {
 												car,

@@ -26,8 +26,8 @@ import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
-import { formatLocation, parseLocation } from '../utils/geo';
-import { handleApiError } from '../utils/global';
+import { handleApiError } from '../utils/common';
+import { formatLocation, parseLocation } from '../utils/location';
 
 interface CarEditProps {
 	isOpen: boolean;
