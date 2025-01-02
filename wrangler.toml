@@ -16,6 +16,12 @@ binding = "CACHE"
 id = "7fda99700a024497bc3da8172120a3d5"
 preview_id = "7fda99700a024497bc3da8172120a3d5"
 
+# Global R2 Configuration
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "miata-registry-images"
+preview_bucket_name = "miata-registry-images"
+
 # Development Environment
 [env.development]
 vars = { NODE_ENV = "development", ENVIRONMENT = "development" }
@@ -30,10 +36,11 @@ binding = "CACHE"
 id = "7fda99700a024497bc3da8172120a3d5"
 preview_id = "7fda99700a024497bc3da8172120a3d5"
 
+[[env.development.r2_buckets]]
+binding = "IMAGES"
+bucket_name = "miata-registry-images"
+preview_bucket_name = "miata-registry-images"
+
 # Production Environment
 [env.production]
 vars = { NODE_ENV = "production" }
-
-[[env.production.r2_buckets]]
-binding = "IMAGES"
-bucket_name = "miata-registry-images"

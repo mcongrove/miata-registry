@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
+import { PhotoUpload } from '../components/form/PhotoUpload';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { TCar } from '../types/Car';
@@ -487,17 +488,8 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 
 					<h4 className="text-md font-semibold mt-3">Photos</h4>
 
-					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg py-3 px-4">
-						<p className="text-sm text-brg-mid">
-							Submission of photographs is under development. Send
-							us photos or links to photos at{' '}
-							<a
-								href={`mailto:support@miataregistry.com?subject=Photo%20Submission:%20${car.id}`}
-								className="underline"
-							>
-								support@miataregistry.com
-							</a>
-						</p>
+					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg p-4">
+						<PhotoUpload carId={car.id} />
 					</div>
 
 					<h4 className="text-md font-semibold mt-3 text-red-700">
