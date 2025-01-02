@@ -64,6 +64,14 @@ carsRouter.get('/', async (c) => {
 
 		for (const filter of filters) {
 			switch (filter.type) {
+				case 'search':
+					conditions.push(
+						sql`(
+							LOWER(${Cars.vin}) LIKE ${`%${filter.value.toLowerCase()}%`} OR 
+							LOWER(${Owners.name}) LIKE ${`%${filter.value.toLowerCase()}%`}
+						)`
+					);
+					break;
 				case 'claimStatus':
 					if (filter.value === 'Claimed') {
 						conditions.push(

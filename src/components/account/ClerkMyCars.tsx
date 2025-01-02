@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useClerk } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
@@ -31,6 +32,8 @@ export const ClerkMyCars = ({
 		destroyed: boolean;
 	}>;
 }) => {
+	const { closeUserProfile } = useClerk();
+
 	if (cars.length === 0) {
 		return (
 			<p className="text-[#B6B6B6] text-[13px]">
@@ -49,6 +52,7 @@ export const ClerkMyCars = ({
 						'text-[13px] group flex flex-col cursor-pointer mb-1 py-1.5 px-2.5 -mx-2.5 rounded-md hover:bg-[#F7F7F7] transition-colors',
 						car.destroyed ? 'text-[#EF4444]' : 'text-[#212126]'
 					)}
+					onClick={() => closeUserProfile()}
 				>
 					<div className="flex items-center gap-1">
 						<span

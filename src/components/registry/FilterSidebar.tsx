@@ -20,6 +20,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { TFilterOption } from '../../types/Filter';
 import { Select } from '../form/Select';
+import { TextField } from '../form/TextField';
 import { FilterHeader } from './FilterHeader';
 import { FilterRadioGroup } from './FilterRadioGroup';
 
@@ -168,6 +169,32 @@ export const FilterSidebar = ({
 					</div>
 
 					<div className="flex-1 divide-y divide-brg-light">
+						<div>
+							<FilterHeader
+								title="Search"
+								onClear={() => handleClear('search')}
+								hasActiveFilter={!!getActiveValue('search')}
+								id="field-search"
+							/>
+
+							<div className="p-4 pt-0">
+								<TextField
+									id="field-search"
+									value={getActiveValue('search') || ''}
+									onChange={(
+										e: ChangeEvent<HTMLInputElement>
+									) =>
+										handleSelectChange(
+											e.target.value,
+											'search'
+										)
+									}
+									placeholder="VIN or Owner name"
+									className="md:!text-xs"
+								/>
+							</div>
+						</div>
+
 						<div>
 							<FilterHeader
 								title="Year"

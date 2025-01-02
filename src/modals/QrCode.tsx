@@ -208,10 +208,7 @@ export function QrCode({
 					>
 						<Field id="quantity" label="Quantity" required>
 							<Select
-								className={SelectStyles(
-									false,
-									'w-32 border-brg-light text-sm'
-								)}
+								className={SelectStyles(false, 'w-32 text-sm')}
 								name="quantity"
 								required
 								value={quantity}

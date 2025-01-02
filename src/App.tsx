@@ -103,8 +103,8 @@ function App() {
 				<CSP />
 				<Toaster />
 
-				<BrowserRouter>
-					<ModalProvider>
+				<ModalProvider>
+					<BrowserRouter>
 						<Routes>
 							<Route element={<Layout />}>
 								<Route path="/" element={<Home />} />
@@ -158,8 +158,8 @@ function App() {
 								/>
 							</Route>
 						</Routes>
-					</ModalProvider>
-				</BrowserRouter>
+					</BrowserRouter>
+				</ModalProvider>
 			</ClerkProvider>
 		</GoogleMapsProvider>
 	);

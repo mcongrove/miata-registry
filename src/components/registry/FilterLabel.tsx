@@ -52,7 +52,9 @@ export const FilterLabel = ({
 		<div
 			className={twMerge(
 				'size-3 rounded-full border',
-				isSelected ? 'bg-brg border-brg' : 'bg-white border-brg-border'
+				isSelected
+					? 'bg-brg border-brg'
+					: 'bg-white border-brg-border/70'
 			)}
 		/>
 

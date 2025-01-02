@@ -26,7 +26,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export const SelectStyles = (disabled: boolean, className: string) => {
 	return twMerge(
-		'w-full p-2 !text-[16px] md:!text-sm bg-white border border-brg-border rounded-md focus:outline-none cursor-pointer appearance-none',
+		'w-full p-2 !text-[16px] md:!text-sm bg-white border border-brg-light rounded-md focus:outline-none cursor-pointer appearance-none',
 		disabled ? 'opacity-50 cursor-not-allowed' : '',
 		'text-[#9CA3AF] [&:not(:has(option[value=""]:checked))]:!text-brg',
 		"bg-[length:16px_16px] bg-[right_8px_center] bg-no-repeat bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23666666%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')]",

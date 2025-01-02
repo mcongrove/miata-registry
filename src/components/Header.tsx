@@ -148,12 +148,12 @@ export const Header = () => {
 				</div>
 			</div>
 
-			<div className="flex items-center gap-6">
+			<div className="flex items-center">
 				{user?.publicMetadata?.moderator ? (
 					<Link
 						to="/moderation"
 						className={twMerge(
-							'text-sm text-brg-mid hover:text-brg transition-colors flex items-center gap-1',
+							'text-sm text-brg-mid hover:text-brg transition-colors flex items-center gap-1 mr-6',
 							isActive('/moderation')
 								? 'text-brg font-medium'
 								: 'text-brg-mid hover:text-brg',

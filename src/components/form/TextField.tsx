@@ -36,7 +36,7 @@ export function TextField({
 	...props
 }: TextFieldProps) {
 	const baseClassName =
-		'w-full px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg placeholder-[#9CA3AF]';
+		'w-full p-2 text-[16px] md:text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid text-brg placeholder-[#9CA3AF]';
 
 	return type === 'textarea' ? (
 		<textarea
