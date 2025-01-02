@@ -20,7 +20,7 @@ import { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 type BaseTextFieldProps = {
-	type?: 'date' | 'email' | 'number' | 'textarea' | 'text';
+	type?: 'date' | 'email' | 'number' | 'textarea' | 'text' | 'time';
 	className?: string;
 };
 

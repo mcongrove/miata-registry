@@ -87,8 +87,13 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 					},
 					body: JSON.stringify({
 						destroyed: formData.get('destroyed') === 'on',
-						manufacture_date:
-							formData.get('manufacture_date') || null,
+						manufacture_date: formData.get('manufacture_date')
+							? `${formData.get('manufacture_date')}${
+									formData.get('manufacture_date_time')
+										? `T${formData.get('manufacture_date_time')}:00.000Z`
+										: 'T00:00:00.000Z'
+								}`
+							: null,
 						owner_date_end: formData.get('owner_date_end') || null,
 						owner_date_start:
 							formData.get('owner_date_start') || null,
@@ -285,7 +290,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="sequence"
 								label="Sequence #"
-								className="w-24 [&>label]:text-brg-mid"
+								className="w-24 shrink-0 [&>label]:text-brg-mid"
 							>
 								<TextField
 									id="sequence"
@@ -303,21 +308,38 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="manufacture_date"
 								label="Manufacture Date"
-								className="w-36 [&>label]:text-brg-mid"
+								className="[&>label]:text-brg-mid"
 							>
-								<TextField
-									id="manufacture_date"
-									name="manufacture_date"
-									type="date"
-									placeholder="1990-01-01"
-									defaultValue={
-										car.manufacture_date
-											? car.manufacture_date
-													.toString()
-													.split('T')[0]
-											: undefined
-									}
-								/>
+								<div className="flex gap-1">
+									<TextField
+										id="manufacture_date"
+										name="manufacture_date"
+										type="date"
+										placeholder="1990-01-01"
+										defaultValue={
+											car.manufacture_date
+												? car.manufacture_date
+														.toString()
+														.split('T')[0]
+												: undefined
+										}
+									/>
+
+									<TextField
+										id="manufacture_date_time"
+										name="manufacture_date_time"
+										type="time"
+										placeholder="00:00"
+										defaultValue={
+											car.manufacture_date
+												? car.manufacture_date
+														.toString()
+														.split('T')[1]
+														.split('.')[0]
+												: undefined
+										}
+									/>
+								</div>
 							</Field>
 						</div>
 
@@ -495,7 +517,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 					<h4 className="text-md font-semibold mt-3">Prior Owners</h4>
 
 					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg py-3 px-4">
-						<p className="text-sm text-brg-mid">
+						<p className="text-sm text-brg-mid/70">
 							Editing owner history is under development. Send us
 							documentation at{' '}
 							<a

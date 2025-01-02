@@ -491,7 +491,7 @@ carsRouter.post('/:id', withAuth(), async (c) => {
 				? null
 				: existing.car.current_owner_id,
 			destroyed: body.destroyed,
-			manufacture_date: `${body.manufacture_date}T00:00:00.000Z`,
+			manufacture_date: body.manufacture_date,
 			sale_date: `${body.sale_date}T00:00:00.000Z`,
 			sale_dealer_city: body.sale_dealer_location?.city,
 			sale_dealer_country: body.sale_dealer_location?.country,
