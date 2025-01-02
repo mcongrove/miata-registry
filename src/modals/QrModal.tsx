@@ -28,11 +28,13 @@ import { TCar } from '../types/Car';
 import { handleApiError } from '../utils/global';
 
 export function QrModal({
-	car,
 	isOpen,
 	onClose,
+	props,
 }: {
-	car?: TCar;
+	props: {
+		car?: TCar;
+	};
 	isOpen: boolean;
 	onClose: () => void;
 }) {
@@ -43,6 +45,7 @@ export function QrModal({
 	const [quantity, setQuantity] = useState('1');
 	const [selectedLocation, setSelectedLocation] = useState('');
 
+	const car = props.car;
 	const qrUrl = car ? `https://miataregistry.com/registry/${car.id}` : '';
 	const imageSize = 250;
 
