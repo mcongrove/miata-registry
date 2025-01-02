@@ -178,7 +178,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						<p className="text-brg-mid">
 							Please send any supporting documentation to{' '}
 							<a
-								href={`mailto:support@miataregistry.com?subject=Sequence%20Number%20Change%20Request:%20${car.id}`}
+								href={`mailto:support@miataregistry.com?subject=Change%20Request:%20${car.id}`}
 								className="underline"
 							>
 								support@miataregistry.com
@@ -490,6 +490,22 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 
 					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg p-4">
 						<PhotoUpload carId={car.id} />
+					</div>
+
+					<h4 className="text-md font-semibold mt-3">Prior Owners</h4>
+
+					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg py-3 px-4">
+						<p className="text-sm text-brg-mid">
+							Editing owner history is under development. Send us
+							documentation at{' '}
+							<a
+								href={`mailto:support@miataregistry.com?subject=Owner%20History%20Submission:%20${car.id}`}
+								className="underline"
+							>
+								support@miataregistry.com
+							</a>{' '}
+							and we'll get it added for you.
+						</p>
 					</div>
 
 					<h4 className="text-md font-semibold mt-3 text-red-700">

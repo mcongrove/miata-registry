@@ -597,7 +597,7 @@ export const CarProfile = () => {
 										color="text-brg-mid"
 										icon="fa-pen-to-square"
 										text="Edit Car"
-										disabled={car?.has_pending_changes}
+										// disabled={car?.has_pending_changes}
 										onClick={() => {
 											openModal('carEdit', {
 												car,

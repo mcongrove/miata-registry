@@ -114,15 +114,15 @@ export function PhotoUpload({ carId }: PhotoUploadProps) {
 					</p>
 				) : (
 					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">
-						<i className="fa-solid fa-camera text-2xl" />
+						<i className="fa-solid fa-camera-retro text-2xl" />
 
 						<p>
 							Click or drag to upload{' '}
 							<span className="text-brg-border">10MB max</span>
 						</p>
 
-						<p className="text-xs text-brg-border">
-							Photos will be immediately submitted
+						<p className="text-xs text-brg-mid/60">
+							Photos will be <em>immediately submitted</em>
 						</p>
 					</div>
 				)}
