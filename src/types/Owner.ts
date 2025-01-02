@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { TPending } from './Global';
+
 export type TOwner = {
 	city?: string;
 	country?: string;
@@ -34,3 +36,5 @@ export type TCarOwner = TOwner & {
 	date_start?: string;
 	owner_id: string;
 };
+
+export type TCarOwnerPending = TCarOwner & TPending;

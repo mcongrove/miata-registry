@@ -19,9 +19,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
-import { Icon } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
-import { EditionCard } from '../components/editions/EditionCard';
+import { Card } from '../components/editions/Card';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TEdition } from '../types/Edition';
 
@@ -83,10 +82,7 @@ export const Editions = () => {
 							</>
 						}
 					>
-						<Icon
-							name="info-circle"
-							className="size-4 lg:!size-5 cursor-help"
-						/>
+						<i className="fa-solid fa-circle-info text-lg text-brg-mid cursor-help" />
 					</Tooltip>
 				</h1>
 
@@ -151,7 +147,7 @@ export const Editions = () => {
 										key={generation}
 										className="flex flex-col gap-6 lg:gap-6"
 									>
-										<h2 className="text-xl lg:text-2xl font-bold text-brg-dark">
+										<h2 className="text-xl lg:text-2xl font-bold text-brg">
 											{generation} Generation{' '}
 											<span className="text-brg-border font-normal">
 												{
@@ -166,7 +162,7 @@ export const Editions = () => {
 											{editionsByGeneration[
 												generation
 											]?.map((edition) => (
-												<EditionCard
+												<Card
 													key={edition.id}
 													edition={edition}
 												/>
@@ -181,8 +177,7 @@ export const Editions = () => {
 
 				<div className="flex flex-col lg:flex-row justify-between items-stretch mt-8 lg:mt-16 gap-4 lg:gap-12">
 					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
-						<h3 className="flex gap-2 items-center text-brg-mid font-bold">
-							<Icon name="question-circle" />
+						<h3 className="text-brg-mid font-bold">
 							Don't see your edition?
 						</h3>
 
@@ -205,8 +200,7 @@ export const Editions = () => {
 					</div>
 
 					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
-						<h3 className="flex gap-2 items-center text-brg-mid font-bold">
-							<Icon name="question-circle" />
+						<h3 className="text-brg-mid font-bold">
 							Are these ChatGPT photos?
 						</h3>
 
@@ -220,8 +214,7 @@ export const Editions = () => {
 					</div>
 
 					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
-						<h3 className="flex gap-2 items-center text-brg-mid font-bold">
-							<Icon name="info-circle" />
+						<h3 className="text-brg-mid font-bold">
 							Have a great photo of your edition?
 						</h3>
 

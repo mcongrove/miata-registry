@@ -22,6 +22,7 @@ import carsRouter from './routes/cars';
 import editionsRouter from './routes/editions';
 import emailRouter from './routes/email';
 import exportRouter from './routes/export';
+import moderationRouter from './routes/moderation';
 import newsRouter from './routes/news';
 import ownersRouter from './routes/owners';
 import statsRouter from './routes/stats';
@@ -63,12 +64,13 @@ app.use('*', async (c, next) => {
 	})(c, next);
 });
 
-app.get('/', (c) => c.json({ error: 'Not Found' }, 404));
+app.get('/', (c) => c.json({ error: 'Not found' }, 404));
 
 app.route('/cars', carsRouter);
 app.route('/editions', editionsRouter);
 app.route('/email', emailRouter);
 app.route('/export', exportRouter);
+app.route('/moderation', moderationRouter);
 app.route('/news', newsRouter);
 app.route('/owners', ownersRouter);
 app.route('/stats', statsRouter);

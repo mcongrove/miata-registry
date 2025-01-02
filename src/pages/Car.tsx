@@ -21,7 +21,6 @@ import { lazy, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { Button } from '../components/Button';
-import { Icon, IconName } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -87,13 +86,21 @@ const EditButton = ({
 			)}
 			onClick={onClick}
 		>
-			<Icon
-				name={icon as IconName}
-				className={`!size-5 ${color} ${className} ${disabled ? 'opacity-50' : ''}`}
+			<i
+				className={twMerge(
+					'fa-solid fa-fw text-xl',
+					icon,
+					color,
+					className,
+					disabled ? 'opacity-50' : ''
+				)}
 			/>
 
 			<span
-				className={`whitespace-nowrap ${disabled ? 'opacity-50' : ''}`}
+				className={twMerge(
+					'whitespace-nowrap',
+					disabled ? 'opacity-50' : ''
+				)}
 			>
 				{text}
 			</span>
@@ -456,10 +463,7 @@ export const CarProfile = () => {
 										</p>
 
 										<Tooltip content="Information retrieved based on VIN; may be inaccurate">
-											<Icon
-												name="info-circle"
-												className="size-3.5 text-brg-border"
-											/>
+											<i className="fa-solid fa-fw fa-circle-info text-brg-border text-sm" />
 										</Tooltip>
 									</div>
 
@@ -557,24 +561,19 @@ export const CarProfile = () => {
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
-						{import.meta.env.DEV &&
-						car?.current_owner?.user_id === userId ? (
+						{car?.current_owner?.user_id === userId ? (
 							<div className="flex items-center justify-between gap-6">
 								{car?.has_pending_changes && (
 									<p className="text-sm text-brg flex items-center gap-2">
-										<Icon
-											name="warning"
-											className="size-4 text-yellow-500"
-										/>{' '}
+										<i className="fa-solid fa-fw fa-triangle-exclamation text-base text-yellow-500" />{' '}
 										This car has pending changes.
 									</p>
 								)}
 
 								<div className="hidden w-fit ml-auto md:grid grid-cols-2 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
 									<EditButton
-										className="scale-90"
 										color="text-brg-mid"
-										icon="edit"
+										icon="fa-pen-to-square"
 										text="Edit Car"
 										disabled={car?.has_pending_changes}
 										onClick={() => {
@@ -597,7 +596,7 @@ export const CarProfile = () => {
 
 									<EditButton
 										color="text-brg-mid"
-										icon="qr"
+										icon="fa-qrcode"
 										text="Get QR Code"
 										onClick={() => {
 											openModal('qr', {
@@ -678,25 +677,7 @@ export const CarProfile = () => {
 										</div>
 									)}
 
-									<svg
-										className="size-5 text-brg-mid"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-										/>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-										/>
-									</svg>
+									<i className="fa-solid fa-fw fa-location-dot text-2xl text-brg-mid" />
 								</div>
 							) : (
 								<div className="p-4 flex items-center justify-between">

@@ -19,7 +19,6 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { TFilterOption } from '../../types/Filters';
-import { Icon } from '../Icon';
 import { Select } from '../form/Select';
 import { FilterHeader } from './FilterHeader';
 import { FilterRadioGroup } from './FilterRadioGroup';
@@ -162,7 +161,7 @@ export const FilterSidebar = ({
 								onClick={onClose}
 								className="text-brg-mid hover:text-brg"
 							>
-								<Icon name="x" className="size-4" />
+								<i className="fa-solid fa-times"></i>
 							</button>
 						</div>
 					</div>

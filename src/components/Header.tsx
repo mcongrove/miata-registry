@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { useUser } from '@clerk/clerk-react';
 import { Link, useLocation } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { Clerk } from '../components/account/Clerk';
@@ -41,13 +42,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 			>
 				{label}
 
-				<svg className="size-4" viewBox="0 0 20 20" fill="currentColor">
-					<path
-						fillRule="evenodd"
-						d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-						clipRule="evenodd"
-					/>
-				</svg>
+				<i className="fa-solid fa-fw fa-chevron-down text-[10px]" />
 			</button>
 
 			<div className="absolute left-0 top-full invisible group-hover:visible">
@@ -91,6 +86,7 @@ const ConstructionBanner = () => (
 );
 
 export const Header = () => {
+	const { user } = useUser();
 	const location = useLocation();
 	const { openModal } = useModal();
 
@@ -151,7 +147,18 @@ export const Header = () => {
 				</div>
 			</div>
 
-			<Clerk />
+			<div className="flex items-center gap-6">
+				{user?.publicMetadata?.moderator ? (
+					<Link
+						to="/moderation"
+						className="text-sm text-brg-mid hover:text-brg transition-colors flex items-center gap-1"
+					>
+						Moderation
+					</Link>
+				) : null}
+
+				<Clerk />
+			</div>
 		</nav>
 	);
 

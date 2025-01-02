@@ -18,15 +18,12 @@
 
 import { TEdition } from '../../types/Edition';
 
-type EditionStatsProps = {
+type StatsProps = {
 	edition: TEdition;
 	showText?: boolean;
 };
 
-export const EditionStats = ({
-	edition,
-	showText = true,
-}: EditionStatsProps) => {
+export const Stats = ({ edition, showText = true }: StatsProps) => {
 	const inRegistryPercentage = Math.max(
 		((edition.in_registry ?? 0) / (edition.total_produced ?? 0)) * 100,
 		3

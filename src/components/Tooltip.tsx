@@ -69,7 +69,7 @@ export const Tooltip = ({
 	return (
 		<>
 			<div
-				className="w-fit"
+				className="w-fit h-fit"
 				ref={refs.setReference}
 				{...getReferenceProps()}
 			>

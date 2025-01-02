@@ -19,7 +19,7 @@
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
-import { Owners } from '../../db/schema';
+import { Cars, Owners } from '../../db/schema';
 import type { Bindings } from '../types';
 
 const webhooksRouter = new Hono<{ Bindings: Bindings }>();
@@ -106,7 +106,7 @@ webhooksRouter.post('/clerk', async (c) => {
 		const payload = JSON.parse(body) as ClerkWebhookPayload;
 		const db = createDb(c.env.DB);
 
-		await db
+		const [updatedOwner] = await db
 			.update(Owners)
 			.set({
 				name:
@@ -115,9 +115,30 @@ webhooksRouter.post('/clerk', async (c) => {
 						.join(' ')
 						.trim() || null,
 			})
-			.where(eq(Owners.user_id, payload.data.id));
+			.where(eq(Owners.user_id, payload.data.id))
+			.returning({ id: Owners.id });
 
-		return c.json({ success: true });
+		const ownedCars = await db
+			.select({ id: Cars.id })
+			.from(Cars)
+			.where(eq(Cars.current_owner_id, updatedOwner.id));
+
+		await Promise.all([
+			...ownedCars
+				.map((car) => [
+					c.env.CACHE.delete(`cars:details:${car.id}`),
+					c.env.CACHE.delete(`cars:summary:${car.id}`),
+				])
+				.flat(),
+		]);
+
+		return c.json({
+			success: true,
+			data: {
+				ownerId: updatedOwner.id,
+				carIds: ownedCars.map((car) => car.id),
+			},
+		});
 	} catch (error) {
 		console.error('Error processing Clerk webhook:', error);
 

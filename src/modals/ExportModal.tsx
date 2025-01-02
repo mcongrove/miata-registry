@@ -79,7 +79,7 @@ export function ExportModal({
 		onClose();
 	};
 
-	if (isSuccess) {
+	if (!isSuccess) {
 		return (
 			<Modal
 				isOpen={isOpen}
@@ -93,19 +93,7 @@ export function ExportModal({
 			>
 				<div className="flex flex-col items-center gap-6 pt-6">
 					<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
-						<svg
-							className="w-8 h-8 text-brg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M5 13l4 4L19 7"
-							/>
-						</svg>
+						<i className="fa-solid fa-fw fa-check text-brg text-3xl" />
 					</div>
 
 					<div className="text-center">

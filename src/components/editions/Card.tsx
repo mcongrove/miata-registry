@@ -19,13 +19,13 @@
 import { Link } from 'react-router-dom';
 import { TEdition } from '../../types/Edition';
 import { Credit } from '../Credit';
-import { EditionStats } from './EditionStats';
+import { Stats } from './Stats';
 
-type EditionCardProps = {
+type CardProps = {
 	edition: TEdition;
 };
 
-export const EditionCard = ({ edition }: EditionCardProps) => {
+export const Card = ({ edition }: CardProps) => {
 	return (
 		<div className="bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light cursor-pointer h-full flex flex-col">
 			<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
@@ -66,7 +66,7 @@ export const EditionCard = ({ edition }: EditionCardProps) => {
 					<p className="text-xs text-brg-mid">{edition.color}</p>
 				</div>
 
-				<EditionStats edition={edition} />
+				<Stats edition={edition} />
 			</Link>
 		</div>
 	);

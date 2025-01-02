@@ -20,7 +20,6 @@ import { lazy, useEffect, useState } from 'react';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from '../components/Button';
 import { Credit } from '../components/Credit';
-import { Icon } from '../components/Icon';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 
@@ -427,7 +426,7 @@ export const Home = () => {
 
 							<div className="flex flex-col items-start gap-3 mt-8 pt-8 border-t border-brg-border text-sm">
 								<h3 className="flex gap-2 items-center text-brg-mid font-bold">
-									<Icon name="info-circle" />
+									<i className="fa-solid fa-circle-info text-lg text-brg-mid cursor-help" />
 									Know of a limited edition Miata?
 								</h3>
 

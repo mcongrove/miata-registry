@@ -22,7 +22,6 @@ import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
-import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
 import { useModal } from '../context/ModalContext';
 import { handleApiError } from '../utils/global';
@@ -126,19 +125,7 @@ export function TipModal({
 			>
 				<div className="flex flex-col items-center gap-6 pt-6">
 					<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
-						<svg
-							className="w-8 h-8 text-brg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M5 13l4 4L19 7"
-							/>
-						</svg>
+						<i className="fa-solid fa-fw fa-check text-brg text-3xl" />
 					</div>
 
 					<div className="text-center">
@@ -242,9 +229,8 @@ export function TipModal({
 											required
 										/>
 
-										<Icon
-											name="x"
-											className="size-3.5"
+										<i
+											className="fa-solid fa-times text-brg-mid cursor-pointer"
 											onClick={() =>
 												setShowOtherInput(false)
 											}

@@ -49,6 +49,12 @@ const Legal = lazy(() =>
 	import('./pages/Legal').then((module) => ({ default: module.Legal }))
 );
 
+const Moderation = lazy(() =>
+	import('./pages/Moderation').then((module) => ({
+		default: module.Moderation,
+	}))
+);
+
 const Registry = lazy(() =>
 	import('./pages/Registry').then((module) => ({ default: module.Registry }))
 );
@@ -115,6 +121,14 @@ function App() {
 									element={
 										<Suspense fallback={<Fallback />}>
 											<Legal />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/moderation"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Moderation />
 										</Suspense>
 									}
 								/>

@@ -43,7 +43,11 @@ export async function verifyAuth(c: Context<{ Bindings: Bindings }>) {
 		});
 
 		if (authResult.isSignedIn) {
-			c.set('userId', authResult.toAuth().userId);
+			const auth = authResult.toAuth();
+			const user = await clerk.users.getUser(auth.userId);
+
+			c.set('userId', user.id);
+			c.set('isModerator', !!user.publicMetadata?.moderator);
 		}
 
 		return authResult.isSignedIn;

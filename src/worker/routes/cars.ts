@@ -387,7 +387,7 @@ carsRouter.get('/:id/summary', async (c) => {
 		if (!car) {
 			return c.json(
 				{
-					error: 'Unauthorized',
+					error: 'Not found',
 					details: "The requested car wasn't found",
 				},
 				404

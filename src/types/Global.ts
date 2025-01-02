@@ -16,14 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TCar } from './Car';
-import { TCarOwner } from './Owner';
-
 export type TPending = {
-	car_id: string;
 	status: 'pending' | 'approved' | 'rejected';
 	created_at: number;
 };
 
-export type TCarPending = TCar & TPending;
-export type TCarOwnerPending = TCarOwner & TPending;
+export type TModerationStats = {
+	pending: number;
+	approved: number;
+	rejected: number;
+};

@@ -23,7 +23,6 @@ import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
-import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
 import { handleApiError } from '../utils/global';
 
@@ -148,19 +147,7 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 			>
 				<div className="flex flex-col items-center gap-6 py-6">
 					<div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
-						<svg
-							className="w-8 h-8 text-red-500"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<i className="fa-solid fa-fw fa-times text-red-500 text-3xl" />
 					</div>
 
 					<div className="flex flex-col gap-2 items-center text-center">
@@ -196,19 +183,7 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 			>
 				<div className="flex flex-col items-center gap-6 pt-6">
 					<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
-						<svg
-							className="w-8 h-8 text-brg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M5 13l4 4L19 7"
-							/>
-						</svg>
+						<i className="fa-solid fa-fw fa-check text-brg text-3xl" />
 					</div>
 
 					<div className="text-center">
@@ -314,9 +289,8 @@ export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
 										required
 									/>
 
-									<Icon
-										name="x"
-										className="size-3.5"
+									<i
+										className="fa-solid fa-times text-brg-mid cursor-pointer"
 										onClick={() => setShowOtherInput(false)}
 									/>
 								</div>

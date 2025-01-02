@@ -17,7 +17,6 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { Icon } from './Icon';
 
 interface ErrorBannerProps {
 	error: string | null;
@@ -47,12 +46,11 @@ export function ErrorBanner({ error, onDismiss }: ErrorBannerProps) {
 				<span>{error}</span>
 
 				{onDismiss && (
-					<Icon
-						name="x"
-						className="size-4 text-red-700 hover:text-red-800"
+					<i
+						className="fa-solid fa-times text-red-700 hover:text-red-800 cursor-pointer"
 						onClick={onDismiss}
 						aria-label="Dismiss error"
-					/>
+					></i>
 				)}
 			</div>
 		</div>

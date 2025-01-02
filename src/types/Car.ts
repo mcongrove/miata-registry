@@ -17,6 +17,7 @@
  */
 
 import { TEdition } from './Edition';
+import { TPending } from './Global';
 import { TCarOwner, TOwner } from './Owner';
 
 export type TCar = {
@@ -43,3 +44,8 @@ export type TCar = {
 	shipping_vessel?: string;
 	vin?: string;
 };
+
+export type TCarPending = TCar &
+	TPending & {
+		car_id: string;
+	};

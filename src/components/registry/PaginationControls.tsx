@@ -87,20 +87,7 @@ export const PaginationControls = ({
 					onClick={() => onPageChange(currentPage - 1)}
 					disabled={currentPage === 1}
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="#666666"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						className="rotate-90"
-					>
-						<polyline points="6 9 12 15 18 9"></polyline>
-					</svg>
+					<i className="fa-solid fa-fw fa-chevron-left text-brg-mid text-xs" />
 
 					<span className="sr-only">Previous page</span>
 				</button>
@@ -127,20 +114,7 @@ export const PaginationControls = ({
 					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage === totalPages || totalPages <= 1}
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="#666666"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						className="-rotate-90"
-					>
-						<polyline points="6 9 12 15 18 9"></polyline>
-					</svg>
+					<i className="fa-solid fa-fw fa-chevron-right text-brg-mid text-xs" />
 
 					<span className="sr-only">Next page</span>
 				</button>

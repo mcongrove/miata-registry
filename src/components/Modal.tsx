@@ -19,7 +19,6 @@
 import { ReactNode, useEffect } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { Button } from './Button';
-import { Icon } from './Icon';
 
 interface ModalProps {
 	action?: {
@@ -77,9 +76,8 @@ export function Modal({
 					<h2 className="flex items-center justify-between text-xl font-bold bg-brg-light/70 px-6 py-4 gap-10 rounded-t-lg border-b border-brg-border/50">
 						{title}
 
-						<Icon
-							name="x"
-							className="text-brg-mid hover:text-brg"
+						<i
+							className="fa-solid fa-times text-brg-mid hover:text-brg cursor-pointer"
 							onClick={onClose}
 						/>
 					</h2>

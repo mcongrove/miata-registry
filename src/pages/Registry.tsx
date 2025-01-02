@@ -19,7 +19,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Chip } from '../components/Chip';
-import { Icon } from '../components/Icon';
 import { FilterSidebar } from '../components/registry/FilterSidebar';
 import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
@@ -256,7 +255,7 @@ export const Registry = () => {
 								onClick={() => setIsFilterDrawerOpen(true)}
 								className={`lg:hidden flex items-center min-w-[34px] h-[34px] shrink-0 justify-center gap-2 py-2 pl-2 ${activeFilters.length ? 'pr-1' : 'pr-2'} text-xs text-brg-mid border border-brg-border rounded-lg transition-colors`}
 							>
-								<Icon name="filter" className="size-3.5" />
+								<i className="fa-solid fa-filter text-sm" />
 
 								{activeFilters.length > 0 && (
 									<span className="bg-brg-mid text-white rounded-md py-1 px-2">

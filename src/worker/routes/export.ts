@@ -19,7 +19,16 @@
 import { Hono } from 'hono';
 import JSZip from 'jszip';
 import { createDb } from '../../db';
-import { CarOwners, Cars, Editions, News, Owners, Tips } from '../../db/schema';
+import {
+	CarOwners,
+	CarOwnersPending,
+	Cars,
+	CarsPending,
+	Editions,
+	News,
+	Owners,
+	Tips,
+} from '../../db/schema';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -53,14 +62,18 @@ exportRouter.get('/', withAuth(), async (c) => {
 		const db = createDb(c.env.DB);
 
 		const carOwners = await db.select().from(CarOwners);
+		const carOwnersPending = await db.select().from(CarOwnersPending);
 		const cars = await db.select().from(Cars);
+		const carsPending = await db.select().from(CarsPending);
 		const editions = await db.select().from(Editions);
 		const news = await db.select().from(News);
 		const owners = await db.select().from(Owners);
 		const tips = await db.select().from(Tips);
 
 		const carOwnersCSV = objectsToCSV(carOwners);
+		const carOwnersPendingCSV = objectsToCSV(carOwnersPending);
 		const carsCSV = objectsToCSV(cars);
+		const carsPendingCSV = objectsToCSV(carsPending);
 		const editionsCSV = objectsToCSV(editions);
 		const newsCSV = objectsToCSV(news);
 		const ownersCSV = objectsToCSV(owners);
@@ -69,7 +82,9 @@ exportRouter.get('/', withAuth(), async (c) => {
 		const zip = new JSZip();
 
 		zip.file('car_owners.csv', carOwnersCSV);
+		zip.file('car_owners_pending.csv', carOwnersPendingCSV);
 		zip.file('cars.csv', carsCSV);
+		zip.file('cars_pending.csv', carsPendingCSV);
 		zip.file('editions.csv', editionsCSV);
 		zip.file('news.csv', newsCSV);
 		zip.file('owners.csv', ownersCSV);

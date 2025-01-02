@@ -28,7 +28,6 @@ import { useLocation } from 'react-router-dom';
 import { TOwner } from '../../types/Owner';
 import { handleApiError } from '../../utils/global';
 import { Button } from '../Button';
-import { Icon } from '../Icon';
 
 const ClerkMyCars = lazy(() =>
 	import('./ClerkMyCars').then((module) => ({
@@ -123,8 +122,8 @@ export function Clerk() {
 										viewBox="0 0 16 16"
 									>
 										<path
-											fill-rule="evenodd"
-											clip-rule="evenodd"
+											fillRule="evenodd"
+											clipRule="evenodd"
 											d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-2.585 2.894c.154.25.107.568-.083.792A5.675 5.675 0 0 1 8 13.688a5.675 5.675 0 0 1-4.332-2.002c-.19-.224-.237-.543-.083-.792.087-.14.189-.271.306-.392.46-.469 1.087-.986 1.703-1.102.514-.097.899.056 1.298.214.331.132.673.267 1.108.267.435 0 .777-.135 1.108-.267.4-.158.784-.31 1.298-.214.616.116 1.243.633 1.703 1.102.117.12.22.252.306.392ZM8 8.919c1.329 0 2.406-1.559 2.406-2.888a2.406 2.406 0 1 0-4.812 0C5.594 7.361 6.67 8.92 8 8.92Z"
 											fill="currentColor"
 										></path>
@@ -136,10 +135,7 @@ export function Clerk() {
 							<UserButton.Action
 								label="My Cars"
 								labelIcon={
-									<Icon
-										name="car"
-										className="size-3.5 text-[#616161]"
-									/>
+									<i className="fa-solid fa-fw fa-car text-[#616161]"></i>
 								}
 								open="cars"
 							/>
@@ -150,10 +146,7 @@ export function Clerk() {
 						<UserButton.UserProfilePage
 							label="Profile"
 							labelIcon={
-								<Icon
-									name="user"
-									className="size-3.5 text-[#2F3037]"
-								/>
+								<i className="fa-solid fa-fw fa-user text-[#2F3037]"></i>
 							}
 							url="profile"
 						>
@@ -182,10 +175,7 @@ export function Clerk() {
 						<UserButton.UserProfilePage
 							label="My Cars"
 							labelIcon={
-								<Icon
-									name="car"
-									className="size-3.5 text-[#2F3037]"
-								/>
+								<i className="fa-solid fa-fw fa-car text-[#2F3037]"></i>
 							}
 							url="cars"
 						>

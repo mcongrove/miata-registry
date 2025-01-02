@@ -20,23 +20,22 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { formatLocation } from '../utils/geo';
-import { Icon } from './Icon';
 
 interface CreditProps {
 	className?: string;
-	id: string;
 	direction?: 'left' | 'right';
+	id: string;
 }
 
 interface CarSummary {
-	year: number;
-	editionName: string;
-	sequence?: number;
 	current_owner?: {
+		country: string;
 		name: string;
 		state: string;
-		country: string;
 	};
+	editionName: string;
+	sequence?: number;
+	year: number;
 }
 
 const CreditText = ({
@@ -83,7 +82,7 @@ const CreditText = ({
 	</div>
 );
 
-export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
+export const Credit = ({ className, direction = 'right', id }: CreditProps) => {
 	const [car, setCar] = useState<CarSummary | null>(null);
 	const [isExpanded, setIsExpanded] = useState(false);
 
@@ -100,6 +99,7 @@ export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 
 						return;
 					}
+
 					throw new Error('Failed to fetch car summary');
 				}
 
@@ -119,12 +119,14 @@ export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
 			const target = e.target as HTMLElement;
+
 			if (!target.closest(`[data-credit-id="${id}"]`)) {
 				setIsExpanded(false);
 			}
 		};
 
 		document.addEventListener('click', handleClickOutside);
+
 		return () => document.removeEventListener('click', handleClickOutside);
 	}, [id]);
 
@@ -132,6 +134,7 @@ export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 		if (window.matchMedia('(hover: none)').matches) {
 			if (!isExpanded) {
 				e.preventDefault();
+
 				setIsExpanded(true);
 			}
 		}
@@ -152,8 +155,8 @@ export const Credit = ({ className, id, direction = 'right' }: CreditProps) => {
 				<CreditText car={car} direction={direction} />
 			)}
 
-			<div className="bg-white p-3 rounded-full z-20 relative">
-				<Icon name="car" className="size-4 text-brg" />
+			<div className="flex items-center justify-center bg-white size-10 rounded-full z-20 relative">
+				<i className="fa-solid fa-car"></i>
 			</div>
 
 			{direction === 'right' && (

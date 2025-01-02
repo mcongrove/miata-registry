@@ -16,27 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
+export const Diff = ({
+	label,
+	oldValue,
+	newValue,
+}: {
+	label: string;
+	oldValue?: string | number | null;
+	newValue?: string | number | null;
+}) => {
+	if (oldValue === newValue || (!oldValue && !newValue)) return null;
 
-declare module 'hono' {
-	interface ContextVariableMap {
-		userId: string;
-		isModerator: boolean;
-	}
-}
+	return (
+		<div className="flex items-center gap-4">
+			<span className="w-1/5 text-sm font-medium text-brg-mid">
+				{label}
+			</span>
 
-export type ApiError = {
-	error: string;
-	details?: string;
+			<span className="w-2/5 line-through text-sm text-brg-border">
+				{oldValue || 'None'}
+			</span>
+
+			<span className="w-2/5 text-sm text-brg">{newValue || 'None'}</span>
+		</div>
+	);
 };
-
-export interface Bindings {
-	CACHE: KVNamespace;
-	CLERK_PUBLISHABLE_KEY: string;
-	CLERK_SECRET_KEY: string;
-	CLERK_WEBHOOK_SECRET: string;
-	DB: D1Database;
-	IMAGES: R2Bucket;
-	NODE_ENV: string;
-	RESEND_API_KEY: string;
-}
