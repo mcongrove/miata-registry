@@ -24,7 +24,7 @@ import { PaginationControls } from '../components/registry/PaginationControls';
 import { RegistryTable } from '../components/registry/RegistryTable';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
-import { TFilterOption, TFilterType } from '../types/Filters';
+import { TFilterOption, TFilterType } from '../types/Filter';
 
 export const Registry = () => {
 	const parseFiltersFromURL = (filterParams: string[]): TFilterOption[] => {

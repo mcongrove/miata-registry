@@ -18,7 +18,7 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { TFilterOption } from '../../types/Filters';
+import { TFilterOption } from '../../types/Filter';
 import { Select } from '../form/Select';
 import { FilterHeader } from './FilterHeader';
 import { FilterRadioGroup } from './FilterRadioGroup';

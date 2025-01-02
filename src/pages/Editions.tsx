@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Tooltip } from '../components/Tooltip';
-import { Card } from '../components/editions/Card';
+import { Card } from '../components/edition/Card';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TEdition } from '../types/Edition';
 

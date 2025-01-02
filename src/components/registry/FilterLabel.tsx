@@ -17,7 +17,7 @@
  */
 
 import { twMerge } from 'tailwind-merge';
-import { TFilterOption, TFilterType } from '../../types/Filters';
+import { TFilterOption, TFilterType } from '../../types/Filter';
 
 interface FilterLabelProps {
 	id: string;
