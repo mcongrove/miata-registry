@@ -28,33 +28,33 @@ import { TModalState, TModalType } from '../types/Modal';
 
 const MODAL_COMPONENTS = {
 	carEdit: lazy(() =>
-		import('../modals/CarEditModal').then((module) => ({
-			default: module.CarEditModal,
+		import('../modals/CarEdit').then((module) => ({
+			default: module.CarEdit,
 		}))
 	),
 	export: lazy(() =>
-		import('../modals/ExportModal').then((module) => ({
-			default: module.ExportModal,
+		import('../modals/Export').then((module) => ({
+			default: module.Export,
 		}))
 	),
 	news: lazy(() =>
-		import('../modals/NewsModal').then((module) => ({
-			default: module.NewsModal,
+		import('../modals/News').then((module) => ({
+			default: module.News,
 		}))
 	),
-	qr: lazy(() =>
-		import('../modals/QrModal').then((module) => ({
-			default: module.QrModal,
+	qrCode: lazy(() =>
+		import('../modals/QrCode').then((module) => ({
+			default: module.QrCode,
 		}))
 	),
 	register: lazy(() =>
-		import('../modals/RegisterModal').then((module) => ({
-			default: module.RegisterModal,
+		import('../modals/Register').then((module) => ({
+			default: module.Register,
 		}))
 	),
 	tip: lazy(() =>
-		import('../modals/TipModal').then((module) => ({
-			default: module.TipModal,
+		import('../modals/Tip').then((module) => ({
+			default: module.Tip,
 		}))
 	),
 } as const;

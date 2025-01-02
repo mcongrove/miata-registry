@@ -68,6 +68,7 @@ export const FilterSidebar = ({
 	useEffect(() => {
 		const loadCountries = async () => {
 			const countryList = await getCountries();
+
 			const formattedCountries = countryList.map((code: string) => ({
 				value: code,
 				label:

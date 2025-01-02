@@ -18,6 +18,7 @@
 
 import { useUser } from '@clerk/clerk-react';
 import { Link, useLocation } from 'react-router-dom';
+import { twMerge } from 'tailwind-merge';
 import Symbol from '../assets/symbol.svg?react';
 import { Clerk } from '../components/account/Clerk';
 import { useModal } from '../context/ModalContext';
@@ -79,9 +80,9 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 };
 
 const ConstructionBanner = () => (
-	<div className="bg-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
-		🚧 &nbsp; This project is in early access. Features may be incomplete or
-		change without notice.
+	<div className="flex gap-1.5 items-center bg-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
+		<i className="fa-solid fa-person-digging text-sm"></i> This project is
+		in early access. Features may be incomplete or change without notice.
 	</div>
 );
 
@@ -151,7 +152,12 @@ export const Header = () => {
 				{user?.publicMetadata?.moderator ? (
 					<Link
 						to="/moderation"
-						className="text-sm text-brg-mid hover:text-brg transition-colors flex items-center gap-1"
+						className={twMerge(
+							'text-sm text-brg-mid hover:text-brg transition-colors flex items-center gap-1',
+							isActive('/moderation')
+								? 'text-brg font-medium'
+								: 'text-brg-mid hover:text-brg'
+						)}
 					>
 						Moderation
 					</Link>

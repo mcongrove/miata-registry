@@ -599,7 +599,7 @@ export const CarProfile = () => {
 										icon="fa-qrcode"
 										text="Get QR Code"
 										onClick={() => {
-											openModal('qr', {
+											openModal('qrCode', {
 												car,
 											});
 										}}

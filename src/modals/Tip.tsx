@@ -26,7 +26,7 @@ import { Modal } from '../components/Modal';
 import { useModal } from '../context/ModalContext';
 import { handleApiError } from '../utils/global';
 
-export function TipModal({
+export function Tip({
 	isOpen,
 	onClose,
 }: {

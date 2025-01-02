@@ -19,7 +19,7 @@
 import { Link } from 'react-router-dom';
 import { Modal } from '../components/Modal';
 
-interface NewsModalProps {
+interface NewsProps {
 	isOpen: boolean;
 	onClose: () => void;
 	props: {
@@ -32,7 +32,7 @@ interface NewsModalProps {
 	};
 }
 
-export function NewsModal({ isOpen, onClose, props }: NewsModalProps) {
+export function News({ isOpen, onClose, props }: NewsProps) {
 	const news = props.news;
 
 	if (!news) {

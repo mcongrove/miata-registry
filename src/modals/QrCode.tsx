@@ -27,7 +27,7 @@ import { Select, SelectStyles } from '../components/form/Select';
 import { TCar } from '../types/Car';
 import { handleApiError } from '../utils/global';
 
-export function QrModal({
+export function QrCode({
 	isOpen,
 	onClose,
 	props,

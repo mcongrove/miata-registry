@@ -30,6 +30,47 @@ const CACHE_TTL = {
 
 const ownersRouter = new Hono<{ Bindings: Bindings }>();
 
+ownersRouter.get('/countries', async (c) => {
+	try {
+		const cached = await c.env.CACHE.get('owners:countries');
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
+
+		const db = createDb(c.env.DB);
+
+		const countries = await db
+			.select({ country: Owners.country })
+			.from(Owners)
+			.innerJoin(Cars, eq(Cars.current_owner_id, Owners.id))
+			.where(sql`${Owners.country} IS NOT NULL`)
+			.groupBy(Owners.country)
+			.orderBy(Owners.country);
+
+		const countryList = countries.map((row) => row.country);
+
+		await c.env.CACHE.put('owners:countries', JSON.stringify(countryList), {
+			expirationTtl: CACHE_TTL.OWNER_COUNTRIES,
+		});
+
+		return c.json(countryList);
+	} catch (error: unknown) {
+		console.error('Error fetching owner countries:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
 ownersRouter.get('/:id', withAuth(), async (c) => {
 	try {
 		const userId = c.get('userId');
@@ -150,47 +191,6 @@ ownersRouter.post('/:id', withAuth(), async (c) => {
 		return c.json({ success: true });
 	} catch (error) {
 		console.error('Error updating owner:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
-	}
-});
-
-ownersRouter.get('/countries', async (c) => {
-	try {
-		const cached = await c.env.CACHE.get('owners:countries');
-
-		if (cached) {
-			return c.json(JSON.parse(cached));
-		}
-
-		const db = createDb(c.env.DB);
-
-		const countries = await db
-			.select({ country: Owners.country })
-			.from(Owners)
-			.innerJoin(Cars, eq(Cars.current_owner_id, Owners.id))
-			.where(sql`${Owners.country} IS NOT NULL`)
-			.groupBy(Owners.country)
-			.orderBy(Owners.country);
-
-		const countryList = countries.map((row) => row.country);
-
-		await c.env.CACHE.put('owners:countries', JSON.stringify(countryList), {
-			expirationTtl: CACHE_TTL.OWNER_COUNTRIES,
-		});
-
-		return c.json(countryList);
-	} catch (error: unknown) {
-		console.error('Error fetching owner countries:', error);
 
 		return c.json(
 			{

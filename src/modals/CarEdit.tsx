@@ -28,7 +28,7 @@ import { TCarOwner } from '../types/Owner';
 import { formatLocation, parseLocation } from '../utils/geo';
 import { handleApiError } from '../utils/global';
 
-interface CarEditModalProps {
+interface CarEditProps {
 	isOpen: boolean;
 	onClose: () => void;
 	props: {
@@ -39,7 +39,7 @@ interface CarEditModalProps {
 	};
 }
 
-export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
+export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 	const { isSignedIn, userId, getToken } = useAuth();
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
@@ -169,9 +169,19 @@ export function CarEditModal({ isOpen, onClose, props }: CarEditModalProps) {
 					<div className="text-center">
 						<h2 className="text-2xl font-bold mb-2">Success!</h2>
 
-						<p className="text-brg-mid">
+						<p className="text-brg-mid mb-2">
 							Your changes have been submitted and will be
 							reviewed by the Miata Registry team.
+						</p>
+
+						<p className="text-brg-mid">
+							Please send any supporting documentation to{' '}
+							<a
+								href={`mailto:support@miataregistry.com?subject=Sequence%20Number%20Change%20Request:%20${car.id}`}
+								className="underline"
+							>
+								support@miataregistry.com
+							</a>
 						</p>
 					</div>
 				</div>

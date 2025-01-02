@@ -26,7 +26,7 @@ import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { handleApiError } from '../utils/global';
 
-interface RegisterModalProps {
+interface RegisterProps {
 	isOpen: boolean;
 	onClose: () => void;
 	props?: {
@@ -38,7 +38,7 @@ interface RegisterModalProps {
 	};
 }
 
-export function RegisterModal({ isOpen, onClose, props }: RegisterModalProps) {
+export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const { isSignedIn, userId } = useAuth();
 	const { openSignIn } = useClerk();
 	const [loading, setLoading] = useState(false);

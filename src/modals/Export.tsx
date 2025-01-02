@@ -20,7 +20,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { useState } from 'react';
 import { Modal } from '../components/Modal';
 
-export function ExportModal({
+export function Export({
 	isOpen,
 	onClose,
 }: {

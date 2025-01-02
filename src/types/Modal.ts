@@ -20,7 +20,7 @@ export type TModalType =
 	| 'carEdit'
 	| 'export'
 	| 'news'
-	| 'qr'
+	| 'qrCode'
 	| 'register'
 	| 'tip';
 
