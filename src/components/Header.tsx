@@ -156,7 +156,8 @@ export const Header = () => {
 							'text-sm text-brg-mid hover:text-brg transition-colors flex items-center gap-1',
 							isActive('/moderation')
 								? 'text-brg font-medium'
-								: 'text-brg-mid hover:text-brg'
+								: 'text-brg-mid hover:text-brg',
+							isHomePage && 'bg-white rounded-lg py-2 px-3'
 						)}
 					>
 						Moderation
