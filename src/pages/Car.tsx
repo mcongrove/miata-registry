@@ -18,8 +18,9 @@
 
 import { useAuth } from '@clerk/clerk-react';
 import { lazy, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import Instagram from '../assets/logos/instagram.svg?react';
 import { Button } from '../components/Button';
 import { Tooltip } from '../components/Tooltip';
 import { useModal } from '../context/ModalContext';
@@ -170,6 +171,14 @@ export const CarProfile = () => {
 
 		const items = [];
 
+		// Destroyed
+		if (car.destroyed) {
+			items.push({
+				name: 'Destroyed',
+				isDestroyed: true,
+			});
+		}
+
 		// Owners
 		if (timelineOwners.length > 0) {
 			timelineOwners.forEach((owner: TCarOwner, index: number) => {
@@ -187,7 +196,7 @@ export const CarProfile = () => {
 							? ''
 							: index === 0
 								? car.destroyed
-									? `${startYear || 'Unknown'} – Destruction`
+									? `${startYear || 'Unknown'} – ${endYear || 'Destruction'}`
 									: `${startYear || 'Unknown'} – Present`
 								: `${startYear || 'Unknown'} – ${endYear || 'Unknown'}`,
 					location: formatLocation({
@@ -195,7 +204,7 @@ export const CarProfile = () => {
 						state: owner.state,
 						country: owner.country || '',
 					}),
-					isActive: index === 0,
+					isActive: index === 0 && !car.destroyed && !endYear,
 				});
 			});
 		}
@@ -322,7 +331,7 @@ export const CarProfile = () => {
 						<div>
 							{car ? (
 								<>
-									<div className="flex items-center justify-between gap-4">
+									<div className="flex items-end justify-between gap-4">
 										<div>
 											<h2 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
 												{car.edition?.year}{' '}
@@ -347,10 +356,23 @@ export const CarProfile = () => {
 											)}
 										</div>
 
-										{car.destroyed && (
-											<span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
-												Destroyed
-											</span>
+										{car.current_owner?.links && (
+											<Link
+												to={`https://instagram.com/${
+													JSON.parse(
+														car.current_owner
+															.links as string
+													).instagram
+												}`}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												<Instagram className="size-7" />
+
+												<span className="sr-only">
+													Car Instagram link
+												</span>
+											</Link>
 										)}
 									</div>
 								</>

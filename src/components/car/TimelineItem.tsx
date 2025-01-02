@@ -19,18 +19,20 @@
 import { twMerge } from 'tailwind-merge';
 
 interface TimelineItemProps {
-	name?: string | React.ReactNode;
 	dateRange?: string | React.ReactNode;
-	location?: string;
 	isActive?: boolean;
+	isDestroyed?: boolean;
+	location?: string;
+	name?: string | React.ReactNode;
 	showConnector?: boolean;
 }
 
 export const TimelineItem = ({
-	name,
 	dateRange,
-	location,
 	isActive = false,
+	isDestroyed = false,
+	location,
+	name,
 	showConnector = true,
 }: TimelineItemProps) => {
 	return (
@@ -58,12 +60,10 @@ export const TimelineItem = ({
 			>
 				<p
 					className={twMerge(
-						'font-medium',
-						!name
-							? 'text-brg-border'
-							: !isActive
-								? 'text-brg-mid'
-								: ''
+						'font-medium text-brg-mid',
+						!name && 'text-brg-border',
+						isActive && 'text-brg',
+						isDestroyed && 'text-red-700'
 					)}
 				>
 					{name || 'Unknown'}

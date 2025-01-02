@@ -276,6 +276,7 @@ carsRouter.get('/:id', async (c) => {
 					city: Owners.city,
 					country: Owners.country,
 					id: Owners.id,
+					links: sql`json(${Owners.links})`,
 					name: Owners.name,
 					state: Owners.state,
 					user_id: Owners.user_id,
