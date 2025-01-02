@@ -28,16 +28,16 @@ export const Diff = ({
 	if (oldValue === newValue || (!oldValue && !newValue)) return null;
 
 	return (
-		<div className="flex items-center gap-4">
-			<span className="w-1/5 text-sm font-medium text-brg-mid">
+		<div className="flex items-center gap-4 font-mono">
+			<span className="w-1/3 text-sm font-medium text-brg-mid">
 				{label}
 			</span>
 
-			<span className="w-2/5 line-through text-sm text-brg-border">
+			<span className="w-1/3 line-through text-sm text-brg-border">
 				{oldValue || 'None'}
 			</span>
 
-			<span className="w-2/5 text-sm text-brg">{newValue || 'None'}</span>
+			<span className="w-1/3 text-sm text-brg">{newValue || 'None'}</span>
 		</div>
 	);
 };

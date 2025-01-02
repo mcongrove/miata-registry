@@ -33,6 +33,7 @@ export const Moderation = () => {
 	const { getToken } = useAuth();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true);
+	const [activeTab, setActiveTab] = useState<string>('cars');
 	const [pendingCars, setPendingCars] = useState<
 		(TCarPending & { current: TCar | null; proposed: TCar })[]
 	>([]);
@@ -47,6 +48,13 @@ export const Moderation = () => {
 		approved: 0,
 		rejected: 0,
 	});
+	const [pendingPhotos, setPendingPhotos] = useState<
+		{
+			id: string;
+			carId: string;
+			uploadedAt: string;
+		}[]
+	>([]);
 
 	useEffect(() => {
 		if (isLoaded && !user?.publicMetadata?.moderator) {
@@ -70,45 +78,61 @@ export const Moderation = () => {
 
 				if (!token) return;
 
-				const [carsResponse, carOwnersResponse, statsResponse] =
-					await Promise.all([
-						fetch(
-							`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/cars`,
-							{
-								headers: {
-									'Content-Type': 'application/json',
-									Authorization: `Bearer ${token}`,
-								},
-							}
-						),
-						fetch(
-							`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/carOwners`,
-							{
-								headers: {
-									'Content-Type': 'application/json',
-									Authorization: `Bearer ${token}`,
-								},
-							}
-						),
-						fetch(
-							`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/stats`,
-							{
-								headers: {
-									'Content-Type': 'application/json',
-									Authorization: `Bearer ${token}`,
-								},
-							}
-						),
-					]);
-
-				const [carsData, carOwnersData, statsData] = await Promise.all([
-					carsResponse.json(),
-					carOwnersResponse.json(),
-					statsResponse.json(),
+				const [
+					carsResponse,
+					carOwnersResponse,
+					photosResponse,
+					statsResponse,
+				] = await Promise.all([
+					fetch(
+						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/cars`,
+						{
+							headers: {
+								'Content-Type': 'application/json',
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					),
+					fetch(
+						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/carOwners`,
+						{
+							headers: {
+								'Content-Type': 'application/json',
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					),
+					fetch(
+						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/photo`,
+						{
+							headers: {
+								'Content-Type': 'application/json',
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					),
+					fetch(
+						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/stats`,
+						{
+							headers: {
+								'Content-Type': 'application/json',
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					),
 				]);
+
+				const [carsData, carOwnersData, photosData, statsData] =
+					await Promise.all([
+						carsResponse.json(),
+						carOwnersResponse.json(),
+						photosResponse.json(),
+						statsResponse.json(),
+					]);
 
 				setPendingCars(carsData);
 				setPendingCarOwners(carOwnersData);
+				setPendingPhotos(photosData);
 				setStats(statsData);
 			} catch (error) {
 				handleApiError(error);
@@ -120,7 +144,10 @@ export const Moderation = () => {
 		loadPendingChanges();
 	}, []);
 
-	const handleApprove = async (type: 'car' | 'carOwner', id: string) => {
+	const handleApprove = async (
+		type: 'car' | 'carOwner' | 'photo',
+		id: string
+	) => {
 		try {
 			const token = await getToken();
 
@@ -145,9 +172,13 @@ export const Moderation = () => {
 
 			if (type === 'car') {
 				setPendingCars((cars) => cars.filter((car) => car.id !== id));
-			} else {
+			} else if (type === 'carOwner') {
 				setPendingCarOwners((owners) =>
 					owners.filter((owner) => owner.id !== id)
+				);
+			} else if (type === 'photo') {
+				setPendingPhotos((photos) =>
+					photos.filter((photo) => photo.id !== id)
 				);
 			}
 		} catch (error) {
@@ -155,7 +186,10 @@ export const Moderation = () => {
 		}
 	};
 
-	const handleReject = async (type: 'car' | 'carOwner', id: string) => {
+	const handleReject = async (
+		type: 'car' | 'carOwner' | 'photo',
+		id: string
+	) => {
 		try {
 			const token = await getToken();
 
@@ -174,9 +208,13 @@ export const Moderation = () => {
 
 			if (type === 'car') {
 				setPendingCars((cars) => cars.filter((car) => car.id !== id));
-			} else {
+			} else if (type === 'carOwner') {
 				setPendingCarOwners((owners) =>
 					owners.filter((owner) => owner.id !== id)
+				);
+			} else if (type === 'photo') {
+				setPendingPhotos((photos) =>
+					photos.filter((photo) => photo.id !== id)
 				);
 			}
 		} catch (error) {
@@ -186,13 +224,52 @@ export const Moderation = () => {
 
 	return (
 		<main className="flex-1 pt-20">
-			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
-				<h1 className="flex justify-between items-center text-2xl lg:text-3xl font-bold">
+			<div className="container mx-auto p-8 lg:p-0 lg:py-8 min-h-[calc(100vh_-_80px)]">
+				<h1 className="flex justify-between items-center text-2xl lg:text-3xl font-bold mb-4">
 					Moderation Panel{' '}
 					<div className="w-60">
 						<Stats stats={stats} />
 					</div>
 				</h1>
+
+				<div className="w-80 flex mb-8 overflow-x-auto">
+					<div className="flex gap-2 p-1 bg-brg-light rounded-lg w-full relative">
+						<div
+							className="absolute transition-all w-[calc(33.33%_-_2px)] duration-200 ease-in-out h-[calc(100%-8px)] bg-white rounded-md shadow-sm"
+							style={{
+								transform: `translateX(${['cars', 'owners', 'photos'].indexOf(activeTab) * 100}%)`,
+							}}
+						/>
+
+						{['cars', 'owners', 'photos'].map((tab) => (
+							<button
+								key={tab}
+								onClick={() => setActiveTab(tab)}
+								className={`relative flex-1 px-4 py-2 text-sm rounded-md transition-colors ${
+									activeTab === tab
+										? 'text-brg'
+										: 'text-brg-mid hover:text-brg'
+								} disabled:text-brg-border/70`}
+								disabled={
+									tab === 'cars'
+										? !pendingCars.length
+										: tab === 'owners'
+											? !pendingCarOwners.length
+											: !pendingPhotos.length
+								}
+							>
+								{tab.charAt(0).toUpperCase() + tab.slice(1)}{' '}
+								<span className="text-brg-border">
+									{tab === 'cars'
+										? pendingCars.length
+										: tab === 'owners'
+											? pendingCarOwners.length
+											: pendingPhotos.length}
+								</span>
+							</button>
+						))}
+					</div>
+				</div>
 
 				{isLoading ? (
 					<div className="pt-4 space-y-4">
@@ -204,22 +281,15 @@ export const Moderation = () => {
 						))}
 					</div>
 				) : (
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-						<section className="pr-4">
-							<h2 className="text-xl font-bold my-2 sticky top-0 bg-white z-10 py-2">
-								Cars{' '}
-								<span className="text-brg-border font-normal">
-									{pendingCars.length}
-								</span>
-							</h2>
-
-							{pendingCars.length === 0 ? (
-								<p className="text-brg-border">
-									No pending changes
-								</p>
-							) : (
-								<div className="max-h-[calc(100vh_-_240px)] overflow-y-auto space-y-4">
-									{pendingCars.map((pending) => (
+					<div className="space-y-4">
+						{activeTab === 'cars' && (
+							<div className="space-y-4">
+								{pendingCars.length === 0 ? (
+									<p className="text-brg-border">
+										No pending changes
+									</p>
+								) : (
+									pendingCars.map((pending) => (
 										<PendingItem
 											key={pending.id}
 											carId={pending.current?.id}
@@ -260,26 +330,19 @@ export const Moderation = () => {
 													/>
 												))}
 										</PendingItem>
-									))}
-								</div>
-							)}
-						</section>
+									))
+								)}
+							</div>
+						)}
 
-						<section className="overflow-y-auto pr-4">
-							<h2 className="text-xl font-bold my-2 sticky top-0 bg-white z-10 py-2">
-								Car Owners{' '}
-								<span className="text-brg-border font-normal">
-									{pendingCarOwners.length}
-								</span>
-							</h2>
-
-							{pendingCarOwners.length === 0 ? (
-								<p className="text-brg-border">
-									No pending changes
-								</p>
-							) : (
-								<div className="max-h-[calc(100vh_-_240px)] overflow-y-auto space-y-4">
-									{pendingCarOwners.map((pending) => (
+						{activeTab === 'owners' && (
+							<div className="space-y-4">
+								{pendingCarOwners.length === 0 ? (
+									<p className="text-brg-border">
+										No pending changes
+									</p>
+								) : (
+									pendingCarOwners.map((pending) => (
 										<PendingItem
 											key={pending.id}
 											carId={pending.current?.car_id}
@@ -327,10 +390,42 @@ export const Moderation = () => {
 													/>
 												))}
 										</PendingItem>
-									))}
-								</div>
-							)}
-						</section>
+									))
+								)}
+							</div>
+						)}
+
+						{activeTab === 'photos' && (
+							<div className="space-y-4">
+								{pendingPhotos.length === 0 ? (
+									<p className="text-brg-border">
+										No pending photos
+									</p>
+								) : (
+									pendingPhotos.map((photo) => (
+										<PendingItem
+											key={photo.id}
+											carId={photo.id}
+											createdAt={new Date(
+												photo.uploadedAt
+											).getTime()}
+											onApprove={() =>
+												handleApprove('photo', photo.id)
+											}
+											onReject={() =>
+												handleReject('photo', photo.id)
+											}
+										>
+											<img
+												src={`https://store.miataregistry.com/car-pending/${photo.id}.jpg`}
+												alt={`Pending photo for car ${photo.carId}`}
+												className="w-full max-w-md rounded-lg"
+											/>
+										</PendingItem>
+									))
+								)}
+							</div>
+						)}
 					</div>
 				)}
 			</div>

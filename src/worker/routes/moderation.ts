@@ -338,6 +338,109 @@ moderationRouter.post('/carOwner/:id/reject', withAuth(), async (c) => {
 	}
 });
 
+moderationRouter.get('/photo', withAuth(), async (c) => {
+	if (!c.get('isModerator')) {
+		return c.json({ error: 'Unauthorized' }, 403);
+	}
+
+	try {
+		const pendingPhotos = await c.env.IMAGES.list({
+			prefix: 'car-pending/',
+		});
+
+		const photos = await Promise.all(
+			pendingPhotos.objects.map(async (object) => {
+				const id = object.key
+					.replace('car-pending/', '')
+					.replace('.jpg', '');
+
+				return {
+					id,
+					uploadedAt: object.uploaded,
+				};
+			})
+		);
+
+		return c.json(photos);
+	} catch (error) {
+		console.error('Error fetching pending photos:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error ? error.message : 'Unknown error',
+			},
+			500
+		);
+	}
+});
+
+moderationRouter.post('/photo/:id/approve', withAuth(), async (c) => {
+	if (!c.get('isModerator')) {
+		return c.json({ error: 'Unauthorized' }, 403);
+	}
+
+	try {
+		const id = c.req.param('id');
+		const pendingPhoto = await c.env.IMAGES.get(`car-pending/${id}.jpg`);
+
+		if (!pendingPhoto) {
+			return c.json({ error: 'Not found' }, 404);
+		}
+
+		await c.env.IMAGES.put(
+			`car/${id}.jpg`,
+			await pendingPhoto.arrayBuffer(),
+			{
+				httpMetadata: {
+					contentType: 'image/jpeg',
+					cacheControl: 'public, max-age=31536000',
+				},
+			}
+		);
+
+		await c.env.IMAGES.delete(`car-pending/${id}.jpg`);
+
+		return c.json({ success: true });
+	} catch (error) {
+		console.error('Error approving photo:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error ? error.message : 'Unknown error',
+			},
+			500
+		);
+	}
+});
+
+moderationRouter.post('/photo/:id/reject', withAuth(), async (c) => {
+	if (!c.get('isModerator')) {
+		return c.json({ error: 'Unauthorized' }, 403);
+	}
+
+	try {
+		const id = c.req.param('id');
+		await c.env.IMAGES.delete(`car-pending/${id}.jpg`);
+
+		return c.json({ success: true });
+	} catch (error) {
+		console.error('Error rejecting photo:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error ? error.message : 'Unknown error',
+			},
+			500
+		);
+	}
+});
+
 moderationRouter.get('/stats', async (c) => {
 	try {
 		const db = createDb(c.env.DB);
