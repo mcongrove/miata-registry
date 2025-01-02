@@ -189,12 +189,18 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 					<div className="text-center">
 						<h2 className="text-2xl font-bold mb-2">Thank You!</h2>
 
-						<p className="text-brg-mid">
+						<p className="text-brg-mid mb-2">
 							Your information has been submitted successfully.
 						</p>
 
 						<p className="text-brg-mid">
-							We'll review it and update the registry accordingly.
+							Please send any supporting documentation to{' '}
+							<a
+								href={`mailto:support@miataregistry.com?subject=Car%20Documentation`}
+								className="underline"
+							>
+								support@miataregistry.com
+							</a>
 						</p>
 					</div>
 				</div>

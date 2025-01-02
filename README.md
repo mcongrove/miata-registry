@@ -16,9 +16,10 @@ The Miata Registry is a public platform where owners of limited edition Mazda Mi
 
 ## 🚀 Getting Started
 
-1. Create an account at [MiataRegistry.com](https://miataregistry.com)
-2. Add your limited edition Miata's details
-3. Connect with the community!
+1. Create an account by clicking "Sign In" at [MiataRegistry.com](https://miataregistry.com)
+2. Find your car on the Registry list page and click "Claim", or (if it's not there) go to Registry > Register your Miata
+3. Submit your car's details and the Miata Registry team will review your submission
+4. Send any supporting documentation to support@miataregistry.com to get verified faster; this can be photos, social media links, PDF files showing vehicle history, etc.
 
 ## 🧑‍💻 Development
 
