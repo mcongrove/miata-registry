@@ -41,7 +41,6 @@ export const Home = () => {
 
 	usePageMeta({
 		path: '/',
-		title: 'Miata Registry',
 		description:
 			'A community-driven project documenting the history of limited edition Mazda Miatas.',
 	});
