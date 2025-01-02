@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TPending } from './Global';
+import { TPending } from './Common';
 
 export type TOwner = {
 	city?: string;
