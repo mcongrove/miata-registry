@@ -424,7 +424,7 @@ carsRouter.get('/:id/summary', async (c) => {
 	}
 });
 
-carsRouter.post('/:id', withAuth(), async (c) => {
+carsRouter.patch('/:id', withAuth(), async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 		const id = c.req.param('id');
@@ -482,40 +482,78 @@ carsRouter.post('/:id', withAuth(), async (c) => {
 			);
 		}
 
-		await db.insert(CarsPending).values({
-			...existing.car,
-			id: crypto.randomUUID(),
-			car_id: existing.car.id,
-			created_at: Date.now(),
-			current_owner_id: body.owner_date_end
-				? null
-				: existing.car.current_owner_id,
-			destroyed: body.destroyed,
-			manufacture_date: body.manufacture_date,
-			sale_date: `${body.sale_date}T00:00:00.000Z`,
-			sale_dealer_city: body.sale_dealer_location?.city,
-			sale_dealer_country: body.sale_dealer_location?.country,
-			sale_dealer_name: body.sale_dealer_name,
-			sale_dealer_state: body.sale_dealer_location?.state,
-			sale_msrp: body.sale_msrp,
-			sequence: body.sequence,
-			shipping_city: body.shipping_location?.city,
-			shipping_country: body.shipping_location?.country,
-			shipping_date: `${body.shipping_date}T00:00:00.000Z`,
-			shipping_state: body.shipping_location?.state,
-			shipping_vessel: body.shipping_vessel,
-			status: 'pending',
-		});
+		const carChecks = {
+			destroyed: existing.car.destroyed !== body.destroyed,
+			manufacture_date:
+				existing.car.manufacture_date !== body.manufacture_date,
+			sale_date: existing.car.sale_date?.split('T')[0] !== body.sale_date,
+			sale_dealer_city:
+				existing.car.sale_dealer_city !==
+				body.sale_dealer_location?.city,
+			sale_dealer_country:
+				existing.car.sale_dealer_country !==
+				body.sale_dealer_location?.country,
+			sale_dealer_name:
+				existing.car.sale_dealer_name !== body.sale_dealer_name,
+			sale_dealer_state:
+				existing.car.sale_dealer_state !==
+				body.sale_dealer_location?.state,
+			sale_msrp: existing.car.sale_msrp !== body.sale_msrp,
+			sequence: existing.car.sequence !== body.sequence,
+			shipping_city:
+				existing.car.shipping_city !== body.shipping_location?.city,
+			shipping_country:
+				existing.car.shipping_country !==
+				body.shipping_location?.country,
+			shipping_date:
+				existing.car.shipping_date?.split('T')[0] !==
+				body.shipping_date,
+			shipping_state:
+				existing.car.shipping_state !== body.shipping_location?.state,
+			shipping_vessel:
+				existing.car.shipping_vessel !== body.shipping_vessel,
+		};
 
-		const ownershipChanged =
-			(existing.owner.date_start
-				? existing.owner.date_start?.split('T')[0]
-				: null) !== body.owner_date_start ||
-			(existing.owner.date_end
-				? existing.owner.date_end?.split('T')[0]
-				: null) !== body.owner_date_end;
+		const ownerChecks = {
+			date_start:
+				(existing.owner.date_start?.split('T')[0] ?? null) !==
+				body.owner_date_start,
+			date_end:
+				(existing.owner.date_end?.split('T')[0] ?? null) !==
+				body.owner_date_end,
+		};
 
-		if (ownershipChanged) {
+		const carChanged = Object.values(carChecks).some(Boolean);
+		const carOwnerChanged = Object.values(ownerChecks).some(Boolean);
+
+		if (carChanged) {
+			await db.insert(CarsPending).values({
+				...existing.car,
+				id: crypto.randomUUID(),
+				car_id: existing.car.id,
+				created_at: Date.now(),
+				current_owner_id: body.owner_date_end
+					? null
+					: existing.car.current_owner_id,
+				destroyed: body.destroyed,
+				manufacture_date: body.manufacture_date,
+				sale_date: `${body.sale_date}T00:00:00.000Z`,
+				sale_dealer_city: body.sale_dealer_location?.city,
+				sale_dealer_country: body.sale_dealer_location?.country,
+				sale_dealer_name: body.sale_dealer_name,
+				sale_dealer_state: body.sale_dealer_location?.state,
+				sale_msrp: body.sale_msrp,
+				sequence: body.sequence,
+				shipping_city: body.shipping_location?.city,
+				shipping_country: body.shipping_location?.country,
+				shipping_date: `${body.shipping_date}T00:00:00.000Z`,
+				shipping_state: body.shipping_location?.state,
+				shipping_vessel: body.shipping_vessel,
+				status: 'pending',
+			});
+		}
+
+		if (carOwnerChanged) {
 			await db.insert(CarOwnersPending).values({
 				car_id: id,
 				created_at: Date.now(),
@@ -529,23 +567,22 @@ carsRouter.post('/:id', withAuth(), async (c) => {
 			});
 		}
 
-		const resend = new Resend(c.env.RESEND_API_KEY);
+		if (carChanged || carOwnerChanged) {
+			const resend = new Resend(c.env.RESEND_API_KEY);
 
-		await resend.emails.send({
-			from: 'Miata Registry <support@miataregistry.com>',
-			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: New Car Change Request',
-			html: `
+			await resend.emails.send({
+				from: 'Miata Registry <support@miataregistry.com>',
+				to: 'mattcongrove@gmail.com',
+				subject: 'Miata Registry: New Car Change Request',
+				html: `
 				<h2>New Change Request</h2>
-				<p><strong>Car ID:</strong> ${existing.car.id}</p>
-				${ownershipChanged ? `<p><strong>Owner ID:</strong> ${existing.owner.owner_id}</p>` : ''}
+				${carChanged ? `<p><strong>Car ID:</strong> ${existing.car.id}</p>` : ''}
+				${carOwnerChanged ? `<p><strong>Owner ID:</strong> ${existing.owner.owner_id}</p>` : ''}
 			`,
-		});
+			});
 
-		await Promise.all([
-			c.env.CACHE.delete(`cars:details:${id}`),
-			c.env.CACHE.delete(`cars:summary:${id}`),
-		]);
+			await Promise.all([c.env.CACHE.delete(`cars:details:${id}`)]);
+		}
 
 		return c.json({ success: true });
 	} catch (error: unknown) {

@@ -59,7 +59,7 @@ app.use('*', async (c, next) => {
 
 	return cors({
 		origin: ALLOWED_ORIGINS,
-		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+		allowMethods: ['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		maxAge: 86400,
 		credentials: true,
 	})(c, next);

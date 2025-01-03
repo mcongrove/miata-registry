@@ -131,7 +131,7 @@ export function Location({
 			value={inputValue}
 			onChange={(e) => setInputValue(e.target.value)}
 			className={twMerge(
-				'w-full p-2 !text-[16px] md:!text-sm border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid',
+				'w-full p-2 !text-[16px] md:!text-sm text-brg border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid',
 				className
 			)}
 		/>

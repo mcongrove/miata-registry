@@ -16,12 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from './schema/CarOwners';
-export * from './schema/CarOwnersPending';
-export * from './schema/Cars';
-export * from './schema/CarsPending';
-export * from './schema/Editions';
-export * from './schema/News';
-export * from './schema/Owners';
-export * from './schema/OwnersPending';
-export * from './schema/Tips';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+export const OwnersPending = sqliteTable('owners_pending', {
+	city: text('city'),
+	country: text('country'),
+	created_at: integer('created_at').notNull(),
+	id: text('id').primaryKey(),
+	information: text('information'),
+	name: text('name'),
+	state: text('state'),
+	status: text('status', { enum: ['pending', 'approved', 'rejected'] })
+		.notNull()
+		.default('pending'),
+	user_id: text('user_id').notNull(),
+});

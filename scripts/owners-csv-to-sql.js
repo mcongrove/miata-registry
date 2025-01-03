@@ -1,6 +1,5 @@
 import { parse } from 'csv-parse/sync';
 import { readFileSync, writeFileSync } from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 
 // Get CSV filename from command line args
 const csvPath = process.argv[2];
@@ -33,7 +32,7 @@ try {
 		.map((record) => {
 			console.log('Processing record:', record);
 
-			return `INSERT INTO owners (id,name,country,state,city) VALUES ('${uuidv4()}',${record.name ? `'${record.name.replace(/'/g, "''")}'` : 'NULL'},${record.country ? `'${record.country}'` : 'NULL'},${record.state ? `'${record.state}'` : 'NULL'},${record.city ? `'${record.city}'` : 'NULL'});`;
+			return `INSERT INTO owners (id,name,country,state,city) VALUES ('${crypto.randomUUID()}',${record.name ? `'${record.name.replace(/'/g, "''")}'` : 'NULL'},${record.country ? `'${record.country}'` : 'NULL'},${record.state ? `'${record.state}'` : 'NULL'},${record.city ? `'${record.city}'` : 'NULL'});`;
 		})
 		.join('\n');
 

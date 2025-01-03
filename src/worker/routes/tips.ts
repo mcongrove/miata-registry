@@ -18,7 +18,6 @@
 
 import { Hono } from 'hono';
 import { Resend } from 'resend';
-import { v4 as uuid } from 'uuid';
 import { createDb } from '../../db';
 import { Tips } from '../../db/schema';
 import type { Bindings } from '../types';
@@ -28,17 +27,17 @@ const tipsRouter = new Hono<{ Bindings: Bindings }>();
 tipsRouter.post('/', async (c) => {
 	try {
 		const formData = await c.req.formData();
-		const tipId = uuid();
+		const tipId = crypto.randomUUID();
 		const db = createDb(c.env.DB);
 
 		await db.insert(Tips).values({
 			created_at: Date.now(),
-			edition: formData.get('edition') as string,
+			edition: formData.get('edition_name') as string,
 			id: tipId,
 			information: (formData.get('information') as string) || null,
-			location: (formData.get('location') as string) || null,
-			owner_name: (formData.get('ownerName') as string) || null,
-			sequence_number: (formData.get('sequenceNumber') as string) || null,
+			location: (formData.get('owner_location') as string) || null,
+			owner_name: (formData.get('owner_name') as string) || null,
+			sequence_number: (formData.get('sequence') as string) || null,
 			user_id: (formData.get('userId') as string) || null,
 			vin: (formData.get('vin') as string) || null,
 		});
@@ -52,11 +51,11 @@ tipsRouter.post('/', async (c) => {
 			html: `
                 <h2>Registry Tip</h2>
                 <p><strong>Tip ID:</strong> ${tipId}</p>
-                <p><strong>Edition:</strong> ${formData.get('edition')}</p>
+                <p><strong>Edition:</strong> ${formData.get('edition_name')}</p>
                 <p><strong>VIN:</strong> ${formData.get('vin') || 'Not provided'}</p>
-                <p><strong>Sequence Number:</strong> ${formData.get('sequenceNumber') || 'Not provided'}</p>
-                <p><strong>Owner Name:</strong> ${formData.get('ownerName') || 'Not provided'}</p>
-                <p><strong>Location:</strong> ${formData.get('location') || 'Not provided'}</p>
+                <p><strong>Sequence Number:</strong> ${formData.get('sequence') || 'Not provided'}</p>
+                <p><strong>Owner Name:</strong> ${formData.get('owner_name') || 'Not provided'}</p>
+                <p><strong>Location:</strong> ${formData.get('owner_location') || 'Not provided'}</p>
                 <p><strong>Information:</strong> ${formData.get('information') || 'Not provided'}</p>
             `,
 		});

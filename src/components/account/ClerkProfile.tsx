@@ -59,7 +59,7 @@ export const ClerkProfile = ({
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/${owner.user_id}`,
 				{
-					method: 'POST',
+					method: 'PATCH',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${token}`,

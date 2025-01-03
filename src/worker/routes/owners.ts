@@ -18,8 +18,15 @@
 
 import { eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
+import { Resend } from 'resend';
 import { createDb } from '../../db';
-import { Cars, Editions, Owners } from '../../db/schema';
+import {
+	CarOwnersPending,
+	Cars,
+	Editions,
+	Owners,
+	OwnersPending,
+} from '../../db/schema';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -142,7 +149,7 @@ ownersRouter.get('/:id', withAuth(), async (c) => {
 	}
 });
 
-ownersRouter.post('/:id', withAuth(), async (c) => {
+ownersRouter.patch('/:id', withAuth(), async (c) => {
 	try {
 		const userId = c.get('userId');
 		const ownerUserId = c.req.param('id');
@@ -201,6 +208,96 @@ ownersRouter.post('/:id', withAuth(), async (c) => {
 						: 'An unknown error occurred',
 			},
 			500
+		);
+	}
+});
+
+ownersRouter.post('/', withAuth(), async (c) => {
+	try {
+		const userId = c.get('userId');
+		const body = await c.req.json();
+		const db = createDb(c.env.DB);
+		let ownerId = body.owner_id;
+
+		console.log(JSON.stringify(body));
+
+		if (!ownerId) {
+			const existingOwner = await db
+				.select({ id: Owners.id })
+				.from(Owners)
+				.where(eq(Owners.user_id, userId));
+
+			if (existingOwner.length > 0) {
+				return c.json(
+					{
+						error: 'Conflict',
+						details: 'An owner already exists for this user',
+					},
+					409
+				);
+			}
+
+			const [{ id: ownerId }] = await db
+				.insert(OwnersPending)
+				.values({
+					city: body.owner_city || null,
+					country: body.owner_country || null,
+					created_at: Date.now(),
+					id: crypto.randomUUID(),
+					information: body.information || null,
+					name: body.owner_name,
+					state: body.owner_state || null,
+					status: 'pending',
+					user_id: userId,
+				})
+				.returning({ id: OwnersPending.id });
+
+			await db.insert(CarOwnersPending).values({
+				car_id: body.car_id,
+				created_at: Date.now(),
+				date_start: `${body.owner_date_start}T00:00:00.000Z`,
+				id: crypto.randomUUID(),
+				owner_id: ownerId,
+				status: 'pending',
+			});
+		} else {
+			await db.insert(CarOwnersPending).values({
+				car_id: body.car_id,
+				created_at: Date.now(),
+				date_start: `${body.owner_date_start}T00:00:00.000Z`,
+				id: crypto.randomUUID(),
+				owner_id: ownerId,
+				status: 'pending',
+			});
+		}
+
+		const resend = new Resend(c.env.RESEND_API_KEY);
+
+		await resend.emails.send({
+			from: 'Miata Registry <support@miataregistry.com>',
+			to: 'mattcongrove@gmail.com',
+			subject: 'Miata Registry: New Owner Request',
+			html: `
+				<h2>New Owner Request</h2>
+				<p><strong>Owner ID:</strong> ${ownerId}</p>
+				<p><strong>Name:</strong> ${body.name}</p>
+				<p><strong>Location:</strong> ${[body.location?.city, body.location?.state, body.location?.country].filter(Boolean).join(', ')}</p>
+		 `,
+		});
+
+		return c.json({ success: true, id: ownerId });
+	} catch (error) {
+		console.error('Error creating owner:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			501
 		);
 	}
 });

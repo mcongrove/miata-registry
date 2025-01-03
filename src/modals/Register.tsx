@@ -18,6 +18,7 @@
 
 import { useAuth, useClerk } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
@@ -25,27 +26,31 @@ import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { handleApiError } from '../utils/common';
+import { parseLocation } from '../utils/location';
 
 interface RegisterProps {
 	isOpen: boolean;
 	onClose: () => void;
 	props?: {
 		prefilledData?: {
-			edition?: string;
+			edition_name?: string;
+			id?: string;
+			sequence?: string;
 			vin?: string;
-			sequenceNumber?: string;
 		};
 	};
 }
 
 export function Register({ isOpen, onClose, props }: RegisterProps) {
-	const { isSignedIn, userId } = useAuth();
+	const { isSignedIn, userId, getToken } = useAuth();
 	const { openSignIn } = useClerk();
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
 	const [editions, setEditions] = useState<string[]>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
+	const [existingOwner, setExistingOwner] = useState<string | null>(null);
+	const [formDataLoading, setFormDataLoading] = useState(false);
 	const prefilledData = props?.prefilledData;
 
 	useEffect(() => {
@@ -65,13 +70,43 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 			}
 		};
 
-		loadEditions();
+		if (!prefilledData?.id) {
+			loadEditions();
+		}
 	}, []);
 
 	useEffect(() => {
+		const checkExistingOwner = async () => {
+			if (!userId || !isSignedIn) return;
+
+			try {
+				const token = await getToken();
+
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/${userId}`,
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+
+				const data = await response.json();
+
+				setExistingOwner(data.owner?.id);
+				setFormDataLoading(true);
+			} catch (error) {
+				handleApiError(error);
+			}
+		};
+
+		checkExistingOwner();
+	}, [userId, isSignedIn, getToken]);
+
+	useEffect(() => {
 		if (
-			prefilledData?.edition &&
-			editions.includes(prefilledData.edition)
+			prefilledData?.edition_name &&
+			editions.includes(prefilledData.edition_name)
 		) {
 			const form = document.querySelector('form');
 
@@ -81,7 +116,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 				) as HTMLSelectElement;
 
 				if (editionSelect) {
-					editionSelect.value = prefilledData.edition;
+					editionSelect.value = prefilledData.edition_name;
 				}
 			}
 		}
@@ -97,26 +132,69 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 		try {
 			const form = document.querySelector('form#registerForm');
+			const token = await getToken();
 
-			if (!form) return;
+			if (!form || !token) return;
 
 			const formData = new FormData(form as HTMLFormElement);
 
-			const response = await fetch(
-				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
-				{
-					method: 'POST',
-					body: formData,
+			if (prefilledData?.id) {
+				const owner_location = formData.get('owner_location')
+					? parseLocation(formData.get('owner_location') as string)
+					: null;
+
+				const ownerFields = existingOwner
+					? { owner_id: existingOwner }
+					: {
+							owner_name: formData.get('owner_name'),
+							owner_city: owner_location?.city,
+							owner_state: owner_location?.state,
+							owner_country: owner_location?.country,
+						};
+
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({
+							car_id: prefilledData.id,
+							information: formData.get('information'),
+							owner_date_start: formData.get('owner_date_start'),
+							...ownerFields,
+						}),
+					}
+				);
+
+				if (!response.ok) {
+					const error = await response.json();
+
+					throw new Error(
+						error.details || 'Failed to submit ownership claim'
+					);
 				}
-			);
 
-			if (!response.ok) {
-				const error = await response.json();
+				setIsSuccess(true);
+			} else {
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
+					{
+						method: 'POST',
+						body: formData,
+					}
+				);
 
-				throw new Error(error.details || 'Failed to submit tip');
+				if (!response.ok) {
+					const error = await response.json();
+
+					throw new Error(error.details || 'Failed to submit tip');
+				}
+
+				setIsSuccess(true);
 			}
-
-			setIsSuccess(true);
 		} catch (error) {
 			handleApiError(error);
 			setFormError('Failed to submit form. Please try again.');
@@ -155,7 +233,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 						<p className="text-brg-mid">
 							Please sign in to{' '}
-							{prefilledData?.edition ? 'claim' : 'register'} your
+							{prefilledData?.id ? 'claim' : 'register'} your
 							Miata.
 						</p>
 
@@ -213,9 +291,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 			isOpen={isOpen}
 			onClose={handleClose}
 			title={
-				prefilledData?.edition
-					? `Claim your Miata`
-					: 'Register your Miata'
+				prefilledData?.id ? `Claim your Miata` : 'Register your Miata'
 			}
 			action={{
 				text: 'Submit',
@@ -223,12 +299,17 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 				loading,
 			}}
 		>
-			<div className="flex flex-col gap-4">
+			<div
+				className={twMerge(
+					'flex flex-col gap-4',
+					!formDataLoading && 'opacity-50'
+				)}
+			>
 				<p className="text-brg-mid text-sm">
 					Until the self-
-					{prefilledData?.edition ? 'claim' : 'register'} feature is
+					{prefilledData?.id ? 'claim' : 'register'} feature is
 					available, please fill out the form below to{' '}
-					{prefilledData?.edition ? 'claim' : 'register'} your Miata.
+					{prefilledData?.id ? 'claim' : 'register'} your Miata.
 				</p>
 
 				<ErrorBanner
@@ -250,71 +331,82 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						/>
 					)}
 
-					<div className="space-y-4">
-						<Field id="edition" label="Edition" required>
-							{prefilledData?.edition ? (
-								<TextField
-									id="edition"
-									name="edition"
-									placeholder="1992 M2-1002 Roadster"
-									defaultValue={prefilledData.edition}
-									required
-									readOnly
-								/>
-							) : !showOtherInput ? (
-								<select
-									className={SelectStyles(
-										false,
-										'w-full border-brg-light text-sm'
-									)}
-									name="edition"
-									required
-									onChange={(e) => {
-										if (e.target.value === 'other') {
-											setShowOtherInput(true);
-										}
-									}}
-									defaultValue=""
-								>
-									<option value="" disabled>
-										Select an edition
-									</option>
-									{editions.map((edition) => (
-										<option key={edition} value={edition}>
-											{edition}
-										</option>
-									))}
-									<option value="other">Other</option>
-								</select>
-							) : (
-								<div className="flex items-center gap-2">
-									<TextField
-										id="edition"
-										name="edition"
-										placeholder="1992 M2-1002 Roadster"
-										required
-									/>
+					{prefilledData && (
+						<input
+							id="id"
+							name="id"
+							type="hidden"
+							value={prefilledData.id}
+						/>
+					)}
 
-									<i
-										className="fa-solid fa-times text-brg-mid cursor-pointer"
-										onClick={() => setShowOtherInput(false)}
-									/>
-								</div>
-							)}
-						</Field>
+					<div className="space-y-4">
+						{!prefilledData?.id && (
+							<Field id="edition_name" label="Edition" required>
+								{!showOtherInput ? (
+									<select
+										className={SelectStyles(
+											false,
+											'w-full border-brg-light text-sm'
+										)}
+										name="edition_name"
+										required
+										onChange={(e) => {
+											if (e.target.value === 'other') {
+												setShowOtherInput(true);
+											}
+										}}
+										defaultValue=""
+									>
+										<option value="" disabled>
+											Select an edition
+										</option>
+										{editions.map((edition) => (
+											<option
+												key={edition}
+												value={edition}
+											>
+												{edition}
+											</option>
+										))}
+										<option value="other">Other</option>
+									</select>
+								) : (
+									<div className="flex items-center gap-2">
+										<TextField
+											id="edition_name"
+											name="edition_name"
+											placeholder="1992 M2-1002 Roadster"
+											required
+										/>
+
+										<i
+											className="fa-solid fa-times text-brg-mid cursor-pointer"
+											onClick={() =>
+												setShowOtherInput(false)
+											}
+										/>
+									</div>
+								)}
+							</Field>
+						)}
 
 						<div className="flex justify-between gap-4">
 							<Field
-								id="sequenceNumber"
+								id="sequence"
 								label="Sequence #"
 								className="w-32"
 							>
 								<TextField
-									id="sequenceNumber"
-									name="sequenceNumber"
+									id="sequence"
+									name="sequence"
 									placeholder="182"
-									defaultValue={prefilledData?.sequenceNumber}
-									readOnly={!!prefilledData?.sequenceNumber}
+									defaultValue={prefilledData?.sequence}
+									readOnly={!!prefilledData?.sequence}
+									className={twMerge(
+										prefilledData?.sequence &&
+											'bg-brg-light text-brg-mid'
+									)}
 								/>
 							</Field>
 
@@ -322,7 +414,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 								id="vin"
 								label="VIN"
 								className="w-full"
-								required
+								required={!prefilledData?.id}
 							>
 								<TextField
 									id="vin"
@@ -330,37 +422,57 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 									placeholder="JM1NA3510M1221538"
 									defaultValue={prefilledData?.vin}
 									readOnly={!!prefilledData?.vin}
+									className={twMerge(
+										prefilledData?.vin &&
+											'bg-brg-light text-brg-mid'
+									)}
 								/>
 							</Field>
 						</div>
 
-						<div className="flex justify-between gap-4">
-							<Field
-								id="ownerName"
-								label="Your Name"
-								required
-								className="w-64"
-							>
-								<TextField
-									id="ownerName"
-									name="ownerName"
-									placeholder="John Doe"
-								/>
-							</Field>
+						{!existingOwner && (
+							<div className="flex justify-between gap-4">
+								<Field
+									id="owner_name"
+									label="Your Name"
+									required
+									className="w-64"
+								>
+									<TextField
+										id="owner_name"
+										name="owner_name"
+										placeholder="John Doe"
+									/>
+								</Field>
 
-							<Field
-								id="location"
-								label="Your Location"
-								required
-								className="w-full"
-							>
-								<Location
-									id="location"
-									name="location"
-									placeholder="City, Country"
-								/>
-							</Field>
-						</div>
+								<Field
+									id="owner_location"
+									label="Your Location"
+									required
+									className="w-full"
+								>
+									<Location
+										id="owner_location"
+										name="owner_location"
+										placeholder="City, Country"
+									/>
+								</Field>
+							</div>
+						)}
+
+						<Field
+							id="owner_date_state"
+							label="Purchase Date"
+							className="w-36"
+							required
+						>
+							<TextField
+								id="owner_date_start"
+								name="owner_date_start"
+								type="date"
+								placeholder="1990-01-01"
+							/>
+						</Field>
 
 						<Field id="information" label="Additional Information">
 							<TextField

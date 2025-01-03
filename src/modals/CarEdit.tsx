@@ -80,7 +80,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${car.id}`,
 				{
-					method: 'POST',
+					method: 'PATCH',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${token}`,
@@ -228,7 +228,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="owner_date_state"
 								label="Purchase Date"
-								className="w-36 [&>label]:text-brg-mid"
+								className="w-36"
 								required
 							>
 								<TextField
@@ -249,7 +249,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="owner_date_end"
 								label="Date Sold"
-								className="w-36 [&>label]:text-brg-mid"
+								className="w-36"
 							>
 								<TextField
 									id="owner_date_end"
@@ -290,7 +290,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="sequence"
 								label="Sequence #"
-								className="w-24 shrink-0 [&>label]:text-brg-mid"
+								className="w-24 shrink-0"
 							>
 								<TextField
 									id="sequence"
@@ -308,7 +308,6 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="manufacture_date"
 								label="Manufacture Date"
-								className="[&>label]:text-brg-mid"
 							>
 								<div className="flex gap-1">
 									<TextField
@@ -335,7 +334,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 												? car.manufacture_date
 														.toString()
 														.split('T')[1]
-														.split('.')[0]
+														.slice(0, -8)
 												: undefined
 										}
 									/>
@@ -373,7 +372,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="sale_msrp"
 								label="MSRP"
-								className="w-24 shrink-0 [&>label]:text-brg-mid"
+								className="w-24 shrink-0"
 							>
 								<TextField
 									id="sale_msrp"
@@ -403,7 +402,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="sale_date"
 								label="Sale Date"
-								className="w-36 [&>label]:text-brg-mid"
+								className="w-36"
 							>
 								<TextField
 									id="sale_date"
@@ -424,7 +423,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						<Field
 							id="sale_dealer_name"
 							label="Dealer"
-							className="w-full [&>label]:text-brg-mid"
+							className="w-full"
 						>
 							<TextField
 								id="sale_dealer_name"
@@ -437,7 +436,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						<Field
 							id="sale_dealer_location"
 							label="Dealer Location"
-							className="w-full [&>label]:text-brg-mid"
+							className="w-full"
 						>
 							<Location
 								id="sale_dealer_location"
@@ -459,7 +458,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="shipping_date"
 								label="Ship Date"
-								className="w-36 shrink-0 [&>label]:text-brg-mid"
+								className="w-36 shrink-0"
 							>
 								<TextField
 									id="shipping_date"
@@ -479,7 +478,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							<Field
 								id="shipping_vessel"
 								label="Vessel"
-								className="w-full [&>label]:text-brg-mid"
+								className="w-full"
 							>
 								<TextField
 									id="shipping_vessel"
@@ -493,7 +492,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						<Field
 							id="shipping_location"
 							label="Entry Port"
-							className="w-full [&>label]:text-brg-mid"
+							className="w-full"
 						>
 							<Location
 								id="shipping_location"
