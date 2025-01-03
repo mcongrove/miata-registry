@@ -191,14 +191,14 @@ export function Tip({
 						}`}
 					>
 						<div className="space-y-4">
-							<Field id="edition" label="Edition" required>
+							<Field id="edition_name" label="Edition" required>
 								{!showOtherInput ? (
 									<select
 										className={SelectStyles(
 											false,
 											'w-full border-brg-light text-sm'
 										)}
-										name="edition"
+										name="edition_name"
 										required
 										onChange={(e) => {
 											if (e.target.value === 'other') {
@@ -223,8 +223,8 @@ export function Tip({
 								) : (
 									<div className="flex items-center gap-2">
 										<TextField
-											id="edition"
-											name="edition"
+											id="edition_name"
+											name="edition_name"
 											placeholder="1992 M2-1002 Roadster"
 											required
 										/>

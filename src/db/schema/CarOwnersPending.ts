@@ -24,6 +24,7 @@ export const CarOwnersPending = sqliteTable('car_owners_pending', {
 	date_end: text('date_end'),
 	date_start: text('date_start'),
 	id: text('id').primaryKey(),
+	information: text('information'),
 	owner_id: text('owner_id').notNull(),
 	status: text('status', { enum: ['pending', 'approved', 'rejected'] })
 		.notNull()

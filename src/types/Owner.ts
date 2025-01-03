@@ -30,6 +30,8 @@ export type TOwner = {
 	user_id?: string;
 };
 
+export type TOwnerPending = TOwner & TPending;
+
 export type TCarOwner = TOwner & {
 	car_id: string;
 	date_end?: string;

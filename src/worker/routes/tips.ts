@@ -32,12 +32,13 @@ tipsRouter.post('/', async (c) => {
 
 		await db.insert(Tips).values({
 			created_at: Date.now(),
-			edition: formData.get('edition_name') as string,
+			edition_name: formData.get('edition_name') as string,
 			id: tipId,
 			information: (formData.get('information') as string) || null,
 			owner_location: (formData.get('owner_location') as string) || null,
 			owner_name: (formData.get('owner_name') as string) || null,
 			sequence: (formData.get('sequence') as string) || null,
+			user_id: (formData.get('user_id') as string) || null,
 			vin: (formData.get('vin') as string) || null,
 		});
 
@@ -46,16 +47,10 @@ tipsRouter.post('/', async (c) => {
 		await resend.emails.send({
 			from: 'Miata Registry <support@miataregistry.com>',
 			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: Tip Form',
+			subject: 'Miata Registry: Tip Submission',
 			html: `
-                <h2>Registry Tip</h2>
+                <h2>Tip Submission</h2>
                 <p><strong>Tip ID:</strong> ${tipId}</p>
-                <p><strong>Edition Name:</strong> ${formData.get('edition_name')}</p>
-                <p><strong>VIN:</strong> ${formData.get('vin') || 'Not provided'}</p>
-                <p><strong>Sequence:</strong> ${formData.get('sequence') || 'Not provided'}</p>
-                <p><strong>Owner Name:</strong> ${formData.get('owner_name') || 'Not provided'}</p>
-                <p><strong>Owner Location:</strong> ${formData.get('owner_location') || 'Not provided'}</p>
-                <p><strong>Information:</strong> ${formData.get('information') || 'Not provided'}</p>
             `,
 		});
 

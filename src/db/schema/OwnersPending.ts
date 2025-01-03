@@ -23,7 +23,6 @@ export const OwnersPending = sqliteTable('owners_pending', {
 	country: text('country'),
 	created_at: integer('created_at').notNull(),
 	id: text('id').primaryKey(),
-	information: text('information'),
 	name: text('name'),
 	state: text('state'),
 	status: text('status', { enum: ['pending', 'approved', 'rejected'] })

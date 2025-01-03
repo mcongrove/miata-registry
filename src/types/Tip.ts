@@ -25,7 +25,7 @@ export type TTipStatus = (typeof TipStatus)[keyof typeof TipStatus];
 
 export type TTip = {
 	created_at: number;
-	edition: string;
+	edition_name: string;
 	id: string;
 	information?: string;
 	owner_location?: string;
@@ -33,5 +33,6 @@ export type TTip = {
 	sequence?: string;
 	status: TTipStatus;
 	updated_at?: number;
+	user_id?: string;
 	vin?: string;
 };

@@ -583,7 +583,7 @@ export const CarProfile = () => {
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
-						{car?.current_owner?.user_id === userId ? (
+						{userId && car?.current_owner?.user_id === userId ? (
 							<div className="flex items-center justify-end gap-6">
 								{car?.has_pending_changes && (
 									<p className="text-sm text-brg flex items-center gap-2">

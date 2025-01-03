@@ -21,15 +21,16 @@ import { TipStatus } from '../../types/Tip';
 
 export const Tips = sqliteTable('tips', {
 	created_at: integer('created_at').notNull(),
-	edition: text('edition').notNull(),
+	edition_name: text('edition_name').notNull(),
 	id: text('id').primaryKey(),
 	information: text('information'),
-	owner_location: text('location'),
+	owner_location: text('owner_location'),
 	owner_name: text('owner_name'),
 	sequence: text('sequence'),
 	status: text('status', { enum: ['pending', 'confirmed'] })
 		.notNull()
 		.default(TipStatus.PENDING),
 	updated_at: integer('updated_at'),
+	user_id: text('user_id'),
 	vin: text('vin'),
 });

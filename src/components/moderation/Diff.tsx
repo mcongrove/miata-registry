@@ -37,7 +37,17 @@ export const Diff = ({
 				{oldValue || 'None'}
 			</span>
 
-			<span className="w-1/3 text-sm text-brg">{newValue || 'None'}</span>
+			<span
+				className="w-1/3 text-sm text-brg cursor-pointer hover:opacity-80"
+				onClick={() => {
+					if (newValue) {
+						navigator.clipboard.writeText(String(newValue));
+					}
+				}}
+				title="Click to copy Car Owner ID"
+			>
+				{newValue || 'None'}
+			</span>
 		</div>
 	);
 };

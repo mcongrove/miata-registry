@@ -75,7 +75,7 @@ photosRouter.post('/:id', withAuth(), async (c) => {
 			to: 'mattcongrove@gmail.com',
 			subject: 'Miata Registry: Photo Submission',
 			html: `
-				<h2>New Photo Submission</h2>
+				<h2>Photo Submission</h2>
 				<p><strong>Car ID:</strong> ${id}</p>
 			`,
 		});

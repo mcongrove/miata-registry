@@ -41,29 +41,27 @@ export const PendingItem = ({
 			<div className="flex items-center justify-between py-3 px-4">
 				<div className="flex flex-col gap-1">
 					<h3 className="flex items-center gap-6">
-						<div
-							className="font-medium cursor-pointer hover:text-brg-dark transition-colors leading-5"
-							onClick={() => {
-								if (carId) {
-									navigator.clipboard.writeText(carId);
+						{carId && (
+							<div
+								className="font-medium cursor-pointer hover:text-brg-dark transition-colors leading-5"
+								onClick={() =>
+									navigator.clipboard.writeText(carId)
 								}
-							}}
-							title="Click to copy Car ID"
-						>
-							<span className="text-brg-border font-normal">
-								Car ID
-							</span>{' '}
-							<span className="font-mono">{carId}</span>
-						</div>
+								title="Click to copy Car ID"
+							>
+								<span className="text-brg-border font-normal">
+									Car ID
+								</span>{' '}
+								<span className="font-mono">{carId}</span>
+							</div>
+						)}
 
 						{ownerId && (
 							<div
 								className="font-medium cursor-pointer hover:text-brg-dark transition-colors leading-5"
-								onClick={() => {
-									if (ownerId) {
-										navigator.clipboard.writeText(ownerId);
-									}
-								}}
+								onClick={() =>
+									navigator.clipboard.writeText(ownerId)
+								}
 								title="Click to copy Car Owner ID"
 							>
 								<span className="text-brg-border font-normal">

@@ -16,18 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ClerkClient } from '@clerk/backend';
 import { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
 
 declare module 'hono' {
 	interface ContextVariableMap {
+		clerk: ClerkClient;
 		userId: string;
-		isModerator: boolean;
 	}
 }
 
 export type ApiError = {
-	error: string;
 	details?: string;
+	error: string;
 };
 
 export interface Bindings {

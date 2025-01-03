@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useAuth, useClerk } from '@clerk/clerk-react';
+import { useAuth, useClerk, useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { ErrorBanner } from '../components/ErrorBanner';
@@ -25,8 +25,9 @@ import { Location } from '../components/form/Location';
 import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
+import { TOwner } from '../types/Owner';
 import { handleApiError } from '../utils/common';
-import { parseLocation } from '../utils/location';
+import { formatLocation, parseLocation } from '../utils/location';
 
 interface RegisterProps {
 	isOpen: boolean;
@@ -43,13 +44,14 @@ interface RegisterProps {
 
 export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const { isSignedIn, userId, getToken } = useAuth();
+	const { user } = useUser();
 	const { openSignIn } = useClerk();
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
 	const [editions, setEditions] = useState<string[]>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
-	const [existingOwner, setExistingOwner] = useState<string | null>(null);
+	const [existingOwner, setExistingOwner] = useState<TOwner | null>(null);
 	const [formDataLoading, setFormDataLoading] = useState(false);
 	const prefilledData = props?.prefilledData;
 
@@ -93,7 +95,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 				const data = await response.json();
 
-				setExistingOwner(data.owner?.id);
+				setExistingOwner(data.owner);
 				setFormDataLoading(true);
 			} catch (error) {
 				handleApiError(error);
@@ -143,15 +145,6 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 					? parseLocation(formData.get('owner_location') as string)
 					: null;
 
-				const ownerFields = existingOwner
-					? { owner_id: existingOwner }
-					: {
-							owner_name: formData.get('owner_name'),
-							owner_city: owner_location?.city,
-							owner_state: owner_location?.state,
-							owner_country: owner_location?.country,
-						};
-
 				const response = await fetch(
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners`,
 					{
@@ -164,7 +157,11 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 							car_id: prefilledData.id,
 							information: formData.get('information'),
 							owner_date_start: formData.get('owner_date_start'),
-							...ownerFields,
+							owner_id: existingOwner?.id || undefined,
+							owner_name: formData.get('owner_name'),
+							owner_city: owner_location?.city,
+							owner_state: owner_location?.state,
+							owner_country: owner_location?.country,
 						}),
 					}
 				);
@@ -322,22 +319,8 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 					onSubmit={handleSubmit}
 					className="flex flex-col gap-4"
 				>
-					{isSignedIn && (
-						<input
-							id="userId"
-							name="userId"
-							type="hidden"
-							value={userId}
-						/>
-					)}
-
-					{prefilledData && (
-						<input
-							id="id"
-							name="id"
-							type="hidden"
-							value={prefilledData.id}
-						/>
+					{user?.id && (
+						<input type="hidden" name="user_id" value={user.id} />
 					)}
 
 					<div className="space-y-4">
@@ -430,35 +413,53 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 							</Field>
 						</div>
 
-						{!existingOwner && (
-							<div className="flex justify-between gap-4">
-								<Field
+						<div className="flex justify-between gap-4">
+							<Field
+								id="owner_name"
+								label="Your Name"
+								className="w-64"
+								required
+							>
+								<TextField
 									id="owner_name"
-									label="Your Name"
-									required
-									className="w-64"
-								>
-									<TextField
-										id="owner_name"
-										name="owner_name"
-										placeholder="John Doe"
-									/>
-								</Field>
+									name="owner_name"
+									placeholder="John Doe"
+									defaultValue={
+										existingOwner?.name ||
+										user?.fullName ||
+										''
+									}
+								/>
+							</Field>
 
-								<Field
+							<Field
+								id="owner_location"
+								label="Your Location"
+								required
+								className="w-full"
+							>
+								<Location
 									id="owner_location"
-									label="Your Location"
-									required
-									className="w-full"
-								>
-									<Location
-										id="owner_location"
-										name="owner_location"
-										placeholder="City, Country"
-									/>
-								</Field>
-							</div>
-						)}
+									name="owner_location"
+									placeholder="City, Country"
+									value={
+										existingOwner
+											? formatLocation({
+													city:
+														existingOwner.city ||
+														'',
+													state:
+														existingOwner.state ||
+														'',
+													country:
+														existingOwner.country ||
+														'',
+												})
+											: undefined
+									}
+								/>
+							</Field>
+						</div>
 
 						<Field
 							id="owner_date_state"

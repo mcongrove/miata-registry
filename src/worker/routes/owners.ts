@@ -219,8 +219,6 @@ ownersRouter.post('/', withAuth(), async (c) => {
 		const db = createDb(c.env.DB);
 		let ownerId = body.owner_id;
 
-		console.log(JSON.stringify(body));
-
 		if (!ownerId) {
 			const existingOwner = await db
 				.select({ id: Owners.id })
@@ -237,14 +235,13 @@ ownersRouter.post('/', withAuth(), async (c) => {
 				);
 			}
 
-			const [{ id: ownerId }] = await db
+			const [{ id }] = await db
 				.insert(OwnersPending)
 				.values({
 					city: body.owner_city || null,
 					country: body.owner_country || null,
 					created_at: Date.now(),
 					id: crypto.randomUUID(),
-					information: body.information || null,
 					name: body.owner_name,
 					state: body.owner_state || null,
 					status: 'pending',
@@ -252,20 +249,35 @@ ownersRouter.post('/', withAuth(), async (c) => {
 				})
 				.returning({ id: OwnersPending.id });
 
+			ownerId = id;
+
 			await db.insert(CarOwnersPending).values({
 				car_id: body.car_id,
 				created_at: Date.now(),
 				date_start: `${body.owner_date_start}T00:00:00.000Z`,
 				id: crypto.randomUUID(),
+				information: body.information || null,
 				owner_id: ownerId,
 				status: 'pending',
 			});
+
+			if (body.owner_name) {
+				const user = await c.get('clerk').users.getUser(userId);
+
+				if (`${user.firstName} ${user.lastName}` !== body.owner_name) {
+					await c.get('clerk').users.updateUser(userId, {
+						firstName: body.owner_name.split(' ')[0],
+						lastName: body.owner_name.split(' ')[1],
+					});
+				}
+			}
 		} else {
 			await db.insert(CarOwnersPending).values({
 				car_id: body.car_id,
 				created_at: Date.now(),
 				date_start: `${body.owner_date_start}T00:00:00.000Z`,
 				id: crypto.randomUUID(),
+				information: body.information || null,
 				owner_id: ownerId,
 				status: 'pending',
 			});
@@ -276,12 +288,10 @@ ownersRouter.post('/', withAuth(), async (c) => {
 		await resend.emails.send({
 			from: 'Miata Registry <support@miataregistry.com>',
 			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: New Owner Request',
+			subject: 'Miata Registry: Owner ChangeRequest',
 			html: `
-				<h2>New Owner Request</h2>
+				<h2>Owner Change Request</h2>
 				<p><strong>Owner ID:</strong> ${ownerId}</p>
-				<p><strong>Name:</strong> ${body.name}</p>
-				<p><strong>Location:</strong> ${[body.location?.city, body.location?.state, body.location?.country].filter(Boolean).join(', ')}</p>
 		 `,
 		});
 

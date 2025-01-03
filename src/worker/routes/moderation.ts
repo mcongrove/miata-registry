@@ -23,6 +23,7 @@ import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
 import { CarsPending } from '../../db/schema/CarsPending';
+import { OwnersPending } from '../../db/schema/OwnersPending';
 import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
 import { Bindings } from '../types';
@@ -125,8 +126,50 @@ moderationRouter.get('/carOwners', withAuth(), async (c) => {
 	}
 });
 
+moderationRouter.get('/owners', withAuth(), async (c) => {
+	try {
+		const db = createDb(c.env.DB);
+
+		const pendingOwners = await db
+			.select()
+			.from(OwnersPending)
+			.where(eq(OwnersPending.status, 'pending'));
+
+		const formattedChanges = pendingOwners.map((owner) => {
+			const { created_at, id, status, ...proposedWithoutMeta } = owner;
+
+			return {
+				id,
+				created_at,
+				status,
+				proposed: proposedWithoutMeta,
+			};
+		});
+
+		return c.json(formattedChanges);
+	} catch (error) {
+		console.error('Error fetching pending owners:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
 moderationRouter.get('/photo', withAuth(), async (c) => {
-	if (!c.get('isModerator')) {
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
+
+	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -165,8 +208,12 @@ moderationRouter.get('/photo', withAuth(), async (c) => {
 
 moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 	const { id } = c.req.param();
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
 
-	if (!c.get('isModerator')) {
+	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -235,8 +282,12 @@ moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 
 moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 	const { id } = c.req.param();
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
 
-	if (!c.get('isModerator')) {
+	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -313,7 +364,12 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 });
 
 moderationRouter.post('/photo/:id/approve', withAuth(), async (c) => {
-	if (!c.get('isModerator')) {
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
+
+	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -355,8 +411,12 @@ moderationRouter.post('/photo/:id/approve', withAuth(), async (c) => {
 
 moderationRouter.post('/car/:id/reject', withAuth(), async (c) => {
 	const { id } = c.req.param();
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
 
-	if (!c.get('isModerator')) {
+	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -387,8 +447,12 @@ moderationRouter.post('/car/:id/reject', withAuth(), async (c) => {
 
 moderationRouter.post('/carOwner/:id/reject', withAuth(), async (c) => {
 	const { id } = c.req.param();
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
 
-	if (!c.get('isModerator')) {
+	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -418,7 +482,12 @@ moderationRouter.post('/carOwner/:id/reject', withAuth(), async (c) => {
 });
 
 moderationRouter.post('/photo/:id/reject', withAuth(), async (c) => {
-	if (!c.get('isModerator')) {
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
+
+	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -455,6 +524,11 @@ moderationRouter.get('/stats', async (c) => {
 			.from(CarOwnersPending)
 			.groupBy(CarOwnersPending.status);
 
+		const ownerStats = await db
+			.select({ status: OwnersPending.status, count: count() })
+			.from(OwnersPending)
+			.groupBy(OwnersPending.status);
+
 		const stats: TModerationStats = {
 			pending:
 				Number(
@@ -463,6 +537,9 @@ moderationRouter.get('/stats', async (c) => {
 				Number(
 					carOwnerStats.find((s) => s.status === 'pending')?.count ||
 						0
+				) +
+				Number(
+					ownerStats.find((s) => s.status === 'pending')?.count || 0
 				),
 			approved:
 				Number(
@@ -471,6 +548,9 @@ moderationRouter.get('/stats', async (c) => {
 				Number(
 					carOwnerStats.find((s) => s.status === 'approved')?.count ||
 						0
+				) +
+				Number(
+					ownerStats.find((s) => s.status === 'approved')?.count || 0
 				),
 			rejected:
 				Number(
@@ -479,6 +559,9 @@ moderationRouter.get('/stats', async (c) => {
 				Number(
 					carOwnerStats.find((s) => s.status === 'rejected')?.count ||
 						0
+				) +
+				Number(
+					ownerStats.find((s) => s.status === 'rejected')?.count || 0
 				),
 		};
 

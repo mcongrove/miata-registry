@@ -573,11 +573,10 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 			await resend.emails.send({
 				from: 'Miata Registry <support@miataregistry.com>',
 				to: 'mattcongrove@gmail.com',
-				subject: 'Miata Registry: New Car Change Request',
+				subject: 'Miata Registry: Car Change Request',
 				html: `
-				<h2>New Change Request</h2>
+				<h2>Car Change Request</h2>
 				${carChanged ? `<p><strong>Car ID:</strong> ${existing.car.id}</p>` : ''}
-				${carOwnerChanged ? `<p><strong>Owner ID:</strong> ${existing.owner.owner_id}</p>` : ''}
 			`,
 			});
 

@@ -19,13 +19,19 @@
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { twMerge } from 'tailwind-merge';
 import { Diff } from '../components/moderation/Diff';
 import { PendingItem } from '../components/moderation/PendingItem';
 import { Stats } from '../components/moderation/Stats';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar, TCarPending } from '../types/Car';
 import { TModerationStats } from '../types/Common';
-import { TCarOwner, TCarOwnerPending } from '../types/Owner';
+import {
+	TCarOwner,
+	TCarOwnerPending,
+	TOwner,
+	TOwnerPending,
+} from '../types/Owner';
 import { handleApiError } from '../utils/common';
 
 export const Moderation = () => {
@@ -41,6 +47,11 @@ export const Moderation = () => {
 		(TCarOwnerPending & {
 			current: TCarOwner | null;
 			proposed: TCarOwner;
+		})[]
+	>([]);
+	const [pendingOwners, setPendingOwners] = useState<
+		(TOwnerPending & {
+			proposed: TOwner;
 		})[]
 	>([]);
 	const [stats, setStats] = useState<TModerationStats>({
@@ -81,6 +92,7 @@ export const Moderation = () => {
 				const [
 					carsResponse,
 					carOwnersResponse,
+					ownersResponse,
 					photosResponse,
 					statsResponse,
 				] = await Promise.all([
@@ -95,6 +107,15 @@ export const Moderation = () => {
 					),
 					fetch(
 						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/carOwners`,
+						{
+							headers: {
+								'Content-Type': 'application/json',
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					),
+					fetch(
+						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/moderation/owners`,
 						{
 							headers: {
 								'Content-Type': 'application/json',
@@ -122,16 +143,23 @@ export const Moderation = () => {
 					),
 				]);
 
-				const [carsData, carOwnersData, photosData, statsData] =
-					await Promise.all([
-						carsResponse.json(),
-						carOwnersResponse.json(),
-						photosResponse.json(),
-						statsResponse.json(),
-					]);
+				const [
+					carsData,
+					carOwnersData,
+					ownersData,
+					photosData,
+					statsData,
+				] = await Promise.all([
+					carsResponse.json(),
+					carOwnersResponse.json(),
+					ownersResponse.json(),
+					photosResponse.json(),
+					statsResponse.json(),
+				]);
 
 				setPendingCars(carsData);
 				setPendingCarOwners(carOwnersData);
+				setPendingOwners(ownersData);
 				setPendingPhotos(photosData);
 				setStats(statsData);
 			} catch (error) {
@@ -145,7 +173,7 @@ export const Moderation = () => {
 	}, []);
 
 	const handleApprove = async (
-		type: 'car' | 'carOwner' | 'photo',
+		type: 'car' | 'carOwner' | 'owner' | 'photo',
 		id: string
 	) => {
 		try {
@@ -173,6 +201,10 @@ export const Moderation = () => {
 			if (type === 'car') {
 				setPendingCars((cars) => cars.filter((car) => car.id !== id));
 			} else if (type === 'carOwner') {
+				setPendingCarOwners((carOwners) =>
+					carOwners.filter((carOwner) => carOwner.id !== id)
+				);
+			} else if (type === 'owner') {
 				setPendingCarOwners((owners) =>
 					owners.filter((owner) => owner.id !== id)
 				);
@@ -187,7 +219,7 @@ export const Moderation = () => {
 	};
 
 	const handleReject = async (
-		type: 'car' | 'carOwner' | 'photo',
+		type: 'car' | 'carOwner' | 'owner' | 'photo',
 		id: string
 	) => {
 		try {
@@ -209,7 +241,11 @@ export const Moderation = () => {
 			if (type === 'car') {
 				setPendingCars((cars) => cars.filter((car) => car.id !== id));
 			} else if (type === 'carOwner') {
-				setPendingCarOwners((owners) =>
+				setPendingCarOwners((carOwners) =>
+					carOwners.filter((carOwner) => carOwner.id !== id)
+				);
+			} else if (type === 'owner') {
+				setPendingOwners((owners) =>
 					owners.filter((owner) => owner.id !== id)
 				);
 			} else if (type === 'photo') {
@@ -232,42 +268,64 @@ export const Moderation = () => {
 					</div>
 				</h1>
 
-				<div className="w-80 flex mb-8 overflow-x-auto">
+				<div className="w-fit flex mb-8 overflow-x-auto">
 					<div className="flex gap-2 p-1 bg-brg-light rounded-lg w-full relative">
-						<div
-							className="absolute transition-all w-[calc(33.33%_-_2px)] duration-200 ease-in-out h-[calc(100%-8px)] bg-white rounded-md shadow-sm"
-							style={{
-								transform: `translateX(${['cars', 'owners', 'photos'].indexOf(activeTab) * 100}%)`,
-							}}
-						/>
+						{(() => {
+							const tabs = {
+								cars: 'Cars',
+								carOwners: 'Car Owners',
+								owners: 'Owners',
+								photos: 'Photos',
+							};
 
-						{['cars', 'owners', 'photos'].map((tab) => (
-							<button
-								key={tab}
-								onClick={() => setActiveTab(tab)}
-								className={`relative flex-1 px-4 py-2 text-sm rounded-md transition-colors ${
-									activeTab === tab
-										? 'text-brg'
-										: 'text-brg-mid hover:text-brg'
-								} disabled:text-brg-border/70`}
-								disabled={
-									tab === 'cars'
-										? !pendingCars.length
-										: tab === 'owners'
-											? !pendingCarOwners.length
-											: !pendingPhotos.length
-								}
-							>
-								{tab.charAt(0).toUpperCase() + tab.slice(1)}{' '}
-								<span className="text-brg-border">
-									{tab === 'cars'
-										? pendingCars.length
-										: tab === 'owners'
-											? pendingCarOwners.length
-											: pendingPhotos.length}
-								</span>
-							</button>
-						))}
+							return (
+								<>
+									<div
+										className="absolute transition-all w-[calc(25%_-_2px)] duration-200 ease-in-out h-[calc(100%-8px)] bg-white rounded-md shadow-sm"
+										style={{
+											transform: `translateX(${Object.keys(tabs).indexOf(activeTab) * 100}%)`,
+										}}
+									/>
+
+									{Object.entries(tabs).map(
+										([key, label]) => (
+											<button
+												key={key}
+												onClick={() =>
+													setActiveTab(key)
+												}
+												className={twMerge(
+													`w-32 relative flex-1 px-4 py-2 text-sm rounded-md transition-colors disabled:text-brg-border/70 whitespace-nowrap`,
+													activeTab === key
+														? 'text-brg'
+														: 'text-brg-mid hover:text-brg'
+												)}
+												disabled={
+													key === 'cars'
+														? !pendingCars.length
+														: key === 'carOwners'
+															? !pendingCarOwners.length
+															: key === 'owners'
+																? !pendingOwners.length
+																: !pendingPhotos.length
+												}
+											>
+												{label}{' '}
+												<span className="text-brg-border">
+													{key === 'cars'
+														? pendingCars.length
+														: key === 'carOwners'
+															? pendingCarOwners.length
+															: key === 'owners'
+																? pendingOwners.length
+																: pendingPhotos.length}
+												</span>
+											</button>
+										)
+									)}
+								</>
+							);
+						})()}
 					</div>
 				</div>
 
@@ -335,7 +393,7 @@ export const Moderation = () => {
 							</div>
 						)}
 
-						{activeTab === 'owners' && (
+						{activeTab === 'carOwners' && (
 							<div className="space-y-4">
 								{pendingCarOwners.length === 0 ? (
 									<p className="text-brg-border">
@@ -389,6 +447,52 @@ export const Moderation = () => {
 														}
 													/>
 												))}
+										</PendingItem>
+									))
+								)}
+							</div>
+						)}
+
+						{activeTab === 'owners' && (
+							<div className="space-y-4">
+								{pendingOwners.length === 0 ? (
+									<p className="text-brg-border">
+										No pending changes
+									</p>
+								) : (
+									pendingOwners.map((pending) => (
+										<PendingItem
+											key={pending.id}
+											createdAt={pending.created_at}
+											onApprove={() =>
+												handleApprove(
+													'owner',
+													pending.id
+												)
+											}
+											onReject={() =>
+												handleReject(
+													'owner',
+													pending.id
+												)
+											}
+										>
+											{Object.keys(pending.proposed).map(
+												(field) => (
+													<Diff
+														key={field}
+														label={
+															field as keyof TOwner
+														}
+														oldValue={undefined}
+														newValue={
+															pending.proposed[
+																field as keyof TOwner
+															] as any
+														}
+													/>
+												)
+											)}
 										</PendingItem>
 									))
 								)}
