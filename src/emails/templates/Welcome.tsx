@@ -50,8 +50,8 @@ export const Welcome = () => {
 			</Preview>
 
 			<Tailwind config={tailwindConfig}>
-				<Body className="bg-white font-sans text-brg py-6">
-					<Container className="border border-solid border-brg-light rounded-lg">
+				<Body className="bg-brg-light font-sans text-brg py-6">
+					<Container className="border border-solid border-brg-border rounded-lg">
 						<Section className="p-12">
 							<Header />
 
