@@ -16,30 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ClerkClient } from '@clerk/backend';
-import { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
-
-declare module 'hono' {
-	interface ContextVariableMap {
-		clerk: ClerkClient;
-		clerkWebhookBody: string;
-		userId: string;
-	}
+interface BaseClerkWebhookPayload {
+	type: string;
+	data: {
+		id: string;
+	};
 }
 
-export type ApiError = {
-	details?: string;
-	error: string;
-};
-
-export interface Bindings {
-	CACHE: KVNamespace;
-	CLERK_PUBLISHABLE_KEY: string;
-	CLERK_SECRET_KEY: string;
-	CLERK_WEBHOOK_SECRET: string;
-	DB: D1Database;
-	IMAGES: R2Bucket;
-	NODE_ENV: string;
-	RESEND_API_KEY: string;
-	RESEND_AUDIENCE_ID: string;
+export interface UserCreatedPayload extends BaseClerkWebhookPayload {
+	type: 'user.created';
+	data: {
+		id: string;
+		email_addresses: {
+			email_address: string;
+			id: string;
+		}[];
+		primary_email_address_id: string;
+	};
 }
+
+export interface UserUpdatedPayload extends BaseClerkWebhookPayload {
+	type: 'user.updated';
+	data: {
+		id: string;
+		first_name: string | null;
+		last_name: string | null;
+	};
+}
+
+export type ClerkWebhookPayload = UserCreatedPayload | UserUpdatedPayload;
