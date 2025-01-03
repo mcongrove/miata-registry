@@ -28,11 +28,10 @@ export type TTip = {
 	edition: string;
 	id: string;
 	information?: string;
-	location?: string;
+	owner_location?: string;
 	owner_name?: string;
-	sequence_number?: string;
+	sequence?: string;
 	status: TTipStatus;
 	updated_at?: number;
-	user_id?: string;
 	vin?: string;
 };

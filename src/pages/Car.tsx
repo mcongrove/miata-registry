@@ -637,11 +637,12 @@ export const CarProfile = () => {
 
 										openModal('register', {
 											prefilledData: {
-												edition: `${car.edition?.year} ${car.edition?.name}`,
-												vin: car.vin || '',
-												sequenceNumber:
+												edition_name: `${car.edition?.year} ${car.edition?.name}`,
+												id: car.id,
+												sequence:
 													car.sequence?.toString() ||
 													'',
+												vin: car.vin || '',
 											},
 										});
 									}}

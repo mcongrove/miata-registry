@@ -24,13 +24,12 @@ export const Tips = sqliteTable('tips', {
 	edition: text('edition').notNull(),
 	id: text('id').primaryKey(),
 	information: text('information'),
-	location: text('location'),
+	owner_location: text('location'),
 	owner_name: text('owner_name'),
-	sequence_number: text('sequence_number'),
+	sequence: text('sequence'),
 	status: text('status', { enum: ['pending', 'confirmed'] })
 		.notNull()
 		.default(TipStatus.PENDING),
 	updated_at: integer('updated_at'),
-	user_id: text('user_id'),
 	vin: text('vin'),
 });

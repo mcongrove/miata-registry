@@ -241,13 +241,13 @@ export function Tip({
 
 							<div className="flex justify-between gap-4">
 								<Field
-									id="sequenceNumber"
+									id="sequence"
 									label="Sequence #"
 									className="w-32"
 								>
 									<TextField
-										id="sequenceNumber"
-										name="sequenceNumber"
+										id="sequence"
+										name="sequence"
 										placeholder="182"
 									/>
 								</Field>
@@ -263,25 +263,25 @@ export function Tip({
 
 							<div className="flex justify-between gap-4">
 								<Field
-									id="ownerName"
+									id="owner_name"
 									label="Owner Name"
 									className="w-64"
 								>
 									<TextField
-										id="ownerName"
-										name="ownerName"
+										id="owner_name"
+										name="owner_name"
 										placeholder="John Doe"
 									/>
 								</Field>
 
 								<Field
-									id="location"
+									id="owner_location"
 									label="Location"
 									className="w-full"
 								>
 									<Location
-										id="location"
-										name="location"
+										id="owner_location"
+										name="owner_location"
 										placeholder="City, Country"
 									/>
 								</Field>
