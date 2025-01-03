@@ -107,11 +107,11 @@ export function PhotoUpload({ carId }: PhotoUploadProps) {
 				) : formError ? (
 					<p className="text-red-700">{formError}</p>
 				) : success ? (
-					<p className="flex flex-col gap-1 items-center justify-center text-brg-mid">
+					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">
 						<i className="fa-solid fa-check text-2xl text-green-700" />
 
 						<p>Uploaded</p>
-					</p>
+					</div>
 				) : (
 					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">
 						<i className="fa-solid fa-camera-retro text-2xl" />

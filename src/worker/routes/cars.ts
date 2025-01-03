@@ -508,9 +508,12 @@ carsRouter.post('/:id', withAuth(), async (c) => {
 		});
 
 		const ownershipChanged =
-			existing.owner.date_start?.split('T')[0] !==
-				body.owner_date_start ||
-			existing.owner.date_end?.split('T')[0] !== body.owner_date_end;
+			(existing.owner.date_start
+				? existing.owner.date_start?.split('T')[0]
+				: null) !== body.owner_date_start ||
+			(existing.owner.date_end
+				? existing.owner.date_end?.split('T')[0]
+				: null) !== body.owner_date_end;
 
 		if (ownershipChanged) {
 			await db.insert(CarOwnersPending).values({

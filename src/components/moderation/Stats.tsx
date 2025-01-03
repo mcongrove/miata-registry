@@ -25,8 +25,8 @@ type StatsProps = {
 
 export const Stats = ({ stats }: StatsProps) => {
 	const total = stats.pending + stats.approved + stats.rejected;
-	const pendingPercentage = Math.max((stats.pending / total) * 100, 3);
-	const approvedPercentage = Math.max((stats.approved / total) * 100, 3);
+	const pendingPercentage = (stats.pending / total) * 100;
+	const approvedPercentage = (stats.approved / total) * 100;
 
 	return (
 		<div className="w-full">
