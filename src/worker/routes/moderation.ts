@@ -23,6 +23,7 @@ import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
 import { CarsPending } from '../../db/schema/CarsPending';
+import { Owners } from '../../db/schema/Owners';
 import { OwnersPending } from '../../db/schema/OwnersPending';
 import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
@@ -363,6 +364,58 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 	}
 });
 
+moderationRouter.post('/owner/:id/approve', withAuth(), async (c) => {
+	const { id } = c.req.param();
+
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
+
+	if (!isModerator) {
+		return c.json({ error: 'Unauthorized' }, 403);
+	}
+
+	try {
+		const db = createDb(c.env.DB);
+
+		const pendingOwner = await db
+			.select()
+			.from(OwnersPending)
+			.where(eq(OwnersPending.id, id))
+			.limit(1);
+
+		if (!pendingOwner.length) {
+			return c.json({ error: 'Not found' }, 404);
+		}
+
+		const owner = pendingOwner[0];
+		const { created_at, status, ...ownerData } = owner;
+
+		await db.insert(Owners).values(ownerData);
+
+		await db
+			.update(OwnersPending)
+			.set({ status: 'approved' })
+			.where(eq(OwnersPending.id, id));
+
+		return c.json({ success: true });
+	} catch (error) {
+		console.error('Error approving owner:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
 moderationRouter.post('/photo/:id/approve', withAuth(), async (c) => {
 	const isModerator = await c
 		.get('clerk')
@@ -467,6 +520,43 @@ moderationRouter.post('/carOwner/:id/reject', withAuth(), async (c) => {
 		return c.json({ success: true });
 	} catch (error) {
 		console.error('Error rejecting car owner:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
+moderationRouter.post('/owner/:id/reject', withAuth(), async (c) => {
+	const { id } = c.req.param();
+
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user) => user.publicMetadata?.moderator);
+
+	if (!isModerator) {
+		return c.json({ error: 'Unauthorized' }, 403);
+	}
+
+	try {
+		const db = createDb(c.env.DB);
+
+		await db
+			.update(OwnersPending)
+			.set({ status: 'rejected' })
+			.where(eq(OwnersPending.id, id));
+
+		return c.json({ success: true });
+	} catch (error) {
+		console.error('Error rejecting owner:', error);
 
 		return c.json(
 			{
