@@ -201,20 +201,6 @@ export const Editions = () => {
 
 					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
 						<h3 className="text-brg-mid font-bold">
-							Are these ChatGPT photos?
-						</h3>
-
-						<p className="text-brg-mid md:w-4/5 lg:w-full">
-							Yes, in order to avoid infringing on anyone's
-							copyright, we use AI to generate photos for our
-							editions. We'd love to have real photographs,
-							though, so please contact us if you have a
-							high-quality photo of your edition.
-						</p>
-					</div>
-
-					<div className="bg-brg-light flex flex-col items-start gap-3 p-8 text-sm rounded-lg lg:w-1/2">
-						<h3 className="text-brg-mid font-bold">
 							Have a great photo of your edition?
 						</h3>
 
