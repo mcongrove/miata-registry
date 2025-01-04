@@ -19,7 +19,7 @@
 import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
-import { Cars, Owners } from '../../db/schema';
+import { Cars, Editions, Owners } from '../../db/schema';
 import type { Bindings } from '../types';
 
 const CACHE_TTL = {
@@ -49,8 +49,8 @@ statsRouter.get('/', async (c) => {
 			.select({ count: sql<number>`count(distinct country)` })
 			.from(Owners);
 		const [uniqueEditions] = await db
-			.select({ count: sql<number>`count(distinct edition_id)` })
-			.from(Cars);
+			.select({ count: sql<number>`count(distinct id)` })
+			.from(Editions);
 
 		const stats = {
 			cars: totalCars.count,
