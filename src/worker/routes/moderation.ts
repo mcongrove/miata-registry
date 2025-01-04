@@ -18,6 +18,7 @@
 
 import { and, count, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+import { Resend } from 'resend';
 import { createDb } from '../../db';
 import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
@@ -25,6 +26,8 @@ import { Cars } from '../../db/schema/Cars';
 import { CarsPending } from '../../db/schema/CarsPending';
 import { Owners } from '../../db/schema/Owners';
 import { OwnersPending } from '../../db/schema/OwnersPending';
+import ApprovedCar from '../../emails/templates/ApprovedCar';
+import ApprovedOwner from '../../emails/templates/ApprovedOwner';
 import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
 import { Bindings } from '../types';
@@ -209,12 +212,9 @@ moderationRouter.get('/photo', withAuth(), async (c) => {
 
 moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 	const { id } = c.req.param();
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
+	const user = await c.get('clerk').users.getUser(c.get('userId'));
 
-	if (!isModerator) {
+	if (!user.publicMetadata?.moderator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -264,6 +264,21 @@ moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 		await c.env.CACHE.delete(`cars:details:${car.car_id}`);
 		await c.env.CACHE.delete(`cars:summary:${car.car_id}`);
 
+		const primaryEmail = user.emailAddresses.find(
+			(email) => email.id === user.primaryEmailAddressId
+		);
+
+		if (primaryEmail) {
+			const resend = new Resend(c.env.RESEND_API_KEY);
+
+			await resend.emails.send({
+				from: 'Miata Registry <no-reply@miataregistry.com>',
+				to: primaryEmail.emailAddress,
+				subject: 'Welcome to Miata Registry!',
+				react: ApprovedCar(),
+			});
+		}
+
 		return c.json({ success: true });
 	} catch (error) {
 		console.error('Error approving car:', error);
@@ -283,12 +298,9 @@ moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 
 moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 	const { id } = c.req.param();
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
+	const user = await c.get('clerk').users.getUser(c.get('userId'));
 
-	if (!isModerator) {
+	if (!user.publicMetadata?.moderator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -347,6 +359,21 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 		await c.env.CACHE.delete(`cars:details:${carOwner.car_id}`);
 		await c.env.CACHE.delete(`cars:summary:${carOwner.car_id}`);
 
+		const primaryEmail = user.emailAddresses.find(
+			(email) => email.id === user.primaryEmailAddressId
+		);
+
+		if (primaryEmail) {
+			const resend = new Resend(c.env.RESEND_API_KEY);
+
+			await resend.emails.send({
+				from: 'Miata Registry <no-reply@miataregistry.com>',
+				to: primaryEmail.emailAddress,
+				subject: 'Welcome to Miata Registry!',
+				react: ApprovedOwner(),
+			});
+		}
+
 		return c.json({ success: true });
 	} catch (error) {
 		console.error('Error approving car owner:', error);
@@ -366,13 +393,9 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 
 moderationRouter.post('/owner/:id/approve', withAuth(), async (c) => {
 	const { id } = c.req.param();
+	const user = await c.get('clerk').users.getUser(c.get('userId'));
 
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
-
-	if (!isModerator) {
+	if (!user.publicMetadata?.moderator) {
 		return c.json({ error: 'Unauthorized' }, 403);
 	}
 
@@ -398,6 +421,21 @@ moderationRouter.post('/owner/:id/approve', withAuth(), async (c) => {
 			.update(OwnersPending)
 			.set({ status: 'approved' })
 			.where(eq(OwnersPending.id, id));
+
+		const primaryEmail = user.emailAddresses.find(
+			(email) => email.id === user.primaryEmailAddressId
+		);
+
+		if (primaryEmail) {
+			const resend = new Resend(c.env.RESEND_API_KEY);
+
+			await resend.emails.send({
+				from: 'Miata Registry <no-reply@miataregistry.com>',
+				to: primaryEmail.emailAddress,
+				subject: 'Welcome to Miata Registry!',
+				react: ApprovedOwner(),
+			});
+		}
 
 		return c.json({ success: true });
 	} catch (error) {

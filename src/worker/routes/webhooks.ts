@@ -20,7 +20,7 @@ import { Hono } from 'hono';
 import { verifyClerkWebhook } from '../middleware/clerk';
 import type { Bindings } from '../types';
 import type { ClerkWebhookPayload } from '../types/clerk';
-import { handleUserCreated, handleUserUpdated } from './webhook_clerk';
+import { handleUserCreated, handleUserUpdated } from '../webhooks/clerk';
 
 const webhooksRouter = new Hono<{ Bindings: Bindings }>();
 

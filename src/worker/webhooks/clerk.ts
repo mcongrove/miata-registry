@@ -22,6 +22,7 @@ import { Context } from 'hono';
 import { Resend } from 'resend';
 import { createDb } from '../../db';
 import { Cars, Owners } from '../../db/schema';
+import Welcome from '../../emails/templates/Welcome';
 import type { Bindings } from '../types';
 import type { UserCreatedPayload, UserUpdatedPayload } from '../types/clerk';
 
@@ -68,6 +69,13 @@ export async function handleUserCreated(
 				500
 			);
 		}
+
+		await resend.emails.send({
+			from: 'Miata Registry <no-reply@miataregistry.com>',
+			to: primaryEmail.email_address,
+			subject: 'Welcome to Miata Registry!',
+			react: Welcome(),
+		});
 
 		await clerk.users.updateUser(payload.data.id, {
 			privateMetadata: {
