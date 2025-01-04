@@ -61,7 +61,12 @@ export const FilterSidebar = ({
 		(_, i) => currentYear - i
 	).reverse();
 
-	const [editionOptions, setEditionOptions] = useState<string[]>([]);
+	const [editionOptions, setEditionOptions] = useState<
+		Array<{
+			name: string;
+			count: number;
+		}>
+	>([]);
 	const [countries, setCountries] = useState<
 		Array<{ value: string; label: string }>
 	>([]);
@@ -88,8 +93,11 @@ export const FilterSidebar = ({
 
 		const loadEditions = async () => {
 			const editions = await getEditionNames();
-
-			setEditionOptions(editions.sort());
+			setEditionOptions(
+				editions.sort((a: { name: string }, b: { name: string }) =>
+					a.name.localeCompare(b.name)
+				)
+			);
 		};
 
 		loadCountries();
@@ -278,8 +286,9 @@ export const FilterSidebar = ({
 										)
 									}
 									options={editionOptions.map((edition) => ({
-										value: edition,
-										label: edition,
+										value: edition.name,
+										label: edition.name,
+										disabled: edition.count === 0,
 									}))}
 									placeholder="Select edition"
 									className="md:!text-xs"

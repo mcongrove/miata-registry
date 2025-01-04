@@ -25,6 +25,7 @@ import { RegistryTable } from '../components/registry/RegistryTable';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TFilterOption, TFilterType } from '../types/Filter';
+import { handleApiError } from '../utils/common';
 
 export const Registry = () => {
 	const parseFiltersFromURL = (filterParams: string[]): TFilterOption[] => {
@@ -101,7 +102,7 @@ export const Registry = () => {
 				setTotalItems(data.total);
 				setTotalPages(data.totalPages);
 			} catch (error) {
-				console.error('Error loading cars:', error);
+				handleApiError(error);
 			} finally {
 				setIsLoading(false);
 			}

@@ -102,24 +102,28 @@ editionsRouter.get('/names', async (c) => {
 
 		const db = createDb(c.env.DB);
 
-		const uniqueNames = await db
+		const editionsWithCounts = await db
 			.select({
 				id: Editions.id,
 				name: sql<string>`CONCAT(${Editions.year}, ' ', ${Editions.name})`.as(
 					'name'
 				),
+				count: sql<number>`COUNT(${Cars.id})`.as('count'),
 			})
 			.from(Editions)
+			.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
 			.orderBy(asc(Editions.year), asc(Editions.name))
 			.groupBy(sql`${Editions.id}, ${Editions.year}, ${Editions.name}`);
 
-		const names = uniqueNames.map((edition) => edition.name);
+		await c.env.CACHE.put(
+			'editions:names',
+			JSON.stringify(editionsWithCounts),
+			{
+				expirationTtl: CACHE_TTL.EDITIONS_NAMES,
+			}
+		);
 
-		await c.env.CACHE.put('editions:names', JSON.stringify(names), {
-			expirationTtl: CACHE_TTL.EDITIONS_NAMES,
-		});
-
-		return c.json(names);
+		return c.json(editionsWithCounts);
 	} catch (error) {
 		console.error('Error fetching edition names:', error);
 

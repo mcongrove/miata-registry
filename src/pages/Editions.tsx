@@ -23,6 +23,7 @@ import { Tooltip } from '../components/Tooltip';
 import { Card } from '../components/edition/Card';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TEdition } from '../types/Edition';
+import { handleApiError } from '../utils/common';
 
 export const Editions = () => {
 	const [editions, setEditions] = useState<TEdition[]>([]);
@@ -46,7 +47,7 @@ export const Editions = () => {
 
 				setEditions(editionsData);
 			} catch (error) {
-				console.error('Error loading editions:', error);
+				handleApiError(error);
 			} finally {
 				setIsLoading(false);
 			}

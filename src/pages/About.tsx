@@ -21,10 +21,12 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
 import { Button } from '../components/Button';
+import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { handleApiError } from '../utils/common';
 
 const getCountCodeCommits = async (owner: string, repo: string) => {
 	const response = await fetch(
@@ -51,6 +53,7 @@ export const About = () => {
 	const location = useLocation();
 	const [isEmailSent, setIsEmailSent] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [formError, setFormError] = useState<string | null>(null);
 	const [stats, setStats] = useState<{
 		cars: number;
 		claimedCars: number;
@@ -132,10 +135,8 @@ export const About = () => {
 
 			setIsEmailSent(true);
 		} catch (error) {
-			console.error('Error:', error);
-
-			alert('Failed to send message. Please try again.');
-
+			handleApiError(error);
+			setFormError('Failed to submit form. Please try again.');
 			setIsSubmitting(false);
 		}
 	};
@@ -425,7 +426,9 @@ export const About = () => {
 							Get in Touch
 						</h2>
 
-						{isEmailSent ? (
+						{formError ? (
+							<ErrorBanner error={formError} />
+						) : isEmailSent ? (
 							<p className="text-sm text-brg-mid">
 								Thanks for your message, we'll get back to you
 								soon.

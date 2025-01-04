@@ -21,7 +21,11 @@ import { twMerge } from 'tailwind-merge';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 	placeholder?: string;
-	options: Array<{ value: string | number; label: string }>;
+	options: Array<{
+		value: string | number;
+		label: string;
+		disabled?: boolean;
+	}>;
 }
 
 export const SelectStyles = (disabled: boolean, className: string) => {
@@ -54,7 +58,11 @@ export const Select = ({
 			{placeholder && <option value="">{placeholder}</option>}
 
 			{options.map((option) => (
-				<option key={option.value} value={option.value}>
+				<option
+					key={option.value}
+					value={option.value}
+					disabled={option.disabled}
+				>
 					{option.label}
 				</option>
 			))}

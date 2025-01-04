@@ -19,6 +19,7 @@
 import { useAuth } from '@clerk/clerk-react';
 import { useState } from 'react';
 import { Modal } from '../components/Modal';
+import { handleApiError } from '../utils/common';
 
 export function Export({
 	isOpen,
@@ -68,7 +69,7 @@ export function Export({
 
 			setIsSuccess(true);
 		} catch (error) {
-			console.error('Download error:', error);
+			handleApiError(error);
 		} finally {
 			setLoading(false);
 		}
