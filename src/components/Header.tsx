@@ -182,7 +182,7 @@ export const Header = () => {
 		return (
 			<>
 				<header className="absolute top-0 left-0 right-0 z-50 h-20">
-					<div className="mx-auto py-6 px-8 lg:px-16">
+					<div className="mx-auto py-4 px-8 lg:px-16">
 						<div className="flex items-center">
 							<NavLinks />
 						</div>
