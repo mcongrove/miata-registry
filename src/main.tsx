@@ -34,9 +34,8 @@ Sentry.init({
 	],
 	tracesSampleRate: 1.0,
 	tracePropagationTargets: [
-		'localhost',
-		'miataregistry.com',
-		/^https:\/\/api\.miataregistry\.com/,
+		/^https?:\/\/(?!(?:clerk\.|accounts\.))(.*\.)?miataregistry\.com/,
+		...(import.meta.env.DEV ? ['localhost'] : []),
 	],
 	replaysSessionSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
 	replaysOnErrorSampleRate: 1.0,
