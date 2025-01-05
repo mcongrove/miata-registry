@@ -50,7 +50,7 @@ const levels = [
 	{
 		description:
 			'Verified limited edition with typical features and documentation',
-		icon: 'fa-star',
+		icon: 'fa-star-half-stroke',
 		level: 'limited-edition',
 		points: 'Below 40 points',
 	},
@@ -58,21 +58,19 @@ const levels = [
 
 const levelColors = {
 	'historically-significant':
-		'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-300',
-	'exceptionally-rare':
-		'bg-gradient-to-r from-neutral-200 to-zinc-100 text-neutral-800 border-neutral-300',
-	'very-rare':
-		'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-800 border-orange-200',
-	rare: 'bg-gradient-to-r from-emerald-100 to-green-50 text-emerald-800 border-emerald-200',
-	'limited-edition': 'bg-brg-light text-brg border-brg-border',
+		'bg-yellow-100 text-yellow-800 border-yellow-300',
+	'exceptionally-rare': 'bg-neutral-100 text-neutral-600 border-neutral-300',
+	'very-rare': 'bg-orange-50 text-amber-700 border-orange-200',
+	rare: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+	'limited-edition': 'bg-white text-slate-500 border-slate-300',
 } as const;
 
 const iconColors = {
-	'historically-significant': 'text-yellow-600',
-	'exceptionally-rare': 'text-neutral-600',
-	'very-rare': 'text-orange-600',
-	rare: 'text-emerald-600',
-	'limited-edition': 'text-brg',
+	'historically-significant': 'text-yellow-500',
+	'exceptionally-rare': 'text-neutral-400',
+	'very-rare': 'text-amber-700',
+	rare: 'text-emerald-700',
+	'limited-edition': 'text-slate-400',
 } as const;
 
 export const RarityLevels = () => {
