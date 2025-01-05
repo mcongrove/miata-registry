@@ -93,6 +93,7 @@ export const FilterSidebar = ({
 
 		const loadEditions = async () => {
 			const editions = await getEditionNames();
+
 			setEditionOptions(
 				editions.sort((a: { name: string }, b: { name: string }) =>
 					a.name.localeCompare(b.name)

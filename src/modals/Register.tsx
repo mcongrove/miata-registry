@@ -49,7 +49,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
-	const [editions, setEditions] = useState<string[]>([]);
+	const [editions, setEditions] = useState<Array<{ name: string }>>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
 	const [existingOwner, setExistingOwner] = useState<TOwner | null>(null);
 	const [formDataLoading, setFormDataLoading] = useState(false);
@@ -62,9 +62,9 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/editions/names`
 				);
 
-				const editionNames = await response.json();
+				const editionData = await response.json();
 
-				setEditions(editionNames);
+				setEditions(editionData);
 			} catch (error) {
 				console.error('Error loading editions:', error);
 
@@ -108,7 +108,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 	useEffect(() => {
 		if (
 			prefilledData?.edition_name &&
-			editions.includes(prefilledData.edition_name)
+			editions.some((e) => e.name === prefilledData.edition_name)
 		) {
 			const form = document.querySelector('form');
 
@@ -302,13 +302,6 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 					!formDataLoading && 'opacity-50'
 				)}
 			>
-				<p className="text-brg-mid text-sm">
-					Until the self-
-					{prefilledData?.id ? 'claim' : 'register'} feature is
-					available, please fill out the form below to{' '}
-					{prefilledData?.id ? 'claim' : 'register'} your Miata.
-				</p>
-
 				<ErrorBanner
 					error={formError}
 					onDismiss={() => setFormError(null)}
@@ -346,10 +339,10 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 										</option>
 										{editions.map((edition) => (
 											<option
-												key={edition}
-												value={edition}
+												key={edition.name}
+												value={edition.name}
 											>
-												{edition}
+												{edition.name}
 											</option>
 										))}
 										<option value="other">Other</option>

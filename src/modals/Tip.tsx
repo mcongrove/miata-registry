@@ -37,7 +37,7 @@ export function Tip({
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
-	const [editions, setEditions] = useState<string[]>([]);
+	const [editions, setEditions] = useState<Array<{ name: string }>>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
 	const [isOwner, setIsOwner] = useState(false);
 
@@ -48,9 +48,9 @@ export function Tip({
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/editions/names`
 				);
 
-				const editionNames = await response.json();
+				const editionData = await response.json();
 
-				setEditions(editionNames);
+				setEditions(editionData);
 			} catch (error) {
 				console.error('Error loading editions:', error);
 
@@ -212,10 +212,10 @@ export function Tip({
 										</option>
 										{editions.map((edition) => (
 											<option
-												key={edition}
-												value={edition}
+												key={edition.name}
+												value={edition.name}
 											>
-												{edition}
+												{edition.name}
 											</option>
 										))}
 										<option value="other">Other</option>
