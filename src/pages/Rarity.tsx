@@ -71,7 +71,7 @@ export const Rarity = () => {
 
 	return (
 		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-20">
-			<div className="container mx-auto flex flex-col gap-8 lg:gap-0 lg:flex-row">
+			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">
 				<div className="flex flex-col gap-8 lg:gap-16 z-10 lg:w-1/2">
 					<div className="flex flex-col gap-4">
 						<div className="w-fit flex gap-1.5 items-center bg-amber-100 border border-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
@@ -93,7 +93,7 @@ export const Rarity = () => {
 							preserved over time.
 						</p>
 
-						<p className="text-md text-brg-mid">
+						<p className="text-sm lg:text-md text-brg-mid">
 							We consider factory performance upgrades, numbered
 							editions, and unique color combinations. Original
 							documentation and preservation state play important
@@ -104,7 +104,7 @@ export const Rarity = () => {
 							documented low mileage and original components.
 						</p>
 
-						<p className="text-md text-brg-mid">
+						<p className="text-sm lg:text-md text-brg-mid">
 							This scoring system helps enthusiasts understand
 							where their vehicles sit in the spectrum of Miata
 							rarity, from limited production runs to truly
@@ -117,7 +117,7 @@ export const Rarity = () => {
 				</div>
 
 				<div className="flex items-center justify-center lg:w-1/2">
-					<div className="relative w-full lg:w-[544px] h-[544px]">
+					<div className="relative w-full h-[374px] lg:w-[544px] lg:h-[544px]">
 						<img
 							src="https://store.miataregistry.com/app/car/about-5.jpg"
 							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover object-left shadow-xl bg-brg-light rotate-6 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
@@ -149,11 +149,11 @@ export const Rarity = () => {
 				</div>
 
 				<div className="flex flex-col gap-4">
-					<h2 className="text-2xl font-semibold text-brg">
+					<h2 className="text-center lg:text-left text-2xl font-semibold text-brg">
 						Edition Base Scores
 					</h2>
 
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
 						<ScoreCard
 							title="Production Score"
 							rows={productionScore}
@@ -169,11 +169,11 @@ export const Rarity = () => {
 				</div>
 
 				<div className="flex flex-col gap-4">
-					<h2 className="text-2xl font-semibold text-brg">
+					<h2 className="text-center lg:text-left text-2xl font-semibold text-brg">
 						Car-Specific Scores
 					</h2>
 
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
 						<ScoreCard
 							title="Mileage Modifiers"
 							rows={mileageModifiers}

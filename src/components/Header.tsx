@@ -162,7 +162,7 @@ export const Header = () => {
 					<Link
 						to="/moderation"
 						className={twMerge(
-							'text-sm text-brg-mid hover:text-brg transition-colors flex items-center gap-1 mr-6',
+							'hidden lg:flex text-sm text-brg-mid hover:text-brg transition-colors items-center gap-1 mr-6',
 							isActive('/moderation')
 								? 'text-brg font-medium'
 								: 'text-brg-mid hover:text-brg',

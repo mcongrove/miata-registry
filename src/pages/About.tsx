@@ -143,7 +143,7 @@ export const About = () => {
 
 	return (
 		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-16">
-			<div className="container mx-auto flex flex-col gap-8 lg:gap-0 lg:flex-row">
+			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">
 				<div className="flex flex-col gap-8 lg:gap-16 z-10 lg:w-1/2">
 					<div id="introduction" className="flex flex-col gap-4">
 						<h1 className="text-4xl lg:text-6xl font-medium text-brg">
@@ -175,7 +175,7 @@ export const About = () => {
 							Project History
 						</h2>
 
-						<p className="text-md text-brg-mid">
+						<p className="text-sm lg:text-md text-brg-mid">
 							The Miata Registry was created at the end of 2024 by
 							Matthew Congrove, a Miata enthusiast, software
 							engineer, and owner of{' '}
@@ -197,7 +197,7 @@ export const About = () => {
 				</div>
 
 				<div className="flex items-center justify-center lg:w-1/2">
-					<div className="relative w-full lg:w-[544px] h-[544px]">
+					<div className="relative w-full h-[374px] lg:w-[544px] lg:h-[544px]">
 						<img
 							src="https://store.miataregistry.com/app/car/about-1.jpg"
 							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light rotate-6 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
@@ -222,7 +222,7 @@ export const About = () => {
 			<div className="container mx-auto">
 				<div
 					id="statistics"
-					className="flex flex-col gap-12 py-0 lg:py-24"
+					className="flex flex-col gap-8 lg:gap-12 py-0 lg:py-24"
 				>
 					<h2
 						className={`text-3xl font-medium text-center ${getHighlightClass('statistics')}`}
@@ -260,7 +260,7 @@ export const About = () => {
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16">
 					<div id="open-source" className="prose">
 						<h2
-							className={`text-xl font-medium ${getHighlightClass('open-source')}`}
+							className={`mb-3 lg:mb-5 text-xl font-medium ${getHighlightClass('open-source')}`}
 						>
 							Open Source Commitment
 						</h2>
@@ -291,7 +291,7 @@ export const About = () => {
 
 					<div id="open-data" className="prose">
 						<h2
-							className={`text-xl font-medium ${getHighlightClass('open-data')}`}
+							className={`mb-3 lg:mb-5 text-xl font-medium ${getHighlightClass('open-data')}`}
 						>
 							Open Data Access
 						</h2>
@@ -324,7 +324,7 @@ export const About = () => {
 
 					<div id="verification" className="prose">
 						<h2
-							className={`text-xl font-medium ${getHighlightClass('verification')}`}
+							className={`mb-3 lg:mb-5 text-xl font-medium ${getHighlightClass('verification')}`}
 						>
 							Community Verification
 						</h2>
@@ -346,7 +346,7 @@ export const About = () => {
 
 					<div id="contribute" className="prose">
 						<h2
-							className={`text-xl font-medium ${getHighlightClass('contribute')}`}
+							className={`mb-3 lg:mb-5 text-xl font-medium ${getHighlightClass('contribute')}`}
 						>
 							How to Contribute
 						</h2>
@@ -390,7 +390,7 @@ export const About = () => {
 
 					<div id="acknowledgements" className="prose">
 						<h2
-							className={`text-xl font-medium ${getHighlightClass('acknowledgements')}`}
+							className={`mb-3 lg:mb-5 text-xl font-medium ${getHighlightClass('acknowledgements')}`}
 						>
 							Acknowledgements
 						</h2>

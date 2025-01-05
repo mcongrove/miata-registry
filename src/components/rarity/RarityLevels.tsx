@@ -75,11 +75,16 @@ const iconColors = {
 
 export const RarityLevels = () => {
 	return (
-		<div className="grid grid-cols-5 gap-8">
-			{levels.map((level) => (
+		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-8">
+			{levels.map((level, index) => (
 				<div
 					key={level.level}
-					className={`${levelColors[level.level]} rounded-lg p-6 text-center border flex flex-col items-center gap-4`}
+					className={twMerge(
+						levelColors[level.level],
+						'rounded-lg p-6 text-center border flex flex-col items-center gap-4',
+						index === levels.length - 1 &&
+							'col-span-2 md:col-span-1 justify-self-center w-1/2 md:w-full'
+					)}
 				>
 					<i
 						className={twMerge(
@@ -89,8 +94,8 @@ export const RarityLevels = () => {
 						)}
 					/>
 
-					<div className="flex flex-col items-center gap-1">
-						<h3 className="font-bold capitalize whitespace-nowrap">
+					<div className="flex flex-col items-center gap-2 lg:gap-1">
+						<h3 className="font-bold capitalize leading-tight lg:whitespace-nowrap">
 							{level.level.replace(/-/g, ' ')}
 						</h3>
 

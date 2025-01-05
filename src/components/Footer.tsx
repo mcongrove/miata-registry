@@ -174,7 +174,7 @@ export const Footer = () => {
 				</div>
 
 				<div className="flex flex-col items-center gap-4 border-t border-white/10 pt-8">
-					<p className="text-sm text-brg-mid/60">
+					<p className="text-center text-sm text-brg-mid/60">
 						© {new Date().getFullYear()}{' '}
 						<a
 							href="https://mattcongrove.com"
