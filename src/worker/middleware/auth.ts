@@ -21,11 +21,9 @@ import { Context } from 'hono';
 import type { Bindings } from '../types';
 
 export async function verifyAuth(c: Context<{ Bindings: Bindings }>) {
-	const secretKey = c.env.CLERK_SECRET_KEY;
-
 	try {
 		const clerk = createClerkClient({
-			secretKey,
+			secretKey: c.env.CLERK_SECRET_KEY,
 			publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
 		});
 

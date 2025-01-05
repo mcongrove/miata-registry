@@ -10,7 +10,7 @@ export default defineConfig({
 		svgr(),
 		sentryVitePlugin({
 			org: 'miata-registry',
-			project: 'javascript-react',
+			project: 'webapp',
 		}),
 	],
 	build: {

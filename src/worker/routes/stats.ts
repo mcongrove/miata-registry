@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { createClerkClient } from '@clerk/backend';
 import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
@@ -24,6 +25,7 @@ import type { Bindings } from '../types';
 
 const CACHE_TTL = {
 	STATS: 60 * 60 * 24 * 7, // 7 days
+	PULSE: 60 * 60 * 24, // 1 day
 };
 
 const statsRouter = new Hono<{ Bindings: Bindings }>();
@@ -66,6 +68,58 @@ statsRouter.get('/', async (c) => {
 		return c.json(stats);
 	} catch (error: unknown) {
 		console.error('Error fetching registry statistics:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
+statsRouter.get('/pulse', async (c) => {
+	try {
+		const cached = await c.env.CACHE.get('pulse');
+
+		if (cached) {
+			return c.json(JSON.parse(cached));
+		}
+
+		const clerk = createClerkClient({
+			secretKey: c.env.CLERK_SECRET_KEY,
+			publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
+		});
+
+		const userId = c.env.ADMIN_USER_ID;
+
+		if (!userId) {
+			throw new Error('ADMIN_USER_ID environment variable is not set');
+		}
+
+		const user = await clerk.users.getUser(userId);
+
+		if (!user) {
+			return c.json({ error: 'User not found' }, 404);
+		}
+
+		await c.env.CACHE.put(
+			'pulse',
+			JSON.stringify({ timestamp: user.lastActiveAt }),
+			{
+				expirationTtl: CACHE_TTL.PULSE,
+			}
+		);
+
+		return c.json({
+			timestamp: user.lastActiveAt,
+		});
+	} catch (error) {
+		console.error('Error fetching pulse:', error);
 
 		return c.json(
 			{

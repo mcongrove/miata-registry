@@ -33,6 +33,7 @@ export type ApiError = {
 };
 
 export interface Bindings {
+	ADMIN_USER_ID: string;
 	CACHE: KVNamespace;
 	CLERK_PUBLISHABLE_KEY: string;
 	CLERK_SECRET_KEY: string;

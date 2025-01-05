@@ -20,6 +20,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { useModal } from '../context/ModalContext';
+import { SitePulse } from './SitePulse';
 
 export const Footer = () => {
 	const { isSignedIn } = useAuth();
@@ -163,8 +164,8 @@ export const Footer = () => {
 					</div>
 				</div>
 
-				<div className="border-t border-white/10 pt-8">
-					<p className="text-sm text-brg-mid/60 text-center">
+				<div className="flex flex-col items-center gap-4 border-t border-white/10 pt-8">
+					<p className="text-sm text-brg-mid/60">
 						© {new Date().getFullYear()}{' '}
 						<a
 							href="https://mattcongrove.com"
@@ -201,6 +202,8 @@ export const Footer = () => {
 						</a>
 						.
 					</p>
+
+					<SitePulse />
 				</div>
 			</div>
 		</footer>
