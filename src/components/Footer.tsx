@@ -192,7 +192,14 @@ export const Footer = () => {
 						>
 							AGPL-3
 						</a>
-						. All other rights reserved.
+						. All other rights reserved. You can reach us at{' '}
+						<a
+							href="mailto:support@miataregistry.com"
+							className="text-brg-mid underline"
+						>
+							support@miataregistry.com
+						</a>
+						.
 					</p>
 				</div>
 			</div>

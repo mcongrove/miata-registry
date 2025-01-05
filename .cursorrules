@@ -1,3 +1,3 @@
-For every TSX file, include the AGPL-3.0 license at the top of the file. Use TailwindCSS classes when styling. Use react-router-dom for routing. Don't include code comments to declare blocks of code. I'm using Cloudflare D1 with Drizzle ORM for the database, and Cloudflare S2 for the storage.
+For every TSX file, include the AGPL-3.0 license at the top of the file. Use TailwindCSS classes when styling. Use react-router-dom for routing. Don't include code comments to declare blocks of code; if you reference another file's pattern, don't include the referenced code in your response. I'm using Cloudflare D1 with Drizzle ORM for the database, and Cloudflare S2 for the storage.
 
 When referring to the cars in the registry, use the term "limited edition" instead of "special edition"; instead of "model", use "edition". Use the "brg" colors, never use "gray".

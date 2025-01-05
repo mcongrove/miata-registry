@@ -27,6 +27,7 @@ import {
 	Editions,
 	News,
 	Owners,
+	OwnersPending,
 	Tips,
 } from '../../db/schema';
 import { withAuth } from '../middleware/auth';
@@ -68,6 +69,7 @@ exportRouter.get('/', withAuth(), async (c) => {
 		const editions = await db.select().from(Editions);
 		const news = await db.select().from(News);
 		const owners = await db.select().from(Owners);
+		const ownersPending = await db.select().from(OwnersPending);
 		const tips = await db.select().from(Tips);
 
 		const carOwnersCSV = objectsToCSV(carOwners);
@@ -77,6 +79,7 @@ exportRouter.get('/', withAuth(), async (c) => {
 		const editionsCSV = objectsToCSV(editions);
 		const newsCSV = objectsToCSV(news);
 		const ownersCSV = objectsToCSV(owners);
+		const ownersPendingCSV = objectsToCSV(ownersPending);
 		const tipsCSV = objectsToCSV(tips);
 
 		const zip = new JSZip();
@@ -88,6 +91,7 @@ exportRouter.get('/', withAuth(), async (c) => {
 		zip.file('editions.csv', editionsCSV);
 		zip.file('news.csv', newsCSV);
 		zip.file('owners.csv', ownersCSV);
+		zip.file('owners_pending.csv', ownersPendingCSV);
 		zip.file('tips.csv', tipsCSV);
 
 		const zipBlob = await zip.generateAsync({ type: 'blob' });

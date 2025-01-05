@@ -59,6 +59,7 @@ export function Export({
 			const a = document.createElement('a');
 			a.href = url;
 			a.download = 'miata-registry.zip';
+
 			document.body.appendChild(a);
 
 			a.click();
@@ -80,7 +81,7 @@ export function Export({
 		onClose();
 	};
 
-	if (!isSuccess) {
+	if (isSuccess) {
 		return (
 			<Modal
 				isOpen={isOpen}

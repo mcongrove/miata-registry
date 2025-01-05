@@ -398,12 +398,10 @@ export const About = () => {
 						<p className="text-sm text-brg-mid">
 							We would like to thank all the contributors who have
 							helped make the Miata Registry a success. Special
-							thanks to the owners and numerous forum members at
-							Miata.net, the BRG Miata Society and NA Miata Club
-							on Facebook. Additional thanks Katla, Harper,
-							Kirsten, Terri, and the countless Miata and car
-							community members who have helped verify and
-							validate registry entries.
+							thanks to Miata.net and all of their forum members.
+							Additional thanks Katla, Harper, Kirsten, Terri, and
+							the countless Miata and car community members who
+							have helped verify and validate registry entries.
 						</p>
 
 						<p className="text-sm text-brg-mid">
