@@ -82,7 +82,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 const ConstructionBanner = () => (
 	<div className="flex gap-1.5 items-center bg-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
 		<i className="fa-solid fa-person-digging text-sm"></i> This project is
-		in early access. Features may be incomplete or change without notice.
+		in early access.
 	</div>
 );
 
