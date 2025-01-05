@@ -135,6 +135,15 @@ export const Footer = () => {
 								</li>
 								<li>
 									<Link
+										to="/rarity"
+										className="flex items-center gap-1.5 text-brg-mid hover:text-brg-light transition-colors"
+									>
+										Rarity Scores{' '}
+										<i className="fa-solid fa-crown text-sm" />
+									</Link>
+								</li>
+								<li>
+									<Link
 										to="/about#contact"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>

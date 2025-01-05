@@ -49,3 +49,10 @@ export type TCarPending = TCar &
 	TPending & {
 		car_id: string;
 	};
+
+export type TRarityLevel =
+	| 'historically-significant'
+	| 'exceptionally-rare'
+	| 'very-rare'
+	| 'rare'
+	| 'limited-edition';

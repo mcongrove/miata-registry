@@ -55,6 +55,10 @@ const Moderation = lazy(() =>
 	}))
 );
 
+const Rarity = lazy(() =>
+	import('./pages/Rarity').then((module) => ({ default: module.Rarity }))
+);
+
 const Registry = lazy(() =>
 	import('./pages/Registry').then((module) => ({ default: module.Registry }))
 );
@@ -129,6 +133,14 @@ function App() {
 									element={
 										<Suspense fallback={<Fallback />}>
 											<Moderation />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/rarity"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Rarity />
 										</Suspense>
 									}
 								/>

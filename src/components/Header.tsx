@@ -25,7 +25,7 @@ import { useModal } from '../context/ModalContext';
 
 interface DropdownProps {
 	label: string;
-	items: { label: string; to?: string; onClick?: () => void }[];
+	items: { label: React.ReactNode; to?: string; onClick?: () => void }[];
 	isActive?: boolean;
 }
 
@@ -80,7 +80,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 };
 
 const ConstructionBanner = () => (
-	<div className="flex gap-1.5 items-center bg-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
+	<div className="flex gap-1.5 items-center bg-amber-100 border border-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
 		<i className="fa-solid fa-person-digging text-sm"></i> This project is
 		in early access.
 	</div>
@@ -137,6 +137,15 @@ export const Header = () => {
 					label="About"
 					items={[
 						{ label: 'About the Registry', to: '/about' },
+						{
+							label: (
+								<span className="flex items-center gap-1.5">
+									Rarity Scores{' '}
+									<i className="fa-solid fa-crown text-sm -mt-0.5" />
+								</span>
+							),
+							to: '/rarity',
+						},
 						{ label: 'Contributing', to: '/about#contribute' },
 						{ label: 'Contact us', to: '/about#contact' },
 					]}

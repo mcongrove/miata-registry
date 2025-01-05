@@ -197,22 +197,22 @@ export const About = () => {
 				</div>
 
 				<div className="flex items-center justify-center lg:w-1/2">
-					<div className="relative w-full h-96 lg:w-[544px]">
+					<div className="relative w-full lg:w-[544px] h-[544px]">
 						<img
 							src="https://store.miataregistry.com/app/car/about-1.jpg"
-							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light"
+							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light rotate-6 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
 							alt="Miata in a valley"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-2.jpg"
-							className="absolute right-0 top-24 size-40 lg:right-0 lg:top-24 lg:size-72 rounded-lg object-cover shadow-xl bg-brg-light"
+							className="absolute right-0 top-24 size-40 lg:right-0 lg:top-24 lg:size-72 rounded-lg object-cover shadow-xl bg-brg-light -rotate-3 hover:-translate-y-3 hover:-translate-x-2 transition-all duration-500 ease-out"
 							alt="Miata in a field at dusk"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-3.jpg"
-							className="absolute top-44 left-0 w-64 h-48 lg:right-40 lg:top-72 lg:w-96 lg:h-64 rounded-lg object-cover shadow-xl bg-brg-light"
+							className="absolute top-44 left-0 w-64 h-48 lg:right-40 lg:top-72 lg:w-96 lg:h-64 rounded-lg object-cover shadow-xl bg-brg-light rotate-3 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
 							alt="A group of Miatas in a field"
 						/>
 					</div>
@@ -258,7 +258,7 @@ export const About = () => {
 
 			<div className="container mx-auto">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16">
-					<div id="open-source" className="flex flex-col gap-3">
+					<div id="open-source" className="prose">
 						<h2
 							className={`text-xl font-medium ${getHighlightClass('open-source')}`}
 						>
@@ -289,7 +289,7 @@ export const About = () => {
 						</p>
 					</div>
 
-					<div id="open-data" className="flex flex-col gap-3">
+					<div id="open-data" className="prose">
 						<h2
 							className={`text-xl font-medium ${getHighlightClass('open-data')}`}
 						>
@@ -322,7 +322,7 @@ export const About = () => {
 						</p>
 					</div>
 
-					<div id="verification" className="flex flex-col gap-3">
+					<div id="verification" className="prose">
 						<h2
 							className={`text-xl font-medium ${getHighlightClass('verification')}`}
 						>
@@ -344,7 +344,7 @@ export const About = () => {
 						</p>
 					</div>
 
-					<div id="contribute" className="flex flex-col gap-3">
+					<div id="contribute" className="prose">
 						<h2
 							className={`text-xl font-medium ${getHighlightClass('contribute')}`}
 						>
@@ -388,7 +388,7 @@ export const About = () => {
 						</p>
 					</div>
 
-					<div id="acknowledgements" className="flex flex-col gap-3">
+					<div id="acknowledgements" className="prose">
 						<h2
 							className={`text-xl font-medium ${getHighlightClass('acknowledgements')}`}
 						>
