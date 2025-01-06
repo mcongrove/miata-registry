@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { RarityLevels } from '../components/rarity/RarityLevels';
+import { Levels } from '../components/rarity/Levels';
 import { ScoreCard } from '../components/rarity/ScoreCard';
 import { usePageMeta } from '../hooks/usePageMeta';
 
@@ -35,6 +35,7 @@ export const Rarity = () => {
 		{ condition: 'Original hard top', points: '+4 points' },
 		{ condition: 'Original soft top', points: '+3 points' },
 		{ condition: 'Original wheels', points: '+3 points' },
+		{ condition: 'Single owner', points: '+3 points' },
 	];
 
 	const ageModifiers = [
@@ -52,6 +53,7 @@ export const Rarity = () => {
 	const documentationScores = [
 		{ condition: 'Original window sticker', points: '+2 points' },
 		{ condition: 'Original sales documents', points: '+2 points' },
+		{ condition: 'Complete service records', points: '+2 points' },
 	];
 
 	const mileageModifiers = [
@@ -75,8 +77,8 @@ export const Rarity = () => {
 				<div className="flex flex-col gap-8 lg:gap-16 z-10 lg:w-1/2">
 					<div className="flex flex-col gap-4">
 						<div className="w-fit flex gap-1.5 items-center bg-amber-100 border border-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
-							<i className="fa-regular fa-clock text-sm"></i>{' '}
-							Coming Soon
+							<i className="fa-regular fa-clock text-sm"></i> Work
+							in Progress
 						</div>
 
 						<h1 className="text-4xl lg:text-6xl font-medium text-brg">
@@ -145,7 +147,7 @@ export const Rarity = () => {
 						Classifications
 					</h2>
 
-					<RarityLevels />
+					<Levels />
 				</div>
 
 				<div className="flex flex-col gap-4">
@@ -154,17 +156,14 @@ export const Rarity = () => {
 					</h2>
 
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
-						<ScoreCard
-							title="Production Score"
-							rows={productionScore}
-						/>
+						<ScoreCard title="Production" rows={productionScore} />
 
 						<ScoreCard
-							title="Characteristics Modifiers"
+							title="Characteristics"
 							rows={characteristicsModifiers}
 						/>
 
-						<ScoreCard title="Age Modifiers" rows={ageModifiers} />
+						<ScoreCard title="Age" rows={ageModifiers} />
 					</div>
 				</div>
 
@@ -174,17 +173,14 @@ export const Rarity = () => {
 					</h2>
 
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8">
-						<ScoreCard
-							title="Mileage Modifiers"
-							rows={mileageModifiers}
-						/>
+						<ScoreCard title="Mileage" rows={mileageModifiers} />
 
 						<ScoreCard
 							title={
 								<span className="flex justify-between items-center">
-									Preservation State
-									<span className="text-[10px] tracking-wider uppercase text-brg-mid/70 font-medium">
-										in good condition
+									Preservation
+									<span className="text-xs text-brg-mid/70 font-normal">
+										Good condition, car older than 10 years
 									</span>
 								</span>
 							}
@@ -192,7 +188,14 @@ export const Rarity = () => {
 						/>
 
 						<ScoreCard
-							title="Documentation Bonuses"
+							title={
+								<span className="flex justify-between items-center">
+									Documentation
+									<span className="text-xs text-brg-mid/70 font-normal">
+										Car older than 10 years
+									</span>
+								</span>
+							}
 							rows={documentationScores}
 						/>
 					</div>

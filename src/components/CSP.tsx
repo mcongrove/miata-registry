@@ -24,17 +24,17 @@ export const CSP = () => {
 
 		meta.httpEquiv = 'Content-Security-Policy';
 
-		const devCSP = import.meta.env.DEV ? ' http://localhost:*' : '';
+		const devCSP = import.meta.env.DEV ? 'http://localhost:*' : '';
 
 		meta.content = `
-			default-src 'self' ${devCSP}; 
-			script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.clerk.accounts.dev *.cloudflareinsights.com clerk.miataregistry.com challenges.cloudflare.com *.fontawesome.com *.clerk.services ${devCSP}; 
-			worker-src 'self' blob: ${devCSP}; 
-			connect-src 'self' *.googleapis.com *.clerk.accounts.dev clerk.miataregistry.com https://api.miataregistry.com https://store.miataregistry.com https://api.github.com vpic.nhtsa.dot.gov challenges.cloudflare.com *.sentry.io *.clerk.miataregistry.com *.clerk.services ${devCSP}; 
-			img-src 'self' data: *.googleapis.com *.gstatic.com *.clerk.com https://store.miataregistry.com flagcdn.com ${devCSP}; 
-			style-src 'self' 'unsafe-inline' *.googleapis.com *.gstatic.com ${devCSP}; 
-			font-src 'self' *.gstatic.com *.fontawesome.com ${devCSP};
-			frame-src 'self' *.clerk.accounts.dev *.clerk.miataregistry.com challenges.cloudflare.com ${devCSP};
+			default-src 'self' ${devCSP};
+			script-src 'self' 'unsafe-inline' 'unsafe-eval' ${devCSP} *.miataregistry.com *.clerk.accounts.dev *.clerk.services *.cloudflareinsights.com *.fontawesome.com *.googleapis.com challenges.cloudflare.com;
+			worker-src 'self' blob: ${devCSP};
+			connect-src 'self' ${devCSP} *.miataregistry.com *.clerk.accounts.dev *.clerk.services *.googleapis.com *.sentry.io api.github.com challenges.cloudflare.com vpic.nhtsa.dot.gov;
+			img-src 'self' data: ${devCSP} store.miataregistry.com *.clerk.com *.googleapis.com *.gstatic.com flagcdn.com;
+			style-src 'self' 'unsafe-inline' ${devCSP} *.googleapis.com *.gstatic.com;
+			font-src 'self' ${devCSP} *.fontawesome.com *.gstatic.com;
+			frame-src 'self' ${devCSP} *.miataregistry.com *.clerk.accounts.dev challenges.cloudflare.com;
 		`
 			.replace(/\s+/g, ' ')
 			.trim();

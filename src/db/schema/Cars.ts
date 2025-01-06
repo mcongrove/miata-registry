@@ -28,6 +28,7 @@ export const Cars = sqliteTable('cars', {
 		.references(() => Editions.id),
 	id: text('id').primaryKey(),
 	manufacture_date: text('manufacture_date'),
+	rarity_score: integer('rarity_score'),
 	sale_date: text('sale_date'),
 	sale_dealer_city: text('sale_dealer_city'),
 	sale_dealer_country: text('sale_dealer_country'),

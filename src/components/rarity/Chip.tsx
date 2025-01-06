@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Link } from 'react-router-dom';
 import { TRarityLevel } from '../../types/Car';
 
 const rarityColors: Record<
@@ -24,46 +25,56 @@ const rarityColors: Record<
 > = {
 	'historically-significant': {
 		bg: 'bg-gradient-to-r from-yellow-100 to-amber-100',
-		text: 'text-yellow-800',
+		text: '!text-yellow-800',
 		border: 'border-yellow-300',
 	},
 	'exceptionally-rare': {
 		bg: 'bg-gradient-to-r from-neutral-200 to-zinc-100',
-		text: 'text-neutral-800',
+		text: '!text-neutral-800',
 		border: 'border-neutral-300',
 	},
 	'very-rare': {
 		bg: 'bg-gradient-to-r from-orange-100 to-amber-50',
-		text: 'text-orange-800',
+		text: '!text-orange-800',
 		border: 'border-orange-200',
 	},
 	rare: {
 		bg: 'bg-gradient-to-r from-emerald-100 to-green-50',
-		text: 'text-emerald-800',
+		text: '!text-emerald-800',
 		border: 'border-emerald-200',
 	},
 	'limited-edition': {
 		bg: 'bg-brg-light',
-		text: 'text-brg',
+		text: '!text-brg',
 		border: 'border-brg-border',
 	},
 };
 
-type RarityChipProps = {
-	level: TRarityLevel;
+const getRarityLevel = (score: number): TRarityLevel => {
+	if (score >= 100) return 'historically-significant';
+	if (score >= 80) return 'exceptionally-rare';
+	if (score >= 60) return 'very-rare';
+	if (score >= 40) return 'rare';
+	return 'limited-edition';
 };
 
-export const RarityChip = ({ level }: RarityChipProps) => {
+type ChipProps = {
+	score: number;
+};
+
+export const Chip = ({ score }: ChipProps) => {
+	const level = getRarityLevel(score);
 	const colors = rarityColors[level];
 
-	return (
-		<div
+	return level !== 'limited-edition' ? (
+		<Link
+			to={`/rarity`}
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors.bg} ${colors.text} ${colors.border}`}
 		>
 			{level
 				.split('-')
 				.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 				.join(' ')}
-		</div>
-	);
+		</Link>
+	) : null;
 };

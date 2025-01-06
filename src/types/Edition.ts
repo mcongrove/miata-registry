@@ -25,6 +25,7 @@ export type TEdition = {
 	image_car_id?: string;
 	in_registry?: number;
 	name: string;
+	rarity_score?: number;
 	total_produced?: number;
 	year: number;
 };

@@ -139,7 +139,7 @@ export const Footer = () => {
 										className="flex items-center gap-1.5 text-brg-mid hover:text-brg-light transition-colors"
 									>
 										Rarity Scores{' '}
-										<i className="fa-solid fa-crown text-sm" />
+										<i className="fa-solid fa-crown text-sm text-yellow-300/50" />
 									</Link>
 								</li>
 								<li>

@@ -30,6 +30,7 @@ export type TCar = {
 	id: string;
 	manufacture_date?: string;
 	owner_history?: TCarOwner[];
+	rarity_score?: number;
 	sale_date?: string;
 	sale_dealer_city?: string;
 	sale_dealer_country?: string;

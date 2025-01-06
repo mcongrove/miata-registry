@@ -57,6 +57,7 @@ editionsRouter.get('/', async (c) => {
 					'in_registry'
 				),
 				name: Editions.name,
+				rarity_score: Editions.rarity_score,
 				total_produced: Editions.total_produced,
 				year: Editions.year,
 			})

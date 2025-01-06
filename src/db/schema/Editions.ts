@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { text, integer, sqliteTable } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const Editions = sqliteTable('editions', {
 	color: text('color').notNull(),
@@ -25,6 +25,7 @@ export const Editions = sqliteTable('editions', {
 	id: text('id').primaryKey(),
 	image_car_id: text('image_car_id'),
 	name: text('name').notNull(),
+	rarity_score: integer('rarity_score'),
 	total_produced: integer('total_produced'),
 	year: integer('year').notNull(),
 });

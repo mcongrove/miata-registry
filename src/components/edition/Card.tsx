@@ -19,6 +19,7 @@
 import { Link } from 'react-router-dom';
 import { TEdition } from '../../types/Edition';
 import { Credit } from '../Credit';
+import { Chip } from '../rarity/Chip';
 import { Stats } from './Stats';
 
 type CardProps = {
@@ -44,8 +45,14 @@ export const Card = ({ edition }: CardProps) => {
 					/>
 				</Link>
 
+				{edition.rarity_score && (
+					<div className="absolute bottom-2 left-2">
+						<Chip score={edition.rarity_score + 20} />
+					</div>
+				)}
+
 				{edition.image_car_id && (
-					<div className="absolute bottom-4 right-4">
+					<div className="absolute bottom-2 right-2">
 						<Credit id={edition.image_car_id} direction="left" />
 					</div>
 				)}

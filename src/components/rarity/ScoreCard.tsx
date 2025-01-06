@@ -19,7 +19,7 @@
 import { twMerge } from 'tailwind-merge';
 
 type ScoreRow = {
-	condition: string;
+	condition: React.ReactNode;
 	points: string;
 };
 

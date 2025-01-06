@@ -20,8 +20,8 @@ import { useAuth } from '@clerk/clerk-react';
 import { lazy, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
-import Instagram from '../assets/logos/instagram.svg?react';
 import { Button } from '../components/Button';
+import { Chip } from '../components/rarity/Chip';
 import { Tooltip } from '../components/Tooltip';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -332,27 +332,41 @@ export const CarProfile = () => {
 							{car ? (
 								<>
 									<div className="flex items-end justify-between gap-4">
-										<div>
+										<div className="flex flex-col gap-1.5 lg:gap-1 items-start">
 											<h2 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
 												{car.edition?.year}{' '}
 												{car.edition?.name}
 											</h2>
 
-											{car.edition?.total_produced && (
-												<p className="text-sm lg:text-base font-medium text-brg-border">
-													{car.sequence ? (
-														<>
-															No.{' '}
-															<span className="text-brg">
-																{car.sequence.toLocaleString()}
-															</span>{' '}
-															of{' '}
-															{car.edition?.total_produced?.toLocaleString()}
-														</>
-													) : (
-														`One of the ${car.edition?.total_produced?.toLocaleString()} produced`
+											{(car.edition?.total_produced ||
+												car.rarity_score) && (
+												<div className="flex gap-2 lg:gap-4 items-center">
+													{car.edition
+														?.total_produced && (
+														<p className="text-sm lg:text-base font-medium text-brg-border">
+															{car.sequence ? (
+																<>
+																	No.{' '}
+																	<span className="text-brg">
+																		{car.sequence.toLocaleString()}
+																	</span>{' '}
+																	of{' '}
+																	{car.edition?.total_produced?.toLocaleString()}
+																</>
+															) : (
+																`One of the ${car.edition?.total_produced?.toLocaleString()} produced`
+															)}
+														</p>
 													)}
-												</p>
+
+													{car.rarity_score && (
+														<Chip
+															score={
+																car.rarity_score
+															}
+														/>
+													)}
+												</div>
 											)}
 										</div>
 
@@ -367,7 +381,7 @@ export const CarProfile = () => {
 												target="_blank"
 												rel="noopener noreferrer"
 											>
-												<Instagram className="size-7" />
+												<i className="fa-brands fa-square-instagram text-3xl text-brg-mid/70" />
 
 												<span className="sr-only">
 													Car Instagram link
@@ -586,7 +600,7 @@ export const CarProfile = () => {
 						{userId && car?.current_owner?.user_id === userId ? (
 							<div className="flex items-center justify-end gap-6">
 								{car?.has_pending_changes && (
-									<p className="text-sm text-brg flex items-center gap-2">
+									<p className="hidden md:flex text-sm text-brg items-center gap-2">
 										<i className="fa-solid fa-fw fa-triangle-exclamation text-base text-yellow-500" />{' '}
 										This car has pending changes
 									</p>

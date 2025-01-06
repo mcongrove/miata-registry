@@ -141,7 +141,7 @@ export const Header = () => {
 							label: (
 								<span className="flex items-center gap-1.5">
 									Rarity Scores{' '}
-									<i className="fa-solid fa-crown text-sm -mt-0.5" />
+									<i className="fa-solid fa-crown text-sm -mt-0.5 opacity-60 text-yellow-600" />
 								</span>
 							),
 							to: '/rarity',

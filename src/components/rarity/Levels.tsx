@@ -21,7 +21,7 @@ import { twMerge } from 'tailwind-merge';
 const levels = [
 	{
 		description:
-			'Historically significant with exceptional provenance and preservation',
+			'Museum-worthy with exceptional provenance and preservation',
 		icon: 'fa-crown',
 		level: 'historically-significant',
 		points: '100+ points',
@@ -73,7 +73,7 @@ const iconColors = {
 	'limited-edition': 'text-slate-400',
 } as const;
 
-export const RarityLevels = () => {
+export const Levels = () => {
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-8">
 			{levels.map((level, index) => (

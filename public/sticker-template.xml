@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DieCutLabel Version="8.0" Units="twips">
+    <PaperOrientation>Landscape</PaperOrientation>
+    <Id>Shipping</Id>
+    <IsOutlined>false</IsOutlined>
+    <PaperName>30323 Shipping</PaperName>
+    <DrawCommands>
+        <RoundRectangle X="0" Y="0" Width="3060" Height="4455" Rx="270" Ry="270" />
+        <CutoutShape X="280" Y="720" Width="2520" Height="2880" Rx="800" Ry="1620" Style="Solid" />
+    </DrawCommands>
+    <ObjectInfo>
+        <ImageObject>
+            <Name>GRAPHIC</Name>
+            <ForeColor Alpha="255" Red="0" Green="0" Blue="0"/>
+            <BackColor Alpha="0" Red="255" Green="255" Blue="255"/>
+            <LinkedObjectName></LinkedObjectName>
+            <Rotation>Rotation0</Rotation>
+            <IsMirrored>False</IsMirrored>
+            <IsVariable>False</IsVariable>
+            <Image></Image>
+            <ScaleMode>Uniform</ScaleMode>
+            <BorderWidth>0</BorderWidth>
+            <BorderColor Alpha="255" Red="0" Green="0" Blue="0"/>
+            <HorizontalAlignment>Center</HorizontalAlignment>
+            <VerticalAlignment>Center</VerticalAlignment>
+        </ImageObject>
+        <Bounds X="660" Y="-240" Width="3000" Height="3400"/>
+    </ObjectInfo>
+</DieCutLabel>
