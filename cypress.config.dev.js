@@ -3,7 +3,7 @@ import { defineConfig } from 'cypress';
 export default defineConfig({
 	projectId: 'ygesqc',
 	e2e: {
-		baseUrl: 'https://miataregistry.com',
+		baseUrl: 'http://localhost:5173',
 		viewportWidth: 1280,
 		viewportHeight: 720,
 		video: false,
@@ -16,6 +16,6 @@ export default defineConfig({
 		experimentalStudio: true,
 	},
 	env: {
-		apiUrl: 'https://miataregistry.com',
+		apiUrl: 'http://localhost:8787',
 	},
 });
