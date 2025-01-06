@@ -105,6 +105,7 @@ export const Editions = () => {
 										? 'text-brg'
 										: 'text-brg-mid hover:text-brg'
 								} disabled:text-brg-border/70`}
+								data-cy={`edition-tabs-${generation}`}
 								disabled={
 									!editionsByGeneration[generation]?.length
 								}

@@ -687,7 +687,10 @@ export const CarProfile = () => {
 								<div className="p-4 flex items-center justify-between">
 									{car?.current_owner?.country ? (
 										<div>
-											<p className="font-medium text-lg">
+											<p
+												className="font-medium text-lg"
+												data-cy="car-location-city"
+											>
 												{car.current_owner?.city}
 											</p>
 

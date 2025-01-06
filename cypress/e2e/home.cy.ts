@@ -25,11 +25,13 @@ describe('Home Page', () => {
 		cy.contains('Read more →').should('exist');
 	});
 
-	it('opens modals when clicking buttons', () => {
+	it('has a working Clerk integration', () => {
 		cy.findByText('Sign In').should('be.visible').click();
 		cy.contains('Sign in to Miata Registry').should('be.visible');
 		cy.get('body').click(0, 0);
+	});
 
+	it('opens modals when clicking buttons', () => {
 		cy.get('[data-cy="home-claim-your-miata"]').click();
 		cy.contains('Account Required').should('be.visible');
 		cy.contains('button', 'Cancel').click();

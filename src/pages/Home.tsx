@@ -108,6 +108,7 @@ export const Home = () => {
 							<Button
 								onClick={() => openModal('register')}
 								data-cy="home-claim-your-miata"
+								className="whitespace-nowrap"
 							>
 								Claim your Miata
 							</Button>
@@ -116,6 +117,7 @@ export const Home = () => {
 								variant="tertiary"
 								withArrow
 								href="/registry"
+								className="whitespace-nowrap"
 							>
 								View the registry
 							</Button>

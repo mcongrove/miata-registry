@@ -71,7 +71,39 @@ declare global {
 }
 
 beforeEach(() => {
-	cy.session('preserve-cookies', () => {
-		// Any authentication setup if needed
+	cy.intercept('*', (req) => {
+		req.on('response', (res) => {
+			if (res.statusCode === 403 || res.statusCode === 401) {
+				Cypress.log({
+					name: 'Network Error',
+					message: `Request to ${req.url} was blocked with status ${res.statusCode}`,
+					consoleProps: () => ({
+						'Request URL': req.url,
+						'Status Code': res.statusCode,
+						'Response Headers': res.headers,
+					}),
+				});
+			} else if (res.statusCode === 404) {
+				Cypress.log({
+					name: 'Network Error',
+					message: `Request to ${req.url} was not found`,
+					consoleProps: () => ({
+						'Request URL': req.url,
+						'Status Code': res.statusCode,
+						'Response Headers': res.headers,
+					}),
+				});
+			} else if (res.statusCode >= 400 && res.statusCode < 600) {
+				Cypress.log({
+					name: 'Network Error',
+					message: `Request to ${req.url} failed with status ${res.statusCode}`,
+					consoleProps: () => ({
+						'Request URL': req.url,
+						'Status Code': res.statusCode,
+						'Response Headers': res.headers,
+					}),
+				});
+			}
+		});
 	});
 });

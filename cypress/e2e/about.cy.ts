@@ -59,7 +59,7 @@ describe('About Page', () => {
 			message: 'This is a test message',
 		};
 
-		cy.intercept('POST', '/email/contact').as('contactSubmit');
+		cy.intercept('POST', '/email/contact').as('formContactRequest');
 
 		cy.get('[name="name"]').should('be.visible').type(formData.name);
 		cy.get('[name="email"]').type(formData.email);
@@ -67,7 +67,7 @@ describe('About Page', () => {
 
 		cy.contains('button', 'Send Message').click();
 
-		cy.wait('@contactSubmit').then((interception) => {
+		cy.wait('@formContactRequest').then((interception) => {
 			expect(interception.response?.statusCode).to.equal(200);
 
 			expect(interception.response?.body).to.deep.equal({
