@@ -105,7 +105,10 @@ export const Home = () => {
 						</div>
 
 						<div className="flex items-center gap-2 lg:gap-4 text-sm">
-							<Button onClick={() => openModal('register')}>
+							<Button
+								onClick={() => openModal('register')}
+								data-cy="home-claim-your-miata"
+							>
 								Claim your Miata
 							</Button>
 
@@ -419,6 +422,7 @@ export const Home = () => {
 							<Button
 								withArrow
 								onClick={() => openModal('register')}
+								data-cy="home-cta-register-your-miata"
 							>
 								Claim your Miata
 							</Button>
@@ -441,6 +445,7 @@ export const Home = () => {
 									withArrow
 									className="text-xs mt-2"
 									onClick={() => openModal('tip')}
+									data-cy="home-cta-submit-a-tip"
 								>
 									Submit a Tip
 								</Button>

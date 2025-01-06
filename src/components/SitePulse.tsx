@@ -58,7 +58,7 @@ export function SitePulse() {
 	}, []);
 
 	return (
-		<p
+		<div
 			className={twMerge(
 				'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
 				!lastActivity
@@ -83,6 +83,6 @@ export function SitePulse() {
 				: isActive
 					? `Site actively maintained as of ${lastActivity}`
 					: `Site not updated since ${lastActivity}`}
-		</p>
+		</div>
 	);
 }

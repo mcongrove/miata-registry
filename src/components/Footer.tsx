@@ -80,6 +80,7 @@ export const Footer = () => {
 									<Link
 										to="/registry"
 										className="text-brg-mid hover:text-brg-light transition-colors"
+										data-cy="footer-browse-the-cars"
 									>
 										Browse Cars
 									</Link>
@@ -96,6 +97,7 @@ export const Footer = () => {
 									<span
 										onClick={() => openModal('register')}
 										className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"
+										data-cy="footer-register-your-miata"
 									>
 										Register your Miata
 									</span>
@@ -104,6 +106,7 @@ export const Footer = () => {
 									<span
 										onClick={() => openModal('tip')}
 										className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"
+										data-cy="footer-submit-a-tip"
 									>
 										Register someone else's Miata
 									</span>

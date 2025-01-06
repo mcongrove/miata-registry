@@ -40,6 +40,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 						? 'text-brg font-medium'
 						: 'text-brg-mid hover:text-brg'
 				} transition-colors flex items-center gap-1`}
+				data-cy={`header-${label.toLowerCase()}`}
 			>
 				{label}
 
@@ -60,6 +61,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 								key={item.to}
 								to={item.to}
 								className={className}
+								data-cy={`header-${item.label?.toString().toLowerCase().replace(/\s+/g, '-')}`}
 							>
 								{item.label}
 							</Link>
@@ -68,6 +70,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 								key={index}
 								onClick={item.onClick}
 								className={className}
+								data-cy={`header-${item.label?.toString().toLowerCase().replace(/\s+/g, '-')}`}
 							>
 								{item.label}
 							</button>
