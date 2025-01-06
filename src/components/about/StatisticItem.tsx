@@ -46,7 +46,10 @@ export const StatisticItem = ({
 	}, [value]);
 
 	return (
-		<div className={twMerge('flex flex-col items-center gap-2', className)}>
+		<div
+			className={twMerge('flex flex-col items-center gap-2', className)}
+			data-cy={`stat-${label.toLowerCase().replace(/\s+/g, '-')}`}
+		>
 			{loading || !count ? (
 				<div className="h-12 w-16 bg-brg-light animate-pulse rounded" />
 			) : (

@@ -235,18 +235,22 @@ export const About = () => {
 							value={stats?.cars ?? 0}
 							label="Total Vehicles"
 						/>
+
 						<StatisticItem
 							value={stats?.claimedCars ?? 0}
 							label="Claimed Vehicles"
 						/>
+
 						<StatisticItem
 							value={stats?.editions ?? 0}
 							label="Limited Editions"
 						/>
+
 						<StatisticItem
 							value={stats?.countries ?? 0}
 							label="Countries Represented"
 						/>
+
 						<StatisticItem
 							value={Promise.resolve(commitCount)}
 							className="col-span-2 lg:col-span-1"
@@ -281,7 +285,7 @@ export const About = () => {
 								href="https://github.com/mcongrove/miata-registry"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="underline"
+								className="underline font-normal text-brg-mid"
 							>
 								GitHub repository
 							</a>
@@ -303,6 +307,7 @@ export const About = () => {
 								<span
 									className="underline cursor-pointer"
 									onClick={() => openModal('export')}
+									data-cy="about-data-export-link"
 								>
 									freely available for public inspection
 								</span>
@@ -373,7 +378,7 @@ export const About = () => {
 								href="https://github.com/mcongrove/miata-registry"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="underline"
+								className="underline font-normal text-brg-mid"
 							>
 								GitHub
 							</a>{' '}

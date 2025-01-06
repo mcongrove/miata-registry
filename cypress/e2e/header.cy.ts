@@ -1,3 +1,21 @@
+/**
+ * Miata Registry
+ * Copyright (C) 2024 Matthew Congrove
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 describe('Header', () => {
 	beforeEach(() => {
 		cy.visit('/');
@@ -15,11 +33,11 @@ describe('Header', () => {
 		cy.get('[data-cy="header-registry"]').realHover();
 		cy.get('[data-cy="header-register-your-miata"]').click();
 		cy.contains('Account Required').should('be.visible');
-		cy.contains('Cancel').click();
+		cy.contains('button', 'Cancel').click();
 
 		cy.get('[data-cy="header-registry"]').realHover();
 		cy.get('[data-cy="header-submit-a-tip"]').click();
 		cy.contains('Submit a Tip').should('be.visible');
-		cy.contains('Cancel').click();
+		cy.contains('button', 'Cancel').click();
 	});
 });
