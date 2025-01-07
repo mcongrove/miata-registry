@@ -184,12 +184,14 @@ export const CarProfile = () => {
 		}> = [];
 
 		// Add manufacture date
-		if (car.manufacture_date) {
-			chronology.push({
-				key: 'manufacture',
-				date: getYear(car.manufacture_date),
-			});
-		}
+		chronology.push({
+			key: 'manufacture',
+			date: getYear(
+				car.manufacture_date
+					? car.manufacture_date
+					: car.edition?.year.toString()
+			),
+		});
 
 		// Add shipping date
 		if (car.shipping_date) {
@@ -244,7 +246,8 @@ export const CarProfile = () => {
 		}> = [];
 
 		chronology.forEach((event, index) => {
-			if (index > 0) {
+			// Only calculate gaps after manufacture date if it has a value
+			if (index > 0 && chronology[0].date) {
 				const prevEvent = chronology[index - 1];
 				const prevEndDate = prevEvent.endDate || prevEvent.date;
 				const currentStartDate = event.date;
