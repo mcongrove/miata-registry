@@ -36,7 +36,7 @@ export const Card = ({ edition }: CardProps) => {
 					).replace(/%20/g, '+')}`}
 				>
 					<img
-						src={`https://store.miataregistry.com/${edition.image_car_id ? `car/${edition.image_car_id}` : `edition/${edition.id}`}.jpg`}
+						src={`https://store.miataregistry.com/edition/${edition.id}.jpg`}
 						alt={edition.name}
 						className="w-full h-full object-cover"
 						onError={(e) => {
