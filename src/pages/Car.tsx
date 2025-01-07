@@ -169,120 +169,207 @@ export const CarProfile = () => {
 	const timelineItems = useMemo(() => {
 		if (!car) return [];
 
-		const items = [];
+		const getYear = (date: string | null | undefined): number | null => {
+			if (!date) return null;
 
-		// Destroyed
-		if (car.destroyed) {
-			items.push({
-				name: 'Destroyed',
-				isDestroyed: true,
+			const year = new Date(date).getUTCFullYear();
+
+			return isNaN(year) ? null : year;
+		};
+
+		const chronology: Array<{
+			key: string;
+			date: number | null;
+			endDate?: number | null;
+		}> = [];
+
+		// Add manufacture date
+		if (car.manufacture_date) {
+			chronology.push({
+				key: 'manufacture',
+				date: getYear(car.manufacture_date),
 			});
 		}
 
-		// Owners
-		if (timelineOwners.length > 0) {
-			timelineOwners.forEach((owner: TCarOwner, index: number) => {
-				const startYear = owner.date_start
-					? new Date(owner.date_start).getUTCFullYear()
-					: '';
-				const endYear = owner.date_end
-					? new Date(owner.date_end).getUTCFullYear()
-					: '';
+		// Add shipping date
+		if (car.shipping_date) {
+			chronology.push({
+				key: 'shipping',
+				date: getYear(car.shipping_date),
+			});
+		}
 
-				items.push({
-					name: owner.name || 'Unknown',
-					dateRange:
-						!startYear && !endYear
-							? ''
-							: index === 0
-								? car.destroyed
-									? `${startYear || 'Unknown'} – ${endYear || 'Destruction'}`
-									: `${startYear || 'Unknown'} – Present`
-								: `${startYear || 'Unknown'} – ${endYear || 'Unknown'}`,
-					location: formatLocation({
-						city: owner.city,
-						state: owner.state,
-						country: owner.country || '',
-					}),
-					isActive: index === 0 && !car.destroyed && !endYear,
+		// Add sale date
+		if (car.sale_date) {
+			chronology.push({
+				key: 'sale',
+				date: getYear(car.sale_date),
+			});
+		}
+
+		// Add owner dates
+		timelineOwners
+			.slice()
+			.reverse()
+			.forEach((owner) => {
+				chronology.push({
+					key: `owner-${owner.id}`,
+					date: getYear(owner.date_start),
+					endDate: getYear(owner.date_end),
 				});
 			});
-		}
 
-		// Dealer
-		if (car.sale_dealer_country || car.sale_dealer_name) {
-			items.push({
-				name: (
-					<>
-						Sold{' '}
-						{car.sale_dealer_name && (
-							<span className="text-brg-border">
-								by {car.sale_dealer_name}
-							</span>
-						)}
-					</>
-				),
-				dateRange: toPrettyDate(car.sale_date || ''),
-				location: formatLocation({
-					city: car.sale_dealer_city || '',
-					state: car.sale_dealer_state || '',
-					country: car.sale_dealer_country || '',
-				}),
+		// Add destruction date if applicable
+		if (car.destroyed) {
+			chronology.push({
+				key: 'destroyed',
+				date: getYear(timelineOwners[0]?.date_end),
 			});
 		}
 
-		// Shipping
-		if (car.shipping_date || car.shipping_country || car.shipping_vessel) {
-			items.push({
-				name: car.shipping_vessel ? (
-					<>
-						Shipped{' '}
-						<span className="text-brg-border">
-							via {toTitleCase(car.shipping_vessel)}
-						</span>
-					</>
-				) : (
-					'Shipped'
-				),
-				dateRange: toPrettyDate(car.shipping_date || ''),
-				location: formatLocation({
-					city: car.shipping_city,
-					state: car.shipping_state,
-					country: car.shipping_country || '',
-				}),
-			});
-		}
+		// Sort chronologically
+		chronology.sort((a, b) => {
+			if (!a.date) return 1;
+			if (!b.date) return -1;
 
-		// Factory
-		if (vinDetails && manufactureLocation) {
-			items.push({
-				name: vinDetails?.Manufacturer ? (
-					<>
-						Built{' '}
-						<span className="text-brg-border">
-							by {toTitleCase(vinDetails.Manufacturer)}
-						</span>
-					</>
-				) : (
-					'Built'
-				),
-				dateRange: car.manufacture_date
-					? toPrettyDate(car.manufacture_date)
-					: car.edition?.year.toString(),
-				location: manufactureLocation,
-			});
-		}
+			return a.date - b.date;
+		});
 
-		// Find the last valid item to set showConnector=false
+		const items: Array<{
+			name: string | React.ReactNode;
+			dateRange?: string;
+			location?: string;
+			isActive?: boolean;
+			isDestroyed?: boolean;
+		}> = [];
+
+		chronology.forEach((event, index) => {
+			if (index > 0) {
+				const prevEvent = chronology[index - 1];
+				const prevEndDate = prevEvent.endDate || prevEvent.date;
+				const currentStartDate = event.date;
+
+				if (
+					prevEndDate &&
+					currentStartDate &&
+					currentStartDate - prevEndDate > 1
+				) {
+					items.push({
+						name: <span className="text-brg-border">Unknown</span>,
+						dateRange: `${prevEndDate} – ${currentStartDate}`,
+						isActive: false,
+					});
+				}
+			}
+
+			if (
+				event.key === 'manufacture' &&
+				vinDetails &&
+				manufactureLocation
+			) {
+				items.push({
+					name: (
+						<>
+							Built{' '}
+							{vinDetails?.Manufacturer && (
+								<span className="text-brg-border">
+									by {toTitleCase(vinDetails.Manufacturer)}
+								</span>
+							)}
+						</>
+					),
+					dateRange: car.manufacture_date
+						? toPrettyDate(car.manufacture_date)
+						: car.edition?.year.toString(),
+					location: manufactureLocation,
+				});
+			} else if (event.key === 'shipping') {
+				items.push({
+					name: (
+						<>
+							Shipped{' '}
+							{car.shipping_vessel && (
+								<span className="text-brg-border">
+									via {toTitleCase(car.shipping_vessel)}
+								</span>
+							)}
+						</>
+					),
+					dateRange: toPrettyDate(car.shipping_date || ''),
+					location: formatLocation({
+						city: car.shipping_city,
+						state: car.shipping_state,
+						country: car.shipping_country || '',
+					}),
+				});
+			} else if (event.key === 'sale') {
+				items.push({
+					name: (
+						<>
+							Sold{' '}
+							{car.sale_dealer_name && (
+								<span className="text-brg-border">
+									by {car.sale_dealer_name}
+								</span>
+							)}
+						</>
+					),
+					dateRange: toPrettyDate(car.sale_date || ''),
+					location: formatLocation({
+						city: car.sale_dealer_city || '',
+						state: car.sale_dealer_state || '',
+						country: car.sale_dealer_country || '',
+					}),
+				});
+			} else if (event.key.startsWith('owner-')) {
+				const owner = timelineOwners.find(
+					(o) => `owner-${o.id}` === event.key
+				);
+
+				if (owner) {
+					const index = timelineOwners.indexOf(owner);
+					const startYear = getYear(owner.date_start);
+					const endYear = getYear(owner.date_end);
+
+					items.push({
+						name: owner.name || (
+							<span className="text-brg-border">Unknown</span>
+						),
+						dateRange:
+							!startYear && !endYear
+								? ''
+								: index === 0
+									? car.destroyed
+										? `${startYear || 'Unknown'} – ${endYear || 'Destruction'}`
+										: `${startYear || 'Unknown'} – Present`
+									: `${startYear || 'Unknown'} – ${endYear || 'Unknown'}`,
+						location: formatLocation({
+							city: owner.city,
+							state: owner.state,
+							country: owner.country || '',
+						}),
+						isActive: index === 0 && !car.destroyed && !endYear,
+					});
+				}
+			} else if (event.key === 'destroyed') {
+				items.push({
+					name: 'Destroyed',
+					isDestroyed: true,
+				});
+			}
+		});
+
 		const lastValidIndex = items.length - 1;
 
-		return items.map((item, index) => (
-			<TimelineItem
-				key={index}
-				{...item}
-				showConnector={index !== lastValidIndex}
-			/>
-		));
+		return items
+			.reverse()
+			.map((item, index) => (
+				<TimelineItem
+					key={index}
+					{...item}
+					showConnector={index !== lastValidIndex}
+				/>
+			));
 	}, [car, timelineOwners, vinDetails, manufactureLocation]);
 
 	const mapLocations = useMemo(() => {

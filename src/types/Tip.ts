@@ -17,8 +17,9 @@
  */
 
 export const TipStatus = {
-	CONFIRMED: 'confirmed',
+	APPROVED: 'approved',
 	PENDING: 'pending',
+	REJECTED: 'rejected',
 } as const;
 
 export type TTipStatus = (typeof TipStatus)[keyof typeof TipStatus];

@@ -27,7 +27,9 @@ export const Tips = sqliteTable('tips', {
 	owner_location: text('owner_location'),
 	owner_name: text('owner_name'),
 	sequence: text('sequence'),
-	status: text('status', { enum: ['pending', 'confirmed'] })
+	status: text('status', {
+		enum: ['approved', 'pending', 'rejected'],
+	})
 		.notNull()
 		.default(TipStatus.PENDING),
 	updated_at: integer('updated_at'),
