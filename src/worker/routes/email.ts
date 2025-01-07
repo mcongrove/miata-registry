@@ -18,6 +18,8 @@
 
 import { Hono } from 'hono';
 import { Resend } from 'resend';
+import Single from '../../emails/templates/Single';
+import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
 const emailRouter = new Hono<{ Bindings: Bindings }>();
@@ -80,6 +82,35 @@ emailRouter.post('/sticker', async (c) => {
 		return c.json({ success: true });
 	} catch (error) {
 		console.error('Error sending sticker request email:', error);
+
+		return c.json(
+			{
+				error: 'Failed to send email',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
+emailRouter.post('/send', withAuth(), async (c) => {
+	try {
+		const resend = new Resend(c.env.RESEND_API_KEY);
+		const { to, subject, message } = await c.req.json();
+
+		await resend.emails.send({
+			from: 'Miata Registry <support@miataregistry.com>',
+			to,
+			subject,
+			react: Single({ subject, message }),
+		});
+
+		return c.json({ success: true });
+	} catch (error) {
+		console.error('Error sending email:', error);
 
 		return c.json(
 			{

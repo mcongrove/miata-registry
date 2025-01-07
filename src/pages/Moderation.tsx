@@ -20,6 +20,11 @@ import { useAuth, useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import { Button } from '../components/Button';
+import { ErrorBanner } from '../components/ErrorBanner';
+import { Field } from '../components/form/Field';
+import { TextField } from '../components/form/TextField';
+import { Modal } from '../components/Modal';
 import { Diff } from '../components/moderation/Diff';
 import { PendingItem } from '../components/moderation/PendingItem';
 import { Stats } from '../components/moderation/Stats';
@@ -66,6 +71,9 @@ export const Moderation = () => {
 			uploadedAt: string;
 		}[]
 	>([]);
+	const [showEmailModal, setShowEmailModal] = useState(false);
+	const [emailLoading, setEmailLoading] = useState(false);
+	const [emailError, setEmailError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (isLoaded && !user?.publicMetadata?.moderator) {
@@ -258,14 +266,73 @@ export const Moderation = () => {
 		}
 	};
 
+	const handleSendEmail = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		setEmailLoading(true);
+		setEmailError(null);
+
+		try {
+			const token = await getToken();
+
+			if (!token) return;
+
+			const form = document.getElementById('emailForm');
+
+			if (!form) {
+				throw new Error('Form not found');
+			}
+
+			const formData = new FormData(form as HTMLFormElement);
+
+			const response = await fetch(
+				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/email/send`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						to: formData.get('to'),
+						subject: formData.get('subject'),
+						message: formData.get('message'),
+					}),
+				}
+			);
+
+			if (!response.ok) {
+				const error = await response.json();
+				throw new Error(error.details || 'Failed to send email');
+			}
+
+			setShowEmailModal(false);
+		} catch (error) {
+			handleApiError(error);
+			setEmailError('Failed to send email. Please try again.');
+		} finally {
+			setEmailLoading(false);
+		}
+	};
+
 	return (
 		<main className="flex-1 pt-20">
 			<div className="container mx-auto p-8 lg:p-0 lg:py-8 min-h-[calc(100vh_-_80px)]">
 				<h1 className="flex justify-between items-center text-2xl lg:text-3xl font-bold mb-4">
-					Moderation Panel{' '}
-					<div className="w-60">
-						<Stats stats={stats} />
+					<div className="flex flex-col gap-3">
+						Moderation Panel{' '}
+						<div className="w-60">
+							<Stats stats={stats} />
+						</div>
 					</div>
+
+					<Button
+						onClick={() => setShowEmailModal(true)}
+						variant="secondary"
+						className="!px-2.5 !py-2"
+					>
+						<i className="fa-solid fa-fw fa-envelope text-white text-xl" />
+					</Button>
 				</h1>
 
 				<div className="w-fit flex mb-8 overflow-x-auto">
@@ -533,6 +600,66 @@ export const Moderation = () => {
 					</div>
 				)}
 			</div>
+
+			{showEmailModal && (
+				<Modal
+					isOpen={showEmailModal}
+					onClose={() => setShowEmailModal(false)}
+					title="Send Email"
+					action={{
+						text: 'Send',
+						onClick: () => {
+							const form = document.getElementById(
+								'emailForm'
+							) as HTMLFormElement;
+							form?.requestSubmit();
+						},
+						loading: emailLoading,
+					}}
+				>
+					<div className="flex flex-col gap-4">
+						<ErrorBanner
+							error={emailError}
+							onDismiss={() => setEmailError(null)}
+						/>
+
+						<form
+							id="emailForm"
+							onSubmit={handleSendEmail}
+							className="flex flex-col gap-4"
+						>
+							<Field id="to" label="To" required>
+								<TextField
+									id="to"
+									name="to"
+									type="email"
+									placeholder="email@example.com"
+									required
+								/>
+							</Field>
+
+							<Field id="subject" label="Subject" required>
+								<TextField
+									id="subject"
+									name="subject"
+									placeholder="Email subject"
+									required
+								/>
+							</Field>
+
+							<Field id="message" label="Message" required>
+								<TextField
+									id="message"
+									name="message"
+									type="textarea"
+									placeholder="Email message"
+									required
+								/>
+							</Field>
+						</form>
+					</div>
+				</Modal>
+			)}
 		</main>
 	);
 };
