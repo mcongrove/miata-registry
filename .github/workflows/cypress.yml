@@ -1,0 +1,39 @@
+name: Run Cypress Tests
+
+on:
+    workflow_run:
+        workflows: ['Deploy Worker']
+        types:
+            - completed
+        branches:
+            - main
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        steps:
+            - name: Wait for deployment
+              run: sleep 90
+
+            - name: Run Cypress tests
+              id: cypress
+              run: npx cypress run --config-file cypress.config.js --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+              continue-on-error: true
+
+            - name: Send email notification on failure
+              if: steps.cypress.outcome == 'failure'
+              run: |
+                  curl -X POST 'https://api.resend.com/emails' \
+                  -H 'Authorization: Bearer ${{ secrets.RESEND_API_KEY }}' \
+                  -H 'Content-Type: application/json' \
+                  -d '{
+                    "from": "Cypress Tests <support@miataregistry.com>",
+                    "to": ["mattcongrove@gmail.com"],
+                    "subject": "❌ Cypress Tests Failed",
+                    "text": "Cypress tests failed in the deployment workflow."
+                  }'
+
+            - name: Exit with Cypress status
+              if: steps.cypress.outcome == 'failure'
+              run: exit 1
