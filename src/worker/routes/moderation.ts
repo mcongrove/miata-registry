@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { and, count, eq } from 'drizzle-orm';
+import { and, count, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { Resend } from 'resend';
 import { createDb } from '../../db';
@@ -222,8 +222,32 @@ moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 		const db = createDb(c.env.DB);
 
 		const pendingCar = await db
-			.select()
+			.select({
+				car_id: CarsPending.car_id,
+				created_at: CarsPending.created_at,
+				current_owner_id: CarsPending.current_owner_id,
+				destroyed: CarsPending.destroyed,
+				edition_id: CarsPending.edition_id,
+				id: CarsPending.id,
+				manufacture_date: CarsPending.manufacture_date,
+				sale_date: CarsPending.sale_date,
+				sale_dealer_city: CarsPending.sale_dealer_city,
+				sale_dealer_country: CarsPending.sale_dealer_country,
+				sale_dealer_name: CarsPending.sale_dealer_name,
+				sale_dealer_state: CarsPending.sale_dealer_state,
+				sale_msrp: CarsPending.sale_msrp,
+				sequence: CarsPending.sequence,
+				shipping_city: CarsPending.shipping_city,
+				shipping_country: CarsPending.shipping_country,
+				shipping_date: CarsPending.shipping_date,
+				shipping_state: CarsPending.shipping_state,
+				shipping_vessel: CarsPending.shipping_vessel,
+				status: CarsPending.status,
+				vin: CarsPending.vin,
+				user_id: Owners.user_id,
+			})
 			.from(CarsPending)
+			.leftJoin(Owners, eq(CarsPending.current_owner_id, Owners.id))
 			.where(eq(CarsPending.id, id))
 			.limit(1);
 
@@ -238,6 +262,7 @@ moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 			id: pendingId,
 			status,
 			car_id,
+			user_id,
 			...carUpdateData
 		} = car;
 
@@ -264,19 +289,23 @@ moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
 		await c.env.CACHE.delete(`cars:details:${car.car_id}`);
 		await c.env.CACHE.delete(`cars:summary:${car.car_id}`);
 
-		const primaryEmail = user.emailAddresses.find(
-			(email) => email.id === user.primaryEmailAddressId
-		);
+		if (user_id) {
+			const requestingUser = await c.get('clerk').users.getUser(user_id);
 
-		if (primaryEmail) {
-			const resend = new Resend(c.env.RESEND_API_KEY);
+			const primaryEmail = requestingUser.emailAddresses.find(
+				(email) => email.id === requestingUser.primaryEmailAddressId
+			);
 
-			await resend.emails.send({
-				from: 'Miata Registry <no-reply@miataregistry.com>',
-				to: primaryEmail.emailAddress,
-				subject: 'Welcome to Miata Registry!',
-				react: ApprovedCar(),
-			});
+			if (primaryEmail) {
+				const resend = new Resend(c.env.RESEND_API_KEY);
+
+				await resend.emails.send({
+					from: 'Miata Registry <no-reply@miataregistry.com>',
+					to: primaryEmail.emailAddress,
+					subject: 'Miata Registry: Car update approved',
+					react: ApprovedCar(),
+				});
+			}
 		}
 
 		return c.json({ success: true });
@@ -308,8 +337,19 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 		const db = createDb(c.env.DB);
 
 		const pendingCarOwner = await db
-			.select()
+			.select({
+				car_id: CarOwnersPending.car_id,
+				created_at: CarOwnersPending.created_at,
+				date_end: CarOwnersPending.date_end,
+				date_start: CarOwnersPending.date_start,
+				id: CarOwnersPending.id,
+				information: CarOwnersPending.information,
+				owner_id: CarOwnersPending.owner_id,
+				status: CarOwnersPending.status,
+				user_id: Owners.user_id,
+			})
 			.from(CarOwnersPending)
+			.leftJoin(Owners, eq(CarOwnersPending.owner_id, Owners.id))
 			.where(eq(CarOwnersPending.id, id))
 			.limit(1);
 
@@ -323,6 +363,7 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 			created_at,
 			id: pendingId,
 			status,
+			user_id,
 			...carOwnerUpdateData
 		} = carOwner;
 
@@ -348,7 +389,22 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 					)
 				);
 		} else {
-			return c.json({ error: 'Not found' }, 404);
+			await db
+				.update(CarOwners)
+				.set({ date_end: carOwner.date_start })
+				.where(
+					and(
+						eq(CarOwners.car_id, carOwner.car_id),
+						sql`${CarOwners.date_end} IS NULL`
+					)
+				);
+
+			await db.insert(CarOwners).values(carOwnerUpdateData);
+
+			await db
+				.update(Cars)
+				.set({ current_owner_id: carOwner.owner_id })
+				.where(eq(Cars.id, carOwner.car_id));
 		}
 
 		await db
@@ -359,19 +415,23 @@ moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
 		await c.env.CACHE.delete(`cars:details:${carOwner.car_id}`);
 		await c.env.CACHE.delete(`cars:summary:${carOwner.car_id}`);
 
-		const primaryEmail = user.emailAddresses.find(
-			(email) => email.id === user.primaryEmailAddressId
-		);
+		if (user_id) {
+			const requestingUser = await c.get('clerk').users.getUser(user_id);
 
-		if (primaryEmail) {
-			const resend = new Resend(c.env.RESEND_API_KEY);
+			const primaryEmail = requestingUser.emailAddresses.find(
+				(email) => email.id === requestingUser.primaryEmailAddressId
+			);
 
-			await resend.emails.send({
-				from: 'Miata Registry <no-reply@miataregistry.com>',
-				to: primaryEmail.emailAddress,
-				subject: 'Welcome to Miata Registry!',
-				react: ApprovedOwner(),
-			});
+			if (primaryEmail) {
+				const resend = new Resend(c.env.RESEND_API_KEY);
+
+				await resend.emails.send({
+					from: 'Miata Registry <no-reply@miataregistry.com>',
+					to: primaryEmail.emailAddress,
+					subject: 'Miata Registry: Ownership update approved',
+					react: ApprovedOwner(),
+				});
+			}
 		}
 
 		return c.json({ success: true });
@@ -421,21 +481,6 @@ moderationRouter.post('/owner/:id/approve', withAuth(), async (c) => {
 			.update(OwnersPending)
 			.set({ status: 'approved' })
 			.where(eq(OwnersPending.id, id));
-
-		const primaryEmail = user.emailAddresses.find(
-			(email) => email.id === user.primaryEmailAddressId
-		);
-
-		if (primaryEmail) {
-			const resend = new Resend(c.env.RESEND_API_KEY);
-
-			await resend.emails.send({
-				from: 'Miata Registry <no-reply@miataregistry.com>',
-				to: primaryEmail.emailAddress,
-				subject: 'Welcome to Miata Registry!',
-				react: ApprovedOwner(),
-			});
-		}
 
 		return c.json({ success: true });
 	} catch (error) {

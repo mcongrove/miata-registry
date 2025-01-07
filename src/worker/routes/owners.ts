@@ -288,7 +288,7 @@ ownersRouter.post('/', withAuth(), async (c) => {
 		await resend.emails.send({
 			from: 'Miata Registry <support@miataregistry.com>',
 			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: Owner ChangeRequest',
+			subject: 'Miata Registry: Owner Change Request',
 			html: `
 				<h2>Owner Change Request</h2>
 				<p><strong>Owner ID:</strong> ${ownerId}</p>
