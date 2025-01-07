@@ -265,7 +265,8 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						<h2 className="text-2xl font-bold mb-2">Thank You!</h2>
 
 						<p className="text-brg-mid mb-2">
-							Your information has been submitted successfully.
+							Your information has been submitted and will be
+							reviewed by the Miata Registry team.
 						</p>
 
 						<p className="text-brg-mid">

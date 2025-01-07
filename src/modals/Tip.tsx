@@ -71,10 +71,23 @@ export function Tip({
 
 		try {
 			const form = document.querySelector('form#tipForm');
-
 			if (!form) return;
 
 			const formData = new FormData(form as HTMLFormElement);
+			const sequence = formData.get('sequence');
+			const vin = formData.get('vin');
+			const ownerName = formData.get('owner_name');
+			const ownerLocation = formData.get('owner_location');
+
+			if (!sequence && !vin) {
+				setFormError('Please provide either a sequence number or VIN');
+				return;
+			}
+
+			if (!ownerName && !ownerLocation) {
+				setFormError('Please provide either an owner name or location');
+				return;
+			}
 
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
@@ -86,14 +99,17 @@ export function Tip({
 
 			if (!response.ok) {
 				const error = await response.json();
-
 				throw new Error(error.details || 'Failed to submit tip');
 			}
 
 			setIsSuccess(true);
 		} catch (error) {
 			handleApiError(error);
-			setFormError('Failed to submit form. Please try again.');
+			setFormError(
+				error instanceof Error
+					? error.message
+					: 'Failed to submit form. Please try again.'
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -239,52 +255,68 @@ export function Tip({
 								)}
 							</Field>
 
-							<div className="flex justify-between gap-4">
-								<Field
-									id="sequence"
-									label="Sequence #"
-									className="w-32"
-								>
-									<TextField
+							<div className="flex flex-col gap-2">
+								<div className="flex justify-between gap-4">
+									<Field
 										id="sequence"
-										name="sequence"
-										placeholder="182"
-									/>
-								</Field>
+										label="Sequence #"
+										className="w-32"
+									>
+										<TextField
+											id="sequence"
+											name="sequence"
+											placeholder="182"
+										/>
+									</Field>
 
-								<Field id="vin" label="VIN" className="w-full">
-									<TextField
+									<Field
 										id="vin"
-										name="vin"
-										placeholder="JM1NA3510M1221538"
-									/>
-								</Field>
+										label="VIN"
+										className="w-full"
+									>
+										<TextField
+											id="vin"
+											name="vin"
+											placeholder="JM1NA3510M1221538"
+										/>
+									</Field>
+								</div>
+
+								<span className="text-xs text-brg-border font-normal">
+									Either a sequence number or VIN is required
+								</span>
 							</div>
 
-							<div className="flex justify-between gap-4">
-								<Field
-									id="owner_name"
-									label="Owner Name"
-									className="w-64"
-								>
-									<TextField
+							<div className="flex flex-col gap-2">
+								<div className="flex justify-between gap-4">
+									<Field
 										id="owner_name"
-										name="owner_name"
-										placeholder="John Doe"
-									/>
-								</Field>
+										label="Owner Name"
+										className="w-64"
+									>
+										<TextField
+											id="owner_name"
+											name="owner_name"
+											placeholder="John Doe"
+										/>
+									</Field>
 
-								<Field
-									id="owner_location"
-									label="Location"
-									className="w-full"
-								>
-									<Location
+									<Field
 										id="owner_location"
-										name="owner_location"
-										placeholder="City, Country"
-									/>
-								</Field>
+										label="Location"
+										className="w-full"
+									>
+										<Location
+											id="owner_location"
+											name="owner_location"
+											placeholder="City, Country"
+										/>
+									</Field>
+								</div>
+
+								<span className="text-xs text-brg-border font-normal">
+									Either an owner name or location is required
+								</span>
 							</div>
 
 							<Field
