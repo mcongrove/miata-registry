@@ -21,6 +21,7 @@ import ReactMarkdown from 'react-markdown';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { handleApiError } from '../utils/common';
 
 interface NewsArticle {
 	body: string;
@@ -50,9 +51,13 @@ export const NewsArticle = () => {
 
 				const data = await response.json();
 
+				if (data.error) {
+					throw new Error(data.error);
+				}
+
 				setArticle(data);
 			} catch (error) {
-				console.error('Error fetching article:', error);
+				handleApiError(error);
 			} finally {
 				setIsLoading(false);
 			}
