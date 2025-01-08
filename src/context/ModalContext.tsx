@@ -37,11 +37,6 @@ const MODAL_COMPONENTS = {
 			default: module.Export,
 		}))
 	),
-	news: lazy(() =>
-		import('../modals/News').then((module) => ({
-			default: module.News,
-		}))
-	),
 	qrCode: lazy(() =>
 		import('../modals/QrCode').then((module) => ({
 			default: module.QrCode,
