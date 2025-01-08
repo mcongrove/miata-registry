@@ -55,6 +55,16 @@ const Moderation = lazy(() =>
 	}))
 );
 
+const News = lazy(() =>
+	import('./pages/News').then((module) => ({ default: module.News }))
+);
+
+const NewsArticle = lazy(() =>
+	import('./pages/NewsArticle').then((module) => ({
+		default: module.NewsArticle,
+	}))
+);
+
 const Rarity = lazy(() =>
 	import('./pages/Rarity').then((module) => ({ default: module.Rarity }))
 );
@@ -133,6 +143,22 @@ function App() {
 									element={
 										<Suspense fallback={<Fallback />}>
 											<Moderation />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/news"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<News />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/news/:id"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<NewsArticle />
 										</Suspense>
 									}
 								/>

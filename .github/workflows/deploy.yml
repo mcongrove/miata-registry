@@ -1,4 +1,4 @@
-name: Deploy Worker
+name: Deploy Worker and Run Cypress Tests
 
 on:
     push:
@@ -29,3 +29,28 @@ jobs:
                   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
               run: npm run worker:deploy
+
+            - name: Wait for deployment
+              run: sleep 90
+
+            - name: Run Cypress tests
+              id: cypress
+              run: npx cypress run --config-file cypress.config.js --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+              continue-on-error: true
+
+            - name: Send email notification on failure
+              if: steps.cypress.outcome == 'failure'
+              run: |
+                  curl -X POST 'https://api.resend.com/emails' \
+                  -H 'Authorization: Bearer ${{ secrets.RESEND_API_KEY }}' \
+                  -H 'Content-Type: application/json' \
+                  -d '{
+                    "from": "Cypress Tests <support@miataregistry.com>",
+                    "to": ["mattcongrove@gmail.com"],
+                    "subject": "❌ Cypress Tests Failed",
+                    "text": "Cypress tests failed in the deployment workflow.\n\nView the test results here: https://cloud.cypress.io/projects/ygesqc/runs/${{ env.CYPRESS_RUN_ID }}"
+                  }'
+
+            - name: Exit with Cypress status
+              if: steps.cypress.outcome == 'failure'
+              run: exit 1

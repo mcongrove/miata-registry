@@ -17,6 +17,7 @@
  */
 
 import { lazy, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from '../components/Button';
 import { Credit } from '../components/Credit';
@@ -33,10 +34,8 @@ export const Home = () => {
 	const { openModal } = useModal();
 	const [isLoading, setIsLoading] = useState(true);
 	const [featuredNews, setFeaturedNews] = useState<{
-		title: string;
+		id: string;
 		title_short: string;
-		body: string;
-		created_at: number;
 	} | null>(null);
 
 	usePageMeta({
@@ -76,19 +75,15 @@ export const Home = () => {
 							<div className="hidden md:block w-64 h-[38px] rounded-full bg-brg-border/30 animate-pulse" />
 						) : (
 							featuredNews && (
-								<div
-									className="hidden md:inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2 cursor-pointer"
-									onClick={() =>
-										openModal('news', {
-											news: featuredNews,
-										})
-									}
+								<Link
+									to={`/news/${featuredNews.id}`}
+									className="hidden md:inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2"
 								>
 									<span>{featuredNews.title_short}</span>
 									<span className="text-brg font-medium">
 										Read more →
 									</span>
-								</div>
+								</Link>
 							)
 						)}
 

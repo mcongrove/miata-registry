@@ -24,6 +24,7 @@ export const News = sqliteTable('news', {
 	featured: integer('featured').notNull().default(0),
 	id: text('id').primaryKey(),
 	published: integer('published').notNull().default(0),
+	slug: text('slug').unique(),
 	title_short: text('title_short').notNull(),
 	title: text('title').notNull(),
 });

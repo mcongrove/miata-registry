@@ -139,6 +139,7 @@ export const Header = () => {
 				<Dropdown
 					label="About"
 					items={[
+						{ label: 'News & Updates', to: '/news' },
 						{ label: 'About the Registry', to: '/about' },
 						{
 							label: (
