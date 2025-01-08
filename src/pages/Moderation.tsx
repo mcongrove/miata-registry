@@ -315,6 +315,34 @@ export const Moderation = () => {
 		}
 	};
 
+	const openEmailModal = (type?: 'rejection') => {
+		setShowEmailModal(true);
+
+		if (type === 'rejection') {
+			setTimeout(() => {
+				const form = document.getElementById(
+					'emailForm'
+				) as HTMLFormElement;
+
+				if (form) {
+					const subjectField = form.querySelector(
+						'[name="subject"]'
+					) as HTMLInputElement;
+
+					const messageField = form.querySelector(
+						'[name="message"]'
+					) as HTMLTextAreaElement;
+
+					if (subjectField) subjectField.value = 'Your Submission';
+
+					if (messageField)
+						messageField.value =
+							"Thank you for your submission to the Miata Registry. We truly appreciate your interest and the time you took to share your Miata with us.\n\nAt present, our registry is focused specifically on Miatas that were produced by Mazda in capped quantities during their original production runs. While your Miata is certainly special, it doesn't fall into this specific category of limited edition vehicles.\n\nWe are keeping record of all submissions, as we hope to expand the scope of our registry in the future to include other Miatas. When that time comes, we would be delighted to revisit your submission. Please continue to enjoy and preserve your Miata, and don't hesitate to submit again if you acquire a limited edition model in the future.\n\nIf you think this decision was made in error, please reply to this email and we will be happy to review your submission again; sending documentation such as photos or original sales paperwork to support your claim is helpful.";
+				}
+			}, 100);
+		}
+	};
+
 	return (
 		<main className="flex-1 pt-20">
 			<div className="container mx-auto p-8 lg:p-0 lg:py-8 min-h-[calc(100vh_-_80px)]">
@@ -326,13 +354,23 @@ export const Moderation = () => {
 						</div>
 					</div>
 
-					<Button
-						onClick={() => setShowEmailModal(true)}
-						variant="secondary"
-						className="!px-2.5 !py-2"
-					>
-						<i className="fa-solid fa-fw fa-envelope text-white text-xl" />
-					</Button>
+					<div className="flex gap-2">
+						<Button
+							onClick={() => openEmailModal()}
+							variant="secondary"
+							className="!px-2.5 !py-2"
+						>
+							<i className="fa-solid fa-fw fa-envelope text-white text-xl"></i>
+						</Button>
+
+						<Button
+							onClick={() => openEmailModal('rejection')}
+							variant="secondary"
+							className="!px-2.5 !py-2 !bg-red-800"
+						>
+							<i className="fa-solid fa-fw fa-envelope text-white text-xl" />
+						</Button>
+					</div>
 				</h1>
 
 				<div className="w-fit flex mb-8 overflow-x-auto">
