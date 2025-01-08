@@ -8,6 +8,10 @@
 	}
 }
 
+select {
+	@apply !rounded-lg;
+}
+
 .cl-modalBackdrop,
 .cl-modalContent {
 	z-index: 999 !important;

@@ -54,6 +54,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const [existingOwner, setExistingOwner] = useState<TOwner | null>(null);
 	const [formDataLoading, setFormDataLoading] = useState(false);
 	const prefilledData = props?.prefilledData;
+	const [selectedEdition, setSelectedEdition] = useState<string>('');
 
 	useEffect(() => {
 		const loadEditions = async () => {
@@ -321,49 +322,81 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						{!prefilledData?.id && (
 							<Field id="edition_name" label="Edition" required>
 								{!showOtherInput ? (
-									<select
-										className={SelectStyles(
-											false,
-											'w-full border-brg-light text-sm'
-										)}
-										name="edition_name"
-										required
-										onChange={(e) => {
-											if (e.target.value === 'other') {
-												setShowOtherInput(true);
-											}
-										}}
-										defaultValue=""
-									>
-										<option value="" disabled>
-											Select an edition
-										</option>
-										{editions.map((edition) => (
-											<option
-												key={edition.name}
-												value={edition.name}
-											>
-												{edition.name}
-											</option>
-										))}
-										<option value="other">Other</option>
-									</select>
-								) : (
-									<div className="flex items-center gap-2">
-										<TextField
-											id="edition_name"
+									<>
+										<select
+											className={SelectStyles(
+												false,
+												'w-full border-brg-light text-sm'
+											)}
 											name="edition_name"
-											placeholder="1992 M2-1002 Roadster"
 											required
-										/>
+											onChange={(e) => {
+												if (
+													e.target.value === 'other'
+												) {
+													setShowOtherInput(true);
+												}
 
-										<i
-											className="fa-solid fa-times text-brg-mid cursor-pointer"
-											onClick={() =>
-												setShowOtherInput(false)
-											}
-										/>
-									</div>
+												setSelectedEdition(
+													e.target.value
+												);
+											}}
+											defaultValue=""
+										>
+											<option value="" disabled>
+												Select an edition
+											</option>
+											{editions.map((edition) => (
+												<option
+													key={edition.name}
+													value={edition.name}
+												>
+													{edition.name}
+												</option>
+											))}
+											<option value="other">Other</option>
+										</select>
+
+										{selectedEdition ===
+											'1990 Color Test Cars' && (
+											<ErrorBanner
+												className="p-2 mt-1"
+												error={
+													<span className="flex flex-col gap-0.5">
+														No, it probably isn't.
+														<span className="text-xs opacity-60">
+															There were only 6
+															produced.
+														</span>
+													</span>
+												}
+											/>
+										)}
+									</>
+								) : (
+									<>
+										<div className="flex items-center gap-2">
+											<TextField
+												id="edition_name"
+												name="edition_name"
+												placeholder="1992 M2-1002 Roadster"
+												required
+											/>
+
+											<i
+												className="fa-solid fa-times text-brg-mid cursor-pointer"
+												onClick={() =>
+													setShowOtherInput(false)
+												}
+											/>
+										</div>
+
+										<span className="text-xs text-brg-border mt-1">
+											Only Miatas produced in limited
+											quantities are eligible for the
+											Registry.
+										</span>
+									</>
 								)}
 							</Field>
 						)}

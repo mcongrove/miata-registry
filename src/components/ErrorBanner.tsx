@@ -17,13 +17,15 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface ErrorBannerProps {
+	className?: string;
 	error: string | null;
 	onDismiss?: () => void;
 }
 
-export function ErrorBanner({ error, onDismiss }: ErrorBannerProps) {
+export function ErrorBanner({ className, error, onDismiss }: ErrorBannerProps) {
 	const bannerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -40,7 +42,10 @@ export function ErrorBanner({ error, onDismiss }: ErrorBannerProps) {
 	return (
 		<div
 			ref={bannerRef}
-			className="w-full p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700"
+			className={twMerge(
+				'w-full p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700',
+				className
+			)}
 		>
 			<div className="flex justify-between items-center">
 				<span>{error}</span>
