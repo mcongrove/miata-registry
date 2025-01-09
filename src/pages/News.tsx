@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { handleApiError } from '../utils/common';
 
 interface NewsArticle {
 	created_at: number;
@@ -51,7 +52,7 @@ export const News = () => {
 
 				setNews(data);
 			} catch (error) {
-				console.error('Error fetching news:', error);
+				handleApiError(error);
 			} finally {
 				setIsLoading(false);
 			}
@@ -92,7 +93,7 @@ export const News = () => {
 								to={`/news/${article.id}`}
 								className="flex flex-col gap-6 group"
 							>
-								<div className="md:aspect-video rounded-xl overflow-hidden bg-brg-light border border-brg-border/40 h-60">
+								<div className="h-60 md:aspect-video rounded-xl overflow-hidden bg-brg-light">
 									<img
 										src={`https://store.miataregistry.com/news/${article.id}.jpg`}
 										alt={article.title}
@@ -111,7 +112,7 @@ export const News = () => {
 										})}
 									</div>
 
-									<h2 className="text-lg font-medium text-brg group-hover:text-brg-dark line-clamp-2">
+									<h2 className="text-lg leading-snug font-medium text-brg group-hover:text-brg-dark line-clamp-2">
 										{article.title}
 									</h2>
 

@@ -59,12 +59,9 @@ newsRouter.get('/', async (c) => {
 			.orderBy(desc(News.created_at));
 
 		const newsWithExcerpt = news.map((item) => {
-			const nextSpace = item.body.indexOf('.', 175);
-			const cutoff = nextSpace > 175 ? nextSpace : 175;
-
 			return {
 				...item,
-				excerpt: item.body.slice(0, cutoff) + '...',
+				excerpt: item.body.split('\n')[0] + '...',
 				body: undefined,
 			};
 		});
@@ -165,16 +162,8 @@ newsRouter.get('/:id', async (c) => {
 			return c.json({ error: 'News article not found' }, 404);
 		}
 
-		const nextSpace = news.body.indexOf('.', 175);
-		const cutoff = nextSpace > 175 ? nextSpace : 175;
-
-		const newsWithExcerpt = {
-			...news,
-			excerpt: news.body.slice(0, cutoff) + '...',
-		};
-
 		if (!isDev) {
-			await c.env.CACHE.put(cacheKey, JSON.stringify(newsWithExcerpt), {
+			await c.env.CACHE.put(cacheKey, JSON.stringify(news), {
 				expirationTtl: CACHE_TTL.NEWS_DETAIL,
 			});
 		}

@@ -141,7 +141,7 @@ export const NewsArticle = () => {
 						</ReactMarkdown>
 					</div>
 
-					<div className="aspect-video rounded-xl overflow-hidden bg-brg-light border border-brg-border/40">
+					<div className="aspect-video rounded-xl overflow-hidden bg-brg-light">
 						<img
 							src={`https://store.miataregistry.com/news/${article.id}.jpg`}
 							alt={article.title}
