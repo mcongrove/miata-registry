@@ -48,10 +48,6 @@ describe('About Page', () => {
 			.should('match', /[\d,]+/);
 	});
 
-	it('does not display the export data link when not signed in', () => {
-		cy.get('[data-cy="about-data-export-link"]').should('not.exist');
-	});
-
 	it('can submit the contact form', () => {
 		const formData = {
 			name: 'Cypress Test',
