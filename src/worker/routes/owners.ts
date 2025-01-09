@@ -16,13 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { Resend } from 'resend';
 import { createDb } from '../../db';
 import {
 	CarOwnersPending,
 	Cars,
+	CarsPending,
 	Editions,
 	Owners,
 	OwnersPending,
@@ -149,6 +150,94 @@ ownersRouter.get('/:id', withAuth(), async (c) => {
 	}
 });
 
+ownersRouter.get('/:id/pending', withAuth(), async (c) => {
+	try {
+		const userId = c.get('userId');
+		const ownerUserId = c.req.param('id');
+
+		if (userId !== ownerUserId) {
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				403
+			);
+		}
+
+		const db = createDb(c.env.DB);
+
+		const owner = await db
+			.select({ id: Owners.id })
+			.from(Owners)
+			.where(eq(Owners.user_id, ownerUserId))
+			.limit(1);
+
+		if (!owner.length) {
+			return c.json(null);
+		}
+
+		const ownerId = owner[0].id;
+
+		const pendingCars = await db
+			.select({
+				id: CarsPending.car_id,
+				created_at: CarsPending.created_at,
+				vin: CarsPending.vin,
+				edition_name: sql<
+					string | null
+				>`COALESCE(${Editions.year}, '') || ' ' || COALESCE(${Editions.name}, '')`,
+			})
+			.from(CarsPending)
+			.leftJoin(Editions, eq(CarsPending.edition_id, Editions.id))
+			.where(
+				and(
+					eq(CarsPending.status, 'pending'),
+					eq(CarsPending.current_owner_id, ownerId)
+				)
+			);
+
+		const pendingCarOwners = await db
+			.select({
+				id: CarOwnersPending.id,
+				car_id: CarOwnersPending.car_id,
+				created_at: CarOwnersPending.created_at,
+				vin: Cars.vin,
+				edition_name: sql<
+					string | null
+				>`COALESCE(${Editions.year}, '') || ' ' || COALESCE(${Editions.name}, '')`,
+			})
+			.from(CarOwnersPending)
+			.innerJoin(Cars, eq(CarOwnersPending.car_id, Cars.id))
+			.innerJoin(Editions, eq(Cars.edition_id, Editions.id))
+			.where(
+				and(
+					eq(CarOwnersPending.status, 'pending'),
+					eq(CarOwnersPending.owner_id, ownerId)
+				)
+			);
+
+		return c.json({
+			cars: pendingCars,
+			carOwners: pendingCarOwners,
+			owners: [],
+		});
+	} catch (error) {
+		console.error('Error fetching pending changes:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
 ownersRouter.patch('/:id', withAuth(), async (c) => {
 	try {
 		const userId = c.get('userId');
@@ -240,7 +329,7 @@ ownersRouter.post('/', withAuth(), async (c) => {
 				.values({
 					city: body.owner_city || null,
 					country: body.owner_country || null,
-					created_at: Date.now(),
+					created_at: Math.floor(Date.now() / 1000),
 					id: crypto.randomUUID(),
 					name: body.owner_name,
 					state: body.owner_state || null,
@@ -253,7 +342,7 @@ ownersRouter.post('/', withAuth(), async (c) => {
 
 			await db.insert(CarOwnersPending).values({
 				car_id: body.car_id,
-				created_at: Date.now(),
+				created_at: Math.floor(Date.now() / 1000),
 				date_start: `${body.owner_date_start}T00:00:00.000Z`,
 				id: crypto.randomUUID(),
 				information: body.information || null,
@@ -274,7 +363,7 @@ ownersRouter.post('/', withAuth(), async (c) => {
 		} else {
 			await db.insert(CarOwnersPending).values({
 				car_id: body.car_id,
-				created_at: Date.now(),
+				created_at: Math.floor(Date.now() / 1000),
 				date_start: `${body.owner_date_start}T00:00:00.000Z`,
 				id: crypto.randomUUID(),
 				information: body.information || null,

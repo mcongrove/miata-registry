@@ -26,6 +26,7 @@ import { Cars } from '../../db/schema/Cars';
 import { CarsPending } from '../../db/schema/CarsPending';
 import { Owners } from '../../db/schema/Owners';
 import { OwnersPending } from '../../db/schema/OwnersPending';
+import { Tips } from '../../db/schema/Tips';
 import ApprovedCar from '../../emails/templates/ApprovedCar';
 import ApprovedOwner from '../../emails/templates/ApprovedOwner';
 import { TModerationStats } from '../../types/Common';
@@ -34,7 +35,20 @@ import { Bindings } from '../types';
 
 const moderationRouter = new Hono<{ Bindings: Bindings }>();
 
-moderationRouter.get('/cars', withAuth(), async (c) => {
+const withModerator = () => async (c: any, next: any) => {
+	const isModerator = await c
+		.get('clerk')
+		.users.getUser(c.get('userId'))
+		.then((user: any) => user.publicMetadata?.moderator);
+
+	if (!isModerator) {
+		return c.json({ error: 'Unauthorized' }, 403);
+	}
+
+	await next();
+};
+
+moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 
@@ -82,7 +96,7 @@ moderationRouter.get('/cars', withAuth(), async (c) => {
 	}
 });
 
-moderationRouter.get('/carOwners', withAuth(), async (c) => {
+moderationRouter.get('/carOwners', withAuth(), withModerator(), async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 
@@ -130,7 +144,7 @@ moderationRouter.get('/carOwners', withAuth(), async (c) => {
 	}
 });
 
-moderationRouter.get('/owners', withAuth(), async (c) => {
+moderationRouter.get('/owners', withAuth(), withModerator(), async (c) => {
 	try {
 		const db = createDb(c.env.DB);
 
@@ -167,16 +181,7 @@ moderationRouter.get('/owners', withAuth(), async (c) => {
 	}
 });
 
-moderationRouter.get('/photo', withAuth(), async (c) => {
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
-
-	if (!isModerator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
-
+moderationRouter.get('/photo', withAuth(), withModerator(), async (c) => {
 	try {
 		const pendingPhotos = await c.env.IMAGES.list({
 			prefix: 'car-pending/',
@@ -210,478 +215,472 @@ moderationRouter.get('/photo', withAuth(), async (c) => {
 	}
 });
 
-moderationRouter.post('/car/:id/approve', withAuth(), async (c) => {
-	const { id } = c.req.param();
-	const user = await c.get('clerk').users.getUser(c.get('userId'));
+moderationRouter.post(
+	'/car/:id/approve',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
 
-	if (!user.publicMetadata?.moderator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
+		try {
+			const db = createDb(c.env.DB);
 
-	try {
-		const db = createDb(c.env.DB);
+			const pendingCar = await db
+				.select({
+					car_id: CarsPending.car_id,
+					created_at: CarsPending.created_at,
+					current_owner_id: CarsPending.current_owner_id,
+					destroyed: CarsPending.destroyed,
+					edition_id: CarsPending.edition_id,
+					id: CarsPending.id,
+					manufacture_date: CarsPending.manufacture_date,
+					sale_date: CarsPending.sale_date,
+					sale_dealer_city: CarsPending.sale_dealer_city,
+					sale_dealer_country: CarsPending.sale_dealer_country,
+					sale_dealer_name: CarsPending.sale_dealer_name,
+					sale_dealer_state: CarsPending.sale_dealer_state,
+					sale_msrp: CarsPending.sale_msrp,
+					sequence: CarsPending.sequence,
+					shipping_city: CarsPending.shipping_city,
+					shipping_country: CarsPending.shipping_country,
+					shipping_date: CarsPending.shipping_date,
+					shipping_state: CarsPending.shipping_state,
+					shipping_vessel: CarsPending.shipping_vessel,
+					status: CarsPending.status,
+					vin: CarsPending.vin,
+					user_id: Owners.user_id,
+				})
+				.from(CarsPending)
+				.leftJoin(Owners, eq(CarsPending.current_owner_id, Owners.id))
+				.where(eq(CarsPending.id, id))
+				.limit(1);
 
-		const pendingCar = await db
-			.select({
-				car_id: CarsPending.car_id,
-				created_at: CarsPending.created_at,
-				current_owner_id: CarsPending.current_owner_id,
-				destroyed: CarsPending.destroyed,
-				edition_id: CarsPending.edition_id,
-				id: CarsPending.id,
-				manufacture_date: CarsPending.manufacture_date,
-				sale_date: CarsPending.sale_date,
-				sale_dealer_city: CarsPending.sale_dealer_city,
-				sale_dealer_country: CarsPending.sale_dealer_country,
-				sale_dealer_name: CarsPending.sale_dealer_name,
-				sale_dealer_state: CarsPending.sale_dealer_state,
-				sale_msrp: CarsPending.sale_msrp,
-				sequence: CarsPending.sequence,
-				shipping_city: CarsPending.shipping_city,
-				shipping_country: CarsPending.shipping_country,
-				shipping_date: CarsPending.shipping_date,
-				shipping_state: CarsPending.shipping_state,
-				shipping_vessel: CarsPending.shipping_vessel,
-				status: CarsPending.status,
-				vin: CarsPending.vin,
-				user_id: Owners.user_id,
-			})
-			.from(CarsPending)
-			.leftJoin(Owners, eq(CarsPending.current_owner_id, Owners.id))
-			.where(eq(CarsPending.id, id))
-			.limit(1);
-
-		if (!pendingCar.length) {
-			return c.json({ error: 'Not found' }, 404);
-		}
-
-		const car = pendingCar[0];
-
-		const {
-			created_at,
-			id: pendingId,
-			status,
-			car_id,
-			user_id,
-			...carUpdateData
-		} = car;
-
-		const existingCar = await db
-			.select()
-			.from(Cars)
-			.where(eq(Cars.id, car.car_id))
-			.limit(1);
-
-		if (existingCar.length) {
-			await db
-				.update(Cars)
-				.set(carUpdateData)
-				.where(eq(Cars.id, car.car_id));
-		} else {
-			return c.json({ error: 'Not found' }, 404);
-		}
-
-		await db
-			.update(CarsPending)
-			.set({ status: 'approved' })
-			.where(eq(CarsPending.id, id));
-
-		await c.env.CACHE.delete(`cars:details:${car.car_id}`);
-		await c.env.CACHE.delete(`cars:summary:${car.car_id}`);
-
-		if (user_id) {
-			const requestingUser = await c.get('clerk').users.getUser(user_id);
-
-			const primaryEmail = requestingUser.emailAddresses.find(
-				(email) => email.id === requestingUser.primaryEmailAddressId
-			);
-
-			if (primaryEmail) {
-				const resend = new Resend(c.env.RESEND_API_KEY);
-
-				await resend.emails.send({
-					from: 'Miata Registry <no-reply@miataregistry.com>',
-					to: primaryEmail.emailAddress,
-					subject: 'Miata Registry: Car update approved',
-					react: ApprovedCar(),
-				});
+			if (!pendingCar.length) {
+				return c.json({ error: 'Not found' }, 404);
 			}
-		}
 
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error approving car:', error);
+			const car = pendingCar[0];
 
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
-	}
-});
+			const {
+				created_at,
+				id: pendingId,
+				status,
+				car_id,
+				user_id,
+				...carUpdateData
+			} = car;
 
-moderationRouter.post('/carOwner/:id/approve', withAuth(), async (c) => {
-	const { id } = c.req.param();
-	const user = await c.get('clerk').users.getUser(c.get('userId'));
+			const existingCar = await db
+				.select()
+				.from(Cars)
+				.where(eq(Cars.id, car.car_id))
+				.limit(1);
 
-	if (!user.publicMetadata?.moderator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
+			if (existingCar.length) {
+				await db
+					.update(Cars)
+					.set(carUpdateData)
+					.where(eq(Cars.id, car.car_id));
+			} else {
+				return c.json({ error: 'Not found' }, 404);
+			}
 
-	try {
-		const db = createDb(c.env.DB);
-
-		const pendingCarOwner = await db
-			.select({
-				car_id: CarOwnersPending.car_id,
-				created_at: CarOwnersPending.created_at,
-				date_end: CarOwnersPending.date_end,
-				date_start: CarOwnersPending.date_start,
-				id: CarOwnersPending.id,
-				information: CarOwnersPending.information,
-				owner_id: CarOwnersPending.owner_id,
-				status: CarOwnersPending.status,
-				user_id: Owners.user_id,
-			})
-			.from(CarOwnersPending)
-			.leftJoin(Owners, eq(CarOwnersPending.owner_id, Owners.id))
-			.where(eq(CarOwnersPending.id, id))
-			.limit(1);
-
-		if (!pendingCarOwner.length) {
-			return c.json({ error: 'Not found' }, 404);
-		}
-
-		const carOwner = pendingCarOwner[0];
-
-		const {
-			created_at,
-			id: pendingId,
-			status,
-			user_id,
-			...carOwnerUpdateData
-		} = carOwner;
-
-		const existingCarOwner = await db
-			.select()
-			.from(CarOwners)
-			.where(
-				and(
-					eq(CarOwners.car_id, carOwner.car_id),
-					eq(CarOwners.owner_id, carOwner.owner_id)
-				)
-			)
-			.limit(1);
-
-		if (existingCarOwner.length) {
 			await db
-				.update(CarOwners)
-				.set(carOwnerUpdateData)
+				.update(CarsPending)
+				.set({ status: 'approved' })
+				.where(eq(CarsPending.id, id));
+
+			await c.env.CACHE.delete(`cars:details:${car.car_id}`);
+			await c.env.CACHE.delete(`cars:summary:${car.car_id}`);
+
+			if (user_id) {
+				const requestingUser = await c
+					.get('clerk')
+					.users.getUser(user_id);
+
+				const primaryEmail = requestingUser.emailAddresses.find(
+					(email) => email.id === requestingUser.primaryEmailAddressId
+				);
+
+				if (primaryEmail) {
+					const resend = new Resend(c.env.RESEND_API_KEY);
+
+					await resend.emails.send({
+						from: 'Miata Registry <no-reply@miataregistry.com>',
+						to: primaryEmail.emailAddress,
+						subject: 'Miata Registry: Car update approved',
+						react: ApprovedCar(),
+					});
+				}
+			}
+
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error approving car:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
+		}
+	}
+);
+
+moderationRouter.post(
+	'/carOwner/:id/approve',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
+
+		try {
+			const db = createDb(c.env.DB);
+
+			const pendingCarOwner = await db
+				.select({
+					car_id: CarOwnersPending.car_id,
+					created_at: CarOwnersPending.created_at,
+					date_end: CarOwnersPending.date_end,
+					date_start: CarOwnersPending.date_start,
+					id: CarOwnersPending.id,
+					information: CarOwnersPending.information,
+					owner_id: CarOwnersPending.owner_id,
+					status: CarOwnersPending.status,
+					user_id: Owners.user_id,
+				})
+				.from(CarOwnersPending)
+				.leftJoin(Owners, eq(CarOwnersPending.owner_id, Owners.id))
+				.where(eq(CarOwnersPending.id, id))
+				.limit(1);
+
+			if (!pendingCarOwner.length) {
+				return c.json({ error: 'Not found' }, 404);
+			}
+
+			const carOwner = pendingCarOwner[0];
+
+			const {
+				created_at,
+				id: pendingId,
+				status,
+				user_id,
+				...carOwnerUpdateData
+			} = carOwner;
+
+			const existingCarOwner = await db
+				.select()
+				.from(CarOwners)
 				.where(
 					and(
 						eq(CarOwners.car_id, carOwner.car_id),
 						eq(CarOwners.owner_id, carOwner.owner_id)
 					)
-				);
-		} else {
+				)
+				.limit(1);
+
+			if (existingCarOwner.length) {
+				await db
+					.update(CarOwners)
+					.set(carOwnerUpdateData)
+					.where(
+						and(
+							eq(CarOwners.car_id, carOwner.car_id),
+							eq(CarOwners.owner_id, carOwner.owner_id)
+						)
+					);
+			} else {
+				await db
+					.update(CarOwners)
+					.set({ date_end: carOwner.date_start })
+					.where(
+						and(
+							eq(CarOwners.car_id, carOwner.car_id),
+							sql`${CarOwners.date_end} IS NULL`
+						)
+					);
+
+				await db.insert(CarOwners).values(carOwnerUpdateData);
+
+				await db
+					.update(Cars)
+					.set({ current_owner_id: carOwner.owner_id })
+					.where(eq(Cars.id, carOwner.car_id));
+			}
+
 			await db
-				.update(CarOwners)
-				.set({ date_end: carOwner.date_start })
-				.where(
-					and(
-						eq(CarOwners.car_id, carOwner.car_id),
-						sql`${CarOwners.date_end} IS NULL`
-					)
+				.update(CarOwnersPending)
+				.set({ status: 'approved' })
+				.where(eq(CarOwnersPending.id, id));
+
+			await c.env.CACHE.delete(`cars:details:${carOwner.car_id}`);
+			await c.env.CACHE.delete(`cars:summary:${carOwner.car_id}`);
+
+			if (user_id) {
+				const requestingUser = await c
+					.get('clerk')
+					.users.getUser(user_id);
+
+				const primaryEmail = requestingUser.emailAddresses.find(
+					(email) => email.id === requestingUser.primaryEmailAddressId
 				);
 
-			await db.insert(CarOwners).values(carOwnerUpdateData);
+				if (primaryEmail) {
+					const resend = new Resend(c.env.RESEND_API_KEY);
 
-			await db
-				.update(Cars)
-				.set({ current_owner_id: carOwner.owner_id })
-				.where(eq(Cars.id, carOwner.car_id));
+					await resend.emails.send({
+						from: 'Miata Registry <no-reply@miataregistry.com>',
+						to: primaryEmail.emailAddress,
+						subject: 'Miata Registry: Ownership update approved',
+						react: ApprovedOwner(),
+					});
+				}
+			}
+
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error approving car owner:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
 		}
+	}
+);
 
-		await db
-			.update(CarOwnersPending)
-			.set({ status: 'approved' })
-			.where(eq(CarOwnersPending.id, id));
+moderationRouter.post(
+	'/owner/:id/approve',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
 
-		await c.env.CACHE.delete(`cars:details:${carOwner.car_id}`);
-		await c.env.CACHE.delete(`cars:summary:${carOwner.car_id}`);
+		try {
+			const db = createDb(c.env.DB);
 
-		if (user_id) {
-			const requestingUser = await c.get('clerk').users.getUser(user_id);
+			const pendingOwner = await db
+				.select()
+				.from(OwnersPending)
+				.where(eq(OwnersPending.id, id))
+				.limit(1);
 
-			const primaryEmail = requestingUser.emailAddresses.find(
-				(email) => email.id === requestingUser.primaryEmailAddressId
+			if (!pendingOwner.length) {
+				return c.json({ error: 'Not found' }, 404);
+			}
+
+			const owner = pendingOwner[0];
+			const { created_at, status, ...ownerData } = owner;
+
+			await db.insert(Owners).values(ownerData);
+
+			await db
+				.update(OwnersPending)
+				.set({ status: 'approved' })
+				.where(eq(OwnersPending.id, id));
+
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error approving owner:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
+		}
+	}
+);
+
+moderationRouter.post(
+	'/photo/:id/approve',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
+
+		try {
+			const pendingPhoto = await c.env.IMAGES.get(
+				`car-pending/${id}.jpg`
 			);
 
-			if (primaryEmail) {
-				const resend = new Resend(c.env.RESEND_API_KEY);
-
-				await resend.emails.send({
-					from: 'Miata Registry <no-reply@miataregistry.com>',
-					to: primaryEmail.emailAddress,
-					subject: 'Miata Registry: Ownership update approved',
-					react: ApprovedOwner(),
-				});
+			if (!pendingPhoto) {
+				return c.json({ error: 'Not found' }, 404);
 			}
-		}
 
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error approving car owner:', error);
+			await c.env.IMAGES.put(
+				`car/${id}.jpg`,
+				await pendingPhoto.arrayBuffer(),
+				{
+					httpMetadata: {
+						contentType: 'image/jpeg',
+						cacheControl: 'public, max-age=31536000',
+					},
+				}
+			);
 
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
-	}
-});
+			await c.env.IMAGES.delete(`car-pending/${id}.jpg`);
 
-moderationRouter.post('/owner/:id/approve', withAuth(), async (c) => {
-	const { id } = c.req.param();
-	const user = await c.get('clerk').users.getUser(c.get('userId'));
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error approving photo:', error);
 
-	if (!user.publicMetadata?.moderator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
-
-	try {
-		const db = createDb(c.env.DB);
-
-		const pendingOwner = await db
-			.select()
-			.from(OwnersPending)
-			.where(eq(OwnersPending.id, id))
-			.limit(1);
-
-		if (!pendingOwner.length) {
-			return c.json({ error: 'Not found' }, 404);
-		}
-
-		const owner = pendingOwner[0];
-		const { created_at, status, ...ownerData } = owner;
-
-		await db.insert(Owners).values(ownerData);
-
-		await db
-			.update(OwnersPending)
-			.set({ status: 'approved' })
-			.where(eq(OwnersPending.id, id));
-
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error approving owner:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
-	}
-});
-
-moderationRouter.post('/photo/:id/approve', withAuth(), async (c) => {
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
-
-	if (!isModerator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
-
-	try {
-		const id = c.req.param('id');
-		const pendingPhoto = await c.env.IMAGES.get(`car-pending/${id}.jpg`);
-
-		if (!pendingPhoto) {
-			return c.json({ error: 'Not found' }, 404);
-		}
-
-		await c.env.IMAGES.put(
-			`car/${id}.jpg`,
-			await pendingPhoto.arrayBuffer(),
-			{
-				httpMetadata: {
-					contentType: 'image/jpeg',
-					cacheControl: 'public, max-age=31536000',
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'Unknown error',
 				},
-			}
-		);
-
-		await c.env.IMAGES.delete(`car-pending/${id}.jpg`);
-
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error approving photo:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error ? error.message : 'Unknown error',
-			},
-			500
-		);
+				500
+			);
+		}
 	}
-});
+);
 
-moderationRouter.post('/car/:id/reject', withAuth(), async (c) => {
-	const { id } = c.req.param();
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
+moderationRouter.post(
+	'/car/:id/reject',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
 
-	if (!isModerator) {
-		return c.json({ error: 'Unauthorized' }, 403);
+		try {
+			const db = createDb(c.env.DB);
+
+			await db
+				.update(CarsPending)
+				.set({ status: 'rejected' })
+				.where(eq(CarsPending.id, id));
+
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error rejecting car:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
+		}
 	}
+);
 
-	try {
-		const db = createDb(c.env.DB);
+moderationRouter.post(
+	'/carOwner/:id/reject',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
 
-		await db
-			.update(CarsPending)
-			.set({ status: 'rejected' })
-			.where(eq(CarsPending.id, id));
+		try {
+			const db = createDb(c.env.DB);
 
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error rejecting car:', error);
+			await db
+				.update(CarOwnersPending)
+				.set({ status: 'rejected' })
+				.where(eq(CarOwnersPending.id, id));
 
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error rejecting car owner:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
+		}
 	}
-});
+);
 
-moderationRouter.post('/carOwner/:id/reject', withAuth(), async (c) => {
-	const { id } = c.req.param();
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
+moderationRouter.post(
+	'/owner/:id/reject',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
 
-	if (!isModerator) {
-		return c.json({ error: 'Unauthorized' }, 403);
+		try {
+			const db = createDb(c.env.DB);
+
+			await db
+				.update(OwnersPending)
+				.set({ status: 'rejected' })
+				.where(eq(OwnersPending.id, id));
+
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error rejecting owner:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
+		}
 	}
+);
 
-	try {
-		const db = createDb(c.env.DB);
+moderationRouter.post(
+	'/photo/:id/reject',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
 
-		await db
-			.update(CarOwnersPending)
-			.set({ status: 'rejected' })
-			.where(eq(CarOwnersPending.id, id));
+		try {
+			await c.env.IMAGES.delete(`car-pending/${id}.jpg`);
 
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error rejecting car owner:', error);
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error rejecting photo:', error);
 
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'Unknown error',
+				},
+				500
+			);
+		}
 	}
-});
-
-moderationRouter.post('/owner/:id/reject', withAuth(), async (c) => {
-	const { id } = c.req.param();
-
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
-
-	if (!isModerator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
-
-	try {
-		const db = createDb(c.env.DB);
-
-		await db
-			.update(OwnersPending)
-			.set({ status: 'rejected' })
-			.where(eq(OwnersPending.id, id));
-
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error rejecting owner:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
-	}
-});
-
-moderationRouter.post('/photo/:id/reject', withAuth(), async (c) => {
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
-
-	if (!isModerator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
-
-	try {
-		const id = c.req.param('id');
-		await c.env.IMAGES.delete(`car-pending/${id}.jpg`);
-
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error rejecting photo:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error ? error.message : 'Unknown error',
-			},
-			500
-		);
-	}
-});
+);
 
 moderationRouter.get('/stats', async (c) => {
 	try {
@@ -702,6 +701,11 @@ moderationRouter.get('/stats', async (c) => {
 			.from(OwnersPending)
 			.groupBy(OwnersPending.status);
 
+		const tipsStats = await db
+			.select({ status: Tips.status, count: count() })
+			.from(Tips)
+			.groupBy(Tips.status);
+
 		const stats: TModerationStats = {
 			pending:
 				Number(
@@ -713,6 +717,9 @@ moderationRouter.get('/stats', async (c) => {
 				) +
 				Number(
 					ownerStats.find((s) => s.status === 'pending')?.count || 0
+				) +
+				Number(
+					tipsStats.find((s) => s.status === 'pending')?.count || 0
 				),
 			approved:
 				Number(
@@ -724,6 +731,9 @@ moderationRouter.get('/stats', async (c) => {
 				) +
 				Number(
 					ownerStats.find((s) => s.status === 'approved')?.count || 0
+				) +
+				Number(
+					tipsStats.find((s) => s.status === 'approved')?.count || 0
 				),
 			rejected:
 				Number(
@@ -735,6 +745,9 @@ moderationRouter.get('/stats', async (c) => {
 				) +
 				Number(
 					ownerStats.find((s) => s.status === 'rejected')?.count || 0
+				) +
+				Number(
+					tipsStats.find((s) => s.status === 'rejected')?.count || 0
 				),
 		};
 

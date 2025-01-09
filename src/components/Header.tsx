@@ -16,12 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useUser } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import Symbol from '../assets/symbol.svg?react';
 import { Clerk } from '../components/account/Clerk';
 import { useModal } from '../context/ModalContext';
+
+const Pending = lazy(() =>
+	import('./account/Pending').then((module) => ({
+		default: module.Pending,
+	}))
+);
 
 interface DropdownProps {
 	label: string;
@@ -82,17 +89,42 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	);
 };
 
-const ConstructionBanner = () => (
-	<div className="flex gap-1.5 items-center bg-amber-100 border border-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
-		<i className="fa-solid fa-person-digging text-sm"></i> This project is
-		in early access.
-	</div>
-);
-
 export const Header = () => {
 	const { user } = useUser();
+	const { getToken } = useAuth();
 	const location = useLocation();
 	const { openModal } = useModal();
+	const [pendingChanges, setPendingChanges] = useState(null);
+
+	useEffect(() => {
+		const fetchPendingChanges = async () => {
+			if (!user?.id) {
+				return;
+			}
+
+			try {
+				const token = await getToken();
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners/${user.id}/pending`,
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+
+				const data = await response.json();
+
+				setPendingChanges(data);
+			} catch (error) {
+				console.error('Failed to fetch pending changes:', error);
+
+				setPendingChanges(null);
+			}
+		};
+
+		fetchPendingChanges();
+	}, [user?.id, getToken]);
 
 	const isHomePage = location.pathname === '/';
 
@@ -153,15 +185,13 @@ export const Header = () => {
 						{ label: 'Contributing', to: '/about#contribute' },
 						{ label: 'Contact us', to: '/about#contact' },
 					]}
-					isActive={isActive('/about')}
+					isActive={
+						isActive('/about') ||
+						isActive('/news') ||
+						isActive('/rarity')
+					}
 				/>
 
-				<div className="hidden lg:block">
-					<ConstructionBanner />
-				</div>
-			</div>
-
-			<div className="flex items-center">
 				{user?.publicMetadata?.moderator ? (
 					<Link
 						to="/moderation"
@@ -169,13 +199,20 @@ export const Header = () => {
 							'hidden lg:flex text-sm text-brg-mid hover:text-brg transition-colors items-center gap-1 mr-6',
 							isActive('/moderation')
 								? 'text-brg font-medium'
-								: 'text-brg-mid hover:text-brg',
-							isHomePage && 'bg-white rounded-lg py-2 px-3'
+								: 'text-brg-mid hover:text-brg'
 						)}
 					>
 						Moderation
 					</Link>
 				) : null}
+			</div>
+
+			<div className="flex items-center gap-4">
+				{pendingChanges && (
+					<Suspense>
+						<Pending changes={pendingChanges} />
+					</Suspense>
+				)}
 
 				<Clerk />
 			</div>
