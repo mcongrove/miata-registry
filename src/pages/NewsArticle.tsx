@@ -21,19 +21,12 @@ import ReactMarkdown from 'react-markdown';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { TNewsArticle } from '../types/News';
 import { handleApiError } from '../utils/common';
-
-interface NewsArticle {
-	body: string;
-	created_at: number;
-	excerpt: string;
-	id: string;
-	title: string;
-}
 
 export const NewsArticle = () => {
 	const { id } = useParams();
-	const [article, setArticle] = useState<NewsArticle | null>(null);
+	const [article, setArticle] = useState<TNewsArticle | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	usePageMeta({
@@ -106,7 +99,7 @@ export const NewsArticle = () => {
 		);
 	}
 
-	return (
+	return article.body ? (
 		<main className="flex-1 px-8 pt-24 lg:pt-32 lg:px-0 pb-16">
 			<div className="container mx-auto">
 				<div className="flex flex-col gap-6 max-w-4xl">
@@ -118,14 +111,14 @@ export const NewsArticle = () => {
 							← Back to News
 						</Link>
 
-						<div className="flex flex-col gap-1">
+						<div className="flex flex-col gap-2">
 							<h1 className="text-4xl font-bold text-brg">
 								{article.title}
 							</h1>
 
 							<div className="text-sm text-brg-mid">
 								{new Date(
-									article.created_at
+									article.publish_date
 								).toLocaleDateString('en-US', {
 									month: 'long',
 									day: 'numeric',
@@ -176,5 +169,5 @@ export const NewsArticle = () => {
 				</div>
 			</div>
 		</main>
-	);
+	) : null;
 };

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, lte } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
 import { News } from '../../db/schema/News';
@@ -33,7 +33,6 @@ const newsRouter = new Hono<{ Bindings: Bindings }>();
 newsRouter.get('/', async (c) => {
 	try {
 		const isDev = c.env.NODE_ENV === 'development';
-
 		const cacheKey = 'news:list';
 
 		if (!isDev) {
@@ -45,6 +44,7 @@ newsRouter.get('/', async (c) => {
 		}
 
 		const db = createDb(c.env.DB);
+		const now = new Date().toISOString();
 
 		const news = await db
 			.select({
@@ -52,19 +52,17 @@ newsRouter.get('/', async (c) => {
 				title: News.title,
 				slug: News.slug,
 				body: News.body,
-				created_at: News.created_at,
+				publish_date: News.publish_date,
 			})
 			.from(News)
-			.where(isDev ? undefined : eq(News.published, 1))
-			.orderBy(desc(News.created_at));
+			.where(isDev ? undefined : lte(News.publish_date, now))
+			.orderBy(desc(News.publish_date));
 
-		const newsWithExcerpt = news.map((item) => {
-			return {
-				...item,
-				excerpt: item.body.split('\n')[0] + '...',
-				body: undefined,
-			};
-		});
+		const newsWithExcerpt = news.map((item) => ({
+			...item,
+			excerpt: item.body.split('\n')[0] + '...',
+			body: undefined,
+		}));
 
 		if (!isDev) {
 			await c.env.CACHE.put(cacheKey, JSON.stringify(newsWithExcerpt), {
@@ -99,6 +97,7 @@ newsRouter.get('/featured', async (c) => {
 		}
 
 		const db = createDb(c.env.DB);
+		const now = new Date().toISOString();
 
 		const [result] = await db
 			.select({
@@ -106,8 +105,8 @@ newsRouter.get('/featured', async (c) => {
 				title_short: News.title_short,
 			})
 			.from(News)
-			.where(and(eq(News.published, 1), eq(News.featured, 1)))
-			.orderBy(desc(News.created_at))
+			.where(and(lte(News.publish_date, now), eq(News.featured, 1)))
+			.orderBy(desc(News.publish_date))
 			.limit(1);
 
 		if (result) {
@@ -148,6 +147,7 @@ newsRouter.get('/:id', async (c) => {
 		}
 
 		const db = createDb(c.env.DB);
+		const now = new Date().toISOString();
 
 		const [news] = await db
 			.select()
@@ -155,7 +155,7 @@ newsRouter.get('/:id', async (c) => {
 			.where(
 				isDev
 					? eq(News.id, id)
-					: and(eq(News.id, id), eq(News.published, 1))
+					: and(eq(News.id, id), lte(News.publish_date, now))
 			);
 
 		if (!news) {

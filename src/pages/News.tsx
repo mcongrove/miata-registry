@@ -19,20 +19,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { TNewsArticle } from '../types/News';
 import { handleApiError } from '../utils/common';
-
-interface NewsArticle {
-	created_at: number;
-	excerpt: string;
-	id: string;
-	slug: string;
-	title_short: string;
-	title: string;
-}
 
 export const News = () => {
 	const [isLoading, setIsLoading] = useState(true);
-	const [news, setNews] = useState<NewsArticle[]>([]);
+	const [news, setNews] = useState<TNewsArticle[]>([]);
 
 	usePageMeta({
 		path: '/news',
@@ -50,9 +42,10 @@ export const News = () => {
 
 				const data = await response.json();
 
-				setNews(data);
+				setNews(Array.isArray(data) ? data : []);
 			} catch (error) {
 				handleApiError(error);
+				setNews([]);
 			} finally {
 				setIsLoading(false);
 			}
@@ -104,7 +97,7 @@ export const News = () => {
 								<div className="flex flex-col gap-1">
 									<div className="text-xs text-brg-mid/80">
 										{new Date(
-											article.created_at
+											article.publish_date
 										).toLocaleDateString('en-US', {
 											month: 'short',
 											day: 'numeric',

@@ -16,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-
-export const News = sqliteTable('news', {
-	body: text('body').notNull(),
-	featured: integer('featured').notNull().default(0),
-	id: text('id').primaryKey(),
-	publish_date: text('publish_date').notNull(),
-	slug: text('slug').unique(),
-	title_short: text('title_short').notNull(),
-	title: text('title').notNull(),
-});
+export interface TNewsArticle {
+	body?: string;
+	excerpt: string;
+	id: string;
+	publish_date: string;
+	slug: string;
+	title_short: string;
+	title: string;
+}
