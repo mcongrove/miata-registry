@@ -16,9 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType = 'carEdit' | 'qrCode' | 'register' | 'tip';
+export const objectsToCSV = (data: any[]) => {
+	if (data.length === 0) return '';
 
-export interface TModalState {
-	props?: any;
-	type: TModalType | null;
-}
+	const headers = Object.keys(data[0]);
+
+	const csvRows = [
+		headers.join(','),
+		...data.map((row) =>
+			headers
+				.map((header) => {
+					const value = row[header]?.toString() ?? '';
+
+					return value.includes(',') || value.includes('"')
+						? `"${value.replace(/"/g, '""')}"`
+						: value;
+				})
+				.join(',')
+		),
+	];
+
+	return csvRows.join('\n');
+};

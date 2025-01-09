@@ -17,40 +17,75 @@
  */
 
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { toPrettyDate } from '../utils/common';
+
 export function SitePulse() {
 	const [lastActivity, setLastActivity] = useState<string>('');
 	const [isActive, setIsActive] = useState<boolean | null>(null);
+	const [lastArchive, setLastArchive] = useState<string>('');
+	const [isArchived, setIsArchived] = useState<boolean | null>(null);
+	const [archiveUrl, setArchiveUrl] = useState<string>('');
 
 	useEffect(() => {
 		const loadPulse = async () => {
 			try {
-				const response = await fetch(
-					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/stats/pulse`
-				);
+				const [pulseResponse, archiveResponse] = await Promise.all([
+					fetch(
+						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/pulse`
+					),
+					fetch(
+						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/archive`
+					),
+				]);
 
-				if (!response.ok) {
-					if (response.status === 404) {
+				if (!pulseResponse.ok || !archiveResponse.ok) {
+					if (pulseResponse.status === 404) {
 						setLastActivity('');
 						setIsActive(false);
-
-						return;
 					}
 
-					throw new Error('Failed to fetch car summary');
+					if (archiveResponse.status === 404) {
+						setLastArchive('');
+						setIsArchived(false);
+					}
+
+					return;
 				}
 
-				const data = await response.json();
-				const lastActivityDate = new Date(data.timestamp);
+				const [pulseData, archiveData] = await Promise.all([
+					pulseResponse.json(),
+					archiveResponse.json(),
+				]);
+
+				const lastActivityDate = new Date(pulseData.timestamp);
+				const lastArchiveDate = new Date(archiveData.timestamp);
 				const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
 
 				setIsActive(
 					Date.now() - lastActivityDate.getTime() < thirtyDaysInMs
 				);
-				setLastActivity(toPrettyDate(data.timestamp).split(' at')[0]);
+
+				setLastActivity(
+					toPrettyDate(pulseData.timestamp).split(' at')[0]
+				);
+
+				setIsArchived(
+					Date.now() - lastArchiveDate.getTime() < thirtyDaysInMs
+				);
+
+				setLastArchive(
+					toPrettyDate(archiveData.timestamp).split(' at')[0]
+				);
+
+				setArchiveUrl(
+					`https://archive.org/details/${archiveData.filename.replace('.zip', '')}`
+				);
 			} catch (error) {
 				setLastActivity('');
+				setLastArchive('');
+				setArchiveUrl('');
 			}
 		};
 
@@ -58,31 +93,79 @@ export function SitePulse() {
 	}, []);
 
 	return (
-		<div
-			className={twMerge(
-				'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
-				!lastActivity
-					? 'bg-neutral-900 text-neutral-600'
-					: isActive
-						? 'bg-emerald-900 text-emerald-500'
-						: 'bg-rose-900 text-rose-400'
-			)}
-		>
+		<div className="flex gap-2">
 			<div
 				className={twMerge(
-					'h-2 w-2 rounded-full',
+					'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
 					!lastActivity
-						? 'bg-neutral-600'
+						? 'bg-neutral-900 text-neutral-600'
 						: isActive
-							? 'bg-emerald-500 animate-pulse'
-							: 'bg-rose-400 animate-pulse'
+							? 'bg-emerald-900 text-emerald-500'
+							: 'bg-rose-900 text-rose-400'
 				)}
-			/>{' '}
-			{!lastActivity
-				? 'Site pulse check not available'
-				: isActive
-					? `Site actively maintained as of ${lastActivity}`
-					: `Site not updated since ${lastActivity}`}
+			>
+				<div
+					className={twMerge(
+						'h-2 w-2 rounded-full',
+						!lastActivity
+							? 'bg-neutral-600'
+							: isActive
+								? 'bg-emerald-500 animate-pulse'
+								: 'bg-rose-400 animate-pulse'
+					)}
+				/>{' '}
+				{!lastActivity
+					? 'Site pulse check not available'
+					: isActive
+						? `Site actively maintained as of ${lastActivity}`
+						: `Site not updated since ${lastActivity}`}
+			</div>
+
+			{archiveUrl ? (
+				<Link
+					to={archiveUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="hover:opacity-80 transition-opacity"
+				>
+					<div
+						className={twMerge(
+							'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
+							!lastArchive
+								? 'bg-neutral-900 text-neutral-600'
+								: isArchived
+									? 'bg-emerald-900 text-emerald-500'
+									: 'bg-rose-900 text-rose-400'
+						)}
+					>
+						<div
+							className={twMerge(
+								'h-2 w-2 rounded-full',
+								!lastArchive
+									? 'bg-neutral-600'
+									: isArchived
+										? 'bg-emerald-500 animate-pulse'
+										: 'bg-rose-400 animate-pulse'
+							)}
+						/>{' '}
+						{!lastArchive
+							? 'Data archive check not available'
+							: isArchived
+								? `Data archived ${lastArchive}`
+								: `Data not archived since ${lastArchive}`}
+					</div>
+				</Link>
+			) : (
+				<div
+					className={twMerge(
+						'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
+						'bg-neutral-900 text-neutral-600'
+					)}
+				>
+					<div className="h-2 w-2 rounded-full bg-neutral-600" /> Data
+					archive check not available
+				</div>
+			)}
 		</div>
 	);
 }

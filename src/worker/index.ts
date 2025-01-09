@@ -21,7 +21,7 @@ import { cors } from 'hono/cors';
 import carsRouter from './routes/cars';
 import editionsRouter from './routes/editions';
 import emailRouter from './routes/email';
-import exportRouter from './routes/export';
+import heartbeatRouter from './routes/heartbeat';
 import moderationRouter from './routes/moderation';
 import newsRouter from './routes/news';
 import ownersRouter from './routes/owners';
@@ -67,10 +67,10 @@ app.use('*', async (c, next) => {
 
 app.get('/', (c) => c.json({ error: 'Not found' }, 404));
 
+app.route('/heartbeat', heartbeatRouter);
 app.route('/cars', carsRouter);
 app.route('/editions', editionsRouter);
 app.route('/email', emailRouter);
-app.route('/export', exportRouter);
 app.route('/moderation', moderationRouter);
 app.route('/news', newsRouter);
 app.route('/owners', ownersRouter);
@@ -79,4 +79,31 @@ app.route('/stats', statsRouter);
 app.route('/tips', tipsRouter);
 app.route('/webhooks', webhooksRouter);
 
-export default app;
+export default {
+	fetch: app.fetch,
+	async scheduled(_event: any, env: any, ctx: any) {
+		try {
+			ctx.waitUntil(
+				(async () => {
+					const response = await fetch(
+						'https://api.miataregistry.com/heartbeat/archive/cron',
+						{
+							method: 'POST',
+							headers: {
+								Authorization: `Bearer ${env.ARCHIVE_ORG_CRON_SECRET}`,
+							},
+						}
+					);
+
+					if (!response.ok) {
+						throw new Error(
+							`Failed to trigger archive: ${response.status} ${response.statusText}`
+						);
+					}
+				})()
+			);
+		} catch (error) {
+			console.error('Cron job failed:', error);
+		}
+	},
+};

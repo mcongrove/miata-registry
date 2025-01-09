@@ -16,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useAuth } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { useModal } from '../context/ModalContext';
 import { SitePulse } from './SitePulse';
 
 export const Footer = () => {
-	const { isSignedIn } = useAuth();
 	const { openModal } = useModal();
 
 	return (
@@ -161,16 +159,6 @@ export const Footer = () => {
 										Privacy Policy and Terms
 									</Link>
 								</li>
-								{isSignedIn && (
-									<li>
-										<span
-											onClick={() => openModal('export')}
-											className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"
-										>
-											Download Entire Dataset
-										</span>
-									</li>
-								)}
 							</ul>
 						</div>
 					</div>

@@ -32,11 +32,6 @@ const MODAL_COMPONENTS = {
 			default: module.CarEdit,
 		}))
 	),
-	export: lazy(() =>
-		import('../modals/Export').then((module) => ({
-			default: module.Export,
-		}))
-	),
 	qrCode: lazy(() =>
 		import('../modals/QrCode').then((module) => ({
 			default: module.QrCode,

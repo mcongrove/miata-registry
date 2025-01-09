@@ -34,6 +34,9 @@ export type ApiError = {
 
 export interface Bindings {
 	ADMIN_USER_ID: string;
+	ARCHIVE_ORG_ACCESS_KEY: string;
+	ARCHIVE_ORG_SECRET_KEY: string;
+	ARCHIVE_ORG_CRON_SECRET: string;
 	CACHE: KVNamespace;
 	CLERK_PUBLISHABLE_KEY: string;
 	CLERK_SECRET_KEY: string;

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useAuth } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
@@ -44,7 +43,6 @@ const getCountCodeCommits = async (owner: string, repo: string) => {
 };
 
 export const About = () => {
-	const { isSignedIn } = useAuth();
 	const { openModal } = useModal();
 	const [highlightedSection, setHighlightedSection] = useState<string | null>(
 		null
@@ -303,17 +301,15 @@ export const About = () => {
 						<p className="text-sm text-brg-mid">
 							In keeping with our commitment to transparency, all
 							registry data except personal login details is{' '}
-							{isSignedIn ? (
-								<span
-									className="underline cursor-pointer"
-									onClick={() => openModal('export')}
-									data-cy="about-data-export-link"
-								>
-									freely available for public inspection
-								</span>
-							) : (
-								'freely available for public inspection'
-							)}
+							<a
+								href="https://archive.org/details/@miataregistry"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="underline font-normal text-brg-mid"
+								data-cy="about-data-export-link"
+							>
+								freely available for public inspection
+							</a>
 							. This includes vehicle information, production
 							numbers, and historical documentation. We believe
 							this openness helps maintain accuracy and allows
@@ -322,8 +318,10 @@ export const About = () => {
 						</p>
 
 						<p className="text-sm text-brg-mid">
-							You must be a registered user to download the entire
-							dataset as a precaution against misuse.
+							Our entire dataset is backed up weekly and stored on
+							the Internet Archive, the world's largest digital
+							library, to ensure it is always available to the
+							public.
 						</p>
 					</div>
 
