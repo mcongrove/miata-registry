@@ -164,14 +164,14 @@ export const Footer = () => {
 					</div>
 				</div>
 
-				<div className="flex flex-col items-center gap-4 border-t border-white/10 pt-8">
-					<p className="text-center text-sm text-brg-mid/60">
+				<div className="flex flex-col items-center gap-8 border-t border-white/10 pt-8 text-xs lg:text-sm">
+					<p className="text-center text-brg-mid/60">
 						© {new Date().getFullYear()}{' '}
 						<a
 							href="https://mattcongrove.com"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-brg-mid underline"
+							className="text-brg-mid underline whitespace-nowrap"
 						>
 							Matthew Congrove
 						</a>
@@ -180,7 +180,7 @@ export const Footer = () => {
 							href="https://github.com/mcongrove/miata-registry"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-brg-mid underline"
+							className="text-brg-mid underline whitespace-nowrap"
 						>
 							Source code
 						</a>{' '}
@@ -189,14 +189,14 @@ export const Footer = () => {
 							href="https://www.gnu.org/licenses/agpl-3.0.en.html"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-brg-mid underline"
+							className="text-brg-mid underline whitespace-nowrap"
 						>
 							AGPL-3
 						</a>
 						. All other rights reserved. You can reach us at{' '}
 						<a
 							href="mailto:support@miataregistry.com"
-							className="text-brg-mid underline"
+							className="text-brg-mid underline whitespace-nowrap"
 						>
 							support@miataregistry.com
 						</a>

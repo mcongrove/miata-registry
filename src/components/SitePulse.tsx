@@ -20,7 +20,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { toPrettyDate } from '../utils/common';
-
 export function SitePulse() {
 	const [lastActivity, setLastActivity] = useState<string>('');
 	const [isActive, setIsActive] = useState<boolean | null>(null);
@@ -93,79 +92,93 @@ export function SitePulse() {
 	}, []);
 
 	return (
-		<div className="flex gap-2">
-			<div
-				className={twMerge(
-					'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
-					!lastActivity
-						? 'bg-neutral-900 text-neutral-600'
-						: isActive
-							? 'bg-emerald-900 text-emerald-500'
-							: 'bg-rose-900 text-rose-400'
-				)}
-			>
-				<div
-					className={twMerge(
-						'h-2 w-2 rounded-full',
-						!lastActivity
-							? 'bg-neutral-600'
-							: isActive
-								? 'bg-emerald-500 animate-pulse'
-								: 'bg-rose-400 animate-pulse'
-					)}
-				/>{' '}
-				{!lastActivity
-					? 'Site pulse check not available'
-					: isActive
-						? `Site actively maintained as of ${lastActivity}`
-						: `Site not updated since ${lastActivity}`}
-			</div>
-
-			{archiveUrl ? (
-				<Link
-					to={archiveUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="hover:opacity-80 transition-opacity"
-				>
-					<div
-						className={twMerge(
-							'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
-							!lastArchive
-								? 'bg-neutral-900 text-neutral-600'
-								: isArchived
-									? 'bg-emerald-900 text-emerald-500'
-									: 'bg-rose-900 text-rose-400'
-						)}
-					>
-						<div
-							className={twMerge(
-								'h-2 w-2 rounded-full',
-								!lastArchive
-									? 'bg-neutral-600'
-									: isArchived
-										? 'bg-emerald-500 animate-pulse'
-										: 'bg-rose-400 animate-pulse'
-							)}
-						/>{' '}
-						{!lastArchive
-							? 'Data archive check not available'
-							: isArchived
-								? `Data archived ${lastArchive}`
-								: `Data not archived since ${lastArchive}`}
-					</div>
-				</Link>
-			) : (
+		<div className="flex flex-col gap-2 items-center">
+			<div className="flex flex-col md:flex-row w-full md:w-fit gap-2">
 				<div
 					className={twMerge(
 						'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
-						'bg-neutral-900 text-neutral-600'
+						!lastActivity
+							? 'bg-neutral-900 text-neutral-600'
+							: isActive
+								? 'bg-emerald-900 text-emerald-500'
+								: 'bg-rose-900 text-rose-400'
 					)}
 				>
-					<div className="h-2 w-2 rounded-full bg-neutral-600" /> Data
-					archive check not available
+					<div
+						className={twMerge(
+							'h-2 w-2 rounded-full',
+							!lastActivity
+								? 'bg-neutral-600'
+								: isActive
+									? 'bg-emerald-500 animate-pulse'
+									: 'bg-rose-400 animate-pulse'
+						)}
+					/>{' '}
+					{!lastActivity
+						? 'Site pulse check not available'
+						: isActive
+							? `Site actively maintained as of ${lastActivity}`
+							: `Site not updated since ${lastActivity}`}
 				</div>
-			)}
+
+				{archiveUrl ? (
+					<Link
+						to={archiveUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="hover:opacity-80 transition-opacity"
+					>
+						<div
+							className={twMerge(
+								'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
+								!lastArchive
+									? 'bg-neutral-900 text-neutral-600'
+									: isArchived
+										? 'bg-emerald-900 text-emerald-500'
+										: 'bg-rose-900 text-rose-400'
+							)}
+						>
+							<div
+								className={twMerge(
+									'h-2 w-2 rounded-full',
+									!lastArchive
+										? 'bg-neutral-600'
+										: isArchived
+											? 'bg-emerald-500 animate-pulse'
+											: 'bg-rose-400 animate-pulse'
+								)}
+							/>{' '}
+							{!lastArchive
+								? 'Data archive check not available'
+								: isArchived
+									? `Data last archived ${lastArchive}`
+									: `Data not archived since ${lastArchive}`}
+						</div>
+					</Link>
+				) : (
+					<div
+						className={twMerge(
+							'flex items-center justify-center gap-1.5 text-xs font-medium rounded-md py-1 px-2',
+							'bg-neutral-900 text-neutral-600'
+						)}
+					>
+						<div className="h-2 w-2 rounded-full bg-neutral-600" />{' '}
+						Data archive check not available
+					</div>
+				)}
+			</div>
+
+			<div className="text-xs text-brg-mid/80 text-center">
+				<p>
+					These statuses act as a proof that the site is actively
+					maintained and the data is publicly archived.
+				</p>
+
+				<p>
+					The actions that update these statuses are not run daily, so
+					only large time lapses should be considered problematic.
+				</p>
+			</div>
 		</div>
 	);
 }
