@@ -73,7 +73,7 @@ export const PendingItem = ({
 					</h3>
 
 					<p className="text-xs text-brg-border">
-						{new Date(createdAt)
+						{new Date(createdAt * 1000)
 							.toLocaleString('en-US', {
 								year: 'numeric',
 								month: '2-digit',

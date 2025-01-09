@@ -33,7 +33,6 @@ export type TTip = {
 	owner_name?: string;
 	sequence?: string;
 	status: TTipStatus;
-	updated_at?: number;
 	user_id?: string;
 	vin?: string;
 };

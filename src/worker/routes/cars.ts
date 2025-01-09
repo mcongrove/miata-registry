@@ -533,7 +533,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				...existing.car,
 				id: crypto.randomUUID(),
 				car_id: existing.car.id,
-				created_at: Date.now(),
+				created_at: Math.floor(Date.now() / 1000),
 				current_owner_id: body.owner_date_end
 					? null
 					: existing.car.current_owner_id,
@@ -558,7 +558,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		if (carOwnerChanged) {
 			await db.insert(CarOwnersPending).values({
 				car_id: id,
-				created_at: Date.now(),
+				created_at: Math.floor(Date.now() / 1000),
 				date_end: body.owner_date_end
 					? `${body.owner_date_end}T00:00:00.000Z`
 					: null,

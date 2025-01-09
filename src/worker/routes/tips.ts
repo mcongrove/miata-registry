@@ -28,8 +28,9 @@ tipsRouter.post('/', async (c) => {
 	try {
 		const formData = await c.req.formData();
 		const tipId = crypto.randomUUID();
+
 		const values = {
-			created_at: Date.now(),
+			created_at: Math.floor(Date.now() / 1000),
 			edition_name: formData.get('edition_name') as string,
 			id: tipId,
 			information: (formData.get('information') as string) || null,

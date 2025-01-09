@@ -32,7 +32,6 @@ export const Tips = sqliteTable('tips', {
 	})
 		.notNull()
 		.default(TipStatus.PENDING),
-	updated_at: integer('updated_at'),
 	user_id: text('user_id'),
 	vin: text('vin'),
 });
