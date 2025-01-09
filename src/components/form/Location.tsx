@@ -19,7 +19,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { TAddress } from '../../types/Location';
-import { GoogleMapsWrapper } from '../GoogleMapsWrapper';
 
 interface LocationProps {
 	className?: string;
@@ -122,21 +121,19 @@ export function Location({
 	}, [onLocationSelect, fullAddress]);
 
 	return (
-		<GoogleMapsWrapper>
-			<input
-				ref={inputRef}
-				id={id}
-				name={name}
-				type="text"
-				placeholder={placeholder}
-				required={required}
-				value={inputValue}
-				onChange={(e) => setInputValue(e.target.value)}
-				className={twMerge(
-					'w-full p-2 !text-[16px] md:!text-sm text-brg border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid',
-					className
-				)}
-			/>
-		</GoogleMapsWrapper>
+		<input
+			ref={inputRef}
+			id={id}
+			name={name}
+			type="text"
+			placeholder={placeholder}
+			required={required}
+			value={inputValue}
+			onChange={(e) => setInputValue(e.target.value)}
+			className={twMerge(
+				'w-full p-2 !text-[16px] md:!text-sm text-brg border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid',
+				className
+			)}
+		/>
 	);
 }

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ClerkProvider, useUser } from '@clerk/clerk-react';
+import { ClerkProvider } from '@clerk/clerk-react';
 import { lazy, Suspense, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import {
@@ -29,6 +29,7 @@ import {
 import { CSP } from './components/CSP';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { GoogleMapsProvider } from './context/GoogleMapsContext';
 import { ModalProvider } from './context/ModalContext';
 import { Home } from './pages/Home';
 
@@ -93,120 +94,112 @@ const Layout = () => (
 
 const Fallback = () => <div className="min-h-screen" />;
 
-function AppRoutes() {
-	const { user } = useUser();
-
-	return (
-		<Routes>
-			<Route element={<Layout />}>
-				<Route path="/" element={<Home />} />
-				<Route
-					path="/about"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<About />
-						</Suspense>
-					}
-				/>
-				<Route
-					path="/legal"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<Legal />
-						</Suspense>
-					}
-				/>
-				{Boolean(user?.publicMetadata?.moderator) && (
-					<Route
-						path="/moderation"
-						element={
-							<Suspense fallback={<Fallback />}>
-								<Moderation />
-							</Suspense>
-						}
-					/>
-				)}
-				<Route
-					path="/news"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<News />
-						</Suspense>
-					}
-				/>
-				<Route
-					path="/news/:id"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<NewsArticle />
-						</Suspense>
-					}
-				/>
-				<Route
-					path="/rarity"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<Rarity />
-						</Suspense>
-					}
-				/>
-				<Route
-					path="/registry"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<Registry />
-						</Suspense>
-					}
-				/>
-				<Route
-					path="/registry/:id"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<CarProfile />
-						</Suspense>
-					}
-				/>
-				<Route
-					path="/registry/editions"
-					element={
-						<Suspense fallback={<Fallback />}>
-							<Editions />
-						</Suspense>
-					}
-				/>
-			</Route>
-		</Routes>
-	);
-}
-
 function App() {
 	return (
-		<ClerkProvider
-			publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-			afterSignOutUrl="/"
-			localization={{
-				userButton: {
-					action__manageAccount: 'Account Settings',
-				},
-				userProfile: {
-					start: {
-						headerTitle__account: 'Account Settings',
+		<GoogleMapsProvider>
+			<ClerkProvider
+				publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+				afterSignOutUrl="/"
+				localization={{
+					userButton: {
+						action__manageAccount: 'Account Settings',
 					},
-					navbar: {
-						account: 'Account',
+					userProfile: {
+						start: {
+							headerTitle__account: 'Account Settings',
+						},
+						navbar: {
+							account: 'Account',
+						},
 					},
-				},
-			}}
-		>
-			<CSP />
-			<Toaster />
+				}}
+			>
+				<CSP />
+				<Toaster />
 
-			<BrowserRouter>
-				<ModalProvider>
-					<AppRoutes />
-				</ModalProvider>
-			</BrowserRouter>
-		</ClerkProvider>
+				<BrowserRouter>
+					<ModalProvider>
+						<Routes>
+							<Route element={<Layout />}>
+								<Route path="/" element={<Home />} />
+								<Route
+									path="/about"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<About />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/legal"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Legal />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/moderation"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Moderation />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/news"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<News />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/news/:id"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<NewsArticle />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/rarity"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Rarity />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/registry"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Registry />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/registry/:id"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<CarProfile />
+										</Suspense>
+									}
+								/>
+								<Route
+									path="/registry/editions"
+									element={
+										<Suspense fallback={<Fallback />}>
+											<Editions />
+										</Suspense>
+									}
+								/>
+							</Route>
+						</Routes>
+					</ModalProvider>
+				</BrowserRouter>
+			</ClerkProvider>
+		</GoogleMapsProvider>
 	);
 }
 
