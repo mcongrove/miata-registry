@@ -21,7 +21,7 @@ import { twMerge } from 'tailwind-merge';
 
 interface ErrorBannerProps {
 	className?: string;
-	error: string | null;
+	error: React.ReactNode;
 	onDismiss?: () => void;
 }
 

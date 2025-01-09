@@ -21,6 +21,7 @@ import { lazy, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { Button } from '../components/Button';
+import { GoogleMapsWrapper } from '../components/GoogleMapsWrapper';
 import { Chip } from '../components/rarity/Chip';
 import { Tooltip } from '../components/Tooltip';
 import { useModal } from '../context/ModalContext';
@@ -760,14 +761,17 @@ export const CarProfile = () => {
 						<div className="bg-white rounded-lg border border-brg-light overflow-hidden">
 							<div className="aspect-[16/9] w-full relative">
 								{car ? (
-									<Map
-										hasOwners={
-											car.owner_history
-												? car.owner_history.length > 0
-												: false
-										}
-										locations={mapLocations}
-									/>
+									<GoogleMapsWrapper>
+										<Map
+											hasOwners={
+												car.owner_history
+													? car.owner_history.length >
+														0
+													: false
+											}
+											locations={mapLocations}
+										/>
+									</GoogleMapsWrapper>
 								) : (
 									<div className="w-full h-full bg-brg-light animate-pulse" />
 								)}

@@ -32,12 +32,11 @@ Sentry.init({
 		Sentry.browserTracingIntegration(),
 		Sentry.replayIntegration(),
 	],
-	tracesSampleRate: 1.0,
+	tracesSampleRate: 0.5,
 	tracePropagationTargets: [
 		/^https?:\/\/(?!(?:clerk\.|accounts\.))(.*\.)?miataregistry\.com/,
 		...(import.meta.env.DEV ? ['localhost'] : []),
 	],
-	replaysSessionSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
 	replaysOnErrorSampleRate: 1.0,
 });
 
