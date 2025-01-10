@@ -37,13 +37,13 @@ describe('Editions Page', () => {
 
 		cy.contains('1990 NA').should('be.visible');
 
-		cy.get('[data-cy="edition-tabs-NB"]').click();
+		cy.get('[data-cy="edition-tabs-NB"]').should('be.visible').click();
 		cy.contains('1999 NB').should('be.visible');
 
-		cy.get('[data-cy="edition-tabs-NC"]').click();
+		cy.get('[data-cy="edition-tabs-NC"]').should('be.visible').click();
 		cy.contains('2006 NC').should('be.visible');
 
-		cy.get('[data-cy="edition-tabs-ND"]').click();
+		cy.get('[data-cy="edition-tabs-ND"]').should('be.visible').click();
 		cy.contains('2019 ND').should('be.visible');
 	});
 });

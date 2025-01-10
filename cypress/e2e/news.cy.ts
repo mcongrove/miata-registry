@@ -36,7 +36,7 @@ describe('News Page', () => {
 	});
 
 	it('handles article links correctly', () => {
-		cy.get('a[href^="/news/"]').first().click();
+		cy.get('a[href^="/news/"]').first().should('be.visible').click();
 		cy.url().should('include', '/news/');
 	});
 });

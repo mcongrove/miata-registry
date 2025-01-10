@@ -29,12 +29,14 @@ describe('Footer', () => {
 	});
 
 	it('opens modals when clicking buttons', () => {
-		cy.get('[data-cy="footer-register-your-miata"]').click();
+		cy.get('[data-cy="footer-register-your-miata"]')
+			.should('be.visible')
+			.click();
 		cy.contains('Account Required').should('be.visible');
-		cy.contains('button', 'Cancel').click();
+		cy.contains('button', 'Cancel').should('be.visible').click();
 
-		cy.get('[data-cy="footer-submit-a-tip"]').click();
+		cy.get('[data-cy="footer-submit-a-tip"]').should('be.visible').click();
 		cy.contains('Submit a Tip').should('be.visible');
-		cy.contains('button', 'Cancel').click();
+		cy.contains('button', 'Cancel').should('be.visible').click();
 	});
 });

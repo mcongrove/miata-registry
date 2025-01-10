@@ -33,6 +33,10 @@ describe('Car Page', () => {
 		cy.get('a[href*="https://instagram.com/brg.182"]').should('be.visible');
 	});
 
+	it('has claim button', () => {
+		cy.contains('Claim this Car').should('be.visible');
+	});
+
 	it('has car photo', () => {
 		cy.get('img[src*="63621393-a540-46b5-b9fe-9231fea2730f"]')
 			.should('be.visible')

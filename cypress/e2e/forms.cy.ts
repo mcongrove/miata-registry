@@ -23,7 +23,7 @@ describe('Forms', () => {
 
 	it('can submit the tip form', () => {
 		cy.get('[data-cy="header-registry"]').realHover();
-		cy.get('[data-cy="header-submit-a-tip"]').click();
+		cy.get('[data-cy="header-submit-a-tip"]').should('be.visible').click();
 		cy.contains('Submit a Tip').should('be.visible');
 
 		const formData = {

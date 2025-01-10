@@ -61,7 +61,7 @@ describe('About Page', () => {
 		cy.get('[name="email"]').type(formData.email);
 		cy.get('[name="message"]').type(formData.message);
 
-		cy.contains('button', 'Send Message').click();
+		cy.contains('button', 'Send Message').should('be.visible').click();
 
 		cy.wait('@formContactRequest').then((interception) => {
 			expect(interception.response?.statusCode).to.equal(200);

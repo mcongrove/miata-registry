@@ -37,7 +37,7 @@ describe('Article Page', () => {
 	});
 
 	it('handles back to news navigation', () => {
-		cy.contains('← Back to News').click();
+		cy.contains('← Back to News').should('be.visible').click();
 		cy.url().should('include', '/news');
 	});
 
