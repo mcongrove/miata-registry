@@ -437,7 +437,7 @@ moderationRouter.post(
 						from: 'Miata Registry <no-reply@miataregistry.com>',
 						to: primaryEmail.emailAddress,
 						subject: 'Miata Registry: Ownership update approved',
-						react: ApprovedOwner(),
+						react: ApprovedOwner({ car_id: carOwner.car_id }),
 					});
 				}
 			}

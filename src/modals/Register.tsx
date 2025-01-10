@@ -326,7 +326,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 										<select
 											className={SelectStyles(
 												false,
-												'w-full border-brg-light text-sm'
+												'w-full border-brg-light text-sm z-10'
 											)}
 											name="edition_name"
 											required
@@ -360,11 +360,11 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 										{selectedEdition ===
 											'1990 Color Test Cars' && (
 											<ErrorBanner
-												className="p-2 mt-1"
+												className="p-2 pt-3.5 pb-2.5 -mt-3 rounded-t-none z-0"
 												error={
-													<span className="flex flex-col gap-0.5">
-														No, it probably isn't.
-														<span className="text-xs opacity-60">
+													<span className="text-xs font-medium">
+														No, it probably isn't.{' '}
+														<span className="font-normal opacity-60">
 															There were only 6
 															produced.
 														</span>
