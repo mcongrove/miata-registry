@@ -217,6 +217,10 @@ ownersRouter.get('/:id/pending', withAuth(), async (c) => {
 				)
 			);
 
+		if (!pendingCars.length && !pendingCarOwners.length) {
+			return c.json(null);
+		}
+
 		return c.json({
 			cars: pendingCars,
 			carOwners: pendingCarOwners,
