@@ -29,6 +29,7 @@ export type TTip = {
 	edition_name: string;
 	id: string;
 	information?: string;
+	owner_date_start?: string;
 	owner_location?: string;
 	owner_name?: string;
 	sequence?: string;
