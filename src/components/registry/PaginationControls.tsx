@@ -98,8 +98,8 @@ export const PaginationControls = ({
 						value={currentPage}
 						disabled={totalPages <= 1}
 						className="md:!text-xs disabled:opacity-30 disabled:cursor-not-allowed"
-						onChange={(value) => {
-							const newPage = Number(value);
+						onChange={(event) => {
+							const newPage = Number(event.target.value);
 
 							if (newPage !== currentPage) {
 								onPageChange(newPage);

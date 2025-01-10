@@ -166,9 +166,9 @@ export const RegistryTable = ({
 											{car.edition?.color}
 										</div>
 									</td>
-									{car.sequence ? (
+									{car.sequence !== null ? (
 										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
-											{car.sequence.toLocaleString()}
+											{car.sequence?.toLocaleString()}
 											{car.edition?.total_produced && (
 												<span className="text-brg-border">
 													of{' '}
@@ -188,7 +188,7 @@ export const RegistryTable = ({
 										</td>
 									)}
 									<td className="px-4 py-3 whitespace-nowrap">
-										{car.current_owner ? (
+										{car.current_owner?.name ? (
 											car.current_owner.name
 										) : (
 											<button

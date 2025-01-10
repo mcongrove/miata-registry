@@ -282,13 +282,13 @@ carsRouter.get('/:id', async (c) => {
 				shipping_vessel: Cars.shipping_vessel,
 				vin: Cars.vin,
 				current_owner: {
-					city: Owners.city,
-					country: Owners.country,
+					city: sql`COALESCE(${Owners.city}, '')`.as('city'),
+					country: sql`COALESCE(${Owners.country}, '')`.as('country'),
 					id: Owners.id,
 					links: sql`json(${Owners.links})`,
-					name: Owners.name,
-					state: Owners.state,
-					user_id: Owners.user_id,
+					name: sql`COALESCE(${Owners.name}, '')`.as('name'),
+					state: sql`COALESCE(${Owners.state}, '')`.as('state'),
+					user_id: sql`COALESCE(${Owners.user_id}, '')`.as('user_id'),
 				},
 				edition: {
 					color: Editions.color,

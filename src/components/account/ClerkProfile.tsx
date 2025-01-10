@@ -67,7 +67,9 @@ export const ClerkProfile = ({
 					body: JSON.stringify({
 						location: location ? parseLocation(location) : null,
 						links: {
-							instagram: instagram || null,
+							instagram: instagram
+								? instagram.replace('@', '')
+								: null,
 						},
 					}),
 				}

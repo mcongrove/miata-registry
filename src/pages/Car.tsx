@@ -43,6 +43,8 @@ const TimelineItem = lazy(() =>
 
 export const getVinDetails = async (vin: string, year: number) => {
 	try {
+		if (!vin || !year) return null;
+
 		const response = await fetch(
 			`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json&modelyear=${year}`
 		);
@@ -376,7 +378,7 @@ export const CarProfile = () => {
 	}, [car, timelineOwners, vinDetails, manufactureLocation]);
 
 	const mapLocations = useMemo(() => {
-		if (!car || !vinDetails) return [];
+		if (!car && !vinDetails) return [];
 
 		return [
 			vinDetails?.VIN?.startsWith('JM1') ? country('JP') : null,
@@ -385,14 +387,14 @@ export const CarProfile = () => {
 				: vinDetails?.VIN?.startsWith('JM1')
 					? country('JP')
 					: null,
-			car.shipping_state
+			car?.shipping_state
 				? state(car.shipping_state)
-				: car.shipping_country
+				: car?.shipping_country
 					? country(car.shipping_country as any)
 					: null,
-			car.sale_dealer_state
+			car?.sale_dealer_state
 				? state(car.sale_dealer_state)
-				: car.sale_dealer_country
+				: car?.sale_dealer_country
 					? country(car.sale_dealer_country as any)
 					: null,
 			...timelineOwners
@@ -434,11 +436,12 @@ export const CarProfile = () => {
 													{car.edition
 														?.total_produced && (
 														<p className="text-sm lg:text-base font-medium text-brg-border">
-															{car.sequence ? (
+															{car.sequence !==
+															null ? (
 																<>
 																	No.{' '}
 																	<span className="text-brg">
-																		{car.sequence.toLocaleString()}
+																		{car.sequence?.toLocaleString()}
 																	</span>{' '}
 																	of{' '}
 																	{car.edition?.total_produced?.toLocaleString()}
@@ -575,7 +578,11 @@ export const CarProfile = () => {
 
 									{car ? (
 										<p className="font-medium font-mono pt-px">
-											{car.vin}
+											{car.vin || (
+												<span className="text-brg-border">
+													Unknown
+												</span>
+											)}
 										</p>
 									) : (
 										<div className="h-6 w-32 bg-brg-light rounded animate-pulse" />
@@ -593,12 +600,27 @@ export const CarProfile = () => {
 										</Tooltip>
 									</div>
 
-									<p
-										className={`font-medium ${!vinDetails ? 'animate-pulse bg-brg-light h-6 w-24 rounded' : formatEngineDetails(vinDetails) === 'Not specified' ? 'text-brg-border' : ''}`}
-									>
-										{vinDetails &&
-											formatEngineDetails(vinDetails)}
-									</p>
+									{car?.vin ? (
+										<p
+											className={twMerge(
+												'font-medium',
+												!vinDetails
+													? 'animate-pulse bg-brg-light h-6 w-24 rounded'
+													: formatEngineDetails(
+																vinDetails
+														  ) === 'Not specified'
+														? 'text-brg-border'
+														: ''
+											)}
+										>
+											{vinDetails &&
+												formatEngineDetails(vinDetails)}
+										</p>
+									) : (
+										<p className="font-medium text-brg-border">
+											Not specified
+										</p>
+									)}
 								</div>
 							</div>
 

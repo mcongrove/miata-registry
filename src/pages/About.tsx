@@ -412,9 +412,9 @@ export const About = () => {
 							registries maintained by All Roadster (Evolution
 							Orange), Barry Weyand (Laguna Blue), Justin Porter
 							(Sunburst Yellow), Bonnie Lutz (Sunburst Yellow),
-							Curtis Wiseman (Sunburst Yellow), Ed Menzenski (1991
-							SE), Chris Owens (10th Anniversary), and David
-							Gilbert (2001 SE). We'd like to thank them
+							Curtis Wiseman (Sunburst Yellow), Chris Owens (10th
+							Anniversary), David Gilbert (2001 SE), and Nathan
+							Ballard (30th Anniversary). We'd like to thank them
 							especially for their contributions to the Miata
 							community.
 						</p>
