@@ -24,6 +24,7 @@ export const Tips = sqliteTable('tips', {
 	edition_name: text('edition_name').notNull(),
 	id: text('id').primaryKey(),
 	information: text('information'),
+	owner_date_start: text('owner_date_start'),
 	owner_location: text('owner_location'),
 	owner_name: text('owner_name'),
 	sequence: text('sequence'),
