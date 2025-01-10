@@ -63,54 +63,6 @@ export const getVinDetails = async (vin: string, year: number) => {
 	}
 };
 
-const EditButton = ({
-	className,
-	color = 'text-brg-mid',
-	disabled = false,
-	icon,
-	onClick,
-	text,
-}: {
-	className?: string;
-	color?: string;
-	disabled?: boolean;
-	icon: string;
-	onClick?: () => void;
-	text: string;
-}) => {
-	return (
-		<div
-			className={twMerge(
-				'flex flex-col items-center justify-center p-3 gap-2 text-xs font-medium',
-				color,
-				disabled
-					? 'cursor-not-allowed pointer-events-none'
-					: 'cursor-pointer hover:bg-brg-light/30'
-			)}
-			onClick={onClick}
-		>
-			<i
-				className={twMerge(
-					'fa-solid fa-fw text-xl',
-					icon,
-					color,
-					className,
-					disabled ? 'opacity-50' : ''
-				)}
-			/>
-
-			<span
-				className={twMerge(
-					'whitespace-nowrap',
-					disabled ? 'opacity-50' : ''
-				)}
-			>
-				{text}
-			</span>
-		</div>
-	);
-};
-
 export const CarProfile = () => {
 	const { id } = useParams();
 	const { userId } = useAuth();
