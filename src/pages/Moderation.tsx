@@ -358,7 +358,7 @@ export const Moderation = () => {
 						<Button
 							onClick={() => openEmailModal()}
 							variant="secondary"
-							className="!px-2.5 !py-2"
+							className="lg:px-2.5 lg:py-2"
 						>
 							<i className="fa-solid fa-fw fa-envelope text-white text-xl"></i>
 						</Button>
@@ -366,7 +366,7 @@ export const Moderation = () => {
 						<Button
 							onClick={() => openEmailModal('rejection')}
 							variant="secondary"
-							className="!px-2.5 !py-2 !bg-red-800"
+							className="lg:px-2.5 lg:py-2 bg-red-800"
 						>
 							<i className="fa-solid fa-fw fa-envelope text-white text-xl" />
 						</Button>

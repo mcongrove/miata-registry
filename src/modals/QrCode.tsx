@@ -176,7 +176,7 @@ export function QrCode({
 			isOpen={isOpen}
 			onClose={handleClose}
 			hideCancel={!showStickerForm}
-			title={showStickerForm ? 'Request Window Sticker' : 'QR Codes'}
+			title={showStickerForm ? 'Request Window Sticker' : 'QR Code'}
 			allowClickOut={!showStickerForm}
 			action={
 				showStickerForm
@@ -236,13 +236,17 @@ export function QrCode({
 					</form>
 				</div>
 			) : (
-				<div className="flex gap-8 min-h-[400px]">
+				<div className="relative flex flex-row gap-8 lg:min-h-[400px]">
 					<div className="w-full flex flex-col items-start gap-4">
-						<Button onClick={handleDownload} variant="secondary">
+						<Button
+							onClick={handleDownload}
+							variant="secondary"
+							className="hidden lg:block"
+						>
 							Save QR code
 						</Button>
 
-						<div className="size-[228px] bg-brg-light p-6 rounded-lg">
+						<div className="size-[228px] lg:bg-brg-light lg:p-6 rounded-lg">
 							<QRCodeSVG
 								value={qrUrl}
 								size={imageSize}
@@ -254,9 +258,9 @@ export function QrCode({
 						</div>
 					</div>
 
-					<div className="w-px bg-brg-light"></div>
+					<div className="w-px bg-brg-light hidden lg:block"></div>
 
-					<div className="flex flex-col gap-4 items-start">
+					<div className="hidden lg:flex flex-col gap-4 items-start">
 						<Button
 							withArrow
 							variant="secondary"

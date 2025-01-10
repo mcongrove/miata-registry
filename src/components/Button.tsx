@@ -19,20 +19,21 @@
 import { ButtonHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	withArrow?: boolean;
-	variant?: 'primary' | 'secondary' | 'tertiary';
 	href?: string;
+	variant?: 'primary' | 'secondary' | 'tertiary';
+	withArrow?: boolean;
 }
 
 export const Button = ({
-	className,
 	children,
-	onClick,
-	withArrow = false,
-	variant = 'primary',
-	href,
+	className,
 	disabled,
+	href,
+	onClick,
+	variant = 'primary',
+	withArrow = false,
 	...props
 }: ButtonProps) => {
 	const buttonClassName = twMerge(

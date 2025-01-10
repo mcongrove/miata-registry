@@ -417,80 +417,152 @@ export const CarProfile = () => {
 
 	return (
 		<main className="flex-1 pt-20 pb-0 lg:pb-16">
-			<div className="container mx-auto px-8 py-6 lg:p-0 lg:py-8">
-				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-					<div className="lg:col-span-8 space-y-6 lg:space-y-8">
-						<div>
-							{car ? (
-								<>
-									<div className="flex items-end justify-between gap-4">
-										<div className="flex flex-col gap-1.5 lg:gap-1 items-start">
-											<h2 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
-												{car.edition?.year}{' '}
-												{car.edition?.name}
-											</h2>
+			<div className="bg-brg-light/40 lg:border-b border-brg-light">
+				<div className="container mx-auto px-8 p-6 lg:px-0 lg:pt-8 lg:pb-6">
+					{car ? (
+						<div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+							<div className="flex flex-col gap-1.5 lg:gap-1 items-start">
+								<h2 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
+									{car.edition?.year} {car.edition?.name}
+								</h2>
 
-											{(car.edition?.total_produced ||
-												car.rarity_score) && (
-												<div className="flex gap-2 lg:gap-4 items-center">
-													{car.edition
-														?.total_produced && (
-														<p className="text-sm lg:text-base font-medium text-brg-border">
-															{car.sequence !==
-															null ? (
-																<>
-																	No.{' '}
-																	<span className="text-brg">
-																		{car.sequence?.toLocaleString()}
-																	</span>{' '}
-																	of{' '}
-																	{car.edition?.total_produced?.toLocaleString()}
-																</>
-															) : (
-																`One of the ${car.edition?.total_produced?.toLocaleString()} produced`
-															)}
-														</p>
-													)}
+								{(car.edition?.total_produced ||
+									car.rarity_score) && (
+									<div className="flex gap-2 lg:gap-4 items-center">
+										{car.edition?.total_produced && (
+											<p className="text-sm lg:text-base text-brg-mid/60">
+												{car.sequence !== null ? (
+													<>
+														No.{' '}
+														<span className="text-brg">
+															{car.sequence?.toLocaleString()}
+														</span>{' '}
+														of{' '}
+														{car.edition?.total_produced?.toLocaleString()}
+													</>
+												) : (
+													`One of the ${car.edition?.total_produced?.toLocaleString()} produced`
+												)}
+											</p>
+										)}
 
-													{car.rarity_score && (
-														<Chip
-															score={
-																car.rarity_score
-															}
-														/>
-													)}
-												</div>
-											)}
-										</div>
-
-										{car.current_owner?.links && (
-											<Link
-												to={`https://instagram.com/${
-													JSON.parse(
-														car.current_owner
-															.links as string
-													).instagram
-												}`}
-												target="_blank"
-												rel="noopener noreferrer"
-											>
-												<i className="fa-brands fa-square-instagram text-3xl text-brg-mid/70" />
-
-												<span className="sr-only">
-													Car Instagram link
-												</span>
-											</Link>
+										{car.rarity_score && (
+											<Chip score={car.rarity_score} />
 										)}
 									</div>
-								</>
-							) : (
-								<div className="space-y-2">
-									<div className="h-10 w-96 bg-brg-light rounded-lg animate-pulse" />
-									<div className="h-6 w-48 bg-brg-light rounded-lg animate-pulse" />
-								</div>
-							)}
-						</div>
+								)}
+							</div>
 
+							<div className="flex gap-2 lg:gap-4 items-center lg:justify-end">
+								{userId &&
+								car?.current_owner?.user_id === userId ? (
+									<>
+										{car?.has_pending_changes && (
+											<p className="hidden md:flex text-sm text-brg items-center gap-2">
+												<i className="fa-solid fa-fw fa-triangle-exclamation text-base text-yellow-500" />{' '}
+												This car has pending changes
+											</p>
+										)}
+
+										<Button
+											onClick={() => {
+												openModal('carEdit', {
+													car,
+													onUpdate: () => {
+														setCar((prev) => {
+															if (!prev)
+																return null;
+
+															return {
+																...prev,
+																has_pending_changes:
+																	true,
+															};
+														});
+													},
+												});
+											}}
+											disabled={car?.has_pending_changes}
+											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
+										>
+											<i className="fa-solid fa-fw fa-pen-to-square opacity-70" />
+											Edit Car
+										</Button>
+
+										<Button
+											onClick={() => {
+												openModal('qrCode', {
+													car,
+												});
+											}}
+											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
+										>
+											<i className="fa-solid fa-fw fa-qrcode opacity-70" />
+
+											<span className="hidden lg:inline">
+												QR Codes
+											</span>
+
+											<span className="inline lg:hidden">
+												QR Code
+											</span>
+										</Button>
+									</>
+								) : (
+									<Button
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+
+											openModal('register', {
+												prefilledData: {
+													edition_name: `${car.edition?.year} ${car.edition?.name}`,
+													id: car.id,
+													sequence:
+														car.sequence?.toString() ||
+														'',
+													vin: car.vin || '',
+												},
+											});
+										}}
+										className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
+									>
+										<i className="fa-solid fa-fw fa-key text-yellow-500" />
+										Claim this Car
+									</Button>
+								)}
+
+								{car.current_owner?.links && (
+									<Link
+										to={`https://instagram.com/${
+											JSON.parse(
+												car.current_owner
+													.links as string
+											).instagram
+										}`}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="ml-auto lg:ml-0"
+									>
+										<Button className="size-9 flex items-center justify-center rounded-md lg:p-2 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white">
+											<i className="fa-brands fa-instagram text-2xl" />
+										</Button>
+									</Link>
+								)}
+							</div>
+						</div>
+					) : (
+						<div className="space-y-2">
+							<div className="h-10 w-96 bg-brg-light rounded-lg animate-pulse" />
+							<div className="h-6 w-48 bg-brg-light rounded-lg animate-pulse" />
+						</div>
+					)}
+				</div>
+			</div>
+
+			<div className="container mx-auto px-8 pb-6 lg:px-0 lg:py-8">
+				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+					<div className="lg:col-span-8 space-y-6 lg:space-y-8">
 						<div className="aspect-video w-screen lg:w-full h-72 md:h-96 lg:h-[550px] relative lg:rounded-lg overflow-hidden lg:m-0 max-lg:relative max-lg:left-1/2 max-lg:w-dvw max-lg:max-w-none max-lg:-translate-x-1/2">
 							{car ? (
 								<div className="w-full h-full bg-brg-light">
@@ -600,26 +672,35 @@ export const CarProfile = () => {
 										</Tooltip>
 									</div>
 
-									{car?.vin ? (
-										<p
-											className={twMerge(
-												'font-medium',
-												!vinDetails
-													? 'animate-pulse bg-brg-light h-6 w-24 rounded'
-													: formatEngineDetails(
-																vinDetails
-														  ) === 'Not specified'
-														? 'text-brg-border'
-														: ''
+									{car ? (
+										<>
+											{car?.vin ? (
+												<p
+													className={twMerge(
+														'font-medium',
+														!vinDetails
+															? 'animate-pulse bg-brg-light h-6 w-24 rounded'
+															: formatEngineDetails(
+																		vinDetails
+																  ) ===
+																  'Not specified'
+																? 'text-brg-border'
+																: ''
+													)}
+												>
+													{vinDetails &&
+														formatEngineDetails(
+															vinDetails
+														)}
+												</p>
+											) : (
+												<p className="font-medium text-brg-border">
+													Not specified
+												</p>
 											)}
-										>
-											{vinDetails &&
-												formatEngineDetails(vinDetails)}
-										</p>
+										</>
 									) : (
-										<p className="font-medium text-brg-border">
-											Not specified
-										</p>
+										<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
 									)}
 								</div>
 							</div>
@@ -709,76 +790,6 @@ export const CarProfile = () => {
 					</div>
 
 					<div className="lg:col-span-4 space-y-6">
-						{userId && car?.current_owner?.user_id === userId ? (
-							<div className="flex items-center justify-end gap-6">
-								{car?.has_pending_changes && (
-									<p className="hidden md:flex text-sm text-brg items-center gap-2">
-										<i className="fa-solid fa-fw fa-triangle-exclamation text-base text-yellow-500" />{' '}
-										This car has pending changes
-									</p>
-								)}
-
-								<div className="hidden md:grid grid-cols-2 divide-x divide-brg-light border rounded-lg rounded-br-none border-brg-light">
-									<EditButton
-										color="text-brg-mid"
-										icon="fa-pen-to-square"
-										text="Edit Car"
-										disabled={car?.has_pending_changes}
-										onClick={() => {
-											openModal('carEdit', {
-												car,
-												onUpdate: () => {
-													setCar((prev) => {
-														if (!prev) return null;
-
-														return {
-															...prev,
-															has_pending_changes:
-																true,
-														};
-													});
-												},
-											});
-										}}
-									/>
-
-									<EditButton
-										color="text-brg-mid"
-										icon="fa-qrcode"
-										text="Get QR Code"
-										onClick={() => {
-											openModal('qrCode', {
-												car,
-											});
-										}}
-									/>
-								</div>
-							</div>
-						) : (
-							car && (
-								<Button
-									onClick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
-
-										openModal('register', {
-											prefilledData: {
-												edition_name: `${car.edition?.year} ${car.edition?.name}`,
-												id: car.id,
-												sequence:
-													car.sequence?.toString() ||
-													'',
-												vin: car.vin || '',
-											},
-										});
-									}}
-									className="w-full md:w-auto justify-center md:flex ml-auto text-sm"
-								>
-									Claim this Car
-								</Button>
-							)
-						)}
-
 						<div className="bg-white rounded-lg border border-brg-light overflow-hidden">
 							<div className="aspect-[16/9] w-full relative">
 								{car ? (
@@ -841,14 +852,31 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						<div className="flex flex-col gap-8">
-							<div>{timelineItems}</div>
+						<div className="flex flex-col gap-4 lg:gap-8">
+							{car ? (
+								<>
+									<div>{timelineItems}</div>
 
-							<p className="text-xs text-brg-border w-3/4">
-								The above information may only be accurate as of
-								a specific date, as it may have been imported
-								from a defunct registry.
-							</p>
+									<p className="text-xs text-brg-border w-3/4">
+										The above information may only be
+										accurate as of a specific date, as it
+										may have been imported from a defunct
+										registry.
+									</p>
+								</>
+							) : (
+								<div className="flex flex-col gap-4">
+									<div className="h-16 bg-brg-light rounded-lg animate-pulse relative">
+										<div className="size-4 bg-white rounded-full absolute top-1/2 left-4 -translate-y-1/2" />
+									</div>
+									<div className="h-16 bg-brg-light rounded-lg animate-pulse relative">
+										<div className="size-4 bg-white rounded-full absolute top-1/2 left-4 -translate-y-1/2" />
+									</div>
+									<div className="h-16 bg-brg-light rounded-lg animate-pulse relative">
+										<div className="size-4 bg-white rounded-full absolute top-1/2 left-4 -translate-y-1/2" />
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 
@@ -864,7 +892,12 @@ export const CarProfile = () => {
 								{car?.edition?.description
 									?.split('\n')
 									.map((paragraph: string, index: number) => (
-										<p key={index}>{paragraph}</p>
+										<p
+											key={index}
+											className="text-sm leading-relaxed"
+										>
+											{paragraph}
+										</p>
 									))}
 							</div>
 						</div>
