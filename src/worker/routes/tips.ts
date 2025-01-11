@@ -34,9 +34,10 @@ tipsRouter.post('/', async (c) => {
 			edition_name: formData.get('edition_name') as string,
 			id: tipId,
 			information: (formData.get('information') as string) || null,
-			owner_date_start:
-				(formData.get('owner_date_start') as string) +
-					'T00:00:00.000Z' || null,
+			owner_date_start: formData.get('owner_date_start')
+				? (formData.get('owner_date_start') as string) +
+					'T00:00:00.000Z'
+				: null,
 			owner_location: (formData.get('owner_location') as string) || null,
 			owner_name: (formData.get('owner_name') as string) || null,
 			sequence: (formData.get('sequence') as string) || null,

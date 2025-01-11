@@ -24,12 +24,13 @@ describe('Forms', () => {
 	it('can submit the tip form', () => {
 		cy.get('[data-cy="header-registry"]').realHover();
 		cy.get('[data-cy="header-submit-a-tip"]').should('be.visible').click();
-		cy.contains('Submit a Tip').should('be.visible');
+		cy.contains('VIN').should('be.visible');
 
 		const formData = {
 			edition_name: '1991 British Racing Green',
 			sequence: '123',
 			vin: 'JM1NA2155N0000000',
+			owner_date_start: null,
 			owner_name: 'Cypress Test',
 			owner_location: 'Austin, TX, US',
 			information: 'This is a test message',
