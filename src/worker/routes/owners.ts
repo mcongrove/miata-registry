@@ -43,7 +43,11 @@ ownersRouter.get('/countries', async (c) => {
 		const cached = await c.env.CACHE.get('owners:countries');
 
 		if (cached) {
-			return c.json(JSON.parse(cached));
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const db = createDb(c.env.DB);

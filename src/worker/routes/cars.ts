@@ -51,7 +51,11 @@ carsRouter.get('/', async (c) => {
 			const cached = await c.env.CACHE.get(cacheKey);
 
 			if (cached) {
-				return c.json(JSON.parse(cached));
+				const response = c.json(JSON.parse(cached));
+
+				response.headers.set('X-Cache', 'HIT');
+
+				return response;
 			}
 		}
 
@@ -254,8 +258,12 @@ carsRouter.get('/:id', async (c) => {
 		const cacheKey = `cars:details:${id}`;
 		const cached = await c.env.CACHE.get(cacheKey);
 
-		if (cached) {
-			return c.json(JSON.parse(cached));
+		if (cached && c.env.NODE_ENV !== 'development') {
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const db = createDb(c.env.DB);
@@ -374,7 +382,11 @@ carsRouter.get('/:id/summary', async (c) => {
 		const cached = await c.env.CACHE.get(cacheKey);
 
 		if (cached) {
-			return c.json(JSON.parse(cached));
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const db = createDb(c.env.DB);

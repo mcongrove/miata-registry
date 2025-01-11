@@ -47,7 +47,11 @@ archiveRouter.get('/pulse', async (c) => {
 		const cached = await c.env.CACHE.get('heartbeat:pulse');
 
 		if (cached) {
-			return c.json(JSON.parse(cached));
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const clerk = createClerkClient({
@@ -104,7 +108,11 @@ archiveRouter.get('/archive', async (c) => {
 			return c.json({ error: 'No archive information available' }, 404);
 		}
 
-		return c.json(JSON.parse(cached));
+		const response = c.json(JSON.parse(cached));
+
+		response.headers.set('X-Cache', 'HIT');
+
+		return response;
 	} catch (error) {
 		console.error('Error fetching archive info:', error);
 

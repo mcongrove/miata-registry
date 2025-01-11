@@ -39,7 +39,11 @@ newsRouter.get('/', async (c) => {
 			const cached = await c.env.CACHE.get(cacheKey);
 
 			if (cached) {
-				return c.json(JSON.parse(cached));
+				const response = c.json(JSON.parse(cached));
+
+				response.headers.set('X-Cache', 'HIT');
+
+				return response;
 			}
 		}
 
@@ -93,7 +97,11 @@ newsRouter.get('/featured', async (c) => {
 		const cached = await c.env.CACHE.get(cacheKey);
 
 		if (cached) {
-			return c.json(JSON.parse(cached));
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const db = createDb(c.env.DB);
@@ -142,7 +150,11 @@ newsRouter.get('/:id', async (c) => {
 			const cached = await c.env.CACHE.get(cacheKey);
 
 			if (cached) {
-				return c.json(JSON.parse(cached));
+				const response = c.json(JSON.parse(cached));
+
+				response.headers.set('X-Cache', 'HIT');
+
+				return response;
 			}
 		}
 

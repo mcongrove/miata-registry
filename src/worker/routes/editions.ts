@@ -33,8 +33,12 @@ editionsRouter.get('/', async (c) => {
 	try {
 		const cached = await c.env.CACHE.get('editions:all');
 
-		if (cached) {
-			return c.json(JSON.parse(cached));
+		if (cached && c.env.NODE_ENV !== 'development') {
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const db = createDb(c.env.DB);
@@ -97,8 +101,12 @@ editionsRouter.get('/names', async (c) => {
 	try {
 		const cached = await c.env.CACHE.get('editions:names');
 
-		if (cached) {
-			return c.json(JSON.parse(cached));
+		if (cached && c.env.NODE_ENV !== 'development') {
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const db = createDb(c.env.DB);

@@ -33,7 +33,11 @@ statsRouter.get('/', async (c) => {
 		const cached = await c.env.CACHE.get('stats:all');
 
 		if (cached) {
-			return c.json(JSON.parse(cached));
+			const response = c.json(JSON.parse(cached));
+
+			response.headers.set('X-Cache', 'HIT');
+
+			return response;
 		}
 
 		const db = createDb(c.env.DB);

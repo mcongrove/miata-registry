@@ -106,7 +106,24 @@ export const CarProfile = () => {
 				setCar(carData);
 
 				if (carData?.owner_history?.length) {
-					setTimelineOwners(carData.owner_history);
+					const ownerHistory = carData.owner_history;
+					const lastOwner = ownerHistory[0];
+
+					if (lastOwner?.date_end && !carData.destroyed) {
+						ownerHistory.unshift({
+							id: 'unknown-current',
+							name: 'Unknown',
+							date_end: undefined,
+							date_start: lastOwner.date_end,
+							city: undefined,
+							country: undefined,
+							state: undefined,
+							car_id: carData.id,
+							owner_id: 'unknown-current',
+						});
+					}
+
+					setTimelineOwners(ownerHistory);
 				}
 
 				if (carData?.vin) {
@@ -298,7 +315,7 @@ export const CarProfile = () => {
 							!startYear && !endYear
 								? ''
 								: index === 0
-									? car.destroyed
+									? car.destroyed || endYear
 										? `${startYear || 'Unknown'} – ${endYear || 'Destruction'}`
 										: `${startYear || 'Unknown'} – Present`
 									: `${startYear || 'Unknown'} – ${endYear || 'Unknown'}`,

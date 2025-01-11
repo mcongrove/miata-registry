@@ -87,6 +87,7 @@ export const colorMap: Record<string, string> = {
 	'sapphire blue mica': '#002B7F',
 	silver: '#C6C9CA',
 	'silver stone metallic': '#C7C9C7',
+	'snowflake white pearl mica': '#F0F0F0',
 	'starlight mica blue': '#2E2787',
 	'strato blue mica': '#1B365D',
 	'sunburst yellow': '#FFD700',
