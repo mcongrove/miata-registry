@@ -137,7 +137,6 @@ export const CarProfile = () => {
 			endDate?: number | null;
 		}> = [];
 
-		// Add manufacture date
 		chronology.push({
 			key: 'manufacture',
 			date: getYear(
@@ -147,7 +146,6 @@ export const CarProfile = () => {
 			),
 		});
 
-		// Add shipping date
 		if (car.shipping_date) {
 			chronology.push({
 				key: 'shipping',
@@ -155,7 +153,6 @@ export const CarProfile = () => {
 			});
 		}
 
-		// Add sale date
 		if (car.sale_date) {
 			chronology.push({
 				key: 'sale',
@@ -163,7 +160,6 @@ export const CarProfile = () => {
 			});
 		}
 
-		// Add owner dates
 		timelineOwners
 			.slice()
 			.reverse()
@@ -175,7 +171,6 @@ export const CarProfile = () => {
 				});
 			});
 
-		// Add destruction date if applicable
 		if (car.destroyed) {
 			chronology.push({
 				key: 'destroyed',
@@ -183,7 +178,6 @@ export const CarProfile = () => {
 			});
 		}
 
-		// Sort chronologically
 		chronology.sort((a, b) => {
 			if (!a.date) return 1;
 			if (!b.date) return -1;
@@ -200,7 +194,6 @@ export const CarProfile = () => {
 		}> = [];
 
 		chronology.forEach((event, index) => {
-			// Only calculate gaps after manufacture date if it has a value
 			if (index > 0 && chronology[0].date) {
 				const prevEvent = chronology[index - 1];
 				const prevEndDate = prevEvent.endDate || prevEvent.date;
@@ -219,18 +212,18 @@ export const CarProfile = () => {
 				}
 			}
 
-			if (
-				event.key === 'manufacture' &&
-				vinDetails &&
-				manufactureLocation
-			) {
+			if (event.key === 'manufacture') {
 				items.push({
 					name: (
 						<>
-							Built{' '}
-							{vinDetails?.Manufacturer && (
+							Built by{' '}
+							{vinDetails?.Manufacturer ? (
 								<span className="text-brg-border">
-									by {toTitleCase(vinDetails.Manufacturer)}
+									{toTitleCase(vinDetails.Manufacturer)}
+								</span>
+							) : (
+								<span className="text-brg-border">
+									by Mazda Motor Corporation
 								</span>
 							)}
 						</>
@@ -238,7 +231,7 @@ export const CarProfile = () => {
 					dateRange: car.manufacture_date
 						? toPrettyDate(car.manufacture_date)
 						: car.edition?.year.toString(),
-					location: manufactureLocation,
+					location: manufactureLocation || 'JP',
 				});
 			} else if (event.key === 'shipping') {
 				items.push({
@@ -385,15 +378,20 @@ export const CarProfile = () => {
 											<p className="text-sm lg:text-base text-brg-mid/60">
 												{car.sequence !== null ? (
 													<>
+														{car.sequence &&
+															car.sequence >
+																car.edition
+																	.total_produced &&
+															'Serial '}
 														No.{' '}
 														<span className="text-brg">
 															{car.sequence?.toLocaleString()}
 														</span>{' '}
 														of{' '}
-														{car.edition?.total_produced?.toLocaleString()}
+														{car.edition.total_produced.toLocaleString()}
 													</>
 												) : (
-													`One of the ${car.edition?.total_produced?.toLocaleString()} produced`
+													`One of the ${car.edition.total_produced.toLocaleString()} produced`
 												)}
 											</p>
 										)}
