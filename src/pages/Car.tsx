@@ -29,7 +29,12 @@ import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { formatEngineDetails, formatPlantLocation } from '../utils/car';
 import { handleApiError, toPrettyDate, toTitleCase } from '../utils/common';
-import { country, formatLocation, state } from '../utils/location';
+import {
+	country,
+	countryNameToCode,
+	formatLocation,
+	state,
+} from '../utils/location';
 
 const Map = lazy(() =>
 	import('../components/car/Map').then((module) => ({ default: module.Map }))
@@ -331,7 +336,7 @@ export const CarProfile = () => {
 
 		return [
 			vinDetails?.PlantCountry
-				? country(vinDetails.PlantCountry)
+				? country(countryNameToCode(vinDetails.PlantCountry))
 				: country('JP'),
 			car?.shipping_state
 				? state(car.shipping_state)

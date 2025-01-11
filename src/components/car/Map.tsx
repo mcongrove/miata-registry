@@ -59,6 +59,7 @@ export const Map = ({
 							lng: location.longitude || 0,
 						},
 					});
+
 					return acc;
 				},
 				[]
