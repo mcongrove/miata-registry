@@ -231,7 +231,11 @@ export const CarProfile = () => {
 					dateRange: car.manufacture_date
 						? toPrettyDate(car.manufacture_date)
 						: car.edition?.year.toString(),
-					location: manufactureLocation || 'JP',
+					location: manufactureLocation
+						? manufactureLocation
+						: car.edition?.name.includes('M2-')
+							? 'Tokyo, JP'
+							: 'JP',
 				});
 			} else if (event.key === 'shipping') {
 				items.push({
@@ -326,12 +330,9 @@ export const CarProfile = () => {
 		if (!car && !vinDetails) return [];
 
 		return [
-			vinDetails?.VIN?.startsWith('JM1') ? country('JP') : null,
 			vinDetails?.PlantCountry
 				? country(vinDetails.PlantCountry)
-				: vinDetails?.VIN?.startsWith('JM1')
-					? country('JP')
-					: null,
+				: country('JP'),
 			car?.shipping_state
 				? state(car.shipping_state)
 				: car?.shipping_country
