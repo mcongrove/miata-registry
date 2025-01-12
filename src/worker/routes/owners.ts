@@ -263,6 +263,7 @@ ownersRouter.patch('/:id', withAuth(), async (c) => {
 		}
 
 		const db = createDb(c.env.DB);
+
 		const linksJson = JSON.stringify({
 			instagram: body.links?.instagram || null,
 		});
