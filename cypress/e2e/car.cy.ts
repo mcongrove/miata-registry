@@ -23,29 +23,23 @@ describe('Car Page', () => {
 
 	it('has car data', () => {
 		cy.contains('1991 British Racing Green').should('be.visible');
-	});
 
-	it('has rarity information', () => {
 		cy.contains('Very Rare').should('be.visible');
-	});
 
-	it('has social media links', () => {
-		cy.get('a[href*="https://instagram.com/brg.182"]').should('be.visible');
-	});
-
-	it('has claim button', () => {
-		cy.contains('Claim this Car').should('be.visible');
-	});
-
-	it('has car photo', () => {
 		cy.get('img[src*="63621393-a540-46b5-b9fe-9231fea2730f"]')
 			.should('be.visible')
 			.and('have.prop', 'naturalWidth')
 			.should('be.greaterThan', 0);
+
+		cy.contains('1.6L 4-cyl 116–127hp').should('be.visible');
+
+		cy.contains('The 1991 Special Edition represents').should('be.visible');
 	});
 
-	it('has VIN data', () => {
-		cy.contains('1.6L 4-cyl 116–127hp').should('be.visible');
+	it('has actions and links', () => {
+		cy.get('a[href*="https://instagram.com/brg.182"]').should('be.visible');
+
+		cy.contains('Claim this Car').should('be.visible');
 	});
 
 	it('has sale data', () => {
@@ -55,24 +49,16 @@ describe('Car Page', () => {
 		cy.contains('San Rafael, CA, US').should('be.visible');
 	});
 
-	it('has edition description', () => {
-		cy.contains('The 1991 Special Edition represents').should('be.visible');
-	});
-
-	it('has working Google map with markers', () => {
+	it('has timeline/location data and Google map', () => {
 		cy.get('[aria-label="Japan"]').should('exist');
 		cy.get('[aria-label="California"]').should('exist');
 		cy.get('[aria-label="Nevada"]').should('exist');
 		cy.get('[aria-label="Texas"]').should('be.visible');
-	});
 
-	it('has current location', () => {
 		cy.get('[data-cy="car-location-city"]')
 			.should('be.visible')
 			.and('have.text', 'Austin');
-	});
 
-	it('has timeline data with proper formatting', () => {
 		cy.contains('Russel Hertzog').should('be.visible');
 		cy.contains('2022 – 2024').should('be.visible');
 		cy.contains('Georgetown, TX, US').should('be.visible');
