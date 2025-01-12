@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { blob, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const OwnersPending = sqliteTable('owners_pending', {
 	city: text('city'),
 	country: text('country'),
 	created_at: integer('created_at').notNull(),
 	id: text('id').primaryKey(),
-	links: blob('links', { mode: 'json' }).$type<{
+	links: text('links').$type<{
 		instagram: string | null;
 	}>(),
 	name: text('name'),

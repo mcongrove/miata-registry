@@ -44,7 +44,7 @@ export const Moderation = () => {
 	const { getToken } = useAuth();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true);
-	const [activeTab, setActiveTab] = useState<string>('cars');
+	const [activeTab, setActiveTab] = useState<string>('carOwners');
 	const [pendingCars, setPendingCars] = useState<
 		(TCarPending & { current: TCar | null; proposed: TCar })[]
 	>([]);
