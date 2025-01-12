@@ -42,7 +42,7 @@ tipsRouter.post('/', async (c) => {
 			owner_name: (formData.get('owner_name') as string) || null,
 			sequence: (formData.get('sequence') as string) || null,
 			user_id: (formData.get('user_id') as string) || null,
-			vin: (formData.get('vin') as string) || null,
+			vin: (formData.get('vin') as string).toUpperCase() || null,
 		};
 
 		if (values.owner_name === 'Cypress Test') {

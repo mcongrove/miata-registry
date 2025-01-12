@@ -31,7 +31,7 @@ jobs:
               run: npm run worker:deploy
 
             - name: Wait for deployment
-              run: sleep 90
+              run: sleep 120
 
             - name: Run Cypress tests
               id: cypress

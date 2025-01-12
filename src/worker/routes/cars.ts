@@ -551,7 +551,10 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					: existing.car.current_owner_id,
 				destroyed: body.destroyed,
 				manufacture_date: body.manufacture_date,
-				sale_date: `${body.sale_date}T00:00:00.000Z`,
+				sale_date:
+					body.sale_date !== null
+						? `${body.sale_date}T00:00:00.000Z`
+						: null,
 				sale_dealer_city: body.sale_dealer_location?.city,
 				sale_dealer_country: body.sale_dealer_location?.country,
 				sale_dealer_name: body.sale_dealer_name,
@@ -560,7 +563,10 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				sequence: body.sequence,
 				shipping_city: body.shipping_location?.city,
 				shipping_country: body.shipping_location?.country,
-				shipping_date: `${body.shipping_date}T00:00:00.000Z`,
+				shipping_date:
+					body.shipping_date !== null
+						? `${body.shipping_date}T00:00:00.000Z`
+						: null,
 				shipping_state: body.shipping_location?.state,
 				shipping_vessel: body.shipping_vessel,
 				status: 'pending',
@@ -574,7 +580,10 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				date_end: body.owner_date_end
 					? `${body.owner_date_end}T00:00:00.000Z`
 					: null,
-				date_start: `${body.owner_date_start}T00:00:00.000Z`,
+				date_start:
+					body.owner_date_start !== null
+						? `${body.owner_date_start}T00:00:00.000Z`
+						: null,
 				id: crypto.randomUUID(),
 				owner_id: existing.owner.owner_id,
 				status: 'pending',
