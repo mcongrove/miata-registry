@@ -456,7 +456,7 @@ export const CarProfile = () => {
 												});
 											}}
 											disabled={car?.has_pending_changes}
-											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
+											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2 disabled:bg-white disabled:opacity-50"
 										>
 											<i className="fa-solid fa-fw fa-pen-to-square opacity-70" />
 											Edit Car

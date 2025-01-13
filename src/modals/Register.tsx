@@ -134,7 +134,16 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 		setFormError(null);
 
 		try {
-			const form = document.querySelector('form#registerForm');
+			const form = document.querySelector(
+				'form#registerForm'
+			) as HTMLFormElement;
+
+			if (!form?.checkValidity()) {
+				form?.reportValidity();
+
+				return;
+			}
+
 			const token = await getToken();
 
 			if (!form || !token) return;
@@ -159,7 +168,9 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 							information: formData.get('information'),
 							owner_date_start: formData.get('owner_date_start'),
 							owner_id: existingOwner?.id || undefined,
-							owner_name: formData.get('owner_name'),
+							owner_name: (formData.get('owner_name') as string)
+								.replace(/\s+/g, ' ')
+								.trim(),
 							owner_city: owner_location?.city,
 							owner_state: owner_location?.state,
 							owner_country: owner_location?.country,
@@ -411,6 +422,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 									id="sequence"
 									name="sequence"
 									placeholder="182"
+									maxLength={4}
 									defaultValue={prefilledData?.sequence}
 									readOnly={!!prefilledData?.sequence}
 									className={twMerge(
@@ -429,7 +441,9 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 								<TextField
 									id="vin"
 									name="vin"
+									maxLength={17}
 									placeholder="JM1NA3510M1221538"
+									required
 									defaultValue={prefilledData?.vin}
 									readOnly={!!prefilledData?.vin}
 									className={twMerge(
@@ -450,6 +464,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 								<TextField
 									id="owner_name"
 									name="owner_name"
+									required
 									placeholder="John Doe"
 									defaultValue={
 										existingOwner?.name ||
@@ -469,6 +484,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 									id="owner_location"
 									name="owner_location"
 									placeholder="City, Country"
+									required
 									value={
 										existingOwner
 											? formatLocation({
@@ -489,13 +505,14 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						</div>
 
 						<Field
-							id="owner_date_state"
+							id="owner_date_start"
 							label="Purchase Date"
 							className="w-36"
 							required
 						>
 							<TextField
 								id="owner_date_start"
+								required
 								name="owner_date_start"
 								type="date"
 								placeholder="1990-01-01"
