@@ -497,44 +497,54 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		}
 
 		const carChecks = {
-			destroyed: existing.car.destroyed !== body.destroyed,
+			destroyed:
+				(existing.car.destroyed ?? null) !== (body.destroyed ?? null),
 			manufacture_date:
-				existing.car.manufacture_date !== body.manufacture_date,
-			sale_date: existing.car.sale_date?.split('T')[0] !== body.sale_date,
+				(existing.car.manufacture_date ?? null) !==
+				(body.manufacture_date ?? null),
+			sale_date:
+				(existing.car.sale_date?.split('T')[0] ?? null) !==
+				(body.sale_date ?? null),
 			sale_dealer_city:
-				existing.car.sale_dealer_city !==
-				body.sale_dealer_location?.city,
+				(existing.car.sale_dealer_city ?? null) !==
+				(body.sale_dealer_location?.city ?? null),
 			sale_dealer_country:
-				existing.car.sale_dealer_country !==
-				body.sale_dealer_location?.country,
+				(existing.car.sale_dealer_country ?? null) !==
+				(body.sale_dealer_location?.country ?? null),
 			sale_dealer_name:
-				existing.car.sale_dealer_name !== body.sale_dealer_name,
+				(existing.car.sale_dealer_name ?? null) !==
+				(body.sale_dealer_name ?? null),
 			sale_dealer_state:
-				existing.car.sale_dealer_state !==
-				body.sale_dealer_location?.state,
-			sale_msrp: existing.car.sale_msrp !== body.sale_msrp,
-			sequence: existing.car.sequence !== body.sequence,
+				(existing.car.sale_dealer_state ?? null) !==
+				(body.sale_dealer_location?.state ?? null),
+			sale_msrp:
+				(existing.car.sale_msrp ?? null) !== (body.sale_msrp ?? null),
+			sequence:
+				(existing.car.sequence ?? null) !== (body.sequence ?? null),
 			shipping_city:
-				existing.car.shipping_city !== body.shipping_location?.city,
+				(existing.car.shipping_city ?? null) !==
+				(body.shipping_location?.city ?? null),
 			shipping_country:
-				existing.car.shipping_country !==
-				body.shipping_location?.country,
+				(existing.car.shipping_country ?? null) !==
+				(body.shipping_location?.country ?? null),
 			shipping_date:
-				existing.car.shipping_date?.split('T')[0] !==
-				body.shipping_date,
+				(existing.car.shipping_date?.split('T')[0] ?? null) !==
+				(body.shipping_date ?? null),
 			shipping_state:
-				existing.car.shipping_state !== body.shipping_location?.state,
+				(existing.car.shipping_state ?? null) !==
+				(body.shipping_location?.state ?? null),
 			shipping_vessel:
-				existing.car.shipping_vessel !== body.shipping_vessel,
+				(existing.car.shipping_vessel ?? null) !==
+				(body.shipping_vessel ?? null),
 		};
 
 		const ownerChecks = {
 			date_start:
 				(existing.owner.date_start?.split('T')[0] ?? null) !==
-				body.owner_date_start,
+				(body.owner_date_start ?? null),
 			date_end:
 				(existing.owner.date_end?.split('T')[0] ?? null) !==
-				body.owner_date_end,
+				(body.owner_date_end ?? null),
 		};
 
 		const carChanged = Object.values(carChecks).some(Boolean);

@@ -32,7 +32,7 @@ statsRouter.get('/', async (c) => {
 	try {
 		const cached = await c.env.CACHE.get('stats:all');
 
-		if (cached) {
+		if (cached && c.env.NODE_ENV !== 'development') {
 			const response = c.json(JSON.parse(cached));
 
 			response.headers.set('X-Cache', 'HIT');

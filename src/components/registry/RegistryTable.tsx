@@ -154,13 +154,22 @@ export const RegistryTable = ({
 									<td className="px-4 py-3 whitespace-nowrap">
 										<div className="flex items-center gap-2">
 											<span
-												className="w-4 h-3 rounded-sm inline-block"
+												className={twMerge(
+													`w-4 h-3 rounded-sm inline-block`,
+													car.edition?.color?.toLowerCase() ===
+														'various'
+														? 'bg-gradient-to-r from-red-500 from-10% via-sky-500 via-50% to-purple-500 to-90%'
+														: ''
+												)}
 												style={{
 													backgroundColor:
-														colorMap[
-															car.edition?.color?.toLowerCase() ||
-																''
-														] || '#DDD',
+														car.edition?.color?.toLowerCase() !==
+														'various'
+															? colorMap[
+																	car.edition?.color?.toLowerCase() ||
+																		''
+																] || '#CCCCCC'
+															: undefined,
 												}}
 											/>
 											{car.edition?.color}
