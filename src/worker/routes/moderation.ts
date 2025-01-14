@@ -240,6 +240,9 @@ moderationRouter.post(
 	withModerator(),
 	async (c) => {
 		const { id } = c.req.param();
+		const { skipEmail } = await c.req
+			.json<{ skipEmail?: boolean }>()
+			.catch(() => ({ skipEmail: false }));
 
 		try {
 			const db = createDb(c.env.DB);
@@ -310,21 +313,24 @@ moderationRouter.post(
 					.get('clerk')
 					.users.getUser(user_id);
 
-				const primaryEmail = requestingUser.emailAddresses.find(
-					(email) => email.id === requestingUser.primaryEmailAddressId
-				);
+				if (!skipEmail) {
+					const primaryEmail = requestingUser.emailAddresses.find(
+						(email) =>
+							email.id === requestingUser.primaryEmailAddressId
+					);
 
-				if (primaryEmail) {
-					const resend = new Resend(c.env.RESEND_API_KEY);
+					if (primaryEmail) {
+						const resend = new Resend(c.env.RESEND_API_KEY);
 
-					await resend.emails.send({
-						from: 'Miata Registry <no-reply@miataregistry.com>',
-						to: primaryEmail.emailAddress,
-						subject: 'Miata Registry: Car update approved',
-						react: ApprovedCar({
-							car_id,
-						}),
-					});
+						await resend.emails.send({
+							from: 'Miata Registry <no-reply@miataregistry.com>',
+							to: primaryEmail.emailAddress,
+							subject: 'Miata Registry: Car update approved',
+							react: ApprovedCar({
+								car_id,
+							}),
+						});
+					}
 				}
 			}
 
@@ -352,6 +358,9 @@ moderationRouter.post(
 	withModerator(),
 	async (c) => {
 		const { id } = c.req.param();
+		const { skipEmail } = await c.req
+			.json<{ skipEmail?: boolean }>()
+			.catch(() => ({ skipEmail: false }));
 
 		try {
 			const db = createDb(c.env.DB);
@@ -441,21 +450,25 @@ moderationRouter.post(
 					.get('clerk')
 					.users.getUser(user_id);
 
-				const primaryEmail = requestingUser.emailAddresses.find(
-					(email) => email.id === requestingUser.primaryEmailAddressId
-				);
+				if (!skipEmail) {
+					const primaryEmail = requestingUser.emailAddresses.find(
+						(email) =>
+							email.id === requestingUser.primaryEmailAddressId
+					);
 
-				if (primaryEmail) {
-					const resend = new Resend(c.env.RESEND_API_KEY);
+					if (primaryEmail) {
+						const resend = new Resend(c.env.RESEND_API_KEY);
 
-					await resend.emails.send({
-						from: 'Miata Registry <no-reply@miataregistry.com>',
-						to: primaryEmail.emailAddress,
-						subject: 'Miata Registry: Ownership update approved',
-						react: ApprovedOwner({
-							car_id: pendingCarOwner.car_id,
-						}),
-					});
+						await resend.emails.send({
+							from: 'Miata Registry <no-reply@miataregistry.com>',
+							to: primaryEmail.emailAddress,
+							subject:
+								'Miata Registry: Ownership update approved',
+							react: ApprovedOwner({
+								car_id: pendingCarOwner.car_id,
+							}),
+						});
+					}
 				}
 			}
 

@@ -24,6 +24,7 @@ export const PendingItem = ({
 	children,
 	createdAt,
 	onApprove,
+	onApproveSkipEmail,
 	onReject,
 	ownerId,
 }: {
@@ -31,6 +32,7 @@ export const PendingItem = ({
 	children: React.ReactNode;
 	createdAt: number;
 	onApprove: () => void;
+	onApproveSkipEmail?: () => void;
 	onReject: () => void;
 	ownerId?: string;
 }) => {
@@ -102,6 +104,15 @@ export const PendingItem = ({
 					>
 						<i className="fa-solid fa-fw fa-check"></i>
 					</Button>
+
+					{onApproveSkipEmail && (
+						<Button
+							onClick={onApproveSkipEmail}
+							className="bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center h-8 w-16 gap-2"
+						>
+							<i className="fa-solid fa-fw fa-check"></i> 🤫
+						</Button>
+					)}
 				</div>
 			</div>
 

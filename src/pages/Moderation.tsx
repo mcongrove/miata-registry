@@ -182,7 +182,8 @@ export const Moderation = () => {
 
 	const handleApprove = async (
 		type: 'car' | 'carOwner' | 'owner' | 'photo',
-		id: string
+		id: string,
+		skipEmail: boolean = false
 	) => {
 		try {
 			const token = await getToken();
@@ -197,6 +198,7 @@ export const Moderation = () => {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${token}`,
 					},
+					body: JSON.stringify({ skipEmail }),
 				}
 			);
 
@@ -460,6 +462,13 @@ export const Moderation = () => {
 											onApprove={() =>
 												handleApprove('car', pending.id)
 											}
+											onApproveSkipEmail={() =>
+												handleApprove(
+													'car',
+													pending.id,
+													true
+												)
+											}
 											onReject={() =>
 												handleReject('car', pending.id)
 											}
@@ -515,6 +524,13 @@ export const Moderation = () => {
 												handleApprove(
 													'carOwner',
 													pending.id
+												)
+											}
+											onApproveSkipEmail={() =>
+												handleApprove(
+													'carOwner',
+													pending.id,
+													true
 												)
 											}
 											onReject={() =>
