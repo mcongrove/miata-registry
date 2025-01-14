@@ -47,7 +47,7 @@ export function ErrorBanner({ className, error, onDismiss }: ErrorBannerProps) {
 				className
 			)}
 		>
-			<div className="flex justify-between items-center">
+			<div className="flex justify-between items-center gap-2">
 				<span>{error}</span>
 
 				{onDismiss && (

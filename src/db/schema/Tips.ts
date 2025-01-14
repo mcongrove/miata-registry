@@ -17,7 +17,7 @@
  */
 
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { TipStatus } from '../../types/Tip';
+import { TipStatus } from '../../types/Claim';
 
 export const Tips = sqliteTable('tips', {
 	created_at: integer('created_at').notNull(),

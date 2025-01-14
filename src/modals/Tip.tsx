@@ -90,7 +90,7 @@ export function Tip({
 			}
 
 			const response = await fetch(
-				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
+				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/claims/tip`,
 				{
 					method: 'POST',
 					body: formData,

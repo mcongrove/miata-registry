@@ -37,7 +37,7 @@ describe('Forms', () => {
 			user_id: null,
 		};
 
-		cy.intercept('POST', '/tips').as('formTipRequest');
+		cy.intercept('POST', '/claims/tip').as('formTipRequest');
 
 		cy.get('[name="edition_name"]')
 			.should('be.visible')

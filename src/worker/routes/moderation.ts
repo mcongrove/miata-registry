@@ -55,28 +55,33 @@ moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 		const pendingChanges = await db
 			.select()
 			.from(CarsPending)
-			.leftJoin(Cars, eq(CarsPending.car_id, Cars.id))
 			.where(eq(CarsPending.status, 'pending'));
 
-		const formattedChanges = pendingChanges.map(
-			({ cars_pending, cars }) => {
+		const formattedChanges = await Promise.all(
+			pendingChanges.map(async (pending) => {
+				const current = await db
+					.select()
+					.from(Cars)
+					.where(eq(Cars.id, pending.car_id))
+					.get();
+
 				const {
 					created_at,
 					id,
 					status,
 					car_id,
 					...proposedWithoutMeta
-				} = cars_pending;
+				} = pending;
 
 				return {
-					id: cars_pending.id,
-					car_id: cars_pending.car_id,
-					created_at: cars_pending.created_at,
-					status: cars_pending.status,
-					current: cars ? cars : null,
+					id,
+					car_id,
+					created_at,
+					status,
+					current: current || null,
 					proposed: { ...proposedWithoutMeta, id: car_id },
 				};
-			}
+			})
 		);
 
 		return c.json(formattedChanges);
@@ -103,28 +108,32 @@ moderationRouter.get('/carOwners', withAuth(), withModerator(), async (c) => {
 		const pendingCarOwners = await db
 			.select()
 			.from(CarOwnersPending)
-			.leftJoin(
-				CarOwners,
-				and(
-					eq(CarOwnersPending.car_id, CarOwners.car_id),
-					eq(CarOwnersPending.owner_id, CarOwners.owner_id)
-				)
-			)
 			.where(eq(CarOwnersPending.status, 'pending'));
 
-		const formattedChanges = pendingCarOwners.map(
-			({ car_owners_pending, car_owners }) => {
+		const formattedChanges = await Promise.all(
+			pendingCarOwners.map(async (pending) => {
+				const current = await db
+					.select()
+					.from(CarOwners)
+					.where(
+						and(
+							eq(CarOwners.car_id, pending.car_id),
+							eq(CarOwners.owner_id, pending.owner_id)
+						)
+					)
+					.get();
+
 				const { created_at, id, status, ...proposedWithoutMeta } =
-					car_owners_pending;
+					pending;
 
 				return {
-					id: car_owners_pending.id,
-					created_at: car_owners_pending.created_at,
-					status: car_owners_pending.status,
-					current: car_owners ? car_owners : null,
+					id,
+					created_at,
+					status,
+					current: current || null,
 					proposed: proposedWithoutMeta,
 				};
-			}
+			})
 		);
 
 		return c.json(formattedChanges);
@@ -153,16 +162,26 @@ moderationRouter.get('/owners', withAuth(), withModerator(), async (c) => {
 			.from(OwnersPending)
 			.where(eq(OwnersPending.status, 'pending'));
 
-		const formattedChanges = pendingOwners.map((owner) => {
-			const { created_at, id, status, ...proposedWithoutMeta } = owner;
+		const formattedChanges = await Promise.all(
+			pendingOwners.map(async (pending) => {
+				const current = await db
+					.select()
+					.from(Owners)
+					.where(eq(Owners.id, pending.id))
+					.get();
 
-			return {
-				id,
-				created_at,
-				status,
-				proposed: proposedWithoutMeta,
-			};
-		});
+				const { created_at, id, status, ...proposedWithoutMeta } =
+					pending;
+
+				return {
+					id,
+					created_at,
+					status,
+					current: current || null,
+					proposed: { ...proposedWithoutMeta, id: pending.id },
+				};
+			})
+		);
 
 		return c.json(formattedChanges);
 	} catch (error) {
@@ -195,7 +214,7 @@ moderationRouter.get('/photo', withAuth(), withModerator(), async (c) => {
 
 				return {
 					id,
-					uploadedAt: object.uploaded,
+					uploadedAt: Math.floor(Number(object.uploaded) / 1000),
 				};
 			})
 		);
@@ -253,13 +272,11 @@ moderationRouter.post(
 				.from(CarsPending)
 				.leftJoin(Owners, eq(CarsPending.current_owner_id, Owners.id))
 				.where(eq(CarsPending.id, id))
-				.limit(1);
+				.get();
 
-			if (!pendingCar.length) {
+			if (!pendingCar) {
 				return c.json({ error: 'Not found' }, 404);
 			}
-
-			const car = pendingCar[0];
 
 			const {
 				created_at,
@@ -267,31 +284,26 @@ moderationRouter.post(
 				status,
 				car_id,
 				user_id,
-				...carUpdateData
-			} = car;
+				...carData
+			} = pendingCar;
 
-			const existingCar = await db
-				.select()
-				.from(Cars)
-				.where(eq(Cars.id, car.car_id))
-				.limit(1);
-
-			if (existingCar.length) {
-				await db
-					.update(Cars)
-					.set(carUpdateData)
-					.where(eq(Cars.id, car.car_id));
-			} else {
-				return c.json({ error: 'Not found' }, 404);
-			}
+			await db
+				.insert(Cars)
+				.values({ id: car_id, ...carData })
+				.onConflictDoUpdate({
+					target: Cars.id,
+					set: carData,
+				});
 
 			await db
 				.update(CarsPending)
 				.set({ status: 'approved' })
 				.where(eq(CarsPending.id, id));
 
-			await c.env.CACHE.delete(`cars:details:${car.car_id}`);
-			await c.env.CACHE.delete(`cars:summary:${car.car_id}`);
+			await c.env.CACHE.delete(`cars:details:${car_id}`);
+			await c.env.CACHE.delete(`cars:summary:${car_id}`);
+			await c.env.CACHE.delete('editions:all');
+			await c.env.CACHE.delete('stats:all');
 
 			if (user_id) {
 				const requestingUser = await c
@@ -309,7 +321,9 @@ moderationRouter.post(
 						from: 'Miata Registry <no-reply@miataregistry.com>',
 						to: primaryEmail.emailAddress,
 						subject: 'Miata Registry: Car update approved',
-						react: ApprovedCar(),
+						react: ApprovedCar({
+							car_id,
+						}),
 					});
 				}
 			}
@@ -357,60 +371,59 @@ moderationRouter.post(
 				.from(CarOwnersPending)
 				.leftJoin(Owners, eq(CarOwnersPending.owner_id, Owners.id))
 				.where(eq(CarOwnersPending.id, id))
-				.limit(1);
+				.get();
 
-			if (!pendingCarOwner.length) {
+			if (!pendingCarOwner) {
 				return c.json({ error: 'Not found' }, 404);
 			}
-
-			const carOwner = pendingCarOwner[0];
 
 			const {
 				created_at,
 				id: pendingId,
+				information,
 				status,
 				user_id,
-				...carOwnerUpdateData
-			} = carOwner;
+				...carOwnerData
+			} = pendingCarOwner;
 
 			const existingCarOwner = await db
 				.select()
 				.from(CarOwners)
 				.where(
 					and(
-						eq(CarOwners.car_id, carOwner.car_id),
-						eq(CarOwners.owner_id, carOwner.owner_id)
+						eq(CarOwners.car_id, pendingCarOwner.car_id),
+						eq(CarOwners.owner_id, pendingCarOwner.owner_id)
 					)
 				)
-				.limit(1);
+				.get();
 
-			if (existingCarOwner.length) {
+			if (existingCarOwner) {
 				await db
 					.update(CarOwners)
-					.set(carOwnerUpdateData)
+					.set(carOwnerData)
 					.where(
 						and(
-							eq(CarOwners.car_id, carOwner.car_id),
-							eq(CarOwners.owner_id, carOwner.owner_id)
+							eq(CarOwners.car_id, pendingCarOwner.car_id),
+							eq(CarOwners.owner_id, pendingCarOwner.owner_id)
 						)
 					);
 			} else {
 				await db
 					.update(CarOwners)
-					.set({ date_end: carOwner.date_start })
+					.set({ date_end: pendingCarOwner.date_start })
 					.where(
 						and(
-							eq(CarOwners.car_id, carOwner.car_id),
+							eq(CarOwners.car_id, pendingCarOwner.car_id),
 							sql`${CarOwners.date_end} IS NULL`
 						)
 					);
 
-				await db.insert(CarOwners).values(carOwnerUpdateData);
+				await db.insert(CarOwners).values(carOwnerData);
 
 				await db
 					.update(Cars)
-					.set({ current_owner_id: carOwner.owner_id })
-					.where(eq(Cars.id, carOwner.car_id));
+					.set({ current_owner_id: pendingCarOwner.owner_id })
+					.where(eq(Cars.id, pendingCarOwner.car_id));
 			}
 
 			await db
@@ -418,8 +431,10 @@ moderationRouter.post(
 				.set({ status: 'approved' })
 				.where(eq(CarOwnersPending.id, id));
 
-			await c.env.CACHE.delete(`cars:details:${carOwner.car_id}`);
-			await c.env.CACHE.delete(`cars:summary:${carOwner.car_id}`);
+			await c.env.CACHE.delete(`cars:details:${pendingCarOwner.car_id}`);
+			await c.env.CACHE.delete(`cars:summary:${pendingCarOwner.car_id}`);
+			await c.env.CACHE.delete('editions:all');
+			await c.env.CACHE.delete('stats:all');
 
 			if (user_id) {
 				const requestingUser = await c
@@ -437,7 +452,9 @@ moderationRouter.post(
 						from: 'Miata Registry <no-reply@miataregistry.com>',
 						to: primaryEmail.emailAddress,
 						subject: 'Miata Registry: Ownership update approved',
-						react: ApprovedOwner({ car_id: carOwner.car_id }),
+						react: ApprovedOwner({
+							car_id: pendingCarOwner.car_id,
+						}),
 					});
 				}
 			}
@@ -474,14 +491,13 @@ moderationRouter.post(
 				.select()
 				.from(OwnersPending)
 				.where(eq(OwnersPending.id, id))
-				.limit(1);
+				.get();
 
-			if (!pendingOwner.length) {
+			if (!pendingOwner) {
 				return c.json({ error: 'Not found' }, 404);
 			}
 
-			const owner = pendingOwner[0];
-			const { created_at, status, ...ownerData } = owner;
+			const { created_at, status, ...ownerData } = pendingOwner;
 
 			await db.insert(Owners).values(ownerData);
 

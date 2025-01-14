@@ -32,7 +32,9 @@ import Header from '../components/Header';
 import Legal from '../components/Legal';
 import tailwindConfig from '../tailwind.config';
 
-export const ApprovedCar = () => {
+export const ApprovedCar = ({ car_id }: { car_id?: string }) => {
+	const link = car_id ? `https://miataregistry.com/registry/${car_id}` : null;
+
 	return (
 		<Html lang="en" dir="ltr">
 			<Head>
@@ -62,11 +64,28 @@ export const ApprovedCar = () => {
 									approved by our team.
 								</Text>
 
-								<Text>
-									These updates are now live in our registry.
-									Thank you for helping us maintain accurate
-									records of limited edition Miatas.
-								</Text>
+								{link ? (
+									<>
+										<Text>
+											These updates are now live in our
+											registry at{' '}
+											<Link href={link}>{link}</Link>
+										</Text>
+
+										<Text>
+											Thank you for helping us maintain
+											accurate records of limited edition
+											Miatas.
+										</Text>
+									</>
+								) : (
+									<Text>
+										These updates are now live in our
+										registry. Thank you for helping us
+										maintain accurate records of limited
+										edition Miatas.
+									</Text>
+								)}
 
 								<Text>
 									If you have any questions about the changes

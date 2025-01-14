@@ -44,7 +44,7 @@ export const Moderation = () => {
 	const { getToken } = useAuth();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true);
-	const [activeTab, setActiveTab] = useState<string>('carOwners');
+	const [activeTab, setActiveTab] = useState<string>('cars');
 	const [pendingCars, setPendingCars] = useState<
 		(TCarPending & { current: TCar | null; proposed: TCar })[]
 	>([]);
@@ -213,7 +213,7 @@ export const Moderation = () => {
 					carOwners.filter((carOwner) => carOwner.id !== id)
 				);
 			} else if (type === 'owner') {
-				setPendingCarOwners((owners) =>
+				setPendingOwners((owners) =>
 					owners.filter((owner) => owner.id !== id)
 				);
 			} else if (type === 'photo') {
@@ -455,7 +455,7 @@ export const Moderation = () => {
 									pendingCars.map((pending) => (
 										<PendingItem
 											key={pending.id}
-											carId={pending.current?.id}
+											carId={pending.proposed?.id}
 											createdAt={pending.created_at}
 											onApprove={() =>
 												handleApprove('car', pending.id)
@@ -508,8 +508,8 @@ export const Moderation = () => {
 									pendingCarOwners.map((pending) => (
 										<PendingItem
 											key={pending.id}
-											carId={pending.current?.car_id}
-											ownerId={pending.current?.owner_id}
+											carId={pending.proposed?.car_id}
+											ownerId={pending.proposed?.owner_id}
 											createdAt={pending.created_at}
 											onApprove={() =>
 												handleApprove(
@@ -568,6 +568,7 @@ export const Moderation = () => {
 									pendingOwners.map((pending) => (
 										<PendingItem
 											key={pending.id}
+											ownerId={pending.proposed?.id}
 											createdAt={pending.created_at}
 											onApprove={() =>
 												handleApprove(

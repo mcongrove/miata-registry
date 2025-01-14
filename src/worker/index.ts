@@ -19,6 +19,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import carsRouter from './routes/cars';
+import claimsRouter from './routes/claims';
 import editionsRouter from './routes/editions';
 import emailRouter from './routes/email';
 import heartbeatRouter from './routes/heartbeat';
@@ -27,14 +28,16 @@ import newsRouter from './routes/news';
 import ownersRouter from './routes/owners';
 import photosRouter from './routes/photos';
 import statsRouter from './routes/stats';
-import tipsRouter from './routes/tips';
 import webhooksRouter from './routes/webhooks';
 import type { Bindings } from './types';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.use('*', async (c, next) => {
-	if (c.req.path.startsWith('/webhooks')) {
+	if (
+		c.req.path.startsWith('/webhooks') ||
+		c.req.path.startsWith('/heartbeat')
+	) {
 		return next();
 	}
 
@@ -69,6 +72,7 @@ app.get('/', (c) => c.json({ error: 'Not found' }, 404));
 
 app.route('/heartbeat', heartbeatRouter);
 app.route('/cars', carsRouter);
+app.route('/claims', claimsRouter);
 app.route('/editions', editionsRouter);
 app.route('/email', emailRouter);
 app.route('/moderation', moderationRouter);
@@ -76,7 +80,6 @@ app.route('/news', newsRouter);
 app.route('/owners', ownersRouter);
 app.route('/photos', photosRouter);
 app.route('/stats', statsRouter);
-app.route('/tips', tipsRouter);
 app.route('/webhooks', webhooksRouter);
 
 export default {

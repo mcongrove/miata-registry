@@ -17,7 +17,8 @@
  */
 
 import { useAuth, useClerk, useUser } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
@@ -48,7 +49,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const { openSignIn } = useClerk();
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
+	const [formError, setFormError] = useState<string | ReactNode | null>(null);
 	const [editions, setEditions] = useState<Array<{ name: string }>>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
 	const [existingOwner, setExistingOwner] = useState<TOwner | null>(null);
@@ -150,13 +151,13 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 			const formData = new FormData(form as HTMLFormElement);
 
-			if (prefilledData?.id) {
-				const owner_location = formData.get('owner_location')
-					? parseLocation(formData.get('owner_location') as string)
-					: null;
+			const owner_location = formData.get('owner_location')
+				? parseLocation(formData.get('owner_location') as string)
+				: null;
 
+			if (prefilledData?.id) {
 				const response = await fetch(
-					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/owners`,
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/claims/existing`,
 					{
 						method: 'POST',
 						headers: {
@@ -166,14 +167,14 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						body: JSON.stringify({
 							car_id: prefilledData.id,
 							information: formData.get('information'),
+							owner_city: owner_location?.city,
+							owner_country: owner_location?.country,
 							owner_date_start: formData.get('owner_date_start'),
 							owner_id: existingOwner?.id || undefined,
 							owner_name: (formData.get('owner_name') as string)
 								.replace(/\s+/g, ' ')
 								.trim(),
-							owner_city: owner_location?.city,
 							owner_state: owner_location?.state,
-							owner_country: owner_location?.country,
 						}),
 					}
 				);
@@ -189,17 +190,56 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 				setIsSuccess(true);
 			} else {
 				const response = await fetch(
-					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/tips`,
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/claims/new`,
 					{
 						method: 'POST',
-						body: formData,
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({
+							edition_name: formData.get('edition_name'),
+							information: formData.get('information'),
+							owner_city: owner_location?.city,
+							owner_country: owner_location?.country,
+							owner_date_start: formData.get('owner_date_start'),
+							owner_id: existingOwner?.id || undefined,
+							owner_name: (formData.get('owner_name') as string)
+								.replace(/\s+/g, ' ')
+								.trim(),
+							owner_state: owner_location?.state,
+							sequence: formData.get('sequence'),
+							vin: formData.get('vin'),
+						}),
 					}
 				);
 
 				if (!response.ok) {
 					const error = await response.json();
 
-					throw new Error(error.details || 'Failed to submit tip');
+					console.log(error);
+
+					if (error.error === 'Conflict' && error.details.id) {
+						setFormError(
+							<>
+								This car already exists in our database.{' '}
+								<Link
+									to={`/registry/${error.details.id}`}
+									className="underline"
+									onClick={handleClose}
+								>
+									Click here
+								</Link>{' '}
+								to view and claim.
+							</>
+						);
+
+						return;
+					} else {
+						throw new Error(
+							error.details || 'Failed to submit tip'
+						);
+					}
 				}
 
 				setIsSuccess(true);
@@ -365,7 +405,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 													{edition.name}
 												</option>
 											))}
-											<option value="other">Other</option>
+											{/* <option value="other">Other</option> */}
 										</select>
 
 										{selectedEdition ===

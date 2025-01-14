@@ -18,7 +18,6 @@
 
 import { and, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { Resend } from 'resend';
 import { createDb } from '../../db';
 import {
 	CarOwnersPending,
@@ -26,7 +25,6 @@ import {
 	CarsPending,
 	Editions,
 	Owners,
-	OwnersPending,
 } from '../../db/schema';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
@@ -306,106 +304,6 @@ ownersRouter.patch('/:id', withAuth(), async (c) => {
 						: 'An unknown error occurred',
 			},
 			500
-		);
-	}
-});
-
-ownersRouter.post('/', withAuth(), async (c) => {
-	try {
-		const userId = c.get('userId');
-		const body = await c.req.json();
-		const db = createDb(c.env.DB);
-		let ownerId = body.owner_id;
-
-		if (!ownerId) {
-			const existingOwner = await db
-				.select({ id: Owners.id })
-				.from(Owners)
-				.where(eq(Owners.user_id, userId));
-
-			if (existingOwner.length > 0) {
-				return c.json(
-					{
-						error: 'Conflict',
-						details: 'An owner already exists for this user',
-					},
-					409
-				);
-			}
-
-			const [{ id }] = await db
-				.insert(OwnersPending)
-				.values({
-					city: body.owner_city || null,
-					country: body.owner_country || null,
-					created_at: Math.floor(Date.now() / 1000),
-					id: crypto.randomUUID(),
-					name: body.owner_name,
-					state: body.owner_state || null,
-					status: 'pending',
-					user_id: userId,
-				})
-				.returning({ id: OwnersPending.id });
-
-			ownerId = id;
-
-			await db.insert(CarOwnersPending).values({
-				car_id: body.car_id,
-				created_at: Math.floor(Date.now() / 1000),
-				date_start: `${body.owner_date_start}T00:00:00.000Z`,
-				id: crypto.randomUUID(),
-				information: body.information || null,
-				owner_id: ownerId,
-				status: 'pending',
-			});
-
-			if (body.owner_name) {
-				const user = await c.get('clerk').users.getUser(userId);
-
-				if (`${user.firstName} ${user.lastName}` !== body.owner_name) {
-					await c.get('clerk').users.updateUser(userId, {
-						firstName: body.owner_name.split(' ')[0],
-						lastName: body.owner_name.split(' ')[1],
-					});
-				}
-			}
-		} else {
-			await db.insert(CarOwnersPending).values({
-				car_id: body.car_id,
-				created_at: Math.floor(Date.now() / 1000),
-				date_start: `${body.owner_date_start}T00:00:00.000Z`,
-				id: crypto.randomUUID(),
-				information: body.information || null,
-				owner_id: ownerId,
-				status: 'pending',
-			});
-		}
-
-		const resend = new Resend(c.env.RESEND_API_KEY);
-
-		await resend.emails.send({
-			from: 'Miata Registry <support@miataregistry.com>',
-			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: Owner Change Request',
-			html: `
-				<h2>Owner Change Request</h2>
-				<p><strong>Owner ID:</strong> ${ownerId}</p>
-		 `,
-		});
-
-		return c.json({ success: true, id: ownerId });
-	} catch (error) {
-		console.error('Error creating owner:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			501
 		);
 	}
 });
