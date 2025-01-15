@@ -204,7 +204,12 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 		const edition = await db
 			.select({ id: Editions.id })
 			.from(Editions)
-			.where(eq(Editions.name, body.edition_name.substring(5)))
+			.where(
+				and(
+					eq(Editions.name, body.edition_name.substring(5)),
+					eq(Editions.year, parseInt(body.edition_name.substring(0, 4)))
+				)
+			)
 			.get();
 
 		let editionId = edition?.id;
