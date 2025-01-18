@@ -38,7 +38,12 @@ app.use('*', async (c, next) => {
 		c.req.path.startsWith('/webhooks') ||
 		c.req.path.startsWith('/heartbeat')
 	) {
-		return next();
+		return cors({
+			origin: '*',
+			allowMethods: ['GET', 'POST'],
+			maxAge: 86400,
+			credentials: true,
+		})(c, next);
 	}
 
 	const ALLOWED_ORIGINS =

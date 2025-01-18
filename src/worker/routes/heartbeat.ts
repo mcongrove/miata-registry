@@ -39,9 +39,9 @@ const CACHE_TTL = {
 	PULSE: 60 * 60 * 24, // 1 day
 };
 
-const archiveRouter = new Hono<{ Bindings: Bindings }>();
+const heartbeatRouter = new Hono<{ Bindings: Bindings }>();
 
-archiveRouter.get('/pulse', async (c) => {
+heartbeatRouter.get('/pulse', async (c) => {
 	try {
 		const isDev = c.env.NODE_ENV === 'development';
 		const cached = await c.env.CACHE.get('heartbeat:pulse');
@@ -100,7 +100,7 @@ archiveRouter.get('/pulse', async (c) => {
 	}
 });
 
-archiveRouter.get('/archive', async (c) => {
+heartbeatRouter.get('/archive', async (c) => {
 	try {
 		const cached = await c.env.CACHE.get('heartbeat:archive');
 
@@ -129,7 +129,7 @@ archiveRouter.get('/archive', async (c) => {
 	}
 });
 
-archiveRouter.post('/archive/cron', async (c) => {
+heartbeatRouter.post('/archive/cron', async (c) => {
 	try {
 		const authHeader = c.req.header('Authorization');
 
@@ -253,4 +253,4 @@ archiveRouter.post('/archive/cron', async (c) => {
 	}
 });
 
-export default archiveRouter;
+export default heartbeatRouter;
