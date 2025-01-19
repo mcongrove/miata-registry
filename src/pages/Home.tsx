@@ -66,8 +66,8 @@ export const Home = () => {
 
 	return (
 		<>
-			<header className="lg:h-[90vh] flex bg-brg-light">
-				<div className="w-full md:w-2/3 lg:w-1/2 p-8 lg:p-16 pt-24 lg:pb-16 flex items-center">
+			<header className="flex bg-brg-light lg:min-h-[600px] lg:h-[90vh]">
+				<div className="w-full md:w-2/3 lg:w-1/2 px-8 pt-24 pb-8 lg:px-16 lg:pt-52 lg:pb-32 flex items-center">
 					<div className="md:pr-20 lg:pr-40 flex flex-col gap-6 lg:gap-10">
 						<Symbol className="w-32 lg:w-48 h-auto text-brg mb-6" />
 
