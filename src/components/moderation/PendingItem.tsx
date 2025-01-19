@@ -31,7 +31,7 @@ export const PendingItem = ({
 	carId?: string;
 	children: React.ReactNode;
 	createdAt: number;
-	onApprove: () => void;
+	onApprove?: () => void;
 	onApproveSkipEmail?: () => void;
 	onReject: () => void;
 	ownerId?: string;
@@ -98,12 +98,14 @@ export const PendingItem = ({
 						<i className="fa-solid fa-fw fa-times"></i>
 					</Button>
 
-					<Button
-						onClick={onApprove}
-						className="bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center size-8"
-					>
-						<i className="fa-solid fa-fw fa-check"></i>
-					</Button>
+					{onApprove && (
+						<Button
+							onClick={onApprove}
+							className="bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center size-8"
+						>
+							<i className="fa-solid fa-fw fa-check"></i>
+						</Button>
+					)}
 
 					{onApproveSkipEmail && (
 						<Button

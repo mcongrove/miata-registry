@@ -44,7 +44,7 @@ export const Moderation = () => {
 	const { getToken } = useAuth();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true);
-	const [activeTab, setActiveTab] = useState<string>('cars');
+	const [activeTab, setActiveTab] = useState<string>('packages');
 	const [pendingCars, setPendingCars] = useState<
 		(TCarPending & { current: TCar | null; proposed: TCar })[]
 	>([]);
@@ -74,6 +74,24 @@ export const Moderation = () => {
 	const [showEmailModal, setShowEmailModal] = useState(false);
 	const [emailLoading, setEmailLoading] = useState(false);
 	const [emailError, setEmailError] = useState<string | null>(null);
+	const [pendingPackages, setPendingPackages] = useState<
+		{
+			car:
+				| (TCarPending & { current: TCar | null; proposed: TCar })
+				| null;
+			carOwner:
+				| (TCarOwnerPending & {
+						current: TCarOwner | null;
+						proposed: TCarOwner;
+				  })
+				| null;
+			owner:
+				| (TOwnerPending & {
+						proposed: TOwner;
+				  })
+				| null;
+		}[]
+	>([]);
 
 	useEffect(() => {
 		if (isLoaded && !user?.publicMetadata?.moderator) {
@@ -170,6 +188,28 @@ export const Moderation = () => {
 				setPendingOwners(ownersData);
 				setPendingPhotos(photosData);
 				setStats(statsData);
+
+				const packages: typeof pendingPackages = [];
+
+				carOwnersData.forEach((carOwner) => {
+					const relatedCar = carsData.find(
+						(car) => car.proposed.id === carOwner.proposed.car_id
+					);
+					const relatedOwner = ownersData.find(
+						(owner) =>
+							owner.proposed.id === carOwner.proposed.owner_id
+					);
+
+					if (relatedCar || relatedOwner) {
+						packages.push({
+							car: relatedCar || null,
+							carOwner: carOwner,
+							owner: relatedOwner || null,
+						});
+					}
+				});
+
+				setPendingPackages(packages);
 			} catch (error) {
 				handleApiError(error);
 			} finally {
@@ -379,6 +419,7 @@ export const Moderation = () => {
 					<div className="flex gap-2 p-1 bg-brg-light rounded-lg w-full relative">
 						{(() => {
 							const tabs = {
+								packages: 'Packages',
 								cars: 'Cars',
 								carOwners: 'Car Owners',
 								owners: 'Owners',
@@ -388,7 +429,7 @@ export const Moderation = () => {
 							return (
 								<>
 									<div
-										className="absolute transition-all w-[calc(25%_-_2px)] duration-200 ease-in-out h-[calc(100%-8px)] bg-white rounded-md shadow-sm"
+										className="absolute transition-all w-[calc(20%_-_2px)] duration-200 ease-in-out h-[calc(100%-8px)] bg-white rounded-md shadow-sm"
 										style={{
 											transform: `translateX(${Object.keys(tabs).indexOf(activeTab) * 100}%)`,
 										}}
@@ -408,24 +449,106 @@ export const Moderation = () => {
 														: 'text-brg-mid hover:text-brg'
 												)}
 												disabled={
-													key === 'cars'
-														? !pendingCars.length
-														: key === 'carOwners'
-															? !pendingCarOwners.length
-															: key === 'owners'
-																? !pendingOwners.length
-																: !pendingPhotos.length
+													key === 'packages'
+														? !pendingPackages.length
+														: key === 'cars'
+															? !pendingCars.filter(
+																	(car) =>
+																		!pendingPackages.some(
+																			(
+																				pkg
+																			) =>
+																				pkg
+																					.car
+																					?.id ===
+																				car.id
+																		)
+																).length
+															: key ===
+																  'carOwners'
+																? !pendingCarOwners.filter(
+																		(
+																			carOwner
+																		) =>
+																			!pendingPackages.some(
+																				(
+																					pkg
+																				) =>
+																					pkg
+																						.carOwner
+																						?.id ===
+																					carOwner.id
+																			)
+																	).length
+																: key ===
+																	  'owners'
+																	? !pendingOwners.filter(
+																			(
+																				owner
+																			) =>
+																				!pendingPackages.some(
+																					(
+																						pkg
+																					) =>
+																						pkg
+																							.owner
+																							?.id ===
+																						owner.id
+																				)
+																		).length
+																	: !pendingPhotos.length
 												}
 											>
 												{label}{' '}
 												<span className="text-brg-border">
-													{key === 'cars'
-														? pendingCars.length
-														: key === 'carOwners'
-															? pendingCarOwners.length
-															: key === 'owners'
-																? pendingOwners.length
-																: pendingPhotos.length}
+													{key === 'packages'
+														? pendingPackages.length
+														: key === 'cars'
+															? pendingCars.filter(
+																	(car) =>
+																		!pendingPackages.some(
+																			(
+																				pkg
+																			) =>
+																				pkg
+																					.car
+																					?.id ===
+																				car.id
+																		)
+																).length
+															: key ===
+																  'carOwners'
+																? pendingCarOwners.filter(
+																		(
+																			carOwner
+																		) =>
+																			!pendingPackages.some(
+																				(
+																					pkg
+																				) =>
+																					pkg
+																						.carOwner
+																						?.id ===
+																					carOwner.id
+																			)
+																	).length
+																: key ===
+																	  'owners'
+																	? pendingOwners.filter(
+																			(
+																				owner
+																			) =>
+																				!pendingPackages.some(
+																					(
+																						pkg
+																					) =>
+																						pkg
+																							.owner
+																							?.id ===
+																						owner.id
+																				)
+																		).length
+																	: pendingPhotos.length}
 												</span>
 											</button>
 										)
@@ -447,160 +570,393 @@ export const Moderation = () => {
 					</div>
 				) : (
 					<div className="space-y-4">
+						{activeTab === 'packages' && (
+							<div className="space-y-4">
+								{pendingPackages.length === 0 ? (
+									<p className="text-brg-border">
+										No pending packages
+									</p>
+								) : (
+									pendingPackages.map((pkg, index) => (
+										<div
+											key={index}
+											className="space-y-2 p-2 bg-brg-light rounded-lg"
+										>
+											{pkg.owner && (
+												<PendingItem
+													ownerId={
+														pkg.owner.proposed?.id
+													}
+													createdAt={
+														pkg.owner.created_at
+													}
+													onApprove={() =>
+														handleApprove(
+															'owner',
+															pkg.owner.id
+														)
+													}
+													onReject={() =>
+														handleReject(
+															'owner',
+															pkg.owner.id
+														)
+													}
+												>
+													{Object.keys(
+														pkg.owner.proposed
+													).map((field) => (
+														<Diff
+															key={field}
+															label={
+																field as keyof TOwner
+															}
+															oldValue={undefined}
+															newValue={
+																pkg.owner
+																	.proposed[
+																	field as keyof TOwner
+																] as any
+															}
+														/>
+													))}
+												</PendingItem>
+											)}
+
+											{pkg.car && (
+												<PendingItem
+													carId={pkg.car.proposed?.id}
+													createdAt={
+														pkg.car.created_at
+													}
+													onApproveSkipEmail={() =>
+														handleApprove(
+															'car',
+															pkg.car!.id,
+															true
+														)
+													}
+													onReject={() =>
+														handleReject(
+															'car',
+															pkg.car!.id
+														)
+													}
+												>
+													{Object.keys(
+														pkg.car.proposed
+													)
+														.filter(
+															(field) =>
+																pkg.car!
+																	.proposed[
+																	field as keyof TCar
+																] !==
+																pkg.car!
+																	.current?.[
+																	field as keyof TCar
+																]
+														)
+														.map((field) => (
+															<Diff
+																key={field}
+																label={
+																	field as keyof TCar
+																}
+																oldValue={
+																	pkg.car!
+																		.current?.[
+																		field as keyof TCar
+																	] as any
+																}
+																newValue={
+																	pkg.car!
+																		.proposed[
+																		field as keyof TCar
+																	] as any
+																}
+															/>
+														))}
+												</PendingItem>
+											)}
+
+											{pkg.carOwner && (
+												<PendingItem
+													carId={
+														pkg.carOwner.proposed
+															?.car_id
+													}
+													ownerId={
+														pkg.carOwner.proposed
+															?.owner_id
+													}
+													createdAt={
+														pkg.carOwner.created_at
+													}
+													onApprove={() =>
+														handleApprove(
+															'carOwner',
+															pkg.carOwner.id
+														)
+													}
+													onReject={() =>
+														handleReject(
+															'carOwner',
+															pkg.carOwner.id
+														)
+													}
+												>
+													{Object.keys(
+														pkg.carOwner.proposed
+													)
+														.filter(
+															(field) =>
+																pkg.carOwner
+																	.proposed[
+																	field as keyof TCarOwner
+																] !==
+																pkg.carOwner
+																	.current?.[
+																	field as keyof TCarOwner
+																]
+														)
+														.map((field) => (
+															<Diff
+																key={field}
+																label={
+																	field as keyof TCar
+																}
+																oldValue={
+																	pkg.carOwner
+																		.current?.[
+																		field as keyof TCarOwner
+																	] as any
+																}
+																newValue={
+																	pkg.carOwner
+																		.proposed[
+																		field as keyof TCarOwner
+																	] as any
+																}
+															/>
+														))}
+												</PendingItem>
+											)}
+										</div>
+									))
+								)}
+							</div>
+						)}
+
 						{activeTab === 'cars' && (
 							<div className="space-y-4">
-								{pendingCars.length === 0 ? (
+								{pendingCars.filter(
+									(car) =>
+										!pendingPackages.some(
+											(pkg) => pkg.car?.id === car.id
+										)
+								).length === 0 ? (
 									<p className="text-brg-border">
 										No pending changes
 									</p>
 								) : (
-									pendingCars.map((pending) => (
-										<PendingItem
-											key={pending.id}
-											carId={pending.proposed?.id}
-											createdAt={pending.created_at}
-											onApprove={() =>
-												handleApprove('car', pending.id)
-											}
-											onApproveSkipEmail={() =>
-												handleApprove(
-													'car',
-													pending.id,
-													true
+									pendingCars
+										.filter(
+											(car) =>
+												!pendingPackages.some(
+													(pkg) =>
+														pkg.car?.id === car.id
 												)
-											}
-											onReject={() =>
-												handleReject('car', pending.id)
-											}
-										>
-											{Object.keys(pending.proposed)
-												.filter(
-													(field) =>
-														pending.proposed[
-															field as keyof TCar
-														] !==
-														pending.current?.[
-															field as keyof TCar
-														]
-												)
-												.map((field) => (
-													<Diff
-														key={field}
-														label={
-															field as keyof TCar
-														}
-														oldValue={
-															pending.current?.[
-																field as keyof TCar
-															] as any
-														}
-														newValue={
+										)
+										.map((pending) => (
+											<PendingItem
+												key={pending.id}
+												carId={pending.proposed?.id}
+												createdAt={pending.created_at}
+												onApprove={() =>
+													handleApprove(
+														'car',
+														pending.id
+													)
+												}
+												onApproveSkipEmail={() =>
+													handleApprove(
+														'car',
+														pending.id,
+														true
+													)
+												}
+												onReject={() =>
+													handleReject(
+														'car',
+														pending.id
+													)
+												}
+											>
+												{Object.keys(pending.proposed)
+													.filter(
+														(field) =>
 															pending.proposed[
 																field as keyof TCar
-															] as any
-														}
-													/>
-												))}
-										</PendingItem>
-									))
+															] !==
+															pending.current?.[
+																field as keyof TCar
+															]
+													)
+													.map((field) => (
+														<Diff
+															key={field}
+															label={
+																field as keyof TCar
+															}
+															oldValue={
+																pending
+																	.current?.[
+																	field as keyof TCar
+																] as any
+															}
+															newValue={
+																pending
+																	.proposed[
+																	field as keyof TCar
+																] as any
+															}
+														/>
+													))}
+											</PendingItem>
+										))
 								)}
 							</div>
 						)}
 
 						{activeTab === 'carOwners' && (
 							<div className="space-y-4">
-								{pendingCarOwners.length === 0 ? (
+								{pendingCarOwners.filter(
+									(carOwner) =>
+										!pendingPackages.some(
+											(pkg) =>
+												pkg.carOwner?.id === carOwner.id
+										)
+								).length === 0 ? (
 									<p className="text-brg-border">
 										No pending changes
 									</p>
 								) : (
-									pendingCarOwners.map((pending) => (
-										<PendingItem
-											key={pending.id}
-											carId={pending.proposed?.car_id}
-											ownerId={pending.proposed?.owner_id}
-											createdAt={pending.created_at}
-											onApprove={() =>
-												handleApprove(
-													'carOwner',
-													pending.id
+									pendingCarOwners
+										.filter(
+											(carOwner) =>
+												!pendingPackages.some(
+													(pkg) =>
+														pkg.carOwner?.id ===
+														carOwner.id
 												)
-											}
-											onApproveSkipEmail={() =>
-												handleApprove(
-													'carOwner',
-													pending.id,
-													true
-												)
-											}
-											onReject={() =>
-												handleReject(
-													'carOwner',
-													pending.id
-												)
-											}
-										>
-											{Object.keys(pending.proposed)
-												.filter(
-													(field) =>
-														pending.proposed[
-															field as keyof TCarOwner
-														] !==
-														pending.current?.[
-															field as keyof TCarOwner
-														]
-												)
-												.map((field) => (
-													<Diff
-														key={field}
-														label={
-															field as keyof TCar
-														}
-														oldValue={
-															pending.current?.[
-																field as keyof TCarOwner
-															] as any
-														}
-														newValue={
+										)
+										.map((pending) => (
+											<PendingItem
+												key={pending.id}
+												carId={pending.proposed?.car_id}
+												ownerId={
+													pending.proposed?.owner_id
+												}
+												createdAt={pending.created_at}
+												onApprove={() =>
+													handleApprove(
+														'carOwner',
+														pending.id
+													)
+												}
+												onApproveSkipEmail={() =>
+													handleApprove(
+														'carOwner',
+														pending.id,
+														true
+													)
+												}
+												onReject={() =>
+													handleReject(
+														'carOwner',
+														pending.id
+													)
+												}
+											>
+												{Object.keys(pending.proposed)
+													.filter(
+														(field) =>
 															pending.proposed[
 																field as keyof TCarOwner
-															] as any
-														}
-													/>
-												))}
-										</PendingItem>
-									))
+															] !==
+															pending.current?.[
+																field as keyof TCarOwner
+															]
+													)
+													.map((field) => (
+														<Diff
+															key={field}
+															label={
+																field as keyof TCar
+															}
+															oldValue={
+																pending
+																	.current?.[
+																	field as keyof TCarOwner
+																] as any
+															}
+															newValue={
+																pending
+																	.proposed[
+																	field as keyof TCarOwner
+																] as any
+															}
+														/>
+													))}
+											</PendingItem>
+										))
 								)}
 							</div>
 						)}
 
 						{activeTab === 'owners' && (
 							<div className="space-y-4">
-								{pendingOwners.length === 0 ? (
+								{pendingOwners.filter(
+									(owner) =>
+										!pendingPackages.some(
+											(pkg) => pkg.owner?.id === owner.id
+										)
+								).length === 0 ? (
 									<p className="text-brg-border">
 										No pending changes
 									</p>
 								) : (
-									pendingOwners.map((pending) => (
-										<PendingItem
-											key={pending.id}
-											ownerId={pending.proposed?.id}
-											createdAt={pending.created_at}
-											onApprove={() =>
-												handleApprove(
-													'owner',
-													pending.id
+									pendingOwners
+										.filter(
+											(owner) =>
+												!pendingPackages.some(
+													(pkg) =>
+														pkg.owner?.id ===
+														owner.id
 												)
-											}
-											onReject={() =>
-												handleReject(
-													'owner',
-													pending.id
-												)
-											}
-										>
-											{Object.keys(pending.proposed).map(
-												(field) => (
+										)
+										.map((pending) => (
+											<PendingItem
+												key={pending.id}
+												ownerId={pending.proposed?.id}
+												createdAt={pending.created_at}
+												onApprove={() =>
+													handleApprove(
+														'owner',
+														pending.id
+													)
+												}
+												onReject={() =>
+													handleReject(
+														'owner',
+														pending.id
+													)
+												}
+											>
+												{Object.keys(
+													pending.proposed
+												).map((field) => (
 													<Diff
 														key={field}
 														label={
@@ -613,10 +969,9 @@ export const Moderation = () => {
 															] as any
 														}
 													/>
-												)
-											)}
-										</PendingItem>
-									))
+												))}
+											</PendingItem>
+										))
 								)}
 							</div>
 						)}
