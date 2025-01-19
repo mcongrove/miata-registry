@@ -49,6 +49,7 @@ export type TCar = {
 export type TCarPending = TCar &
 	TPending & {
 		car_id: string;
+		edition?: string;
 	};
 
 export type TRarityLevel =

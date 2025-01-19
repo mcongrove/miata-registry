@@ -675,6 +675,14 @@ export const Moderation = () => {
 																		field as keyof TCar
 																	] as any
 																}
+																subText={
+																	field ===
+																	'edition_id'
+																		? pkg
+																				.car!
+																				.edition
+																		: undefined
+																}
 															/>
 														))}
 												</PendingItem>

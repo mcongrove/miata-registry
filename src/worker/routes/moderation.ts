@@ -24,6 +24,7 @@ import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
 import { CarsPending } from '../../db/schema/CarsPending';
+import { Editions } from '../../db/schema/Editions';
 import { Owners } from '../../db/schema/Owners';
 import { OwnersPending } from '../../db/schema/OwnersPending';
 import { Tips } from '../../db/schema/Tips';
@@ -53,8 +54,32 @@ moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 		const db = createDb(c.env.DB);
 
 		const pendingChanges = await db
-			.select()
+			.select({
+				car_id: CarsPending.car_id,
+				created_at: CarsPending.created_at,
+				current_owner_id: CarsPending.current_owner_id,
+				destroyed: CarsPending.destroyed,
+				edition_id: CarsPending.edition_id,
+				id: CarsPending.id,
+				manufacture_date: CarsPending.manufacture_date,
+				sale_date: CarsPending.sale_date,
+				sale_dealer_city: CarsPending.sale_dealer_city,
+				sale_dealer_country: CarsPending.sale_dealer_country,
+				sale_dealer_name: CarsPending.sale_dealer_name,
+				sale_dealer_state: CarsPending.sale_dealer_state,
+				sale_msrp: CarsPending.sale_msrp,
+				sequence: CarsPending.sequence,
+				shipping_city: CarsPending.shipping_city,
+				shipping_country: CarsPending.shipping_country,
+				shipping_date: CarsPending.shipping_date,
+				shipping_state: CarsPending.shipping_state,
+				shipping_vessel: CarsPending.shipping_vessel,
+				status: CarsPending.status,
+				vin: CarsPending.vin,
+				edition: sql<string>`${Editions.year} || ' ' || ${Editions.name}`,
+			})
 			.from(CarsPending)
+			.leftJoin(Editions, eq(CarsPending.edition_id, Editions.id))
 			.where(eq(CarsPending.status, 'pending'));
 
 		const formattedChanges = await Promise.all(
@@ -70,6 +95,7 @@ moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 					id,
 					status,
 					car_id,
+					edition,
 					...proposedWithoutMeta
 				} = pending;
 
@@ -78,6 +104,7 @@ moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 					car_id,
 					created_at,
 					status,
+					edition,
 					current: current || null,
 					proposed: { ...proposedWithoutMeta, id: car_id },
 				};

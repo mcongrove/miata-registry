@@ -18,17 +18,19 @@
 
 export const Diff = ({
 	label,
-	oldValue,
 	newValue,
+	oldValue,
+	subText,
 }: {
 	label: string;
-	oldValue?: string | number | null;
 	newValue?: string | number | null;
+	oldValue?: string | number | null;
+	subText?: string;
 }) => {
 	if (oldValue === newValue || (!oldValue && !newValue)) return null;
 
 	return (
-		<div className="flex items-center gap-4 font-mono">
+		<div className="flex items-start gap-4 font-mono">
 			<span className="w-1/3 text-sm font-medium text-brg-mid">
 				{label}
 			</span>
@@ -44,9 +46,16 @@ export const Diff = ({
 						navigator.clipboard.writeText(String(newValue));
 					}
 				}}
-				title="Click to copy Car Owner ID"
+				title="Click to copy"
 			>
 				{newValue || 'None'}
+
+				{subText && (
+					<>
+						<br />
+						<span className="text-brg-border">{subText}</span>
+					</>
+				)}
 			</span>
 		</div>
 	);
