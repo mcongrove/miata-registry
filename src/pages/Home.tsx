@@ -123,7 +123,7 @@ export const Home = () => {
 				<div className="w-1/2 h-full relative hidden lg:block">
 					<img
 						src="https://store.miataregistry.com/app/car/1991SE182.jpg"
-						alt="1991 British Racing Green #182"
+						alt="1991 Special Edition (US) #182"
 						className="w-full h-full object-cover object-left"
 					/>
 

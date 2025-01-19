@@ -53,7 +53,7 @@ describe('Home Page', () => {
 		cy.get('[data-credit-id="63621393-a540-46b5-b9fe-9231fea2730f"]')
 			.should('be.visible')
 			.realHover();
-		cy.contains('1991 British Racing Green #182').should('be.visible');
+		cy.contains('1991 Special Edition (US) #182').should('be.visible');
 		cy.contains('Matthew Congrove').should('be.visible');
 		cy.contains('TX, US').should('be.visible');
 	});

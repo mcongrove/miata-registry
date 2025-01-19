@@ -22,7 +22,7 @@ describe('Car Page', () => {
 	});
 
 	it('has car data', () => {
-		cy.contains('1991 British Racing Green').should('be.visible');
+		cy.contains('1991 Special Edition (US)').should('be.visible');
 
 		cy.contains('Very Rare').should('be.visible');
 

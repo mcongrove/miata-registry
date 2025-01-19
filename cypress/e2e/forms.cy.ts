@@ -27,7 +27,7 @@ describe('Forms', () => {
 		cy.contains('VIN').should('be.visible');
 
 		const formData = {
-			edition_name: '1991 British Racing Green',
+			edition_name: '1991 Special Edition (US)',
 			sequence: '123',
 			vin: 'JM1NA2155N0000000',
 			owner_date_start: null,

@@ -168,22 +168,37 @@ export const CarProfile = () => {
 			),
 		});
 
-		if (car.shipping_date) {
+		if (car.shipping_date || car.shipping_city || car.shipping_vessel) {
 			chronology.push({
 				key: 'shipping',
-				date: getYear(car.shipping_date),
+				date: getYear(
+					car.shipping_date
+						? car.shipping_date
+						: car.edition?.year.toString()
+				),
 			});
 		}
 
-		if (car.sale_date) {
+		if (car.sale_date || car.sale_dealer_name) {
 			chronology.push({
 				key: 'sale',
-				date: getYear(car.sale_date),
+				date: getYear(
+					car.sale_date ? car.sale_date : car.edition?.year.toString()
+				),
 			});
 		}
 
 		timelineOwners
 			.slice()
+			.sort((a, b) => {
+				if (!a.date_start) return 1;
+				if (!b.date_start) return -1;
+
+				return (
+					new Date(b.date_start).getTime() -
+					new Date(a.date_start).getTime()
+				);
+			})
 			.reverse()
 			.forEach((owner) => {
 				chronology.push({
@@ -199,13 +214,6 @@ export const CarProfile = () => {
 				date: getYear(timelineOwners[0]?.date_end),
 			});
 		}
-
-		chronology.sort((a, b) => {
-			if (!a.date) return 1;
-			if (!b.date) return -1;
-
-			return a.date - b.date;
-		});
 
 		const items: Array<{
 			name: string | React.ReactNode;
@@ -238,10 +246,10 @@ export const CarProfile = () => {
 				items.push({
 					name: (
 						<>
-							Built by{' '}
+							Built{' '}
 							{vinDetails?.Manufacturer ? (
 								<span className="text-brg-border">
-									{toTitleCase(vinDetails.Manufacturer)}
+									by {toTitleCase(vinDetails.Manufacturer)}
 								</span>
 							) : (
 								<span className="text-brg-border">
