@@ -39,26 +39,38 @@ import {
 } from '../types/Owner';
 import { handleApiError } from '../utils/common';
 
+type TPendingCar = TCarPending & {
+	current: TCar | null;
+	proposed: TCar;
+};
+
+type TPendingCarOwner = TCarOwnerPending & {
+	current: TCarOwner | null;
+	proposed: TCarOwner;
+};
+
+type TPendingOwner = TOwnerPending & {
+	proposed: TOwner;
+};
+
+type TPackage = {
+	car: TPendingCar | null;
+	carOwner: TPendingCarOwner | null;
+	owner: TPendingOwner | null;
+};
+
 export const Moderation = () => {
 	const { user, isLoaded } = useUser();
 	const { getToken } = useAuth();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true);
 	const [activeTab, setActiveTab] = useState<string>('packages');
-	const [pendingCars, setPendingCars] = useState<
-		(TCarPending & { current: TCar | null; proposed: TCar })[]
-	>([]);
+	const [pendingPackages, setPendingPackages] = useState<TPackage[]>([]);
+	const [pendingCars, setPendingCars] = useState<TPendingCar[]>([]);
 	const [pendingCarOwners, setPendingCarOwners] = useState<
-		(TCarOwnerPending & {
-			current: TCarOwner | null;
-			proposed: TCarOwner;
-		})[]
+		TPendingCarOwner[]
 	>([]);
-	const [pendingOwners, setPendingOwners] = useState<
-		(TOwnerPending & {
-			proposed: TOwner;
-		})[]
-	>([]);
+	const [pendingOwners, setPendingOwners] = useState<TPendingOwner[]>([]);
 	const [stats, setStats] = useState<TModerationStats>({
 		pending: 0,
 		approved: 0,
@@ -74,24 +86,6 @@ export const Moderation = () => {
 	const [showEmailModal, setShowEmailModal] = useState(false);
 	const [emailLoading, setEmailLoading] = useState(false);
 	const [emailError, setEmailError] = useState<string | null>(null);
-	const [pendingPackages, setPendingPackages] = useState<
-		{
-			car:
-				| (TCarPending & { current: TCar | null; proposed: TCar })
-				| null;
-			carOwner:
-				| (TCarOwnerPending & {
-						current: TCarOwner | null;
-						proposed: TCarOwner;
-				  })
-				| null;
-			owner:
-				| (TOwnerPending & {
-						proposed: TOwner;
-				  })
-				| null;
-		}[]
-	>([]);
 
 	useEffect(() => {
 		if (isLoaded && !user?.publicMetadata?.moderator) {
@@ -189,55 +183,30 @@ export const Moderation = () => {
 				setPendingPhotos(photosData);
 				setStats(statsData);
 
-				const packages: typeof pendingPackages = [];
+				const packages: TPackage[] = [];
 
-				// First add packages with pending cars
-				carOwnersData.forEach((carOwner) => {
-					const relatedCar = carsData.find(
-						(car) => car.proposed.id === carOwner.proposed.car_id
-					);
-					const relatedOwner = ownersData.find(
-						(owner) =>
-							owner.proposed.id === carOwner.proposed.owner_id
-					);
-
-					if (relatedCar || relatedOwner) {
-						packages.push({
-							car: relatedCar || null,
-							carOwner: carOwner,
-							owner: relatedOwner || null,
-						});
-					}
-				});
-
-				// Then add packages for existing cars
-				carOwnersData.forEach((carOwner) => {
-					// Skip if this carOwner is already in a package
+				carOwnersData.forEach((carOwner: TPendingCarOwner) => {
 					if (
 						packages.some((pkg) => pkg.carOwner?.id === carOwner.id)
 					) {
 						return;
 					}
 
+					const relatedCar = carsData.find(
+						(car: TPendingCar) =>
+							car.proposed.id === carOwner.proposed.car_id
+					);
+
 					const relatedOwner = ownersData.find(
-						(owner) =>
+						(owner: TPendingOwner) =>
 							owner.proposed.id === carOwner.proposed.owner_id
 					);
 
-					// If there's no pending car but there is a carOwner (and optionally an owner),
-					// create a package
-					if (
-						!carsData.some(
-							(car) =>
-								car.proposed.id === carOwner.proposed.car_id
-						)
-					) {
-						packages.push({
-							car: null,
-							carOwner: carOwner,
-							owner: relatedOwner || null,
-						});
-					}
+					packages.push({
+						car: relatedCar ?? null,
+						carOwner,
+						owner: relatedOwner ?? null,
+					});
 				});
 
 				setPendingPackages(packages);
@@ -249,7 +218,35 @@ export const Moderation = () => {
 		};
 
 		loadPendingChanges();
-	}, []);
+	}, [getToken]);
+
+	const openEmailModal = (type?: 'rejection') => {
+		setShowEmailModal(true);
+
+		if (type === 'rejection') {
+			setTimeout(() => {
+				const form = document.getElementById(
+					'emailForm'
+				) as HTMLFormElement;
+
+				if (form) {
+					const subjectField = form.querySelector(
+						'[name="subject"]'
+					) as HTMLInputElement;
+
+					const messageField = form.querySelector(
+						'[name="message"]'
+					) as HTMLTextAreaElement;
+
+					if (subjectField) subjectField.value = 'Your Submission';
+
+					if (messageField)
+						messageField.value =
+							"Thank you for your submission to the Miata Registry. We truly appreciate your interest and the time you took to share your Miata with us.\n\nAt present, our registry is focused specifically on Miatas that were produced by Mazda in capped quantities during their original production runs. While your Miata is certainly special, it doesn't fall into this specific category of limited edition vehicles.\n\nWe are keeping record of all submissions, as we hope to expand the scope of our registry in the future to include other Miatas. When that time comes, we would be delighted to revisit your submission. Please continue to enjoy and preserve your Miata, and don't hesitate to submit again if you acquire a limited edition model in the future.\n\nIf you think this decision was made in error, please reply to this email and we will be happy to review your submission again; sending documentation such as photos or original sales paperwork to support your claim is helpful.";
+				}
+			}, 100);
+		}
+	};
 
 	const handleApprove = async (
 		type: 'car' | 'carOwner' | 'owner' | 'photo',
@@ -385,34 +382,6 @@ export const Moderation = () => {
 			setEmailError('Failed to send email. Please try again.');
 		} finally {
 			setEmailLoading(false);
-		}
-	};
-
-	const openEmailModal = (type?: 'rejection') => {
-		setShowEmailModal(true);
-
-		if (type === 'rejection') {
-			setTimeout(() => {
-				const form = document.getElementById(
-					'emailForm'
-				) as HTMLFormElement;
-
-				if (form) {
-					const subjectField = form.querySelector(
-						'[name="subject"]'
-					) as HTMLInputElement;
-
-					const messageField = form.querySelector(
-						'[name="message"]'
-					) as HTMLTextAreaElement;
-
-					if (subjectField) subjectField.value = 'Your Submission';
-
-					if (messageField)
-						messageField.value =
-							"Thank you for your submission to the Miata Registry. We truly appreciate your interest and the time you took to share your Miata with us.\n\nAt present, our registry is focused specifically on Miatas that were produced by Mazda in capped quantities during their original production runs. While your Miata is certainly special, it doesn't fall into this specific category of limited edition vehicles.\n\nWe are keeping record of all submissions, as we hope to expand the scope of our registry in the future to include other Miatas. When that time comes, we would be delighted to revisit your submission. Please continue to enjoy and preserve your Miata, and don't hesitate to submit again if you acquire a limited edition model in the future.\n\nIf you think this decision was made in error, please reply to this email and we will be happy to review your submission again; sending documentation such as photos or original sales paperwork to support your claim is helpful.";
-				}
-			}, 100);
 		}
 	};
 
@@ -616,7 +585,7 @@ export const Moderation = () => {
 											{pkg.owner && (
 												<PendingItem
 													ownerId={
-														pkg.owner.proposed?.id
+														pkg.owner.proposed.id
 													}
 													createdAt={
 														pkg.owner.created_at
@@ -624,13 +593,13 @@ export const Moderation = () => {
 													onApprove={() =>
 														handleApprove(
 															'owner',
-															pkg.owner.id
+															pkg.owner!.id
 														)
 													}
 													onReject={() =>
 														handleReject(
 															'owner',
-															pkg.owner.id
+															pkg.owner!.id
 														)
 													}
 												>
@@ -644,7 +613,7 @@ export const Moderation = () => {
 															}
 															oldValue={undefined}
 															newValue={
-																pkg.owner
+																pkg.owner!
 																	.proposed[
 																	field as keyof TOwner
 																] as any
@@ -656,7 +625,7 @@ export const Moderation = () => {
 
 											{pkg.car && (
 												<PendingItem
-													carId={pkg.car.proposed?.id}
+													carId={pkg.car.proposed.id}
 													createdAt={
 														pkg.car.created_at
 													}
@@ -715,11 +684,11 @@ export const Moderation = () => {
 												<PendingItem
 													carId={
 														pkg.carOwner.proposed
-															?.car_id
+															.car_id
 													}
 													ownerId={
 														pkg.carOwner.proposed
-															?.owner_id
+															.owner_id
 													}
 													createdAt={
 														pkg.carOwner.created_at
@@ -727,13 +696,13 @@ export const Moderation = () => {
 													onApprove={() =>
 														handleApprove(
 															'carOwner',
-															pkg.carOwner.id
+															pkg.carOwner!.id
 														)
 													}
 													onReject={() =>
 														handleReject(
 															'carOwner',
-															pkg.carOwner.id
+															pkg.carOwner!.id
 														)
 													}
 												>
@@ -742,11 +711,11 @@ export const Moderation = () => {
 													)
 														.filter(
 															(field) =>
-																pkg.carOwner
+																pkg.carOwner!
 																	.proposed[
 																	field as keyof TCarOwner
 																] !==
-																pkg.carOwner
+																pkg.carOwner!
 																	.current?.[
 																	field as keyof TCarOwner
 																]
@@ -758,13 +727,15 @@ export const Moderation = () => {
 																	field as keyof TCar
 																}
 																oldValue={
-																	pkg.carOwner
+																	pkg
+																		.carOwner!
 																		.current?.[
 																		field as keyof TCarOwner
 																	] as any
 																}
 																newValue={
-																	pkg.carOwner
+																	pkg
+																		.carOwner!
 																		.proposed[
 																		field as keyof TCarOwner
 																	] as any
