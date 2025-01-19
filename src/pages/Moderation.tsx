@@ -191,6 +191,7 @@ export const Moderation = () => {
 
 				const packages: typeof pendingPackages = [];
 
+				// First add packages with pending cars
 				carOwnersData.forEach((carOwner) => {
 					const relatedCar = carsData.find(
 						(car) => car.proposed.id === carOwner.proposed.car_id
@@ -203,6 +204,36 @@ export const Moderation = () => {
 					if (relatedCar || relatedOwner) {
 						packages.push({
 							car: relatedCar || null,
+							carOwner: carOwner,
+							owner: relatedOwner || null,
+						});
+					}
+				});
+
+				// Then add packages for existing cars
+				carOwnersData.forEach((carOwner) => {
+					// Skip if this carOwner is already in a package
+					if (
+						packages.some((pkg) => pkg.carOwner?.id === carOwner.id)
+					) {
+						return;
+					}
+
+					const relatedOwner = ownersData.find(
+						(owner) =>
+							owner.proposed.id === carOwner.proposed.owner_id
+					);
+
+					// If there's no pending car but there is a carOwner (and optionally an owner),
+					// create a package
+					if (
+						!carsData.some(
+							(car) =>
+								car.proposed.id === carOwner.proposed.car_id
+						)
+					) {
+						packages.push({
+							car: null,
 							carOwner: carOwner,
 							owner: relatedOwner || null,
 						});
