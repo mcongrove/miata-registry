@@ -102,3 +102,16 @@ export const colorMap: Record<string, string> = {
 	various: '#CCCCCC',
 	white: '#FFFFFF',
 };
+
+export const colorMapSocial: Record<string, string> = {
+	...colorMap,
+	'blazing yellow mica': '#D79732',
+	'evolution orange': '#DC7200',
+	'icy blue': '#009799',
+	'silver stone metallic': '#6D6F64',
+	'snowflake white pearl mica': '#6D6F64',
+	'sunburst yellow': '#D79732',
+	silver: '#6D6F64',
+	various: '#6D6F64',
+	white: '#6D6F64',
+};

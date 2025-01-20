@@ -42,6 +42,11 @@ const MODAL_COMPONENTS = {
 			default: module.Register,
 		}))
 	),
+	socialGeneration: lazy(() =>
+		import('../modals/SocialGeneration').then((module) => ({
+			default: module.SocialGeneration,
+		}))
+	),
 	tip: lazy(() =>
 		import('../modals/Tip').then((module) => ({
 			default: module.Tip,

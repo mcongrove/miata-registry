@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 import { lazy, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
@@ -71,6 +71,7 @@ export const getVinDetails = async (vin: string, year: number) => {
 export const CarProfile = () => {
 	const { id } = useParams();
 	const { userId } = useAuth();
+	const { user } = useUser();
 	const { openModal } = useModal();
 	const [car, setCar] = useState<TCar | null>(null);
 	const [vinDetails, setVinDetails] = useState<any>(null);
@@ -530,6 +531,19 @@ export const CarProfile = () => {
 										</Button>
 									</Link>
 								)}
+
+								{user?.publicMetadata?.moderator ? (
+									<Button
+										onClick={() =>
+											openModal('socialGeneration', {
+												car,
+											})
+										}
+										className="size-9 flex items-center justify-center rounded-md lg:p-2 bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark"
+									>
+										<i className="fa-solid fa-share-nodes" />
+									</Button>
+								) : null}
 							</div>
 						</div>
 					) : (
