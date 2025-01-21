@@ -94,8 +94,8 @@ export function PhotoUpload({ carId }: PhotoUploadProps) {
 				type="file"
 				accept="image/*"
 				onChange={handleFileChange}
-				disabled={loading}
-				className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+				disabled={loading || success}
+				className="absolute inset-0 w-full h-full opacity-0 [&:not(:disabled)]:cursor-pointer"
 			/>
 
 			<div className="flex items-center justify-center h-32 border-2 border-dashed border-brg-light rounded-lg bg-brg-light/10 text-sm">
@@ -110,7 +110,12 @@ export function PhotoUpload({ carId }: PhotoUploadProps) {
 					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">
 						<i className="fa-solid fa-check text-2xl text-green-700" />
 
-						<p>Uploaded</p>
+						<p>Upload Complete</p>
+
+						<p className="text-xs text-brg-mid/60 text-center w-2/3">
+							The photo has been submitted, you can close the form
+							if you have no other changes
+						</p>
 					</div>
 				) : (
 					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">

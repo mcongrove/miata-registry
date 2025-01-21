@@ -17,7 +17,7 @@
  */
 
 import { QRCodeSVG } from 'qrcode.react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../components/Button';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Modal } from '../components/Modal';
@@ -42,12 +42,49 @@ export function QrCode({
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
+	const [isFormValid, setIsFormValid] = useState(false);
 	const [quantity, setQuantity] = useState('1');
 	const [selectedLocation, setSelectedLocation] = useState('');
 
 	const car = props.car;
 	const qrUrl = car ? `https://miataregistry.com/registry/${car.id}` : '';
 	const imageSize = 250;
+
+	useEffect(() => {
+		const form = document.querySelector(
+			'form#stickerForm'
+		) as HTMLFormElement;
+
+		if (form) {
+			const checkValidity = () => {
+				const quantity = form.querySelector(
+					'[name="quantity"]'
+				) as HTMLSelectElement;
+
+				const address = form.querySelector(
+					'[name="address"]'
+				) as HTMLInputElement;
+
+				setIsFormValid(
+					quantity.value !== '' &&
+						address.value !== '' &&
+						selectedLocation !== ''
+				);
+			};
+
+			checkValidity();
+
+			form.querySelectorAll('input, select').forEach((input) => {
+				input.addEventListener('input', checkValidity);
+			});
+
+			return () => {
+				form.querySelectorAll('input, select').forEach((input) => {
+					input.removeEventListener('input', checkValidity);
+				});
+			};
+		}
+	}, [showStickerForm, selectedLocation]);
 
 	const handleClose = () => {
 		setShowStickerForm(false);
@@ -184,6 +221,7 @@ export function QrCode({
 							text: 'Submit',
 							onClick: () => handleStickerSubmit(),
 							loading,
+							disabled: !isFormValid,
 						}
 					: undefined
 			}

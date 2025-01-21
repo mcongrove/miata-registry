@@ -39,12 +39,12 @@ export const Field = ({
 }: FieldProps) => (
 	<div className={twMerge('flex flex-col gap-1 text-brg-mid', className)}>
 		<label htmlFor={id} className="text-sm font-medium">
-			<span>
+			<span className="select-none">
 				{label} {required && <span className="text-red-500">*</span>}
 			</span>
 
 			{(caption || error) && (
-				<div className="flex justify-between items-start gap-2">
+				<div className="flex justify-between items-start gap-2 select-none">
 					{caption && (
 						<span className="text-xs text-brg-border font-normal">
 							{caption}

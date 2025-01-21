@@ -50,6 +50,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | ReactNode | null>(null);
+	const [isFormValid, setIsFormValid] = useState(false);
 	const [editions, setEditions] = useState<Array<{ name: string }>>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
 	const [existingOwner, setExistingOwner] = useState<TOwner | null>(null);
@@ -125,6 +126,34 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 			}
 		}
 	}, [editions, prefilledData]);
+
+	useEffect(() => {
+		const form = document.querySelector(
+			'form#registerForm'
+		) as HTMLFormElement;
+
+		if (form) {
+			const checkValidity = () => {
+				setIsFormValid(form.checkValidity());
+			};
+
+			checkValidity();
+
+			form.querySelectorAll('input, select, textarea').forEach(
+				(input) => {
+					input.addEventListener('input', checkValidity);
+				}
+			);
+
+			return () => {
+				form.querySelectorAll('input, select, textarea').forEach(
+					(input) => {
+						input.removeEventListener('input', checkValidity);
+					}
+				);
+			};
+		}
+	}, [formDataLoading]);
 
 	const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
 		if (e) {
@@ -347,6 +376,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 				text: 'Submit',
 				onClick: () => handleSubmit(),
 				loading,
+				disabled: !isFormValid,
 			}}
 		>
 			<div

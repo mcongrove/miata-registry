@@ -52,6 +52,7 @@ export const About = () => {
 	const [isEmailSent, setIsEmailSent] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
+	const [isFormValid, setIsFormValid] = useState(false);
 	const [stats, setStats] = useState<{
 		cars: number;
 		claimedCars: number;
@@ -99,6 +100,34 @@ export const About = () => {
 			setTimeout(() => setHighlightedSection(null), 2500);
 		}
 	}, [location]);
+
+	useEffect(() => {
+		const form = document.querySelector(
+			'form#contactForm'
+		) as HTMLFormElement;
+
+		if (form) {
+			const checkValidity = () => {
+				setIsFormValid(form.checkValidity());
+			};
+
+			checkValidity();
+
+			form.querySelectorAll('input, select, textarea').forEach(
+				(input) => {
+					input.addEventListener('input', checkValidity);
+				}
+			);
+
+			return () => {
+				form.querySelectorAll('input, select, textarea').forEach(
+					(input) => {
+						input.removeEventListener('input', checkValidity);
+					}
+				);
+			};
+		}
+	}, []);
 
 	const getHighlightClass = (sectionId: string) => {
 		return highlightedSection === sectionId ? 'text-red-800' : 'text-brg';
@@ -436,6 +465,7 @@ export const About = () => {
 							</p>
 						) : (
 							<form
+								id="contactForm"
 								className="flex flex-col gap-4 mx-auto w-full max-w-2xl"
 								onSubmit={handleSubmit}
 							>
@@ -470,7 +500,7 @@ export const About = () => {
 
 								<Button
 									type="submit"
-									disabled={isSubmitting}
+									disabled={!isFormValid || isSubmitting}
 									className="w-fit ml-auto"
 								>
 									{isSubmitting

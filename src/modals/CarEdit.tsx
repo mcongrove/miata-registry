@@ -45,6 +45,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
+	const [isFormDirty, setIsFormDirty] = useState(false);
 	const [warningSequence, setWarningSequence] = useState(false);
 	const [warningOwnerDateEnd, setWarningOwnerDateEnd] = useState(false);
 	const car = props.car;
@@ -59,6 +60,96 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 		const newValue = e.target.value ? Number(e.target.value) : null;
 
 		setWarningSequence(newValue !== car.sequence);
+	};
+
+	const handleFormChange = () => {
+		const form = document.querySelector(
+			'form#carEditForm'
+		) as HTMLFormElement;
+
+		if (!form) return;
+
+		const formData = new FormData(form);
+
+		const hasChanges = Array.from(formData.entries()).some(
+			([key, value]) => {
+				const currentValue = value.toString().trim();
+
+				switch (key) {
+					case 'destroyed':
+						const isChecked = formData.get('destroyed') !== null;
+						return isChecked !== car.destroyed;
+					case 'sequence':
+						return currentValue
+							? Number(currentValue) !== car.sequence
+							: car.sequence !== null;
+					case 'sale_msrp':
+						const msrp = currentValue
+							? Number(currentValue.replace(/[^0-9]/g, ''))
+							: null;
+						return msrp !== car.sale_msrp;
+					case 'owner_date_start':
+						return (
+							currentValue !==
+							(car.owner_history?.[0]?.date_start
+								?.toString()
+								.split('T')[0] || '')
+						);
+					case 'owner_date_end':
+						return (
+							currentValue !==
+							(car.owner_history?.[0]?.date_end
+								?.toString()
+								.split('T')[0] || '')
+						);
+					case 'manufacture_date':
+						return (
+							currentValue !==
+							(car.manufacture_date?.toString().split('T')[0] ||
+								'')
+						);
+					case 'manufacture_date_time':
+						return (
+							currentValue !==
+							(car.manufacture_date
+								?.toString()
+								.split('T')[1]
+								.slice(0, -8) || '')
+						);
+					case 'sale_date':
+						return (
+							currentValue !==
+							(car.sale_date?.toString().split('T')[0] || '')
+						);
+					case 'sale_dealer_name':
+						return currentValue !== (car.sale_dealer_name || '');
+					case 'sale_dealer_location':
+						const currentLocation = formatLocation({
+							city: car.sale_dealer_city,
+							state: car.sale_dealer_state,
+							country: car.sale_dealer_country || '',
+						});
+						return currentValue !== currentLocation;
+					case 'shipping_date':
+						return (
+							currentValue !==
+							(car.shipping_date?.toString().split('T')[0] || '')
+						);
+					case 'shipping_vessel':
+						return currentValue !== (car.shipping_vessel || '');
+					case 'shipping_location':
+						const currentShippingLocation = formatLocation({
+							city: car.shipping_city,
+							state: car.shipping_state,
+							country: car.shipping_country || '',
+						});
+						return currentValue !== currentShippingLocation;
+				}
+				return false;
+			}
+		);
+
+		setIsFormDirty(hasChanges);
 	};
 
 	const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -204,11 +295,13 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 				text: 'Save Changes',
 				onClick: handleSubmit,
 				loading,
+				disabled: !isFormDirty,
 			}}
 		>
 			<form
 				id="carEditForm"
 				onSubmit={handleSubmit}
+				onChange={handleFormChange}
 				className="flex flex-col gap-4"
 			>
 				<input type="hidden" name="userId" value={userId} />
@@ -507,7 +600,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						</Field>
 					</div>
 
-					<h4 className="text-md font-semibold mt-3">Photos</h4>
+					<h4 className="text-md font-semibold mt-3">Photo</h4>
 
 					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg p-4">
 						<PhotoUpload carId={car.id} />
@@ -529,12 +622,28 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						</p>
 					</div>
 
+					<h4 className="text-md font-semibold mt-3">Rarity Score</h4>
+
+					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg py-3 px-4">
+						<p className="text-sm text-brg-mid/70">
+							Editing your car's rarity score is under
+							development. Send us documentation at{' '}
+							<a
+								href={`mailto:support@miataregistry.com?subject=Rarity%20Score%20Submission:%20${car.id}`}
+								className="underline"
+							>
+								support@miataregistry.com
+							</a>{' '}
+							and we'll get it added for you.
+						</p>
+					</div>
+
 					<h4 className="text-md font-semibold mt-3 text-red-700">
 						Danger Zone
 					</h4>
 
 					<div className="flex flex-col gap-4 bg-red-50 border border-red-100 rounded-lg py-3 px-4 mb-1">
-						<label className="flex items-center gap-2 text-sm text-red-700">
+						<label className="flex items-center gap-2 text-sm text-red-700 select-none">
 							<input
 								type="checkbox"
 								id="destroyed"
