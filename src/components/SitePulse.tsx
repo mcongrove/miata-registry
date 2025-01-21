@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { toPrettyDate } from '../utils/common';
+
 export function SitePulse() {
 	const [lastActivity, setLastActivity] = useState<string>('');
 	const [isActive, setIsActive] = useState<boolean | null>(null);
@@ -30,57 +31,69 @@ export function SitePulse() {
 	useEffect(() => {
 		const loadPulse = async () => {
 			try {
-				const [pulseResponse, archiveResponse] = await Promise.all([
-					fetch(
-						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/pulse`
-					),
-					fetch(
-						`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/archive`
-					),
-				]);
+				const pulsePromise = fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/pulse`
+				);
 
-				if (!pulseResponse.ok || !archiveResponse.ok) {
-					if (pulseResponse.status === 404) {
-						setLastActivity('');
-						setIsActive(false);
+				const archivePromise = fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/archive`
+				);
+
+				try {
+					const pulseResponse = await pulsePromise;
+
+					if (!pulseResponse.ok) {
+						if (pulseResponse.status === 404) {
+							setLastActivity('');
+							setIsActive(false);
+						}
+					} else {
+						const pulseData = await pulseResponse.json();
+						const lastActivityDate = new Date(pulseData.timestamp);
+						const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+
+						setIsActive(
+							Date.now() - lastActivityDate.getTime() <
+								thirtyDaysInMs
+						);
+						setLastActivity(
+							toPrettyDate(pulseData.timestamp).split(' at')[0]
+						);
 					}
-
-					if (archiveResponse.status === 404) {
-						setLastArchive('');
-						setIsArchived(false);
-					}
-
-					return;
+				} catch (error) {
+					setLastActivity('');
+					setIsActive(null);
 				}
 
-				const [pulseData, archiveData] = await Promise.all([
-					pulseResponse.json(),
-					archiveResponse.json(),
-				]);
+				try {
+					const archiveResponse = await archivePromise;
 
-				const lastActivityDate = new Date(pulseData.timestamp);
-				const lastArchiveDate = new Date(archiveData.timestamp);
-				const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+					if (!archiveResponse.ok) {
+						if (archiveResponse.status === 404) {
+							setLastArchive('');
+							setIsArchived(false);
+						}
+					} else {
+						const archiveData = await archiveResponse.json();
+						const lastArchiveDate = new Date(archiveData.timestamp);
+						const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
 
-				setIsActive(
-					Date.now() - lastActivityDate.getTime() < thirtyDaysInMs
-				);
-
-				setLastActivity(
-					toPrettyDate(pulseData.timestamp).split(' at')[0]
-				);
-
-				setIsArchived(
-					Date.now() - lastArchiveDate.getTime() < thirtyDaysInMs
-				);
-
-				setLastArchive(
-					toPrettyDate(archiveData.timestamp).split(' at')[0]
-				);
-
-				setArchiveUrl(
-					`https://archive.org/details/${archiveData.filename.replace('.zip', '')}`
-				);
+						setIsArchived(
+							Date.now() - lastArchiveDate.getTime() <
+								thirtyDaysInMs
+						);
+						setLastArchive(
+							toPrettyDate(archiveData.timestamp).split(' at')[0]
+						);
+						setArchiveUrl(
+							`https://archive.org/details/${archiveData.filename.replace('.zip', '')}`
+						);
+					}
+				} catch (error) {
+					setLastArchive('');
+					setIsArchived(null);
+					setArchiveUrl('');
+				}
 			} catch (error) {
 				setLastActivity('');
 				setLastArchive('');

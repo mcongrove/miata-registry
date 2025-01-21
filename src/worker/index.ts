@@ -94,7 +94,7 @@ export default {
 			ctx.waitUntil(
 				(async () => {
 					const response = await fetch(
-						'https://api.miataregistry.com/heartbeat/archive/cron',
+						'https://miata-registry.miata-registry.workers.dev/heartbeat/archive/cron',
 						{
 							method: 'POST',
 							headers: {
