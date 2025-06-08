@@ -47,6 +47,3 @@ preview_bucket_name = "miata-registry-images"
 # Production Environment
 [env.production]
 vars = { NODE_ENV = "production" }
-
-[triggers]
-crons = ["0 3 * * 1"]

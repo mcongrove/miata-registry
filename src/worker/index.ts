@@ -86,32 +86,3 @@ app.route('/owners', ownersRouter);
 app.route('/photos', photosRouter);
 app.route('/stats', statsRouter);
 app.route('/webhooks', webhooksRouter);
-
-export default {
-	fetch: app.fetch,
-	async scheduled(_event: any, env: any, ctx: any) {
-		try {
-			ctx.waitUntil(
-				(async () => {
-					const response = await fetch(
-						'https://miata-registry.miata-registry.workers.dev/heartbeat/archive/cron',
-						{
-							method: 'POST',
-							headers: {
-								Authorization: `Bearer ${env.ARCHIVE_ORG_CRON_SECRET}`,
-							},
-						}
-					);
-
-					if (!response.ok) {
-						throw new Error(
-							`Failed to trigger archive: ${response.status} ${response.statusText}`
-						);
-					}
-				})()
-			);
-		} catch (error) {
-			console.error('Cron job failed:', error);
-		}
-	},
-};

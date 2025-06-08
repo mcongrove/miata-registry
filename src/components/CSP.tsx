@@ -30,7 +30,7 @@ export const CSP = () => {
 			default-src 'self' ${devCSP};
 			script-src 'self' 'unsafe-inline' 'unsafe-eval' ${devCSP} *.miataregistry.com *.clerk.accounts.dev *.clerk.services *.cloudflareinsights.com *.fontawesome.com *.googleapis.com challenges.cloudflare.com;
 			worker-src 'self' blob: ${devCSP};
-			connect-src 'self' ${devCSP} *.miataregistry.com *.clerk.accounts.dev *.clerk.services *.googleapis.com *.sentry.io api.github.com challenges.cloudflare.com vpic.nhtsa.dot.gov;
+			connect-src 'self' ${devCSP} *.miataregistry.com *.clerk.accounts.dev *.clerk.services *.googleapis.com api.github.com challenges.cloudflare.com vpic.nhtsa.dot.gov;
 			img-src 'self' data: ${devCSP} store.miataregistry.com *.clerk.com *.googleapis.com *.gstatic.com flagcdn.com;
 			style-src 'self' 'unsafe-inline' ${devCSP} *.googleapis.com *.gstatic.com;
 			font-src 'self' ${devCSP} *.fontawesome.com *.gstatic.com;
