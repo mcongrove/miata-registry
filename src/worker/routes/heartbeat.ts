@@ -32,6 +32,7 @@ import {
 	Tips,
 } from '../../db/schema';
 import { objectsToCSV } from '../../utils/data';
+import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
 const CACHE_TTL = {
@@ -39,53 +40,103 @@ const CACHE_TTL = {
 	PULSE: 60 * 60 * 24, // 1 day
 };
 
+const PULSE_CACHE_KEY = 'heartbeat:pulse';
+
 const heartbeatRouter = new Hono<{ Bindings: Bindings }>();
+
+const getClerkClient = (c: { env: Bindings }) =>
+	createClerkClient({
+		secretKey: c.env.CLERK_SECRET_KEY,
+		publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
+	});
+
+const readPulseCache = async (cache: Bindings['CACHE']) => {
+	const cached = await cache.get(PULSE_CACHE_KEY);
+
+	return cached ? JSON.parse(cached) : null;
+};
+
+const writePulseCache = async (
+	cache: Bindings['CACHE'],
+	timestamp: number,
+	isDev: boolean
+) => {
+	if (isDev) return;
+
+	await cache.put(PULSE_CACHE_KEY, JSON.stringify({ timestamp }), {
+		expirationTtl: CACHE_TTL.PULSE,
+	});
+};
+
+const fetchAdminPulseFromClerk = async (c: { env: Bindings }) => {
+	const userId = c.env.ADMIN_USER_ID;
+
+	if (!userId) {
+		throw new Error('ADMIN_USER_ID environment variable is not set');
+	}
+
+	const user = await getClerkClient(c).users.getUser(userId);
+
+	if (!user) {
+		return null;
+	}
+
+	return { timestamp: user.lastActiveAt };
+};
 
 heartbeatRouter.get('/pulse', async (c) => {
 	try {
 		const isDev = c.env.NODE_ENV === 'development';
-		const cached = await c.env.CACHE.get('heartbeat:pulse');
+		const cached = await readPulseCache(c.env.CACHE);
 
 		if (cached) {
-			const response = c.json(JSON.parse(cached));
+			const response = c.json(cached);
 
 			response.headers.set('X-Cache', 'HIT');
 
 			return response;
 		}
 
-		const clerk = createClerkClient({
-			secretKey: c.env.CLERK_SECRET_KEY,
-			publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
-		});
+		const pulse = await fetchAdminPulseFromClerk(c);
 
-		const userId = c.env.ADMIN_USER_ID;
-
-		if (!userId) {
-			throw new Error('ADMIN_USER_ID environment variable is not set');
-		}
-
-		const user = await clerk.users.getUser(userId);
-
-		if (!user) {
+		if (!pulse) {
 			return c.json({ error: 'User not found' }, 404);
 		}
 
-		if (!isDev) {
-			await c.env.CACHE.put(
-				'heartbeat:pulse',
-				JSON.stringify({ timestamp: user.lastActiveAt }),
-				{
-					expirationTtl: CACHE_TTL.PULSE,
-				}
-			);
-		}
+		await writePulseCache(c.env.CACHE, pulse.timestamp, isDev);
 
-		return c.json({
-			timestamp: user.lastActiveAt,
-		});
+		return c.json(pulse);
 	} catch (error) {
 		console.error('Error fetching pulse:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error
+						? error.message
+						: 'An unknown error occurred',
+			},
+			500
+		);
+	}
+});
+
+heartbeatRouter.post('/pulse', withAuth(), async (c) => {
+	try {
+		if (c.get('userId') !== c.env.ADMIN_USER_ID) {
+			return c.body(null, 204);
+		}
+
+		const isDev = c.env.NODE_ENV === 'development';
+		const timestamp = Date.now();
+
+		await c.env.CACHE.delete(PULSE_CACHE_KEY);
+		await writePulseCache(c.env.CACHE, timestamp, isDev);
+
+		return c.json({ timestamp });
+	} catch (error) {
+		console.error('Error refreshing pulse:', error);
 
 		return c.json(
 			{

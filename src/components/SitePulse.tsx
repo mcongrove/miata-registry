@@ -16,53 +16,80 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useEffect, useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { toPrettyDate } from '../utils/common';
 
 export function SitePulse() {
+	const { isSignedIn, isLoaded, getToken } = useAuth();
 	const [lastActivity, setLastActivity] = useState<string>('');
 	const [isActive, setIsActive] = useState<boolean | null>(null);
 	const [lastArchive, setLastArchive] = useState<string>('');
 	const [isArchived, setIsArchived] = useState<boolean | null>(null);
 	const [archiveUrl, setArchiveUrl] = useState<string>('');
 
+	const applyPulseData = useCallback((timestamp: number) => {
+		const lastActivityDate = new Date(timestamp);
+		const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+
+		setIsActive(Date.now() - lastActivityDate.getTime() < thirtyDaysInMs);
+		setLastActivity(toPrettyDate(timestamp).split(' at')[0]);
+	}, []);
+
 	useEffect(() => {
+		if (!isLoaded) return;
+
 		const loadPulse = async () => {
+			let pulseLoaded = false;
+
 			try {
-				const pulsePromise = fetch(
-					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/pulse`
-				);
+				if (isSignedIn) {
+					const token = await getToken();
+
+					if (token) {
+						const refreshResponse = await fetch(
+							`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/pulse`,
+							{
+								method: 'POST',
+								headers: {
+									Authorization: `Bearer ${token}`,
+								},
+							}
+						);
+
+						if (refreshResponse.status === 200) {
+							const pulseData = await refreshResponse.json();
+							applyPulseData(pulseData.timestamp);
+							pulseLoaded = true;
+						}
+					}
+				}
 
 				const archivePromise = fetch(
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/archive`
 				);
 
-				try {
-					const pulseResponse = await pulsePromise;
+				if (!pulseLoaded) {
+					try {
+						const pulseResponse = await fetch(
+							`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/pulse`
+						);
 
-					if (!pulseResponse.ok) {
-						if (pulseResponse.status === 404) {
-							setLastActivity('');
-							setIsActive(false);
+						if (!pulseResponse.ok) {
+							if (pulseResponse.status === 404) {
+								setLastActivity('');
+								setIsActive(false);
+							}
+						} else {
+							const pulseData = await pulseResponse.json();
+							applyPulseData(pulseData.timestamp);
 						}
-					} else {
-						const pulseData = await pulseResponse.json();
-						const lastActivityDate = new Date(pulseData.timestamp);
-						const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-
-						setIsActive(
-							Date.now() - lastActivityDate.getTime() <
-								thirtyDaysInMs
-						);
-						setLastActivity(
-							toPrettyDate(pulseData.timestamp).split(' at')[0]
-						);
+					} catch (error) {
+						setLastActivity('');
+						setIsActive(null);
 					}
-				} catch (error) {
-					setLastActivity('');
-					setIsActive(null);
 				}
 
 				try {
@@ -102,7 +129,7 @@ export function SitePulse() {
 		};
 
 		loadPulse();
-	}, []);
+	}, [isLoaded, isSignedIn, getToken, applyPulseData]);
 
 	return (
 		<div className="flex flex-col gap-2 items-center">
