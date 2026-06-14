@@ -86,3 +86,5 @@ app.route('/owners', ownersRouter);
 app.route('/photos', photosRouter);
 app.route('/stats', statsRouter);
 app.route('/webhooks', webhooksRouter);
+
+export default app;
