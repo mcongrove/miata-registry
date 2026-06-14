@@ -29,6 +29,7 @@ import {
 	OwnersPending,
 	Tips,
 } from '../../db/schema';
+import { parseSequence } from '../../utils/car';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -230,7 +231,7 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			current_owner_id: ownerId,
 			edition_id: editionId,
 			id: crypto.randomUUID(),
-			sequence: body.sequence,
+			sequence: parseSequence(body.sequence),
 			status: 'pending',
 			vin: body.vin,
 		});

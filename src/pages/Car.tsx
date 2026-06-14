@@ -27,7 +27,11 @@ import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
-import { formatEngineDetails, formatPlantLocation } from '../utils/car';
+import {
+	formatEngineDetails,
+	formatPlantLocation,
+	hasSequence,
+} from '../utils/car';
 import { handleApiError, toPrettyDate, toTitleCase } from '../utils/common';
 import {
 	country,
@@ -80,7 +84,7 @@ export const CarProfile = () => {
 	usePageMeta({
 		path: `/registry/${id}`,
 		title: car
-			? `${car.edition?.year} ${car.edition?.name}${car.sequence ? ` #${car.sequence}` : ''}`
+			? `${car.edition?.year} ${car.edition?.name}${hasSequence(car.sequence) ? ` #${car.sequence}` : ''}`
 			: '',
 		description: car ? car.edition?.description?.split('\n')[0] : '',
 	});
@@ -408,7 +412,7 @@ export const CarProfile = () => {
 									<div className="flex gap-2 lg:gap-4 items-center">
 										{car.edition?.total_produced && (
 											<p className="text-sm lg:text-base text-brg-mid/60">
-												{car.sequence !== null ? (
+												{hasSequence(car.sequence) ? (
 													<>
 														{car.sequence &&
 															car.sequence >
@@ -469,25 +473,6 @@ export const CarProfile = () => {
 										>
 											<i className="fa-solid fa-fw fa-pen-to-square opacity-70" />
 											Edit Car
-										</Button>
-
-										<Button
-											onClick={() => {
-												openModal('qrCode', {
-													car,
-												});
-											}}
-											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
-										>
-											<i className="fa-solid fa-fw fa-qrcode opacity-70" />
-
-											<span className="hidden lg:inline">
-												QR Codes
-											</span>
-
-											<span className="inline lg:hidden">
-												QR Code
-											</span>
 										</Button>
 									</>
 								) : (

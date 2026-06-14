@@ -22,7 +22,7 @@ import { Select } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { TCar } from '../types/Car';
-import { colorMapSocial } from '../utils/car';
+import { colorMapSocial, hasSequence } from '../utils/car';
 import { toTitleCase } from '../utils/common';
 import { formatLocation } from '../utils/location';
 
@@ -245,7 +245,7 @@ export function SocialGeneration({
 						zIndex: 2,
 					}}
 				>
-					{car.sequence !== null ? (
+					{hasSequence(car.sequence) ? (
 						<>
 							<span style={{ opacity: 0.6 }}>
 								{car.sequence &&

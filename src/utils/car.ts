@@ -19,6 +19,26 @@
 import { toTitleCase } from './common';
 import { countryNameToCode } from './location';
 
+export const hasSequence = (
+	sequence?: number | string | null
+): sequence is number => {
+	if (sequence == null || sequence === '') return false;
+
+	const value = Number(sequence);
+
+	return Number.isFinite(value) && value > 0;
+};
+
+export const parseSequence = (
+	value: FormDataEntryValue | string | number | null | undefined
+): number | null => {
+	if (value == null || value === '') return null;
+
+	const sequence = Number(value);
+
+	return Number.isFinite(sequence) && sequence > 0 ? sequence : null;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatEngineDetails = (details: any) => {
 	const displacement = details.DisplacementL

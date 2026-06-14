@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useModal } from '../../context/ModalContext';
 import { TCar } from '../../types/Car';
-import { colorMap } from '../../utils/car';
+import { colorMap, hasSequence } from '../../utils/car';
 
 interface RegistryTableProps {
 	cars: TCar[];
@@ -175,7 +175,7 @@ export const RegistryTable = ({
 											{car.edition?.color}
 										</div>
 									</td>
-									{car.sequence !== null ? (
+									{hasSequence(car.sequence) ? (
 										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
 											{car.sequence?.toLocaleString()}
 											{car.edition?.total_produced && (

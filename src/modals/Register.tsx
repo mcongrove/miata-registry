@@ -27,6 +27,7 @@ import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { TOwner } from '../types/Owner';
+import { parseSequence } from '../utils/car';
 import { handleApiError } from '../utils/common';
 import { formatLocation, parseLocation } from '../utils/location';
 
@@ -237,7 +238,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 								.replace(/\s+/g, ' ')
 								.trim(),
 							owner_state: owner_location?.state,
-							sequence: formData.get('sequence'),
+							sequence: parseSequence(formData.get('sequence')),
 							vin: formData.get('vin'),
 						}),
 					}
