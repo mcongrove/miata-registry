@@ -1,9 +1,7 @@
 name: Deploy Worker and Run Cypress Tests
 
 on:
-    push:
-        branches:
-            - main
+    workflow_dispatch:
 
 jobs:
     deploy:
