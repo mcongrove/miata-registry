@@ -29,6 +29,8 @@ export type TCar = {
 	has_pending_changes?: boolean;
 	id: string;
 	manufacture_date?: string;
+	mileage?: number;
+	mileage_date?: string;
 	owner_history?: TCarOwner[];
 	rarity_score?: number;
 	sale_date?: string;
@@ -43,6 +45,7 @@ export type TCar = {
 	shipping_date?: string;
 	shipping_state?: string;
 	shipping_vessel?: string;
+	story?: string;
 	vin?: string;
 };
 

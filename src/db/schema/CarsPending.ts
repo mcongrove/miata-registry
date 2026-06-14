@@ -26,6 +26,8 @@ export const CarsPending = sqliteTable('cars_pending', {
 	edition_id: text('edition_id').notNull(),
 	id: text('id').primaryKey(),
 	manufacture_date: text('manufacture_date'),
+	mileage: integer('mileage'),
+	mileage_date: text('mileage_date'),
 	sale_date: text('sale_date'),
 	sale_dealer_city: text('sale_dealer_city'),
 	sale_dealer_country: text('sale_dealer_country'),
@@ -38,6 +40,7 @@ export const CarsPending = sqliteTable('cars_pending', {
 	shipping_date: text('shipping_date'),
 	shipping_state: text('shipping_state'),
 	shipping_vessel: text('shipping_vessel'),
+	story: text('story'),
 	status: text('status', { enum: ['pending', 'approved', 'rejected'] })
 		.notNull()
 		.default('pending'),

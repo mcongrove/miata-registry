@@ -17,18 +17,15 @@
  */
 
 import { useAuth, useUser } from '@clerk/clerk-react';
-import { lazy, useEffect, useMemo, useState } from 'react';
+import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { twMerge } from 'tailwind-merge';
 import { Button } from '../components/Button';
 import { Chip } from '../components/rarity/Chip';
-import { Tooltip } from '../components/Tooltip';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import {
-	formatEngineDetails,
 	formatPlantLocation,
 	hasSequence,
 } from '../utils/car';
@@ -93,59 +90,59 @@ export const CarProfile = () => {
 		return vinDetails ? formatPlantLocation(vinDetails) : null;
 	}, [vinDetails]);
 
-	useEffect(() => {
-		const loadCar = async () => {
-			if (!id) return;
+	const loadCar = useCallback(async () => {
+		if (!id) return;
 
-			try {
-				const response = await fetch(
-					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${id}`
+		try {
+			const response = await fetch(
+				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${id}`
+			);
+
+			if (!response.ok) {
+				throw new Error('Failed to fetch car');
+			}
+
+			const carData = await response.json();
+
+			setCar(carData);
+
+			if (carData?.owner_history?.length) {
+				const ownerHistory = carData.owner_history;
+				const lastOwner = ownerHistory[0];
+
+				if (lastOwner?.date_end && !carData.destroyed) {
+					ownerHistory.unshift({
+						id: 'unknown-current',
+						name: 'Unknown',
+						date_end: undefined,
+						date_start: lastOwner.date_end,
+						city: undefined,
+						country: undefined,
+						state: undefined,
+						car_id: carData.id,
+						owner_id: 'unknown-current',
+					});
+				}
+
+				setTimelineOwners(ownerHistory);
+			}
+
+			if (carData?.vin) {
+				const details = await getVinDetails(
+					carData.vin,
+					carData.edition.year
 				);
 
-				if (!response.ok) {
-					throw new Error('Failed to fetch car');
-				}
-
-				const carData = await response.json();
-
-				setCar(carData);
-
-				if (carData?.owner_history?.length) {
-					const ownerHistory = carData.owner_history;
-					const lastOwner = ownerHistory[0];
-
-					if (lastOwner?.date_end && !carData.destroyed) {
-						ownerHistory.unshift({
-							id: 'unknown-current',
-							name: 'Unknown',
-							date_end: undefined,
-							date_start: lastOwner.date_end,
-							city: undefined,
-							country: undefined,
-							state: undefined,
-							car_id: carData.id,
-							owner_id: 'unknown-current',
-						});
-					}
-
-					setTimelineOwners(ownerHistory);
-				}
-
-				if (carData?.vin) {
-					const details = await getVinDetails(
-						carData.vin,
-						carData.edition.year
-					);
-
-					setVinDetails(details);
-				}
-			} catch (error) {
-				handleApiError(error);
+				setVinDetails(details);
 			}
-		};
-
-		loadCar();
+		} catch (error) {
+			handleApiError(error);
+		}
 	}, [id]);
+
+	useEffect(() => {
+		loadCar();
+	}, [loadCar]);
 
 	const timelineItems = useMemo(() => {
 		if (!car) return [];
@@ -454,18 +451,7 @@ export const CarProfile = () => {
 											onClick={() => {
 												openModal('carEdit', {
 													car,
-													onUpdate: () => {
-														setCar((prev) => {
-															if (!prev)
-																return null;
-
-															return {
-																...prev,
-																has_pending_changes:
-																	true,
-															};
-														});
-													},
+													onUpdate: () => loadCar(),
 												});
 											}}
 											disabled={car?.has_pending_changes}
@@ -607,145 +593,112 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						<div className="bg-white rounded-lg overflow-hidden border border-brg-light">
-							<div className="grid grid-cols-1 md:grid-cols-3">
-								<div className="p-4 lg:p-6 md:border-r border-brg-light">
-									<p className="text-sm text-brg-mid mb-1">
-										Factory Color
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+							<div className="bg-white rounded-lg border border-brg-light p-4 lg:p-5 min-w-0">
+								<p className="text-sm text-brg-mid mb-1 whitespace-nowrap">
+									Factory Color
+								</p>
+
+								{car ? (
+									<p className="font-medium whitespace-nowrap">
+										{car.edition?.color}
 									</p>
-
-									{car ? (
-										<p className="font-medium">
-											{car.edition?.color}
-										</p>
-									) : (
-										<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
-									)}
-								</div>
-
-								<div className="p-4 lg:p-6 border-t md:border-t-0 md:border-r border-brg-light">
-									<p className="text-sm text-brg-mid mb-1">
-										VIN
-									</p>
-
-									{car ? (
-										<p className="font-medium font-mono pt-px">
-											{car.vin || (
-												<span className="text-brg-border">
-													Unknown
-												</span>
-											)}
-										</p>
-									) : (
-										<div className="h-6 w-32 bg-brg-light rounded animate-pulse" />
-									)}
-								</div>
-
-								<div className="p-4 lg:p-6 border-t md:border-t-0 md:border-r border-brg-light">
-									<div className="flex items-center gap-1 mb-1">
-										<p className="text-sm text-brg-mid">
-											Engine
-										</p>
-
-										<Tooltip content="Information retrieved based on VIN; may be inaccurate">
-											<i className="fa-solid fa-fw fa-circle-info text-brg-border text-sm" />
-										</Tooltip>
-									</div>
-
-									{car ? (
-										<>
-											{car?.vin ? (
-												<p
-													className={twMerge(
-														'font-medium',
-														!vinDetails
-															? 'animate-pulse bg-brg-light h-6 w-24 rounded'
-															: formatEngineDetails(
-																		vinDetails
-																  ) ===
-																  'Not specified'
-																? 'text-brg-border'
-																: ''
-													)}
-												>
-													{vinDetails &&
-														formatEngineDetails(
-															vinDetails
-														)}
-												</p>
-											) : (
-												<p className="font-medium text-brg-border">
-													Not specified
-												</p>
-											)}
-										</>
-									) : (
-										<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
-									)}
-								</div>
+								) : (
+									<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />
+								)}
 							</div>
 
-							{(car?.sale_date ||
-								car?.sale_msrp ||
-								car?.sale_dealer_name) && (
-								<div className="flex flex-wrap gap-3 lg:gap-16 border-t border-brg-light p-4 lg:p-6">
-									{car?.sale_msrp && (
-										<div className="w-full lg:w-auto">
-											<p className="text-sm text-brg-mid mb-1">
-												Original{' '}
-												<span className="hidden lg:inline">
-													MSRP
-												</span>
-												<span className="inline lg:hidden">
-													Purchase
-												</span>
-											</p>
+							<div className="bg-white rounded-lg border border-brg-light p-4 lg:p-5 min-w-0">
+								<p className="text-sm text-brg-mid mb-1 whitespace-nowrap">
+									VIN
+								</p>
 
-											<p className="font-medium">
-												$
-												{car?.sale_msrp?.toLocaleString()}
-											</p>
-										</div>
+								{car ? (
+									<p className="font-medium font-mono pt-px whitespace-nowrap">
+										{car.vin || (
+											<span className="text-brg-border">
+												Unknown
+											</span>
+										)}
+									</p>
+								) : (
+									<div className="h-6 w-32 bg-brg-light rounded animate-pulse" />
+								)}
+							</div>
+
+							{car?.mileage != null && (
+								<div className="bg-white rounded-lg border border-brg-light p-4 lg:p-5 min-w-0">
+									<p className="text-sm text-brg-mid mb-1 whitespace-nowrap">
+										Current Mileage
+									</p>
+
+									<p className="font-medium whitespace-nowrap">
+										{car.mileage.toLocaleString()} mi
+									</p>
+
+									{car.mileage_date && (
+										<p className="text-xs text-brg-mid mt-0.5 whitespace-nowrap">
+											as of{' '}
+											{toPrettyDate(car.mileage_date)}
+										</p>
+									)}
+								</div>
+							)}
+
+							{(car?.sale_date || car?.sale_dealer_name) && (
+								<div className="bg-white rounded-lg border border-brg-light p-4 lg:p-5 min-w-0">
+									<p className="text-sm text-brg-mid mb-1 whitespace-nowrap">
+										Original Sale
+									</p>
+
+									{car.sale_date && (
+										<p className="font-medium whitespace-nowrap">
+											{toPrettyDate(car.sale_date)}
+										</p>
 									)}
 
-									{car?.sale_date && (
-										<div className="w-full lg:w-auto">
-											<p className="text-sm text-brg-mid mb-1 hidden lg:block">
-												Purchase Date
-											</p>
-
-											<p className="font-medium">
-												{toPrettyDate(car?.sale_date)}
-											</p>
-										</div>
+									{car.sale_dealer_name && (
+										<p
+											className={
+												car.sale_date
+													? 'text-sm whitespace-nowrap mt-0.5'
+													: 'font-medium whitespace-nowrap'
+											}
+										>
+											{car.sale_dealer_name}
+										</p>
 									)}
 
-									{car?.sale_dealer_name && (
-										<div className="w-full lg:w-auto">
-											<p className="text-sm text-brg-mid mb-1 hidden lg:block">
-												Original Dealer
-											</p>
-
-											<p className="font-medium">
-												{car?.sale_dealer_name}
-											</p>
-
-											{car?.sale_dealer_city && (
-												<p className="text-xs text-brg-mid">
-													{formatLocation({
-														city: car.sale_dealer_city,
-														state: car.sale_dealer_state,
-														country:
-															car.sale_dealer_country ||
-															'',
-													})}
-												</p>
-											)}
-										</div>
+									{car.sale_dealer_city && (
+										<p className="text-xs text-brg-mid whitespace-nowrap">
+											{formatLocation({
+												city: car.sale_dealer_city,
+												state: car.sale_dealer_state,
+												country:
+													car.sale_dealer_country ||
+													'',
+											})}
+										</p>
 									)}
 								</div>
 							)}
 						</div>
+
+						{car?.story && (
+							<div className="hidden lg:flex flex-col gap-4">
+								<h3 className="text-xl font-semibold">
+									About this Miata
+								</h3>
+
+								<div className="prose max-w-none">
+									{car.story
+										.split('\n')
+										.map((paragraph, index) => (
+											<p key={index}>{paragraph}</p>
+										))}
+								</div>
+							</div>
+						)}
 
 						{car?.edition?.description ? (
 							<div className="hidden lg:flex flex-col gap-4">
@@ -859,6 +812,27 @@ export const CarProfile = () => {
 							)}
 						</div>
 					</div>
+
+					{car?.story && (
+						<div className="flex lg:hidden flex-col gap-4">
+							<h3 className="text-xl font-semibold">
+								About this Miata
+							</h3>
+
+							<div className="prose max-w-none space-y-4">
+								{car.story
+									.split('\n')
+									.map((paragraph, index) => (
+										<p
+											key={index}
+											className="text-sm leading-relaxed"
+										>
+											{paragraph}
+										</p>
+									))}
+							</div>
+						</div>
+					)}
 
 					{car?.edition?.description ? (
 						<div className="flex lg:hidden flex-col gap-4">

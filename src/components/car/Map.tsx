@@ -33,7 +33,7 @@ export const Map = ({
 	locations?: (TMapLocation | null)[];
 	hasOwners: boolean;
 }) => {
-	const { isLoaded } = useGoogleMaps();
+	const { isLoaded, mapsEnabled } = useGoogleMaps();
 	const [markers, setMarkers] = useState<MarkerData[]>([]);
 
 	useEffect(() => {
@@ -73,7 +73,7 @@ export const Map = ({
 		}
 	}, [locations, isLoaded]);
 
-	if (!isLoaded) {
+	if (!mapsEnabled || !isLoaded) {
 		return <div className="w-full h-96 bg-brg-50" />;
 	}
 

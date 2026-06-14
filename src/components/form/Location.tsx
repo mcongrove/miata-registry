@@ -18,6 +18,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { mapsEnabled } from '../../context/GoogleMapsContext';
 import { TAddress } from '../../types/Location';
 
 interface LocationProps {
@@ -54,7 +55,7 @@ export function Location({
 	}, [value]);
 
 	useEffect(() => {
-		if (!inputRef.current) return;
+		if (!mapsEnabled || !inputRef.current) return;
 
 		autocompleteRef.current = new window.google.maps.places.Autocomplete(
 			inputRef.current,

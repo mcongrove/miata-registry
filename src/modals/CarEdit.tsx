@@ -17,17 +17,19 @@
  */
 
 import { useAuth } from '@clerk/clerk-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { PhotoUpload } from '../components/form/PhotoUpload';
+import { Select } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { handleApiError } from '../utils/common';
 import { formatLocation, parseLocation } from '../utils/location';
+import { parseMileageInput, convertMileageDisplay, TMileageUnit } from '../utils/car';
 
 interface CarEditProps {
 	isOpen: boolean;
@@ -44,11 +46,29 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 	const { isSignedIn, userId, getToken } = useAuth();
 	const [loading, setLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [pendingReview, setPendingReview] = useState(true);
 	const [formError, setFormError] = useState<string | null>(null);
 	const [isFormDirty, setIsFormDirty] = useState(false);
 	const [warningSequence, setWarningSequence] = useState(false);
 	const [warningOwnerDateEnd, setWarningOwnerDateEnd] = useState(false);
+	const [mileageUnit, setMileageUnit] = useState<TMileageUnit>('mi');
+	const [mileageDisplay, setMileageDisplay] = useState('');
 	const car = props.car;
+
+	useEffect(() => {
+		if (!isOpen) return;
+
+		setMileageUnit('mi');
+		setMileageDisplay(
+			car.mileage != null ? car.mileage.toLocaleString() : ''
+		);
+	}, [isOpen, car.id]);
+
+	useEffect(() => {
+		if (!isOpen) return;
+
+		handleFormChange();
+	}, [mileageDisplay, mileageUnit, isOpen, car.mileage]);
 
 	const handleOwnerDateEndChange = (e: any) => {
 		const newValue = e.target.value;
@@ -144,12 +164,21 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							country: car.shipping_country || '',
 						});
 						return currentValue !== currentShippingLocation;
+					case 'mileage':
+					case 'mileage_unit':
+						return false;
+					case 'story':
+						return currentValue !== (car.story || '');
 				}
 				return false;
 			}
 		);
 
-		setIsFormDirty(hasChanges);
+		const mileageDirty =
+			parseMileageInput(mileageDisplay, mileageUnit) !==
+			(car.mileage ?? null);
+
+		setIsFormDirty(hasChanges || mileageDirty);
 	};
 
 	const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -185,6 +214,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 										: 'T00:00:00.000Z'
 								}`
 							: null,
+						mileage: parseMileageInput(mileageDisplay, mileageUnit),
 						owner_date_end: formData.get('owner_date_end') || null,
 						owner_date_start:
 							formData.get('owner_date_start') || null,
@@ -219,6 +249,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 							: null,
 						shipping_vessel:
 							formData.get('shipping_vessel') || null,
+						story: formData.get('story') || null,
 					}),
 				}
 			);
@@ -229,6 +260,9 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 				throw new Error(error.details || 'Failed to update car');
 			}
 
+			const result = await response.json();
+
+			setPendingReview(Boolean(result.pending_review));
 			setIsSuccess(true);
 
 			props.onUpdate();
@@ -242,6 +276,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 
 	const handleClose = () => {
 		setIsSuccess(false);
+		setPendingReview(true);
 
 		onClose();
 	};
@@ -267,19 +302,22 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						<h2 className="text-2xl font-bold mb-2">Success!</h2>
 
 						<p className="text-brg-mid mb-2">
-							Your changes have been submitted and will be
-							reviewed by the Miata Registry team.
+							{pendingReview
+								? 'Your changes have been submitted and will be reviewed by the Miata Registry team.'
+								: 'Your changes have been saved.'}
 						</p>
 
-						<p className="text-brg-mid">
-							Please send any supporting documentation to{' '}
-							<a
-								href={`mailto:support@miataregistry.com?subject=Change%20Request:%20${car.id}`}
-								className="underline"
-							>
-								support@miataregistry.com
-							</a>
-						</p>
+						{pendingReview && (
+							<p className="text-brg-mid">
+								Please send any supporting documentation to{' '}
+								<a
+									href={`mailto:support@miataregistry.com?subject=Change%20Request:%20${car.id}`}
+									className="underline"
+								>
+									support@miataregistry.com
+								</a>
+							</p>
+						)}
 					</div>
 				</div>
 			</Modal>
@@ -450,6 +488,62 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						)}
 					</div>
 
+					<h4 className="text-md font-semibold mt-3">Shipping</h4>
+
+					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg p-4">
+						<div className="flex gap-8">
+							<Field
+								id="shipping_date"
+								label="Ship Date"
+								className="w-36 shrink-0"
+							>
+								<TextField
+									id="shipping_date"
+									name="shipping_date"
+									type="date"
+									placeholder="1990-01-01"
+									defaultValue={
+										car.shipping_date
+											? car.shipping_date
+													.toString()
+													.split('T')[0]
+											: undefined
+									}
+								/>
+							</Field>
+
+							<Field
+								id="shipping_vessel"
+								label="Vessel"
+								className="w-full"
+							>
+								<TextField
+									id="shipping_vessel"
+									name="shipping_vessel"
+									placeholder="Olive Ace"
+									defaultValue={car.shipping_vessel}
+								/>
+							</Field>
+						</div>
+
+						<Field
+							id="shipping_location"
+							label="Entry Port"
+							className="w-full"
+						>
+							<Location
+								id="shipping_location"
+								name="shipping_location"
+								placeholder="Enter a location"
+								value={formatLocation({
+									city: car.shipping_city,
+									state: car.shipping_state,
+									country: car.shipping_country || '',
+								})}
+							/>
+						</Field>
+					</div>
+
 					<h4 className="text-md font-semibold mt-3">
 						Original Sale
 					</h4>
@@ -544,92 +638,103 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						</Field>
 					</div>
 
-					<h4 className="text-md font-semibold mt-3">Shipping</h4>
-
-					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg p-4">
-						<div className="flex gap-8">
-							<Field
-								id="shipping_date"
-								label="Ship Date"
-								className="w-36 shrink-0"
-							>
-								<TextField
-									id="shipping_date"
-									name="shipping_date"
-									type="date"
-									placeholder="1990-01-01"
-									defaultValue={
-										car.shipping_date
-											? car.shipping_date
-													.toString()
-													.split('T')[0]
-											: undefined
-									}
-								/>
-							</Field>
-
-							<Field
-								id="shipping_vessel"
-								label="Vessel"
-								className="w-full"
-							>
-								<TextField
-									id="shipping_vessel"
-									name="shipping_vessel"
-									placeholder="Olive Ace"
-									defaultValue={car.shipping_vessel}
-								/>
-							</Field>
-						</div>
-
-						<Field
-							id="shipping_location"
-							label="Entry Port"
-							className="w-full"
-						>
-							<Location
-								id="shipping_location"
-								name="shipping_location"
-								placeholder="Enter a location"
-								value={formatLocation({
-									city: car.shipping_city,
-									state: car.shipping_state,
-									country: car.shipping_country || '',
-								})}
-							/>
-						</Field>
-					</div>
-
 					<h4 className="text-md font-semibold mt-3">Photo</h4>
 
 					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg p-4">
 						<PhotoUpload carId={car.id} />
 					</div>
 
-					<h4 className="text-md font-semibold mt-3">Prior Owners</h4>
+					<h4 className="text-md font-semibold mt-3">About this Miata</h4>
 
-					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg py-3 px-4">
-						<p className="text-sm text-brg-mid/70">
-							Editing owner history is under development. Send us
-							documentation at{' '}
-							<a
-								href={`mailto:support@miataregistry.com?subject=Owner%20History%20Submission:%20${car.id}`}
-								className="underline"
+					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg p-4">
+						<div className="flex gap-2 items-end">
+							<Field
+								id="mileage"
+								label="Current Mileage"
+								className="flex-1 min-w-0"
 							>
-								support@miataregistry.com
-							</a>{' '}
-							and we'll get it added for you.
-						</p>
+								<TextField
+									id="mileage"
+									name="mileage"
+									inputMode="numeric"
+									placeholder="42,500"
+									value={mileageDisplay}
+									onChange={(
+										e: React.ChangeEvent<HTMLInputElement>
+									) => {
+										const value = e.target.value.replace(
+											/[^0-9]/g,
+											''
+										);
+
+										setMileageDisplay(
+											value
+												? Number(
+														value
+													).toLocaleString()
+												: ''
+										);
+									}}
+								/>
+							</Field>
+
+							<Select
+								name="mileage_unit"
+								className="w-20"
+								value={mileageUnit}
+								onChange={(
+									e: React.ChangeEvent<HTMLSelectElement>
+								) => {
+									const newUnit =
+										e.target.value as TMileageUnit;
+									const raw = Number(
+										mileageDisplay.replace(/[^0-9]/g, '')
+									);
+
+									if (raw) {
+										setMileageDisplay(
+											convertMileageDisplay(
+												raw,
+												mileageUnit,
+												newUnit
+											).toLocaleString()
+										);
+									}
+
+									setMileageUnit(newUnit);
+								}}
+								options={[
+									{ value: 'mi', label: 'mi' },
+									{ value: 'km', label: 'km' },
+								]}
+							/>
+						</div>
+
+						<Field
+							id="story"
+							label="Your Car's Story"
+							className="w-full"
+						>
+							<TextField
+								id="story"
+								name="story"
+								type="textarea"
+								placeholder="Mods, service history, how you use it, provenance you've learned as an owner…"
+								defaultValue={car.story || ''}
+							/>
+						</Field>
 					</div>
 
-					<h4 className="text-md font-semibold mt-3">Rarity Score</h4>
+					<h4 className="text-md font-semibold mt-3">
+						Prior Owners and Rarity Scores
+					</h4>
 
 					<div className="flex flex-col gap-4 bg-brg-light/30 border border-brg-light rounded-lg py-3 px-4">
 						<p className="text-sm text-brg-mid/70">
-							Editing your car's rarity score is under
-							development. Send us documentation at{' '}
+							Editing prior owner history and rarity scores is
+							under development. Send us documentation at{' '}
 							<a
-								href={`mailto:support@miataregistry.com?subject=Rarity%20Score%20Submission:%20${car.id}`}
+								href={`mailto:support@miataregistry.com?subject=Prior%20Owners%20/%20Rarity%20Score%20Submission:%20${car.id}`}
 								className="underline"
 							>
 								support@miataregistry.com

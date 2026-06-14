@@ -21,6 +21,7 @@ import { createContext, ReactNode, useContext } from 'react';
 
 interface GoogleMapsContextType {
 	isLoaded: boolean;
+	mapsEnabled: boolean;
 }
 
 const GoogleMapsContext = createContext<GoogleMapsContextType | undefined>(
@@ -29,7 +30,9 @@ const GoogleMapsContext = createContext<GoogleMapsContextType | undefined>(
 
 const GOOGLE_MAPS_LIBRARIES: Libraries = ['places'];
 
-export function GoogleMapsProvider({ children }: { children: ReactNode }) {
+export const mapsEnabled = !import.meta.env.DEV;
+
+function GoogleMapsLoader({ children }: { children: ReactNode }) {
 	const { isLoaded } = useJsApiLoader({
 		id: 'google-map-script',
 		googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -37,10 +40,24 @@ export function GoogleMapsProvider({ children }: { children: ReactNode }) {
 	});
 
 	return (
-		<GoogleMapsContext.Provider value={{ isLoaded }}>
+		<GoogleMapsContext.Provider value={{ isLoaded, mapsEnabled: true }}>
 			{children}
 		</GoogleMapsContext.Provider>
 	);
+}
+
+export function GoogleMapsProvider({ children }: { children: ReactNode }) {
+	if (!mapsEnabled) {
+		return (
+			<GoogleMapsContext.Provider
+				value={{ isLoaded: false, mapsEnabled: false }}
+			>
+				{children}
+			</GoogleMapsContext.Provider>
+		);
+	}
+
+	return <GoogleMapsLoader>{children}</GoogleMapsLoader>;
 }
 
 export function useGoogleMaps() {

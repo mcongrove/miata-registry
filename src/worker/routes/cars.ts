@@ -275,6 +275,8 @@ carsRouter.get('/:id', async (c) => {
 				edition_id: Cars.edition_id,
 				id: Cars.id,
 				manufacture_date: Cars.manufacture_date,
+				mileage: Cars.mileage,
+				mileage_date: Cars.mileage_date,
 				rarity_score: sql`COALESCE(${Cars.rarity_score}, 0) + COALESCE(${Editions.rarity_score}, 0)`,
 				sale_date: Cars.sale_date,
 				sale_dealer_city: Cars.sale_dealer_city,
@@ -288,6 +290,7 @@ carsRouter.get('/:id', async (c) => {
 				shipping_date: Cars.shipping_date,
 				shipping_state: Cars.shipping_state,
 				shipping_vessel: Cars.shipping_vessel,
+				story: Cars.story,
 				vin: Cars.vin,
 				current_owner: {
 					city: sql`COALESCE(${Owners.city}, '')`.as('city'),
@@ -444,6 +447,10 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		const id = c.req.param('id');
 		const userId = c.get('userId');
 		const body = await c.req.json();
+		const accessConditions = [
+			eq(Cars.id, id),
+			eq(Owners.user_id, userId),
+		];
 
 		const [existing] = await db
 			.select({
@@ -453,6 +460,8 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					edition_id: Cars.edition_id,
 					id: Cars.id,
 					manufacture_date: Cars.manufacture_date,
+					mileage: Cars.mileage,
+					mileage_date: Cars.mileage_date,
 					sale_date: Cars.sale_date,
 					sale_dealer_city: Cars.sale_dealer_city,
 					sale_dealer_country: Cars.sale_dealer_country,
@@ -465,6 +474,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					shipping_date: Cars.shipping_date,
 					shipping_state: Cars.shipping_state,
 					shipping_vessel: Cars.shipping_vessel,
+					story: Cars.story,
 					vin: Cars.vin,
 				},
 				owner: {
@@ -484,7 +494,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					sql`${CarOwners.date_end} IS NULL`
 				)
 			)
-			.where(and(eq(Cars.id, id), eq(Owners.user_id, userId)));
+			.where(and(...accessConditions));
 
 		if (!existing || !existing.car || !existing.owner) {
 			return c.json(
@@ -496,7 +506,23 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 			);
 		}
 
-		const carChecks = {
+		const parsedMileage =
+			body.mileage !== undefined && body.mileage !== null
+				? Number(body.mileage)
+				: null;
+		const mileageChanged =
+			(existing.car.mileage ?? null) !== (parsedMileage ?? null);
+		const resolvedMileageDate = mileageChanged
+			? `${new Date().toISOString().split('T')[0]}T00:00:00.000Z`
+			: (existing.car.mileage_date ?? null);
+
+		const ownersLogChecks = {
+			mileage: mileageChanged,
+			mileage_date: mileageChanged,
+			story: (existing.car.story ?? null) !== (body.story ?? null),
+		};
+
+		const moderatedCarChecks = {
 			destroyed:
 				(existing.car.destroyed ?? null) !== (body.destroyed ?? null),
 			manufacture_date:
@@ -547,10 +573,24 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				(body.owner_date_end ?? null),
 		};
 
-		const carChanged = Object.values(carChecks).some(Boolean);
+		const ownersLogChanged = Object.values(ownersLogChecks).some(Boolean);
+		const moderatedCarChanged = Object.values(moderatedCarChecks).some(
+			Boolean
+		);
 		const carOwnerChanged = Object.values(ownerChecks).some(Boolean);
 
-		if (carChanged) {
+		if (ownersLogChanged) {
+			await db
+				.update(Cars)
+				.set({
+					mileage: parsedMileage,
+					mileage_date: resolvedMileageDate,
+					story: body.story ?? null,
+				})
+				.where(eq(Cars.id, id));
+		}
+
+		if (moderatedCarChanged) {
 			await db.insert(CarsPending).values({
 				...existing.car,
 				id: crypto.randomUUID(),
@@ -561,6 +601,12 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					: existing.car.current_owner_id,
 				destroyed: body.destroyed,
 				manufacture_date: body.manufacture_date,
+				mileage: ownersLogChanged
+					? parsedMileage
+					: existing.car.mileage,
+				mileage_date: ownersLogChanged
+					? resolvedMileageDate
+					: existing.car.mileage_date,
 				sale_date:
 					body.sale_date !== null
 						? `${body.sale_date}T00:00:00.000Z`
@@ -579,6 +625,9 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 						: null,
 				shipping_state: body.shipping_location?.state,
 				shipping_vessel: body.shipping_vessel,
+				story: ownersLogChanged
+					? (body.story ?? null)
+					: existing.car.story,
 				status: 'pending',
 			});
 		}
@@ -600,7 +649,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 			});
 		}
 
-		if (carChanged || carOwnerChanged) {
+		if (moderatedCarChanged || carOwnerChanged) {
 			const resend = new Resend(c.env.RESEND_API_KEY);
 
 			await resend.emails.send({
@@ -609,14 +658,20 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				subject: 'Miata Registry: Car Change Request',
 				html: `
 				<h2>Car Change Request</h2>
-				${carChanged ? `<p><strong>Car ID:</strong> ${existing.car.id}</p>` : ''}
+				${moderatedCarChanged ? `<p><strong>Car ID:</strong> ${existing.car.id}</p>` : ''}
 			`,
 			});
+		}
 
+		if (ownersLogChanged || moderatedCarChanged || carOwnerChanged) {
 			await Promise.all([c.env.CACHE.delete(`cars:details:${id}`)]);
 		}
 
-		return c.json({ success: true });
+		return c.json({
+			success: true,
+			owners_log_applied: ownersLogChanged,
+			pending_review: moderatedCarChanged || carOwnerChanged,
+		});
 	} catch (error: unknown) {
 		console.error('Error updating car:', error);
 

@@ -39,6 +39,35 @@ export const parseSequence = (
 	return Number.isFinite(sequence) && sequence > 0 ? sequence : null;
 };
 
+export type TMileageUnit = 'mi' | 'km';
+
+const KM_PER_MILE = 1.609344;
+
+export const parseMileageInput = (
+	value: FormDataEntryValue | string | number | null | undefined,
+	unit: TMileageUnit = 'mi'
+): number | null => {
+	if (value == null || value === '') return null;
+
+	const raw = Number(String(value).replace(/[^0-9]/g, ''));
+
+	if (!Number.isFinite(raw) || raw < 0) return null;
+
+	return unit === 'km' ? Math.round(raw / KM_PER_MILE) : raw;
+};
+
+export const convertMileageDisplay = (
+	value: number,
+	from: TMileageUnit,
+	to: TMileageUnit
+): number => {
+	if (!Number.isFinite(value) || from === to) return value;
+
+	return from === 'mi'
+		? Math.round(value * KM_PER_MILE)
+		: Math.round(value / KM_PER_MILE);
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatEngineDetails = (details: any) => {
 	const displacement = details.DisplacementL
