@@ -77,7 +77,7 @@ const fetchAdminPulseFromClerk = async (c: { env: Bindings }) => {
 
 	const user = await getClerkClient(c).users.getUser(userId);
 
-	if (!user) {
+	if (!user?.lastActiveAt) {
 		return null;
 	}
 

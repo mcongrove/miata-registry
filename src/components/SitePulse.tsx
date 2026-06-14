@@ -35,7 +35,7 @@ export function SitePulse() {
 		const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
 
 		setIsActive(Date.now() - lastActivityDate.getTime() < thirtyDaysInMs);
-		setLastActivity(toPrettyDate(timestamp).split(' at')[0]);
+		setLastActivity(toPrettyDate(lastActivityDate).split(' at')[0]);
 	}, []);
 
 	useEffect(() => {
