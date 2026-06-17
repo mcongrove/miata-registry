@@ -27,7 +27,15 @@ import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { TOwner } from '../types/Owner';
-import { parseSequence } from '../utils/car';
+import {
+	getVinDetails,
+	isFullVin,
+	isVinApiValid,
+	parseEditionYear,
+	parseSequence,
+	VIN_INPUT_PATTERN,
+	VIN_VALIDATION_MESSAGE,
+} from '../utils/car';
 import { handleApiError } from '../utils/common';
 import { formatLocation, parseLocation } from '../utils/location';
 
@@ -58,6 +66,11 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const [formDataLoading, setFormDataLoading] = useState(false);
 	const prefilledData = props?.prefilledData;
 	const [selectedEdition, setSelectedEdition] = useState<string>('');
+	const [vinApiWarning, setVinApiWarning] = useState<string | null>(null);
+
+	const resetVinApiWarning = () => {
+		setVinApiWarning(null);
+	};
 
 	useEffect(() => {
 		const loadEditions = async () => {
@@ -219,6 +232,29 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 				setIsSuccess(true);
 			} else {
+				const vin = String(formData.get('vin') ?? '').trim();
+
+				if (isFullVin(vin)) {
+					if (vinApiWarning) {
+						resetVinApiWarning();
+					} else {
+						const year = parseEditionYear(
+							formData.get('edition_name') as string
+						);
+						const details = year
+							? await getVinDetails(vin, year)
+							: null;
+
+						if (details && !isVinApiValid(details)) {
+							setVinApiWarning(
+								'This VIN could not be verified by the NHTSA database. Please double-check it for typos. You can still submit if you are confident it is correct.'
+							);
+
+							return;
+						}
+					}
+				}
+
 				const response = await fetch(
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/claims/new`,
 					{
@@ -284,6 +320,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 	const handleClose = () => {
 		setIsSuccess(false);
+		resetVinApiWarning();
 
 		onClose();
 	};
@@ -374,7 +411,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 				prefilledData?.id ? `Claim your Miata` : 'Register your Miata'
 			}
 			action={{
-				text: 'Submit',
+				text: vinApiWarning ? 'Submit anyway' : 'Submit',
 				onClick: () => handleSubmit(),
 				loading,
 				disabled: !isFormValid,
@@ -514,9 +551,12 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 									name="vin"
 									maxLength={17}
 									placeholder="JM1NA3510M1221538"
-									required
+									pattern={VIN_INPUT_PATTERN}
+									title={VIN_VALIDATION_MESSAGE}
+									required={!prefilledData?.id}
 									defaultValue={prefilledData?.vin}
 									readOnly={!!prefilledData?.vin}
+									onInput={resetVinApiWarning}
 									className={twMerge(
 										prefilledData?.vin &&
 											'bg-brg-light text-brg-mid'
@@ -600,6 +640,12 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						</Field>
 					</div>
 				</form>
+
+				{vinApiWarning && (
+					<div className="w-full p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
+						{vinApiWarning}
+					</div>
+				)}
 			</div>
 		</Modal>
 	);

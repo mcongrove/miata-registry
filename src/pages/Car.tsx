@@ -27,6 +27,7 @@ import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import {
 	formatPlantLocation,
+	getVinDetails,
 	hasSequence,
 } from '../utils/car';
 import { handleApiError, toPrettyDate, toTitleCase } from '../utils/common';
@@ -46,28 +47,6 @@ const TimelineItem = lazy(() =>
 		default: module.TimelineItem,
 	}))
 );
-
-export const getVinDetails = async (vin: string, year: number) => {
-	try {
-		if (!vin || !year) return null;
-
-		const response = await fetch(
-			`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json&modelyear=${year}`
-		);
-
-		const data = await response.json();
-
-		if (data.Results?.[0]) {
-			return data.Results[0];
-		}
-
-		return null;
-	} catch (error) {
-		console.error('Error fetching VIN details:', error);
-
-		return null;
-	}
-};
 
 export const CarProfile = () => {
 	const { id } = useParams();

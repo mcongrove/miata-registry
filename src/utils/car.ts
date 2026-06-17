@@ -39,6 +39,83 @@ export const parseSequence = (
 	return Number.isFinite(sequence) && sequence > 0 ? sequence : null;
 };
 
+export const VIN_INPUT_PATTERN =
+	'(?:[A-Z0-9]{5}-[A-Z0-9]{6}|JM[A-Z0-9]{15})';
+
+export const VIN_VALIDATION_MESSAGE =
+	'Enter a 17-character VIN starting with JM, or a chassis number as XXXXX-XXXXXX.';
+
+const VIN_PATTERN = new RegExp(`^${VIN_INPUT_PATTERN}$`, 'i');
+
+export const isValidVin = (vin: string | null | undefined): boolean => {
+	if (!vin?.trim()) return false;
+
+	return VIN_PATTERN.test(vin.trim());
+};
+
+const CHASSIS_PATTERN = /^[A-Z0-9]{5}-[A-Z0-9]{6}$/i;
+const FULL_VIN_PATTERN = /^JM[A-Z0-9]{15}$/i;
+
+export const isChassisNumber = (vin: string | null | undefined): boolean => {
+	if (!vin?.trim()) return false;
+
+	return CHASSIS_PATTERN.test(vin.trim());
+};
+
+export const isFullVin = (vin: string | null | undefined): boolean => {
+	if (!vin?.trim()) return false;
+
+	return FULL_VIN_PATTERN.test(vin.trim());
+};
+
+export const parseEditionYear = (
+	editionName: string | null | undefined
+): number | null => {
+	if (!editionName) return null;
+
+	const match = editionName.trim().match(/^(\d{4})/);
+
+	return match ? Number(match[1]) : null;
+};
+
+export type TVinDetails = {
+	ErrorCode?: string;
+	Manufacturer?: string;
+};
+
+export const getVinDetails = async (
+	vin: string,
+	year: number
+): Promise<TVinDetails | null> => {
+	try {
+		if (!vin || !year) return null;
+
+		const response = await fetch(
+			`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json&modelyear=${year}`
+		);
+
+		if (!response.ok) return null;
+
+		const data = await response.json();
+
+		if (data.Results?.[0]) {
+			return data.Results[0];
+		}
+
+		return null;
+	} catch (error) {
+		console.error('Error fetching VIN details:', error);
+
+		return null;
+	}
+};
+
+export const isVinApiValid = (details: TVinDetails | null): boolean => {
+	if (!details?.ErrorCode) return false;
+
+	return details.ErrorCode.split(';').every((code) => code.trim() === '0');
+};
+
 export type TMileageUnit = 'mi' | 'km';
 
 const KM_PER_MILE = 1.609344;
