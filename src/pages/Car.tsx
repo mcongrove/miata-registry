@@ -408,9 +408,7 @@ export const CarProfile = () => {
 											</p>
 										)}
 
-										{car.rarity_score && (
-											<Chip score={car.rarity_score} />
-										)}
+										<Chip score={car.rarity_score ?? 0} />
 									</div>
 								)}
 							</div>

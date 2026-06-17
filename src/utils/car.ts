@@ -16,8 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { TRarityLevel } from '../types/Car';
 import { toTitleCase } from './common';
 import { countryNameToCode } from './location';
+
+export const RARITY_LEVELS: TRarityLevel[] = [
+	'historically-significant',
+	'exceptionally-rare',
+	'very-rare',
+	'rare',
+	'limited-edition',
+];
+
+export const formatRarityLevel = (level: string): string =>
+	level
+		.split('-')
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ');
 
 export const hasSequence = (
 	sequence?: number | string | null

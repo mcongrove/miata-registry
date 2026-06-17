@@ -47,7 +47,7 @@ export const Card = ({ edition }: CardProps) => {
 
 				{edition.rarity_score && (
 					<div className="absolute bottom-2 left-2">
-						<Chip score={edition.rarity_score + 20} />
+						<Chip score={edition.rarity_score} />
 					</div>
 				)}
 

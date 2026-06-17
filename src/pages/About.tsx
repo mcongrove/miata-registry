@@ -130,7 +130,7 @@ export const About = () => {
 	}, []);
 
 	const getHighlightClass = (sectionId: string) => {
-		return highlightedSection === sectionId ? 'text-red-800' : 'text-brg';
+		return highlightedSection === sectionId ? 'text-white' : 'text-brg';
 	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

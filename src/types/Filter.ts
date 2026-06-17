@@ -21,6 +21,7 @@ export type TFilterType =
 	| 'country'
 	| 'edition'
 	| 'generation'
+	| 'rarity'
 	| 'search'
 	| 'year';
 

@@ -19,6 +19,7 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { TFilterOption } from '../../types/Filter';
+import { formatRarityLevel, RARITY_LEVELS } from '../../utils/car';
 import { Select } from '../form/Select';
 import { TextField } from '../form/TextField';
 import { FilterHeader } from './FilterHeader';
@@ -292,6 +293,36 @@ export const FilterSidebar = ({
 										disabled: edition.count === 0,
 									}))}
 									placeholder="Select edition"
+									className="md:!text-xs"
+								/>
+							</div>
+						</div>
+
+						<div>
+							<FilterHeader
+								title="Rarity"
+								onClear={() => handleClear('rarity')}
+								hasActiveFilter={!!getActiveValue('rarity')}
+								id="field-rarity"
+							/>
+
+							<div className="p-4 pt-0">
+								<Select
+									id="field-rarity"
+									value={getActiveValue('rarity') || ''}
+									onChange={(
+										e: ChangeEvent<HTMLSelectElement>
+									) =>
+										handleSelectChange(
+											e.target.value,
+											'rarity'
+										)
+									}
+									options={RARITY_LEVELS.map((level) => ({
+										value: level,
+										label: formatRarityLevel(level),
+									}))}
+									placeholder="Select rarity"
 									className="md:!text-xs"
 								/>
 							</div>

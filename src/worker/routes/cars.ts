@@ -37,6 +37,10 @@ const CACHE_TTL = {
 	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
 };
 
+const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v2:';
+
+const rarityScoreExpr = sql`COALESCE(${Cars.rarity_score}, 0) + COALESCE(${Editions.rarity_score}, 0)`;
+
 const carsRouter = new Hono<{ Bindings: Bindings }>();
 
 carsRouter.get('/', async (c) => {
@@ -47,7 +51,7 @@ carsRouter.get('/', async (c) => {
 		const shouldCache = filters.length === 0 && page === 1;
 
 		if (shouldCache) {
-			const cacheKey = `cars:list:${JSON.stringify(params)}`;
+			const cacheKey = `${CARS_LIST_CACHE_KEY_PREFIX}${JSON.stringify(params)}`;
 			const cached = await c.env.CACHE.get(cacheKey);
 
 			if (cached) {
@@ -110,6 +114,32 @@ carsRouter.get('/', async (c) => {
 					conditions.push(eq(Editions.year, parseInt(filter.value)));
 
 					break;
+				case 'rarity':
+					switch (filter.value) {
+						case 'historically-significant':
+							conditions.push(sql`${rarityScoreExpr} >= 100`);
+							break;
+						case 'exceptionally-rare':
+							conditions.push(
+								sql`${rarityScoreExpr} >= 80 AND ${rarityScoreExpr} < 100`
+							);
+							break;
+						case 'very-rare':
+							conditions.push(
+								sql`${rarityScoreExpr} >= 60 AND ${rarityScoreExpr} < 80`
+							);
+							break;
+						case 'rare':
+							conditions.push(
+								sql`${rarityScoreExpr} >= 40 AND ${rarityScoreExpr} < 60`
+							);
+							break;
+						case 'limited-edition':
+							conditions.push(sql`${rarityScoreExpr} < 40`);
+							break;
+					}
+
+					break;
 				default:
 					break;
 			}
@@ -130,6 +160,7 @@ carsRouter.get('/', async (c) => {
 					year: Editions.year,
 				},
 				id: Cars.id,
+				rarity_score: rarityScoreExpr,
 				sequence: Cars.sequence,
 				vin: Cars.vin,
 				total: sql<number>`count(*) OVER()`,
@@ -189,6 +220,9 @@ carsRouter.get('/', async (c) => {
 				);
 				sortConditions.push(sortFn(Cars.sequence));
 				break;
+			case 'rarity_score':
+				sortConditions.push(sortFn(rarityScoreExpr));
+				break;
 		}
 
 		if (sortField !== 'year') {
@@ -228,7 +262,7 @@ carsRouter.get('/', async (c) => {
 		};
 
 		if (shouldCache) {
-			const cacheKey = `cars:list:${JSON.stringify(params)}`;
+			const cacheKey = `${CARS_LIST_CACHE_KEY_PREFIX}${JSON.stringify(params)}`;
 
 			await c.env.CACHE.put(cacheKey, JSON.stringify(result), {
 				expirationTtl: CACHE_TTL.CARS_LIST,
@@ -277,7 +311,7 @@ carsRouter.get('/:id', async (c) => {
 				manufacture_date: Cars.manufacture_date,
 				mileage: Cars.mileage,
 				mileage_date: Cars.mileage_date,
-				rarity_score: sql`COALESCE(${Cars.rarity_score}, 0) + COALESCE(${Editions.rarity_score}, 0)`,
+				rarity_score: rarityScoreExpr,
 				sale_date: Cars.sale_date,
 				sale_dealer_city: Cars.sale_dealer_city,
 				sale_dealer_country: Cars.sale_dealer_country,

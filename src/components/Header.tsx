@@ -182,7 +182,6 @@ export const Header = () => {
 							),
 							to: '/rarity',
 						},
-						{ label: 'Contributing', to: '/about#contribute' },
 						{ label: 'Contact us', to: '/about#contact' },
 					]}
 					isActive={

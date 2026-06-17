@@ -19,6 +19,7 @@
 import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useModal } from '../../context/ModalContext';
+import { Chip } from '../rarity/Chip';
 import { TCar } from '../../types/Car';
 import { colorMap, hasSequence } from '../../utils/car';
 
@@ -48,6 +49,7 @@ export const RegistryTable = ({
 		{ header: 'Edition', key: 'edition.name', width: 'w-44' },
 		{ header: 'Color', key: 'edition.color', width: 'w-52' },
 		{ header: 'Sequence #', key: 'sequence', width: 'w-36' },
+		{ header: 'Rarity', key: 'rarity_score', width: 'w-40' },
 		{ header: 'Owner', key: 'owner.name', width: 'w-44' },
 		{ header: 'Country', key: 'owner.country', width: 'w-40' },
 	];
@@ -196,6 +198,9 @@ export const RegistryTable = ({
 											)}
 										</td>
 									)}
+									<td className="px-4 py-3 whitespace-nowrap">
+										<Chip score={car.rarity_score ?? 0} />
+									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
 										{car.current_owner?.name ? (
 											car.current_owner.name

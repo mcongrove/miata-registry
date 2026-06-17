@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
 const levels = [
@@ -50,7 +51,7 @@ const levels = [
 	{
 		description:
 			'Verified limited edition with typical features and documentation',
-		icon: 'fa-star-half-stroke',
+		icon: 'fa-star',
 		level: 'limited-edition',
 		points: 'Below 40 points',
 	},
@@ -77,11 +78,14 @@ export const Levels = () => {
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-8">
 			{levels.map((level, index) => (
-				<div
+				<Link
 					key={level.level}
+					to={`/registry?filter=${encodeURIComponent(
+						`rarity:${level.level}`
+					)}`}
 					className={twMerge(
 						levelColors[level.level],
-						'rounded-lg p-6 text-center border flex flex-col items-center gap-4',
+						'group rounded-lg p-6 text-center border flex flex-col items-center gap-4 transition-opacity hover:opacity-90',
 						index === levels.length - 1 &&
 							'col-span-2 md:col-span-1 justify-self-center w-1/2 md:w-full'
 					)}
@@ -106,8 +110,15 @@ export const Levels = () => {
 						<p className="text-xs opacity-75">
 							{level.description}
 						</p>
+
+						<span className="inline-flex items-center gap-1 text-xs font-medium mt-1">
+							View cars
+							<i
+								className="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-0.5 transition-transform"
+							/>
+						</span>
 					</div>
-				</div>
+				</Link>
 			))}
 		</div>
 	);

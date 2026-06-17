@@ -25,6 +25,7 @@ import { RegistryTable } from '../components/registry/RegistryTable';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TFilterOption, TFilterType } from '../types/Filter';
+import { formatRarityLevel } from '../utils/car';
 import { handleApiError } from '../utils/common';
 
 export const Registry = () => {
@@ -201,7 +202,10 @@ export const Registry = () => {
 						{activeFilters.length > 0 && (
 							<div className="hidden lg:flex mb-3 gap-2 flex-wrap">
 								{activeFilters.map((filter) => {
-									const displayValue = filter.value;
+									const displayValue =
+										filter.type === 'rarity'
+											? formatRarityLevel(filter.value)
+											: filter.value;
 
 									return (
 										<Chip

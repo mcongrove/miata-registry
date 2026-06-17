@@ -63,10 +63,14 @@ type ChipProps = {
 };
 
 export const Chip = ({ score }: ChipProps) => {
-	const level = getRarityLevel(score);
+	const numericScore = Number(score);
+
+	if (!Number.isFinite(numericScore) || numericScore <= 0) return null;
+
+	const level = getRarityLevel(numericScore);
 	const colors = rarityColors[level];
 
-	return level !== 'limited-edition' ? (
+	return (
 		<Link
 			to={`/rarity`}
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors.bg} ${colors.text} ${colors.border}`}
@@ -76,5 +80,5 @@ export const Chip = ({ score }: ChipProps) => {
 				.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 				.join(' ')}
 		</Link>
-	) : null;
+	);
 };

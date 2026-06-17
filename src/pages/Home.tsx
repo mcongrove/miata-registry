@@ -311,13 +311,28 @@ export const Home = () => {
 							developed the Miata in the first place.&rdquo;
 						</p>
 
-						<footer className="mt-4 text-sm text-brg-mid not-italic">
+						<footer className="mt-4 flex flex-col items-center gap-1 text-sm text-brg-mid not-italic">
 							<cite className="not-italic font-medium text-brg text-base">
 								Norman Garrett
 							</cite>
 
-							<span className="block mt-0.5">
-								Miata Concept Engineer
+							<span>Miata Concept Engineer</span>
+
+							<span className="text-xs">
+								Owner of{' '}
+								<Link
+									to="/registry/c7d23941-94e0-44f2-bb97-4ac203a840ae"
+									className="underline hover:text-brg transition-colors"
+								>
+									BRG #408
+								</Link>{' '}
+								and{' '}
+								<Link
+									to="/registry/d726b0fb-a47c-4b74-a03b-780b2d061d40"
+									className="underline hover:text-brg transition-colors"
+								>
+									BRG #3275
+								</Link>
 							</span>
 						</footer>
 					</blockquote>
