@@ -157,8 +157,8 @@ export function SitePulse() {
 					{!lastActivity
 						? 'Site pulse check not available'
 						: isActive
-							? `Site actively maintained as of ${lastActivity}`
-							: `Site not updated since ${lastActivity}`}
+							? `Active as of ${lastActivity}`
+							: `Not maintained since ${lastActivity}`}
 				</div>
 
 				{archiveUrl ? (
@@ -191,8 +191,8 @@ export function SitePulse() {
 							{!lastArchive
 								? 'Data archive check not available'
 								: isArchived
-									? `Data last archived ${lastArchive}`
-									: `Data not archived since ${lastArchive}`}
+									? `Data backed up ${lastArchive}`
+									: `Data not backed up since ${lastArchive}`}
 						</div>
 					</Link>
 				) : (
@@ -208,7 +208,7 @@ export function SitePulse() {
 				)}
 			</div>
 
-			<div className="text-xs text-brg-mid/80 text-center">
+			<div className="text-xs text-center text-[color-mix(in_srgb,#5D6D69_70%,#10b981_30%)]">
 				<p>
 					These statuses act as a proof that the site is actively
 					maintained and the data is publicly archived.

@@ -186,7 +186,7 @@ export const Home = () => {
 
 									<div className="absolute bottom-0 left-0 w-full h-[500px] bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
 
-									<div className="space-y-16 py-24">
+									<div className="space-y-16 pt-24 pb-8 lg:pb-12">
 										<TimelineItem
 											year="1991"
 											title="British Racing Green"
@@ -228,7 +228,7 @@ export const Home = () => {
 							</div>
 						</div>
 
-						<div className="lg:w-1/2 p-8 lg:p-24">
+						<div className="lg:w-1/2 p-8 lg:px-24 lg:pt-24 lg:pb-8">
 							<h1 className="hidden lg:block text-4xl font-bold text-brg mb-6">
 								The Miata Registry
 							</h1>
@@ -301,6 +301,26 @@ export const Home = () => {
 							</p>
 						</div>
 					</div>
+				</div>
+
+				<div className="container mx-auto px-8 lg:px-24 pt-16 lg:pt-24 pb-16 lg:pb-40">
+					<blockquote className="max-w-2xl mx-auto text-center">
+						<p className="text-lg lg:text-xl italic text-brg">
+							&ldquo;Thanks for keeping the flame alive. It was
+							enthusiasts like you we were thinking of when we
+							developed the Miata in the first place.&rdquo;
+						</p>
+
+						<footer className="mt-4 text-sm text-brg-mid not-italic">
+							<cite className="not-italic font-medium text-brg text-base">
+								Norman Garrett
+							</cite>
+
+							<span className="block mt-0.5">
+								Miata Concept Engineer
+							</span>
+						</footer>
+					</blockquote>
 				</div>
 
 				{/*
