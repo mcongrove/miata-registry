@@ -37,7 +37,7 @@ const CACHE_TTL = {
 	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
 };
 
-const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v2:';
+const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v3:';
 
 const rarityScoreExpr = sql`COALESCE(${Cars.rarity_score}, 0) + COALESCE(${Editions.rarity_score}, 0)`;
 
@@ -175,6 +175,12 @@ carsRouter.get('/', async (c) => {
 				: baseQuery;
 
 		const sortConditions = [];
+
+		sortConditions.push(
+			sql`CASE WHEN ${Cars.updated_date} IS NULL THEN 1 ELSE 0 END`
+		);
+		sortConditions.push(desc(Cars.updated_date));
+
 		const sortField = sortColumn.includes('.')
 			? sortColumn.split('.')[1]
 			: sortColumn;

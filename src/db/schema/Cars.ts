@@ -44,5 +44,6 @@ export const Cars = sqliteTable('cars', {
 	shipping_state: text('shipping_state'),
 	shipping_vessel: text('shipping_vessel'),
 	story: text('story'),
+	updated_date: text('updated_date'),
 	vin: text('vin'),
 });

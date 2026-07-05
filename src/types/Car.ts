@@ -46,6 +46,7 @@ export type TCar = {
 	shipping_state?: string;
 	shipping_vessel?: string;
 	story?: string;
+	updated_date?: string;
 	vin?: string;
 };
 

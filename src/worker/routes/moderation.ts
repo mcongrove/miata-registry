@@ -464,7 +464,10 @@ moderationRouter.post(
 
 				await db
 					.update(Cars)
-					.set({ current_owner_id: pendingCarOwner.owner_id })
+					.set({
+						current_owner_id: pendingCarOwner.owner_id,
+						updated_date: new Date(created_at * 1000).toISOString(),
+					})
 					.where(eq(Cars.id, pendingCarOwner.car_id));
 			}
 
