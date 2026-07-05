@@ -74,6 +74,15 @@ export const Registry = () => {
 	});
 
 	useEffect(() => {
+		setSortColumn(searchParams.get('sortColumn') || 'edition.year');
+		setSortDirection(
+			(searchParams.get('sortDir') as 'asc' | 'desc') || 'asc'
+		);
+		setCurrentPage(parseInt(searchParams.get('page') || '1'));
+		setActiveFilters(parseFiltersFromURL(searchParams.getAll('filter')));
+	}, [searchParams]);
+
+	useEffect(() => {
 		const loadCars = async () => {
 			setIsLoading(true);
 

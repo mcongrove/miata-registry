@@ -37,7 +37,7 @@ const CACHE_TTL = {
 	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
 };
 
-const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v3:';
+const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v4:';
 
 const rarityScoreExpr = sql`COALESCE(${Cars.rarity_score}, 0) + COALESCE(${Editions.rarity_score}, 0)`;
 
@@ -68,6 +68,12 @@ carsRouter.get('/', async (c) => {
 		const sortColumn = params.sortColumn || 'edition.year';
 		const sortDirection = (params.sortDirection || 'asc') as 'asc' | 'desc';
 		const pageSize = Math.min(parseInt(params.pageSize || '50'), 50);
+		const sortField = sortColumn.includes('.')
+			? sortColumn.split('.')[1]
+			: sortColumn;
+		const sortFn = sortDirection === 'desc' ? desc : asc;
+		const isDefaultSort =
+			sortColumn === 'edition.year' && sortDirection === 'asc';
 		const conditions = [];
 
 		for (const filter of filters) {
@@ -175,85 +181,77 @@ carsRouter.get('/', async (c) => {
 				: baseQuery;
 
 		const sortConditions = [];
-		const isDefaultSort =
-			sortColumn === 'edition.year' && sortDirection === 'asc';
 
 		if (isDefaultSort) {
 			sortConditions.push(
 				sql`CASE WHEN ${Cars.updated_date} IS NULL THEN 1 ELSE 0 END`
 			);
 			sortConditions.push(desc(Cars.updated_date));
-		}
-
-		const sortField = sortColumn.includes('.')
-			? sortColumn.split('.')[1]
-			: sortColumn;
-		const sortFn = sortDirection === 'desc' ? desc : asc;
-
-		switch (sortField) {
-			case 'year':
-				sortConditions.push(
-					sql`CASE WHEN ${Editions.year} IS NULL THEN 1 ELSE 0 END`
-				);
-				sortConditions.push(sortFn(Editions.year));
-				break;
-			case 'name':
-				if (sortColumn.startsWith('owner')) {
-					sortConditions.push(
-						sql`CASE WHEN ${Owners.name} IS NULL THEN 1 ELSE 0 END`
-					);
-					sortConditions.push(sortFn(Owners.name));
-				} else {
-					sortConditions.push(
-						sql`CASE WHEN ${Editions.name} IS NULL THEN 1 ELSE 0 END`
-					);
-					sortConditions.push(sortFn(Editions.name));
-				}
-				break;
-			case 'country':
-				if (sortColumn.startsWith('owner')) {
-					sortConditions.push(
-						sql`CASE WHEN ${Owners.country} IS NULL THEN 1 ELSE 0 END`
-					);
-					sortConditions.push(sortFn(Owners.country));
-				}
-				break;
-			case 'generation':
-				sortConditions.push(
-					sql`CASE WHEN ${Editions.generation} IS NULL THEN 1 ELSE 0 END`
-				);
-				sortConditions.push(sortFn(Editions.generation));
-				break;
-			case 'sequence':
-				sortConditions.push(
-					sql`CASE WHEN ${Cars.sequence} IS NULL THEN 1 ELSE 0 END`
-				);
-				sortConditions.push(sortFn(Cars.sequence));
-				break;
-			case 'rarity_score':
-				sortConditions.push(sortFn(rarityScoreExpr));
-				break;
-		}
-
-		if (sortField !== 'year') {
 			sortConditions.push(
 				sql`CASE WHEN ${Editions.year} IS NULL THEN 1 ELSE 0 END`
 			);
 			sortConditions.push(asc(Editions.year));
-		}
-
-		if (sortField !== 'name' && sortField !== 'country') {
 			sortConditions.push(
 				sql`CASE WHEN ${Editions.name} IS NULL THEN 1 ELSE 0 END`
 			);
 			sortConditions.push(asc(Editions.name));
-		}
-
-		if (sortField !== 'sequence') {
 			sortConditions.push(
 				sql`CASE WHEN ${Cars.sequence} IS NULL THEN 1 ELSE 0 END`
 			);
 			sortConditions.push(asc(Cars.sequence));
+		} else {
+			switch (sortField) {
+				case 'year':
+					sortConditions.push(
+						sql`CASE WHEN ${Editions.year} IS NULL THEN 1 ELSE 0 END`
+					);
+					sortConditions.push(sortFn(Editions.year));
+					break;
+				case 'name':
+					if (sortColumn.startsWith('owner')) {
+						sortConditions.push(
+							sql`CASE WHEN NULLIF(${Owners.name}, '') IS NULL THEN 1 ELSE 0 END`
+						);
+						sortConditions.push(sortFn(Owners.name));
+					} else {
+						sortConditions.push(
+							sql`CASE WHEN ${Editions.name} IS NULL THEN 1 ELSE 0 END`
+						);
+						sortConditions.push(sortFn(Editions.name));
+					}
+					break;
+				case 'country':
+					if (sortColumn.startsWith('owner')) {
+						sortConditions.push(
+							sql`CASE WHEN NULLIF(${Owners.country}, '') IS NULL THEN 1 ELSE 0 END`
+						);
+						sortConditions.push(sortFn(Owners.country));
+					}
+					break;
+				case 'color':
+					sortConditions.push(
+						sql`CASE WHEN ${Editions.color} IS NULL THEN 1 ELSE 0 END`
+					);
+					sortConditions.push(sortFn(Editions.color));
+					break;
+				case 'generation':
+					sortConditions.push(
+						sql`CASE WHEN ${Editions.generation} IS NULL THEN 1 ELSE 0 END`
+					);
+					sortConditions.push(sortFn(Editions.generation));
+					break;
+				case 'sequence':
+					sortConditions.push(
+						sql`CASE WHEN ${Cars.sequence} IS NULL THEN 1 ELSE 0 END`
+					);
+					sortConditions.push(sortFn(Cars.sequence));
+					break;
+				case 'rarity_score':
+					sortConditions.push(sortFn(rarityScoreExpr));
+					break;
+			}
+
+			sortConditions.push(asc(Cars.id));
 		}
 
 		const offset = (page - 1) * pageSize;
