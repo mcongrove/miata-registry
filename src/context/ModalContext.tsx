@@ -106,6 +106,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 	);
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- context hook
 export function useModal() {
 	const context = useContext(ModalContext);
 

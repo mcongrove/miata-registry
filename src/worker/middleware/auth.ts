@@ -49,7 +49,7 @@ export async function verifyAuth(c: Context<{ Bindings: Bindings }>) {
 		}
 
 		return authResult.isSignedIn;
-	} catch (error) {
+	} catch {
 		return false;
 	}
 }

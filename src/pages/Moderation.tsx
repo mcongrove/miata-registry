@@ -616,8 +616,7 @@ export const Moderation = () => {
 																pkg.owner!
 																	.proposed[
 																	field as keyof TOwner
-																] as any
-															}
+																]															}
 														/>
 													))}
 												</PendingItem>
@@ -667,14 +666,12 @@ export const Moderation = () => {
 																	pkg.car!
 																		.current?.[
 																		field as keyof TCar
-																	] as any
-																}
+																	]																}
 																newValue={
 																	pkg.car!
 																		.proposed[
 																		field as keyof TCar
-																	] as any
-																}
+																	]																}
 																subText={
 																	field ===
 																	'edition_id'
@@ -739,15 +736,13 @@ export const Moderation = () => {
 																		.carOwner!
 																		.current?.[
 																		field as keyof TCarOwner
-																	] as any
-																}
+																	]																}
 																newValue={
 																	pkg
 																		.carOwner!
 																		.proposed[
 																		field as keyof TCarOwner
-																	] as any
-																}
+																	]																}
 															/>
 														))}
 												</PendingItem>
@@ -823,14 +818,12 @@ export const Moderation = () => {
 																pending
 																	.current?.[
 																	field as keyof TCar
-																] as any
-															}
+																]															}
 															newValue={
 																pending
 																	.proposed[
 																	field as keyof TCar
-																] as any
-															}
+																]															}
 														/>
 													))}
 											</PendingItem>
@@ -909,14 +902,12 @@ export const Moderation = () => {
 																pending
 																	.current?.[
 																	field as keyof TCarOwner
-																] as any
-															}
+																]															}
 															newValue={
 																pending
 																	.proposed[
 																	field as keyof TCarOwner
-																] as any
-															}
+																]															}
 														/>
 													))}
 											</PendingItem>
@@ -976,8 +967,7 @@ export const Moderation = () => {
 														newValue={
 															pending.proposed[
 																field as keyof TOwner
-															] as any
-														}
+															]														}
 													/>
 												))}
 											</PendingItem>

@@ -92,6 +92,8 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 		if (!prefilledData?.id) {
 			loadEditions();
 		}
+	// Mount-only: skip when claim flow pre-fills a car id
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount guard
 	}, []);
 
 	useEffect(() => {

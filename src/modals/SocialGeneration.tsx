@@ -65,6 +65,7 @@ export function SocialGeneration({
 
 	useEffect(() => {
 		setSocialText(generateSocialText());
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- regenerate when car changes, not when helper is recreated
 	}, [car]);
 
 	const generateSocialText = () => {
@@ -92,7 +93,7 @@ export function SocialGeneration({
 	const getParsedStyles = () => {
 		try {
 			return JSON.parse(imageStyles);
-		} catch (e) {
+		} catch {
 			return {};
 		}
 	};

@@ -97,5 +97,7 @@ export const usePageMeta = ({ title, description, path }: PageMetaProps) => {
 				document.head.removeChild(preloadLink);
 			};
 		}
+	// path is reflected in metaUrl; omit path to avoid duplicate title/meta updates
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- metaUrl derives from path
 	}, [metaTitle, metaDescription, metaUrl]);
 };

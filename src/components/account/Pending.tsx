@@ -29,8 +29,28 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toRelativeTime } from '../../utils/common';
 
+interface PendingCarSummary {
+	id: string;
+	edition_name: string;
+	vin: string;
+	created_at: number;
+}
+
+interface PendingCarOwnerSummary {
+	id: string;
+	car_id: string;
+	edition_name: string;
+	vin: string;
+	created_at: number;
+}
+
+interface PendingChanges {
+	cars: PendingCarSummary[];
+	carOwners: PendingCarOwnerSummary[];
+}
+
 interface PendingProps {
-	changes: any;
+	changes: PendingChanges;
 }
 
 export const Pending = ({ changes }: PendingProps) => {
@@ -85,7 +105,7 @@ export const Pending = ({ changes }: PendingProps) => {
 										Cars
 									</h5>
 
-									{changes.cars.map((car: any) => (
+									{changes.cars.map((car) => (
 										<Link
 											to={`/registry/${car.id}`}
 											key={car.id}
@@ -116,7 +136,7 @@ export const Pending = ({ changes }: PendingProps) => {
 										Ownership
 									</h5>
 
-									{changes.carOwners.map((carOwner: any) => (
+									{changes.carOwners.map((carOwner) => (
 										<Link
 											to={`/registry/${carOwner.car_id}`}
 											key={carOwner.id}

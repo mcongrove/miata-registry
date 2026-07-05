@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const objectsToCSV = (data: any[]) => {
+export const objectsToCSV = (data: Record<string, unknown>[]) => {
 	if (data.length === 0) return '';
 
 	const headers = Object.keys(data[0]);

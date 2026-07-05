@@ -17,7 +17,7 @@
  */
 
 import { and, count, eq, sql } from 'drizzle-orm';
-import { Hono } from 'hono';
+import { Context, Hono, Next } from 'hono';
 import { Resend } from 'resend';
 import { createDb } from '../../db';
 import { CarOwners } from '../../db/schema/CarOwners';
@@ -36,11 +36,11 @@ import { Bindings } from '../types';
 
 const moderationRouter = new Hono<{ Bindings: Bindings }>();
 
-const withModerator = () => async (c: any, next: any) => {
+const withModerator = () => async (c: Context<{ Bindings: Bindings }>, next: Next) => {
 	const isModerator = await c
 		.get('clerk')
 		.users.getUser(c.get('userId'))
-		.then((user: any) => user.publicMetadata?.moderator);
+		.then((user) => user.publicMetadata?.moderator);
 
 	if (!isModerator) {
 		return c.json({ error: 'Unauthorized' }, 403);
@@ -315,9 +315,9 @@ moderationRouter.post(
 			}
 
 			const {
-				created_at,
-				id: pendingId,
-				status,
+				created_at: _created_at,
+				id: _pendingId,
+				status: _status,
 				car_id,
 				user_id,
 				...carData
@@ -420,10 +420,10 @@ moderationRouter.post(
 			}
 
 			const {
-				created_at,
-				id: pendingId,
-				information,
-				status,
+				created_at: _created_at,
+				id: _pendingId,
+				information: _information,
+				status: _status,
 				user_id,
 				...carOwnerData
 			} = pendingCarOwner;
@@ -466,7 +466,9 @@ moderationRouter.post(
 					.update(Cars)
 					.set({
 						current_owner_id: pendingCarOwner.owner_id,
-						updated_date: new Date(created_at * 1000).toISOString(),
+						updated_date: new Date(
+							pendingCarOwner.created_at * 1000
+						).toISOString(),
 					})
 					.where(eq(Cars.id, pendingCarOwner.car_id));
 			}
@@ -546,7 +548,11 @@ moderationRouter.post(
 				return c.json({ error: 'Not found' }, 404);
 			}
 
-			const { created_at, status, ...ownerData } = pendingOwner;
+			const {
+				created_at: _created_at,
+				status: _status,
+				...ownerData
+			} = pendingOwner;
 
 			await db.insert(Owners).values(ownerData);
 

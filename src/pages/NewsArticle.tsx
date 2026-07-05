@@ -147,12 +147,9 @@ export const NewsArticle = () => {
 							.split('\n')
 							.slice(1)
 							.map((paragraph, index) => (
-								<ReactMarkdown
-									key={index}
-									className="text-brg-mid"
-								>
-									{paragraph}
-								</ReactMarkdown>
+								<div key={index} className="text-brg-mid">
+									<ReactMarkdown>{paragraph}</ReactMarkdown>
+								</div>
 							))}
 					</div>
 

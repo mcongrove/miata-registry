@@ -85,7 +85,7 @@ export const ClerkProfile = ({
 				onUpdate();
 			}, 2000);
 		} catch (err) {
-			handleApiError(error);
+			handleApiError(err);
 			setError('Failed to submit form. Please try again.');
 		} finally {
 			setIsSubmitting(false);

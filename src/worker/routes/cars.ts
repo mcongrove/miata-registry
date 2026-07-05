@@ -99,7 +99,7 @@ carsRouter.get('/', async (c) => {
 					conditions.push(eq(Owners.country, filter.value));
 
 					break;
-				case 'edition':
+				case 'edition': {
 					const [year, ...nameParts] = filter.value.split(' ');
 					const name = nameParts.join(' ');
 
@@ -111,6 +111,7 @@ carsRouter.get('/', async (c) => {
 					);
 
 					break;
+				}
 				case 'generation':
 					conditions.push(eq(Editions.generation, filter.value));
 
@@ -261,7 +262,7 @@ carsRouter.get('/', async (c) => {
 		const total = cars[0]?.total ?? 0;
 
 		const result = {
-			cars: cars.map(({ total, ...car }) => car),
+			cars: cars.map(({ total: _total, ...car }) => car),
 			total,
 			page,
 			pageSize,
