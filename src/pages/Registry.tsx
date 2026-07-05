@@ -90,9 +90,17 @@ export const Registry = () => {
 				const params = new URLSearchParams({
 					page: currentPage.toString(),
 					pageSize: itemsPerPage.toString(),
-					sortColumn,
-					sortDirection,
 				});
+
+				const urlSortColumn = searchParams.get('sortColumn');
+
+				if (urlSortColumn) {
+					params.set('sortColumn', urlSortColumn);
+					params.set(
+						'sortDirection',
+						searchParams.get('sortDir') || 'asc'
+					);
+				}
 
 				if (activeFilters.length > 0) {
 					params.set('filters', JSON.stringify(activeFilters));
@@ -119,7 +127,7 @@ export const Registry = () => {
 		};
 
 		loadCars();
-	}, [activeFilters, sortColumn, sortDirection, currentPage]);
+	}, [activeFilters, currentPage, searchParams]);
 
 	useEffect(() => {
 		setIsFilterDrawerOpen(false);
@@ -173,8 +181,8 @@ export const Registry = () => {
 		setSortDirection('asc');
 
 		updateSearchParams({
-			sortColumn: 'edition.year',
-			sortDir: 'asc',
+			sortColumn: null,
+			sortDir: null,
 		});
 	};
 

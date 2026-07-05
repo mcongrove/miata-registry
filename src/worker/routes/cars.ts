@@ -37,7 +37,7 @@ const CACHE_TTL = {
 	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
 };
 
-const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v4:';
+const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v5:';
 
 const rarityScoreExpr = sql`COALESCE(${Cars.rarity_score}, 0) + COALESCE(${Editions.rarity_score}, 0)`;
 
@@ -65,6 +65,7 @@ carsRouter.get('/', async (c) => {
 
 		const db = createDb(c.env.DB);
 
+		const isDefaultBrowse = !params.sortColumn;
 		const sortColumn = params.sortColumn || 'edition.year';
 		const sortDirection = (params.sortDirection || 'asc') as 'asc' | 'desc';
 		const pageSize = Math.min(parseInt(params.pageSize || '50'), 50);
@@ -72,8 +73,6 @@ carsRouter.get('/', async (c) => {
 			? sortColumn.split('.')[1]
 			: sortColumn;
 		const sortFn = sortDirection === 'desc' ? desc : asc;
-		const isDefaultSort =
-			sortColumn === 'edition.year' && sortDirection === 'asc';
 		const conditions = [];
 
 		for (const filter of filters) {
@@ -182,7 +181,7 @@ carsRouter.get('/', async (c) => {
 
 		const sortConditions = [];
 
-		if (isDefaultSort) {
+		if (isDefaultBrowse) {
 			sortConditions.push(
 				sql`CASE WHEN ${Cars.updated_date} IS NULL THEN 1 ELSE 0 END`
 			);
