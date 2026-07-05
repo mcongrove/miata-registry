@@ -87,7 +87,7 @@ export const RegistryTable = ({
 										{header}
 										<span
 											className={`ml-1 ${
-												sortColumn === key
+												sortColumn && sortColumn === key
 													? 'opacity-100'
 													: 'opacity-0'
 											}`}

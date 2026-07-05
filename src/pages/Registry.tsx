@@ -52,12 +52,14 @@ export const Registry = () => {
 		parseInt(searchParams.get('page') || '1')
 	);
 	const [sortColumn, setSortColumn] = useState<string>(
-		searchParams.get('sortColumn') || 'edition.year'
+		searchParams.get('sortColumn') || ''
 	);
 	const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
 		const urlSortDir = searchParams.get('sortDir') as 'asc' | 'desc';
 
-		if (urlSortDir) return urlSortDir;
+		if (searchParams.get('sortColumn') && urlSortDir) {
+			return urlSortDir;
+		}
 
 		return 'asc';
 	});
@@ -74,7 +76,7 @@ export const Registry = () => {
 	});
 
 	useEffect(() => {
-		setSortColumn(searchParams.get('sortColumn') || 'edition.year');
+		setSortColumn(searchParams.get('sortColumn') || '');
 		setSortDirection(
 			(searchParams.get('sortDir') as 'asc' | 'desc') || 'asc'
 		);
@@ -177,7 +179,7 @@ export const Registry = () => {
 			return;
 		}
 
-		setSortColumn('edition.year');
+		setSortColumn('');
 		setSortDirection('asc');
 
 		updateSearchParams({
