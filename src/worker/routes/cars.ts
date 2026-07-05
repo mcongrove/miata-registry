@@ -175,11 +175,15 @@ carsRouter.get('/', async (c) => {
 				: baseQuery;
 
 		const sortConditions = [];
+		const isDefaultSort =
+			sortColumn === 'edition.year' && sortDirection === 'asc';
 
-		sortConditions.push(
-			sql`CASE WHEN ${Cars.updated_date} IS NULL THEN 1 ELSE 0 END`
-		);
-		sortConditions.push(desc(Cars.updated_date));
+		if (isDefaultSort) {
+			sortConditions.push(
+				sql`CASE WHEN ${Cars.updated_date} IS NULL THEN 1 ELSE 0 END`
+			);
+			sortConditions.push(desc(Cars.updated_date));
+		}
 
 		const sortField = sortColumn.includes('.')
 			? sortColumn.split('.')[1]
@@ -238,7 +242,7 @@ carsRouter.get('/', async (c) => {
 			sortConditions.push(asc(Editions.year));
 		}
 
-		if (sortField !== 'name') {
+		if (sortField !== 'name' && sortField !== 'country') {
 			sortConditions.push(
 				sql`CASE WHEN ${Editions.name} IS NULL THEN 1 ELSE 0 END`
 			);
