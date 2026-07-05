@@ -456,6 +456,45 @@ export const Countries = {
 	ZW: { latitude: -19.015438, longitude: 29.154857, name: 'Zimbabwe' },
 } as const;
 
+const COUNTRY_CODE_ALIASES: Record<string, keyof typeof Countries> = {
+	UK: 'GB',
+};
+
+let regionDisplayNames: Intl.DisplayNames | undefined;
+
+export const getCountryDisplayName = (code: string): string => {
+	if (!code) {
+		return '';
+	}
+
+	const trimmed = code.trim();
+	const normalized =
+		COUNTRY_CODE_ALIASES[trimmed.toUpperCase()] ?? trimmed.toUpperCase();
+	const fromMap = Countries[normalized as keyof typeof Countries];
+
+	if (fromMap) {
+		return fromMap.name;
+	}
+
+	if (normalized.length === 2) {
+		try {
+			regionDisplayNames ??= new Intl.DisplayNames(['en'], {
+				type: 'region',
+			});
+
+			const displayName = regionDisplayNames.of(normalized);
+
+			if (displayName) {
+				return displayName;
+			}
+		} catch {
+			// invalid or deprecated region code for Intl
+		}
+	}
+
+	return trimmed;
+};
+
 export const States = {
 	AB: { name: 'Alberta', latitude: 54.5, longitude: -115 },
 	AK: { name: 'Alaska', latitude: 63.588753, longitude: -154.493062 },

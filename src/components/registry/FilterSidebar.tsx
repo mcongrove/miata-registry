@@ -20,6 +20,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { TFilterOption } from '../../types/Filter';
 import { formatRarityLevel, RARITY_LEVELS } from '../../utils/car';
+import { getCountryDisplayName } from '../../utils/location';
 import { Select } from '../form/Select';
 import { TextField } from '../form/TextField';
 import { FilterHeader } from './FilterHeader';
@@ -78,10 +79,7 @@ export const FilterSidebar = ({
 
 			const formattedCountries = countryList.map((code: string) => ({
 				value: code,
-				label:
-					new Intl.DisplayNames(['en'], { type: 'region' }).of(
-						code
-					) || code,
+				label: getCountryDisplayName(code),
 			}));
 
 			setCountries(

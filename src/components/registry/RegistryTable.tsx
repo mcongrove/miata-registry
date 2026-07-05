@@ -22,6 +22,7 @@ import { useModal } from '../../context/ModalContext';
 import { Chip } from '../rarity/Chip';
 import { TCar } from '../../types/Car';
 import { colorMap, hasSequence } from '../../utils/car';
+import { getCountryDisplayName } from '../../utils/location';
 
 interface RegistryTableProps {
 	cars: TCar[];
@@ -238,11 +239,9 @@ export const RegistryTable = ({
 													}
 													className="w-4 h-3"
 												/>
-												{new Intl.DisplayNames(['en'], {
-													type: 'region',
-												}).of(
-													car.current_owner
-														?.country || ''
+												{getCountryDisplayName(
+													car.current_owner?.country ||
+														''
 												)}
 											</span>
 										) : (
