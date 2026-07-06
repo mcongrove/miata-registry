@@ -33,6 +33,7 @@ import ApprovedOwner from '../../emails/templates/ApprovedOwner';
 import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
 import { Bindings } from '../types';
+import { renderEmail } from '../utils/renderEmail';
 
 const moderationRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -359,9 +360,11 @@ moderationRouter.post(
 							from: 'Miata Registry <no-reply@miataregistry.com>',
 							to: primaryEmail.emailAddress,
 							subject: 'Miata Registry: Car update approved',
-							react: ApprovedCar({
-								car_id,
-							}),
+							html: await renderEmail(
+								ApprovedCar({
+									car_id,
+								})
+							),
 						});
 					}
 				}
@@ -502,9 +505,11 @@ moderationRouter.post(
 							to: primaryEmail.emailAddress,
 							subject:
 								'Miata Registry: Ownership update approved',
-							react: ApprovedOwner({
-								car_id: pendingCarOwner.car_id,
-							}),
+							html: await renderEmail(
+								ApprovedOwner({
+									car_id: pendingCarOwner.car_id,
+								})
+							),
 						});
 					}
 				}

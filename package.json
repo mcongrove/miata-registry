@@ -23,6 +23,7 @@
 		"@clerk/clerk-react": "^5.61.8",
 		"@cloudflare/workers-types": "^4.20260617.1",
 		"@floating-ui/react": "^0.27.19",
+		"@react-email/render": "^2.0.10",
 		"@react-google-maps/api": "^2.20.8",
 		"browser-image-compression": "^2.0.2",
 		"drizzle-orm": "^0.45.2",

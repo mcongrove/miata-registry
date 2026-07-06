@@ -21,6 +21,7 @@ import { Resend } from 'resend';
 import Single from '../../emails/templates/Single';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
+import { renderEmail } from '../utils/renderEmail';
 
 const emailRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -105,7 +106,7 @@ emailRouter.post('/send', withAuth(), async (c) => {
 			from: 'Miata Registry <support@miataregistry.com>',
 			to,
 			subject,
-			react: Single({ subject, message }),
+			html: await renderEmail(Single({ subject, message })),
 		});
 
 		return c.json({ success: true });

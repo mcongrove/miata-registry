@@ -25,6 +25,7 @@ import { Cars, Owners } from '../../db/schema';
 import Welcome from '../../emails/templates/Welcome';
 import type { Bindings } from '../types';
 import type { UserCreatedPayload, UserUpdatedPayload } from '../types/clerk';
+import { renderEmail } from '../utils/renderEmail';
 
 type WebhookContext = Context<{ Bindings: Bindings }>;
 
@@ -74,7 +75,7 @@ export async function handleUserCreated(
 			from: 'Miata Registry <no-reply@miataregistry.com>',
 			to: primaryEmail.email_address,
 			subject: 'Welcome to Miata Registry!',
-			react: Welcome(),
+			html: await renderEmail(Welcome()),
 		});
 
 		await clerk.users.updateUser(payload.data.id, {
