@@ -105,7 +105,7 @@ export function Clerk() {
 				</SignInButton>
 			</SignedOut>
 
-			<div onClick={fetchOwnerData} className="h-9">
+			<div onClick={fetchOwnerData} className="flex h-9 items-center">
 				<SignedIn>
 					<UserButton
 						appearance={{

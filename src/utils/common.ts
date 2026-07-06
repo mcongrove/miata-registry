@@ -88,15 +88,20 @@ export const toRelativeTime = (date: Date) => {
 		minute: 60,
 	};
 
+	const capitalize = (value: string) =>
+		value.charAt(0).toUpperCase() + value.slice(1);
+
 	for (const [unit, seconds] of Object.entries(intervals)) {
 		const interval = Math.floor(diffInSeconds / seconds);
 
 		if (interval >= 1) {
 			const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
-			return rtf.format(-interval, unit as Intl.RelativeTimeFormatUnit);
+			return capitalize(
+				rtf.format(-interval, unit as Intl.RelativeTimeFormatUnit)
+			);
 		}
 	}
 
-	return 'just now';
+	return 'Just now';
 };

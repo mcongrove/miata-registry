@@ -206,7 +206,7 @@ export const Header = () => {
 				) : null}
 			</div>
 
-			<div className="flex items-center gap-4">
+			<div className="flex h-9 items-center gap-4">
 				{pendingChanges && (
 					<Suspense>
 						<Pending changes={pendingChanges} />
