@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Container, Img, Link, Section, Text } from '@react-email/components';
+import { Container, Img, Link, Section, Text } from 'react-email';
 
 export default function Legal() {
 	return (
