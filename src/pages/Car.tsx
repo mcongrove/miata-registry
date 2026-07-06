@@ -29,6 +29,7 @@ import {
 	formatPlantLocation,
 	getVinDetails,
 	hasSequence,
+	TVinDetails,
 } from '../utils/car';
 import { handleApiError, toPrettyDate, toTitleCase } from '../utils/common';
 import {
@@ -54,7 +55,7 @@ export const CarProfile = () => {
 	const { user } = useUser();
 	const { openModal } = useModal();
 	const [car, setCar] = useState<TCar | null>(null);
-	const [vinDetails, setVinDetails] = useState<any>(null);
+	const [vinDetails, setVinDetails] = useState<TVinDetails | null>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
 
 	usePageMeta({
@@ -347,12 +348,12 @@ export const CarProfile = () => {
 			car?.shipping_state
 				? state(car.shipping_state)
 				: car?.shipping_country
-					? country(car.shipping_country as any)
+					? country(car.shipping_country)
 					: null,
 			car?.sale_dealer_state
 				? state(car.sale_dealer_state)
 				: car?.sale_dealer_country
-					? country(car.sale_dealer_country as any)
+					? country(car.sale_dealer_country)
 					: null,
 			...timelineOwners
 				.slice()
@@ -361,10 +362,12 @@ export const CarProfile = () => {
 					owner.state
 						? state(owner.state)
 						: owner.country
-							? country(owner.country as any)
+							? country(owner.country)
 							: null
 				),
 		].filter((location) => location !== null);
+	// Granular car fields — avoid re-running when unrelated car props change
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional partial deps
 	}, [
 		vinDetails,
 		car?.sale_dealer_state,
@@ -505,7 +508,7 @@ export const CarProfile = () => {
 
 			<div className="container mx-auto px-8 pb-6 lg:px-0 lg:py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-					<div className="lg:col-span-8 space-y-6 lg:space-y-8">
+					<div className="lg:col-span-8 flex flex-col gap-6 lg:gap-8">
 						<div className="aspect-video w-screen lg:w-full h-72 md:h-96 lg:h-[550px] relative lg:rounded-lg overflow-hidden lg:m-0 max-lg:relative max-lg:left-1/2 max-lg:w-dvw max-lg:max-w-none max-lg:-translate-x-1/2">
 							{car ? (
 								<div className="w-full h-full bg-brg-light">

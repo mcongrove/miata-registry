@@ -99,7 +99,7 @@ carsRouter.get('/', async (c) => {
 					conditions.push(eq(Owners.country, filter.value));
 
 					break;
-				case 'edition':
+				case 'edition': {
 					const [year, ...nameParts] = filter.value.split(' ');
 					const name = nameParts.join(' ');
 
@@ -111,6 +111,7 @@ carsRouter.get('/', async (c) => {
 					);
 
 					break;
+				}
 				case 'generation':
 					conditions.push(eq(Editions.generation, filter.value));
 
@@ -261,7 +262,7 @@ carsRouter.get('/', async (c) => {
 		const total = cars[0]?.total ?? 0;
 
 		const result = {
-			cars: cars.map(({ total, ...car }) => car),
+			cars: cars.map(({ total: _total, ...car }) => car),
 			total,
 			page,
 			pageSize,
@@ -487,6 +488,17 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		const db = createDb(c.env.DB);
 		const id = c.req.param('id');
 		const userId = c.get('userId');
+
+		if (!id || !userId) {
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				401
+			);
+		}
+
 		const body = await c.req.json();
 		const accessConditions = [
 			eq(Cars.id, id),
@@ -674,6 +686,18 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		}
 
 		if (carOwnerChanged) {
+			const ownerId = existing.owner.owner_id;
+
+			if (!ownerId) {
+				return c.json(
+					{
+						error: 'Unauthorized',
+						details: "You don't have permission to do that",
+					},
+					403
+				);
+			}
+
 			await db.insert(CarOwnersPending).values({
 				car_id: id,
 				created_at: Math.floor(Date.now() / 1000),
@@ -685,7 +709,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 						? `${body.owner_date_start}T00:00:00.000Z`
 						: null,
 				id: crypto.randomUUID(),
-				owner_id: existing.owner.owner_id,
+				owner_id: ownerId,
 				status: 'pending',
 			});
 		}

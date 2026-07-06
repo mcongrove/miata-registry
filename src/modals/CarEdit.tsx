@@ -17,7 +17,7 @@
  */
 
 import { useAuth } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
@@ -62,21 +62,24 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 		setMileageDisplay(
 			car.mileage != null ? car.mileage.toLocaleString() : ''
 		);
+	// Reset mileage display when opening a different car, not on every mileage change
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: car.id only
 	}, [isOpen, car.id]);
 
 	useEffect(() => {
 		if (!isOpen) return;
 
 		handleFormChange();
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- handleFormChange reads live form state
 	}, [mileageDisplay, mileageUnit, isOpen, car.mileage]);
 
-	const handleOwnerDateEndChange = (e: any) => {
+	const handleOwnerDateEndChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value;
 
 		setWarningOwnerDateEnd(newValue !== car.owner_history?.[0]?.date_end);
 	};
 
-	const handleSequenceChange = (e: any) => {
+	const handleSequenceChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const newValue = e.target.value ? Number(e.target.value) : null;
 
 		setWarningSequence(newValue !== car.sequence);
@@ -96,18 +99,20 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 				const currentValue = value.toString().trim();
 
 				switch (key) {
-					case 'destroyed':
+					case 'destroyed': {
 						const isChecked = formData.get('destroyed') !== null;
 						return isChecked !== car.destroyed;
+					}
 					case 'sequence':
 						return currentValue
 							? Number(currentValue) !== car.sequence
 							: car.sequence !== null;
-					case 'sale_msrp':
+					case 'sale_msrp': {
 						const msrp = currentValue
 							? Number(currentValue.replace(/[^0-9]/g, ''))
 							: null;
 						return msrp !== car.sale_msrp;
+					}
 					case 'owner_date_start':
 						return (
 							currentValue !==
@@ -143,13 +148,14 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						);
 					case 'sale_dealer_name':
 						return currentValue !== (car.sale_dealer_name || '');
-					case 'sale_dealer_location':
+					case 'sale_dealer_location': {
 						const currentLocation = formatLocation({
 							city: car.sale_dealer_city,
 							state: car.sale_dealer_state,
 							country: car.sale_dealer_country || '',
 						});
 						return currentValue !== currentLocation;
+					}
 					case 'shipping_date':
 						return (
 							currentValue !==
@@ -157,13 +163,14 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 						);
 					case 'shipping_vessel':
 						return currentValue !== (car.shipping_vessel || '');
-					case 'shipping_location':
+					case 'shipping_location': {
 						const currentShippingLocation = formatLocation({
 							city: car.shipping_city,
 							state: car.shipping_state,
 							country: car.shipping_country || '',
 						});
 						return currentValue !== currentShippingLocation;
+					}
 					case 'mileage':
 					case 'mileage_unit':
 						return false;
@@ -570,7 +577,7 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 											? `$${car.sale_msrp.toLocaleString()}`
 											: ''
 									}
-									onChange={(e: any) => {
+									onChange={(e: ChangeEvent<HTMLInputElement>) => {
 										const value = e.target.value.replace(
 											/[^0-9]/g,
 											''

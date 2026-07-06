@@ -24,6 +24,8 @@ export type TModalType =
 	| 'tip';
 
 export interface TModalState {
+	// Each modal type passes different props; validated at openModal call sites
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- polymorphic modal props
 	props?: any;
 	type: TModalType | null;
 }

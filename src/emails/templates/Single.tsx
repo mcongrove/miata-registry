@@ -25,7 +25,7 @@ import {
 	Section,
 	Tailwind,
 	Text,
-} from '@react-email/components';
+} from 'react-email';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import Legal from '../components/Legal';

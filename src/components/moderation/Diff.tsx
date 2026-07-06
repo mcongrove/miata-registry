@@ -23,11 +23,21 @@ export const Diff = ({
 	subText,
 }: {
 	label: string;
-	newValue?: string | number | null;
-	oldValue?: string | number | null;
+	newValue?: unknown;
+	oldValue?: unknown;
 	subText?: string;
 }) => {
-	if (oldValue === newValue || (!oldValue && !newValue)) return null;
+	const formatValue = (value: unknown) => {
+		if (value == null || value === '') return null;
+		if (typeof value === 'object') return JSON.stringify(value);
+		return value as string | number | boolean;
+	};
+
+	const formattedOld = formatValue(oldValue);
+	const formattedNew = formatValue(newValue);
+
+	if (formattedOld === formattedNew || (!formattedOld && !formattedNew))
+		return null;
 
 	return (
 		<div className="flex items-start gap-4 font-mono">
@@ -36,19 +46,19 @@ export const Diff = ({
 			</span>
 
 			<span className="w-1/3 line-through text-sm text-brg-border">
-				{oldValue || 'None'}
+				{formattedOld ?? 'None'}
 			</span>
 
 			<span
 				className="w-1/3 text-sm text-brg cursor-pointer hover:opacity-80"
 				onClick={() => {
-					if (newValue) {
-						navigator.clipboard.writeText(String(newValue));
+					if (formattedNew != null) {
+						navigator.clipboard.writeText(String(formattedNew));
 					}
 				}}
 				title="Click to copy"
 			>
-				{newValue || 'None'}
+				{formattedNew ?? 'None'}
 
 				{subText && (
 					<>

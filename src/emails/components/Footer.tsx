@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Img } from '@react-email/components';
+import { Img } from 'react-email';
 
 type FooterProps = {
 	variant: number;

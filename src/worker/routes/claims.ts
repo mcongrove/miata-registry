@@ -213,7 +213,7 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			)
 			.get();
 
-		let editionId = edition?.id;
+		const editionId = edition?.id;
 
 		if (!editionId) {
 			return c.json(

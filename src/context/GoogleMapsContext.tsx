@@ -60,6 +60,7 @@ export function GoogleMapsProvider({ children }: { children: ReactNode }) {
 	return <GoogleMapsLoader>{children}</GoogleMapsLoader>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- context hook
 export function useGoogleMaps() {
 	const context = useContext(GoogleMapsContext);
 

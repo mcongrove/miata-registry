@@ -96,6 +96,10 @@ export const parseEditionYear = (
 export type TVinDetails = {
 	ErrorCode?: string;
 	Manufacturer?: string;
+	PlantCity?: string;
+	PlantCountry?: string;
+	PlantState?: string;
+	VIN?: string;
 };
 
 export const getVinDetails = async (
@@ -189,8 +193,7 @@ export const formatEngineDetails = (details: any) => {
 	);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const formatPlantLocation = (details: any) => {
+export const formatPlantLocation = (details: TVinDetails | null) => {
 	if (!details) return '';
 
 	// Default to Japan for Mazda VINs starting with JM1

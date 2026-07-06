@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-export default {
+export default defineConfig({
 	schema: './src/db/schema/*',
 	out: './migrations',
 	dialect: 'sqlite',
@@ -28,4 +28,4 @@ export default {
 		databaseId: process.env.VITE_CLOUDFLARE_DATABASE_ID!,
 		token: process.env.VITE_CLOUDFLARE_D1_TOKEN!,
 	},
-} satisfies Config;
+});

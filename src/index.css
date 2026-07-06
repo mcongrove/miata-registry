@@ -1,15 +1,28 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+	--font-sans: Inter, sans-serif;
+	--color-brg: #172e28;
+	--color-brg-dark: #10201c;
+	--color-brg-mid: #5d6d69;
+	--color-brg-border: #bac1bf;
+	--color-brg-light: #e8ebea;
+}
 
 @layer base {
 	html {
 		@apply text-brg;
 	}
+
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
 }
 
 select {
-	@apply !rounded-lg;
+	@apply rounded-lg!;
 }
 
 .cl-modalBackdrop,

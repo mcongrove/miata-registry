@@ -30,6 +30,17 @@ photosRouter.post('/:id', withAuth(), async (c) => {
 	try {
 		const id = c.req.param('id');
 		const userId = c.get('userId');
+
+		if (!id || !userId) {
+			return c.json(
+				{
+					error: 'Unauthorized',
+					details: "You don't have permission to do that",
+				},
+				401
+			);
+		}
+
 		const formData = await c.req.formData();
 		const file = formData.get('photo') as File;
 

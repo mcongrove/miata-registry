@@ -86,7 +86,7 @@ export function SitePulse() {
 							const pulseData = await pulseResponse.json();
 							applyPulseData(pulseData.timestamp);
 						}
-					} catch (error) {
+					} catch {
 						setLastActivity('');
 						setIsActive(null);
 					}
@@ -116,12 +116,12 @@ export function SitePulse() {
 							`https://archive.org/details/${archiveData.filename.replace('.zip', '')}`
 						);
 					}
-				} catch (error) {
+				} catch {
 					setLastArchive('');
 					setIsArchived(null);
 					setArchiveUrl('');
 				}
-			} catch (error) {
+			} catch {
 				setLastActivity('');
 				setLastArchive('');
 				setArchiveUrl('');
