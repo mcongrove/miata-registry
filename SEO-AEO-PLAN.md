@@ -7,8 +7,10 @@ Living plan for search engines (SEO) and answer engines (GEO/AEO). Last updated:
 ## Deploy notes (manual)
 
 **Cloudflare Pages** (miataregistry.com frontend):
-- Deploy from repo with `functions/` directory enabled
-- Bind D1 (`registry`) and KV (`CACHE`) per `wrangler.pages.toml`
+- Build: `npm run build`, output `dist` (dashboard settings)
+- **Cannot** share `wrangler.toml` with the API Worker — Pages skips worker config automatically
+- **Required:** bind D1 `DB` → `registry` and KV `CACHE` in Pages → Settings → Functions (see `wrangler.pages.toml` for IDs)
+- Pages Functions serve `/sitemap.xml`, `/data/editions.json`, and bot HTML injection via `_middleware.ts`
 - Pages Functions serve `/sitemap.xml`, `/data/editions.json`, and bot HTML injection via `_middleware.ts`
 
 **API worker** (optional fallback for SEO routes on workers.dev):

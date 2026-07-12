@@ -2,7 +2,6 @@
 name = "miata-registry"
 main = "src/worker/index.ts"
 compatibility_date = "2025-04-01"
-pages_build_output_dir = "dist"
 
 [observability.logs]
 enabled = true
