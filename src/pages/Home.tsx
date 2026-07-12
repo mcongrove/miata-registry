@@ -68,7 +68,7 @@ export const Home = () => {
 		<>
 			<header className="flex bg-brg-light lg:min-h-[600px] lg:h-[90vh]">
 				<div className="w-full md:w-2/3 lg:w-1/2 px-8 pt-24 pb-8 lg:px-16 lg:pt-52 lg:pb-32 flex items-center">
-					<div className="md:pr-20 lg:pr-40 flex flex-col gap-6 lg:gap-10">
+					<div className="md:pr-20 lg:pr-40 flex flex-col items-start gap-6 lg:gap-10">
 						<Symbol className="w-32 lg:w-48 h-auto text-brg mb-6" />
 
 						{isLoading ? (
@@ -77,10 +77,12 @@ export const Home = () => {
 							featuredNews && (
 								<Link
 									to={`/news/${featuredNews.id}`}
-									className="hidden md:inline-flex w-fit items-center gap-2 text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2"
+									className="hidden md:inline-flex w-fit max-w-full flex-nowrap items-center gap-2 self-start text-sm text-brg-mid hover:text-brg rounded-full border border-brg-border hover:border-brg-mid transition-colors px-4 py-2"
 								>
-									<span>{featuredNews.title_short}</span>
-									<span className="text-brg font-medium">
+									<span className="min-w-0 truncate">
+										{featuredNews.title_short}
+									</span>
+									<span className="shrink-0 text-brg font-medium">
 										Read more →
 									</span>
 								</Link>

@@ -138,31 +138,22 @@ export const fetchIndexableCarUrls = async (
 	}));
 };
 
-export type SitemapGeneration =
-	| { type: 'urlset'; xml: string }
-	| { type: 'index'; xml: string; chunkCount: number };
+export type SitemapGeneration = {
+	xml: string;
+	chunkCount: number;
+};
+
+export const carSitemapPath = (chunk: number): string =>
+	chunk === 0 ? '/sitemap/cars.xml' : `/sitemap/cars/${chunk}.xml`;
 
 export const generateSitemap = async (
 	db: D1Database
 ): Promise<SitemapGeneration> => {
-	const [staticUrls, newsUrls, carUrls] = await Promise.all([
-		Promise.resolve(fetchStaticSitemapUrls()),
-		fetchNewsSitemapUrls(db),
-		fetchIndexableCarUrls(db),
-	]);
-
-	const allUrls = [...staticUrls, ...newsUrls, ...carUrls];
-
-	if (allUrls.length <= SITEMAP_MAX_URLS) {
-		return {
-			type: 'urlset',
-			xml: renderUrlSet(allUrls),
-		};
-	}
-
-	const staticAndNews = [...staticUrls, ...newsUrls];
-	const chunkSize = SITEMAP_MAX_URLS - staticAndNews.length;
-	const chunkCount = Math.ceil(carUrls.length / chunkSize);
+	const carUrls = await fetchIndexableCarUrls(db);
+	const chunkCount =
+		carUrls.length === 0
+			? 0
+			: Math.ceil(carUrls.length / SITEMAP_MAX_URLS);
 	const indexEntries: SitemapUrl[] = [
 		{
 			loc: `${BASE_URL}/sitemap/static.xml`,
@@ -172,13 +163,12 @@ export const generateSitemap = async (
 
 	for (let index = 0; index < chunkCount; index += 1) {
 		indexEntries.push({
-			loc: `${BASE_URL}/sitemap/cars/${index}.xml`,
+			loc: `${BASE_URL}${carSitemapPath(index)}`,
 			lastmod: STATIC_SITEMAP_LASTMOD,
 		});
 	}
 
 	return {
-		type: 'index',
 		xml: renderSitemapIndex(indexEntries),
 		chunkCount,
 	};
@@ -199,16 +189,9 @@ export const generateCarChunkSitemapXml = async (
 	db: D1Database,
 	chunk: number
 ): Promise<string | null> => {
-	const [staticUrls, newsUrls, carUrls] = await Promise.all([
-		Promise.resolve(fetchStaticSitemapUrls()),
-		fetchNewsSitemapUrls(db),
-		fetchIndexableCarUrls(db),
-	]);
-
-	const staticAndNews = [...staticUrls, ...newsUrls];
-	const chunkSize = SITEMAP_MAX_URLS - staticAndNews.length;
-	const start = chunk * chunkSize;
-	const slice = carUrls.slice(start, start + chunkSize);
+	const carUrls = await fetchIndexableCarUrls(db);
+	const start = chunk * SITEMAP_MAX_URLS;
+	const slice = carUrls.slice(start, start + SITEMAP_MAX_URLS);
 
 	if (slice.length === 0) {
 		return null;

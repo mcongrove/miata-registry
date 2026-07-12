@@ -623,7 +623,7 @@ export const CarProfile = () => {
 							)}
 						</div>
 
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+						<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
 							<div className="bg-white rounded-lg border border-brg-light p-4 lg:p-5 min-w-0">
 								<p className="text-sm text-brg-mid mb-1 whitespace-nowrap">
 									Factory Color
@@ -644,7 +644,10 @@ export const CarProfile = () => {
 								</p>
 
 								{car ? (
-									<p className="font-medium font-mono pt-px whitespace-nowrap">
+									<p
+										className="font-medium font-mono pt-px truncate"
+										title={car.vin ?? undefined}
+									>
 										{car.vin || (
 											<span className="text-brg-border">
 												Unknown

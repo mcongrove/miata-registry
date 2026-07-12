@@ -47,6 +47,16 @@ seoRouter.get('/sitemap/static.xml', async (c) => {
 	}
 });
 
+seoRouter.get('/sitemap/cars.xml', async (c) => {
+	try {
+		return await handleCarChunkSitemapRequest(c.env, 0);
+	} catch (error) {
+		console.error('Error generating car sitemap:', error);
+
+		return c.text('Internal server error', 500);
+	}
+});
+
 seoRouter.get('/sitemap/cars/:chunk.xml', async (c) => {
 	try {
 		const chunkParam = c.req.param('chunk') ?? '';

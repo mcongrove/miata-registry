@@ -51,7 +51,12 @@ const fetchIndexHtml = async (
 	env: Env,
 	request: Request
 ): Promise<string | null> => {
-	const assetRequest = new Request(new URL('/index.html', request.url), request);
+	const assetRequest = new Request(new URL('/index.html', request.url), {
+		method: 'GET',
+		headers: {
+			Accept: 'text/html',
+		},
+	});
 	const response = await env.ASSETS.fetch(assetRequest);
 
 	if (!response.ok) {
