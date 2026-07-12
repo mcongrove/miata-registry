@@ -24,7 +24,7 @@ Cross-reference findings against **direct** dependencies only (`dependencies` an
 
 **Env files** (get values from a maintainer):
 
-- `.env` — frontend (`VITE_*`); worker URL defaults to `http://localhost:8787`
+- `.env` — frontend (`VITE_*`); worker URL defaults to `http://localhost:8788`
 - `.dev.vars` — worker secrets (Clerk, Resend, archive keys, etc.)
 
 **Run locally — both processes are required:**
@@ -32,7 +32,7 @@ Cross-reference findings against **direct** dependencies only (`dependencies` an
 ```bash
 npm install
 npm run dev          # Vite on :5173
-npm run worker:dev   # Wrangler remote worker on :8787
+npm run worker:dev   # Wrangler remote worker on :8788
 ```
 
 Without `worker:dev`, all API calls fail (`failed to fetch`).
