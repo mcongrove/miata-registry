@@ -39,7 +39,8 @@ export const toTitleCase = (str: string): string => {
 };
 
 export const toPrettyDate = (
-	timestamp: Date | string | null | undefined
+	timestamp: Date | string | null | undefined,
+	options?: { dateOnly?: boolean }
 ): string => {
 	if (!timestamp) return '';
 
@@ -60,7 +61,7 @@ export const toPrettyDate = (
 			month: 'long',
 			day: 'numeric',
 			year: 'numeric',
-			...(isMidnight
+			...(options?.dateOnly || isMidnight
 				? {}
 				: {
 						hour: 'numeric',

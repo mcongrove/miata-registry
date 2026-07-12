@@ -41,6 +41,10 @@ const CACHE_TTL = {
 };
 
 const PULSE_CACHE_KEY = 'heartbeat:pulse';
+const ARCHIVE_ERROR_CACHE_KEY = 'heartbeat:archive:error';
+
+const truncateError = (message: string, maxLength = 500) =>
+	message.length <= maxLength ? message : `${message.slice(0, maxLength)}…`;
 
 const heartbeatRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -153,13 +157,19 @@ heartbeatRouter.post('/pulse', withAuth(), async (c) => {
 
 heartbeatRouter.get('/archive', async (c) => {
 	try {
-		const cached = await c.env.CACHE.get('heartbeat:archive');
+		const [cached, errorCached] = await Promise.all([
+			c.env.CACHE.get('heartbeat:archive'),
+			c.env.CACHE.get(ARCHIVE_ERROR_CACHE_KEY),
+		]);
 
-		if (!cached) {
+		if (!cached && !errorCached) {
 			return c.json({ error: 'No archive information available' }, 404);
 		}
 
-		const response = c.json(JSON.parse(cached));
+		const response = c.json({
+			...(cached ? JSON.parse(cached) : {}),
+			...(errorCached ? { lastError: JSON.parse(errorCached) } : {}),
+		});
 
 		response.headers.set('X-Cache', 'HIT');
 
@@ -180,6 +190,9 @@ heartbeatRouter.get('/archive', async (c) => {
 	}
 });
 
+// Weekly backup to Internet Archive — triggered by cron-job.org POSTing here
+// with Authorization: Bearer {ARCHIVE_ORG_CRON_SECRET}.
+// Set ARCHIVE_DRY_RUN=true to exercise export/zip without uploading.
 heartbeatRouter.post('/archive/cron', async (c) => {
 	try {
 		const authHeader = c.req.header('Authorization');
@@ -239,6 +252,14 @@ heartbeatRouter.post('/archive/cron', async (c) => {
 		const identifier = `miata-registry-${timestamp}`;
 		const filename = `miata-registry-${timestamp}.zip`;
 
+		if (c.env.ARCHIVE_DRY_RUN === 'true') {
+			console.log(
+				`Archive dry run — would upload ${filename} (${zipBlob.size} bytes)`
+			);
+
+			return c.json({ success: true, dryRun: true, filename });
+		}
+
 		const response = await fetch(
 			`https://s3.us.archive.org/${identifier}/${filename}`,
 			{
@@ -287,17 +308,30 @@ heartbeatRouter.post('/archive/cron', async (c) => {
 			}
 		);
 
+		await c.env.CACHE.delete(ARCHIVE_ERROR_CACHE_KEY);
+
 		return c.json({ success: true });
 	} catch (error) {
-		console.error('Error fetching pulse:', error);
+		console.error('Error running archive backup:', error);
+
+		const message =
+			error instanceof Error
+				? error.message
+				: 'An unknown error occurred';
+
+		await c.env.CACHE.put(
+			ARCHIVE_ERROR_CACHE_KEY,
+			JSON.stringify({
+				timestamp: Date.now(),
+				message: truncateError(message, 2000),
+			}),
+			{ expirationTtl: CACHE_TTL.ARCHIVE }
+		);
 
 		return c.json(
 			{
 				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
+				details: truncateError(message),
 			},
 			500
 		);

@@ -619,7 +619,9 @@ export const CarProfile = () => {
 									{car.mileage_date && (
 										<p className="text-xs text-brg-mid mt-0.5 whitespace-nowrap">
 											as of{' '}
-											{toPrettyDate(car.mileage_date)}
+											{toPrettyDate(car.mileage_date, {
+												dateOnly: true,
+											})}
 										</p>
 									)}
 								</div>

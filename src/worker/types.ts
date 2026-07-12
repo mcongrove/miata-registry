@@ -37,6 +37,7 @@ export interface Bindings {
 	ARCHIVE_ORG_ACCESS_KEY: string;
 	ARCHIVE_ORG_SECRET_KEY: string;
 	ARCHIVE_ORG_CRON_SECRET: string;
+	ARCHIVE_DRY_RUN?: string;
 	CACHE: KVNamespace;
 	CLERK_PUBLISHABLE_KEY: string;
 	CLERK_SECRET_KEY: string;
