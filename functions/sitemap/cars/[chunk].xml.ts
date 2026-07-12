@@ -17,7 +17,7 @@
  */
 
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types';
-import { handleCarChunkSitemapRequest } from '../src/seo/handlers';
+import { handleCarChunkSitemapRequest } from '../../../src/seo/handlers';
 
 interface Env {
 	CACHE: KVNamespace;
