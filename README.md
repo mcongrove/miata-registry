@@ -23,12 +23,29 @@ The Miata Registry is a public platform where owners of limited edition Mazda Mi
 
 ## 🧑‍💻 Development
 
-To run the Miata Registry locally:
+### Prerequisites
+
+- Node.js 22
+- npm
+
+### Tech stack
+
+- **Frontend:** React 19, Vite 6, Tailwind CSS 4, react-router-dom
+- **Backend:** Hono on Cloudflare Workers
+- **Data:** Cloudflare D1 (Drizzle ORM), KV, R2
+- **Auth:** Clerk
+- **Email:** react-email, Resend
+
+### Architecture
+
+Vite builds the SPA; a Cloudflare Worker serves the API. In production the frontend is hosted separately from the worker. Local dev runs the Vite dev server and a remote worker (`worker:dev`) side by side.
+
+### Local setup
 
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/miata-registry.git
+    git clone https://github.com/mcongrove/miata-registry.git
     cd miata-registry
     ```
 
@@ -47,11 +64,15 @@ To run the Miata Registry locally:
     npm run worker:dev
     ```
 
-> **Note**: The local development environment connects to the production Cloudflare D1 database, KV cache, and R2 storage through local worker APIs. This ensures consistency between development and production environments while this project is in development.
+> **Note:** When running locally, `worker:dev` connects to the production Cloudflare D1 database, KV cache, and R2 storage. Be careful not to mutate production data during development.
+
+### Deploy
+
+Pushes to `main` trigger GitHub Actions to lint, build, and deploy the API worker to Cloudflare. The web frontend is deployed separately via the Cloudflare dashboard.
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Whether it's adding new features, improving documentation, or reporting bugs, please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions from the community! Whether it's adding new features, improving documentation, or reporting bugs — via [GitHub issues](https://github.com/mcongrove/miata-registry/issues) or [support@miataregistry.com](mailto:support@miataregistry.com) — see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 

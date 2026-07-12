@@ -3,6 +3,15 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
+	"homepage": "https://miataregistry.com",
+	"bugs": {
+		"url": "https://github.com/mcongrove/miata-registry/issues",
+		"email": "support@miataregistry.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mcongrove/miata-registry.git"
+	},
 	"scripts": {
 		"build": "tsc && vite build",
 		"db:backup": "wrangler d1 export registry --remote --output=backups/registry-$(date +%s).sqlite",

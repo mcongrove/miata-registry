@@ -1,0 +1,192 @@
+{
+	"schemaVersion": 2,
+	"generatedAt": "2026-07-12T07:40:00.000Z",
+	"title": "Design System: Miata Registry",
+	"extensions": {
+		"colorMeta": {
+			"brg": {
+				"role": "primary",
+				"displayName": "British Racing Green",
+				"canonical": "oklch(28% 0.04 165)",
+				"tonalRamp": [
+					"oklch(15% 0.03 165)",
+					"oklch(20% 0.035 165)",
+					"oklch(25% 0.04 165)",
+					"oklch(28% 0.04 165)",
+					"oklch(35% 0.035 165)",
+					"oklch(45% 0.025 165)",
+					"oklch(60% 0.015 165)",
+					"oklch(75% 0.008 165)",
+					"oklch(92% 0.004 165)",
+					"oklch(97% 0.002 165)"
+				]
+			},
+			"brg-mid": {
+				"role": "neutral",
+				"displayName": "Roadstone",
+				"canonical": "oklch(48% 0.015 165)",
+				"tonalRamp": [
+					"oklch(25% 0.02 165)",
+					"oklch(32% 0.018 165)",
+					"oklch(40% 0.016 165)",
+					"oklch(48% 0.015 165)",
+					"oklch(55% 0.012 165)",
+					"oklch(65% 0.01 165)",
+					"oklch(75% 0.008 165)",
+					"oklch(85% 0.005 165)",
+					"oklch(92% 0.003 165)",
+					"oklch(97% 0.002 165)"
+				]
+			},
+			"brg-light": {
+				"role": "neutral",
+				"displayName": "Clubhouse Light",
+				"canonical": "oklch(93% 0.004 165)",
+				"tonalRamp": [
+					"oklch(30% 0.02 165)",
+					"oklch(40% 0.015 165)",
+					"oklch(50% 0.012 165)",
+					"oklch(60% 0.01 165)",
+					"oklch(70% 0.008 165)",
+					"oklch(80% 0.006 165)",
+					"oklch(88% 0.005 165)",
+					"oklch(93% 0.004 165)",
+					"oklch(96% 0.003 165)",
+					"oklch(99% 0.001 165)"
+				]
+			}
+		},
+		"typographyMeta": {
+			"display": {
+				"displayName": "Display",
+				"purpose": "Page heroes and major section titles only."
+			},
+			"body": {
+				"displayName": "Body",
+				"purpose": "Paragraphs, table cells, form content."
+			},
+			"label": {
+				"displayName": "Label",
+				"purpose": "Buttons, nav, chips, metadata."
+			}
+		},
+		"shadows": [
+			{
+				"name": "menu",
+				"value": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+				"purpose": "Header dropdown panels only."
+			}
+		],
+		"motion": [
+			{
+				"name": "color-transition",
+				"value": "color 150ms ease, background-color 150ms ease, border-color 150ms ease",
+				"purpose": "Default hover on buttons, links, nav."
+			},
+			{
+				"name": "arrow-nudge",
+				"value": "transform 150ms ease",
+				"purpose": "Button withArrow hover translate."
+			}
+		],
+		"breakpoints": [
+			{ "name": "md", "value": "768px" },
+			{ "name": "lg", "value": "1024px" }
+		]
+	},
+	"components": [
+		{
+			"name": "Primary Button",
+			"kind": "button",
+			"refersTo": "button-primary",
+			"description": "Main CTAs — claim, submit, confirm.",
+			"html": "<button class=\"ds-btn-primary\">Claim your Miata</button>",
+			"css": ".ds-btn-primary { display: inline-flex; align-items: center; font-family: Inter, sans-serif; font-weight: 500; font-size: 0.875rem; padding: 12px 16px; border-radius: 8px; border: none; background: #172E28; color: #ffffff; cursor: pointer; transition: background-color 150ms ease; } .ds-btn-primary:hover { background: rgba(23, 46, 40, 0.9); } .ds-btn-primary:disabled { background: rgba(23, 46, 40, 0.5); cursor: not-allowed; }"
+		},
+		{
+			"name": "Tertiary Button",
+			"kind": "button",
+			"refersTo": "button-tertiary",
+			"description": "Secondary navigation actions with optional arrow.",
+			"html": "<button class=\"ds-btn-tertiary\">View the registry <span class=\"ds-btn-arrow\">→</span></button>",
+			"css": ".ds-btn-tertiary { display: inline-flex; align-items: center; font-family: Inter, sans-serif; font-weight: 500; font-size: 0.875rem; padding: 12px 16px; border-radius: 8px; border: none; background: transparent; color: #172E28; cursor: pointer; transition: color 150ms ease; } .ds-btn-tertiary:hover { color: #5D6D69; } .ds-btn-arrow { margin-left: 8px; transition: transform 150ms ease; } .ds-btn-tertiary:hover .ds-btn-arrow { transform: translateX(4px); }"
+		},
+		{
+			"name": "Text Field",
+			"kind": "input",
+			"refersTo": "input-default",
+			"description": "Default text input and textarea styling.",
+			"html": "<input class=\"ds-input\" type=\"text\" placeholder=\"VIN\" />",
+			"css": ".ds-input { width: 100%; padding: 8px; font-family: Inter, sans-serif; font-size: 16px; color: #172E28; background: #ffffff; border: 1px solid #E8EBEA; border-radius: 8px; transition: border-color 150ms ease; } .ds-input::placeholder { color: #5D6D69; opacity: 0.7; } .ds-input:focus { outline: none; border-color: #5D6D69; }"
+		},
+		{
+			"name": "Filter Chip",
+			"kind": "chip",
+			"description": "Active registry filter pill with dismiss.",
+			"html": "<span class=\"ds-chip\"><span class=\"ds-chip-label\">Edition</span> 1991 SE <button class=\"ds-chip-dismiss\" aria-label=\"Remove filter\">×</button></span>",
+			"css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; background: #172E28; color: #E8EBEA; font-family: Inter, sans-serif; font-size: 0.75rem; padding: 4px 0 4px 12px; border-radius: 6px; } .ds-chip-label { color: rgba(232, 235, 234, 0.6); } .ds-chip-dismiss { background: none; border: none; color: inherit; padding: 4px 12px 4px 0; cursor: pointer; font-size: 1rem; line-height: 1; transition: color 150ms ease; } .ds-chip-dismiss:hover { color: #fca5a5; }"
+		},
+		{
+			"name": "Edition Card",
+			"kind": "card",
+			"description": "Edition browse card with image and hover wash.",
+			"html": "<div class=\"ds-card\"><div class=\"ds-card-media\"></div><div class=\"ds-card-body\"><h3 class=\"ds-card-title\">1991 Special Edition</h3></div></div>",
+			"css": ".ds-card { display: flex; flex-direction: column; height: 100%; background: #ffffff; border: 1px solid #E8EBEA; border-radius: 8px; overflow: hidden; cursor: pointer; transition: background-color 150ms ease; } .ds-card:hover { background: rgba(232, 235, 234, 0.25); } .ds-card-media { aspect-ratio: 16 / 9; background: #E8EBEA; } .ds-card-body { padding: 16px; } .ds-card-title { font-family: Inter, sans-serif; font-weight: 500; font-size: 1rem; color: #172E28; margin: 0; }"
+		},
+		{
+			"name": "Header Nav Link",
+			"kind": "nav",
+			"description": "Top-level navigation item default and hover.",
+			"html": "<a class=\"ds-nav-link\" href=\"#\">Registry</a>",
+			"css": ".ds-nav-link { font-family: Inter, sans-serif; font-size: 0.875rem; color: #5D6D69; text-decoration: none; transition: color 150ms ease; } .ds-nav-link:hover, .ds-nav-link.is-active { color: #172E28; font-weight: 500; }"
+		}
+	],
+	"narrative": {
+		"northStar": "The Club Archive",
+		"overview": "Miata Registry looks like a careful enthusiast institution: muted British-racing-green tones, Inter at readable sizes, soft corners, and borders instead of dramatic shadows. Density is moderate — registry tables and car profiles need room for data; marketing moments on the home page still use the same vocabulary. The system rejects startup gloss and AI-slop tells.",
+		"keyCharacteristics": [
+			"Single sans family (Inter) for everything",
+			"brg token palette only for UI chrome",
+			"rounded-lg (8px) as the default corner language",
+			"Primary actions are solid brg fills",
+			"Modals and dropdowns are the main elevation exceptions"
+		],
+		"rules": [
+			{
+				"name": "The BRG-Only Rule",
+				"body": "UI colors come from the brg token set. Do not introduce gray-*, slate-*, or purple/blue accent utilities for chrome.",
+				"section": "colors"
+			},
+			{
+				"name": "The One Accent Rule",
+				"body": "Green carries the brand; red appears only for destructive/remove affordances.",
+				"section": "colors"
+			},
+			{
+				"name": "The Inter-Only Rule",
+				"body": "Do not add a second font family for character. Enthusiasm comes from photography and copy.",
+				"section": "typography"
+			},
+			{
+				"name": "The Flat-By-Default Rule",
+				"body": "If you're reaching for a shadow, first try a border or tonal background step.",
+				"section": "elevation"
+			}
+		],
+		"dos": [
+			"Do use brg, brg-mid, brg-border, brg-light tokens for all UI chrome.",
+			"Do keep Inter as the only UI typeface.",
+			"Do use rounded-lg for buttons, inputs, cards, and modals unless a pill is intentional.",
+			"Do let car photography and registry data dominate visual interest.",
+			"Do match existing component APIs before inventing new primitives."
+		],
+		"donts": [
+			"Don't use purple gradients, glassmorphism, neon accents, or floating-orbit hero decorations.",
+			"Don't use gray-* / slate-* Tailwind classes for UI surfaces.",
+			"Don't add display serifs, gradient text, or oversized fluid type in app screens.",
+			"Don't ship inconsistent button styles on different pages.",
+			"Don't add decorative motion beyond hover and skeleton states.",
+			"Don't call registry cars special editions or models in new copy."
+		]
+	}
+}
