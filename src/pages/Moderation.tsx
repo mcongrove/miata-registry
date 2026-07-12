@@ -100,6 +100,7 @@ export const Moderation = () => {
 		path: '/moderation',
 		title: 'Moderation',
 		description: 'Review and action pending changes to the registry.',
+		noindex: true,
 	});
 
 	useEffect(() => {

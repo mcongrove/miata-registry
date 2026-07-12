@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useModal } from '../../context/ModalContext';
 import { Chip } from '../rarity/Chip';
@@ -152,7 +152,13 @@ export const RegistryTable = ({
 										{car.edition?.generation}
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
-										{car.edition?.name}
+										<Link
+											to={`/registry/${car.id}`}
+											className="text-brg hover:underline"
+											onClick={(e) => e.stopPropagation()}
+										>
+											{car.edition?.name}
+										</Link>
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
 										<div className="flex items-center gap-2">

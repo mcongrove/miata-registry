@@ -27,6 +27,7 @@ import moderationRouter from './routes/moderation';
 import newsRouter from './routes/news';
 import ownersRouter from './routes/owners';
 import photosRouter from './routes/photos';
+import seoRouter from './routes/seo';
 import statsRouter from './routes/stats';
 import webhooksRouter from './routes/webhooks';
 import type { Bindings } from './types';
@@ -36,7 +37,10 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.use('*', async (c, next) => {
 	if (
 		c.req.path.startsWith('/webhooks') ||
-		c.req.path.startsWith('/heartbeat')
+		c.req.path.startsWith('/heartbeat') ||
+		c.req.path === '/sitemap.xml' ||
+		c.req.path.startsWith('/sitemap/') ||
+		c.req.path === '/data/editions.json'
 	) {
 		return cors({
 			origin: '*',
@@ -73,6 +77,7 @@ app.use('*', async (c, next) => {
 	})(c, next);
 });
 
+app.route('/', seoRouter);
 app.get('/', (c) => c.json({ error: 'Not found' }, 404));
 
 app.route('/heartbeat', heartbeatRouter);

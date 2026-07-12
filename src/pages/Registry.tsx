@@ -69,10 +69,46 @@ export const Registry = () => {
 	const [totalPages, setTotalPages] = useState(1);
 	const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
+	const isNonDefaultView =
+		currentPage > 1 || activeFilters.length > 0 || Boolean(sortColumn);
+
+	const buildRegistryPath = (page: number) => {
+		const params = new URLSearchParams();
+
+		if (page > 1) {
+			params.set('page', page.toString());
+		}
+
+		if (sortColumn) {
+			params.set('sortColumn', sortColumn);
+			params.set('sortDir', sortDirection);
+		}
+
+		activeFilters.forEach((filter) => {
+			const value =
+				typeof filter.value === 'object'
+					? JSON.stringify(filter.value)
+					: filter.value;
+
+			params.append('filter', `${filter.type}:${value}`);
+		});
+
+		const query = params.toString();
+
+		return query ? `/registry?${query}` : '/registry';
+	};
+
 	usePageMeta({
 		path: '/registry',
 		title: 'Cars',
 		description: 'A list of all Mazda Miatas in the Miata Registry.',
+		noindex: isNonDefaultView ? true : false,
+		prev:
+			currentPage > 1 ? buildRegistryPath(currentPage - 1) : undefined,
+		next:
+			currentPage < totalPages
+				? buildRegistryPath(currentPage + 1)
+				: undefined,
 	});
 
 	useEffect(() => {
@@ -218,6 +254,10 @@ export const Registry = () => {
 					/>
 
 					<div className="flex flex-1 flex-col w-full">
+						<h1 className="text-2xl font-bold text-brg mb-4">
+							Browse Cars
+						</h1>
+
 						{activeFilters.length > 0 && (
 							<div className="hidden lg:flex mb-3 gap-2 flex-wrap">
 								{activeFilters.map((filter) => {

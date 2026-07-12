@@ -1,0 +1,5 @@
+Contact: mailto:support@miataregistry.com
+Expires: 2027-07-12T12:00:00.000Z
+Preferred-Languages: en
+Canonical: https://miataregistry.com/.well-known/security.txt
+Policy: https://miataregistry.com/legal

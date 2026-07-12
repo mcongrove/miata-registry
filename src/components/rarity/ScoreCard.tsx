@@ -41,18 +41,31 @@ export const ScoreCard = ({ className, rows, title }: ScoreCardProps) => {
 				{title}
 			</h3>
 
-			<div className="divide-y divide-brg-light">
-				{rows.map((row, index) => (
-					<div
-						key={index}
-						className="flex justify-between items-center py-3 px-4 text-xs hover:bg-brg-light/20"
-					>
-						<div className="text-brg-mid">{row.condition}</div>
+			<table className="w-full text-xs">
+				<thead className="sr-only">
+					<tr>
+						<th scope="col">Condition</th>
+						<th scope="col">Points</th>
+					</tr>
+				</thead>
 
-						<div className="text-brg">{row.points}</div>
-					</div>
-				))}
-			</div>
+				<tbody className="divide-y divide-brg-light">
+					{rows.map((row, index) => (
+						<tr
+							key={index}
+							className="hover:bg-brg-light/20"
+						>
+							<td className="py-3 px-4 text-brg-mid">
+								{row.condition}
+							</td>
+
+							<td className="py-3 px-4 text-brg text-right whitespace-nowrap">
+								{row.points}
+							</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
 		</div>
 	);
 };
