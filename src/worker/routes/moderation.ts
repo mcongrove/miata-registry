@@ -20,6 +20,7 @@ import { and, count, eq, sql } from 'drizzle-orm';
 import { Context, Hono, Next } from 'hono';
 import { Resend } from 'resend';
 import { createDb } from '../../db';
+import { invalidateSeoCaches } from '../../seo/cache';
 import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
@@ -341,6 +342,7 @@ moderationRouter.post(
 			await c.env.CACHE.delete(`cars:summary:${car_id}`);
 			await c.env.CACHE.delete('editions:all');
 			await c.env.CACHE.delete('stats:all');
+			await invalidateSeoCaches(c.env.CACHE);
 
 			if (user_id) {
 				const requestingUser = await c
@@ -485,6 +487,7 @@ moderationRouter.post(
 			await c.env.CACHE.delete(`cars:summary:${pendingCarOwner.car_id}`);
 			await c.env.CACHE.delete('editions:all');
 			await c.env.CACHE.delete('stats:all');
+			await invalidateSeoCaches(c.env.CACHE);
 
 			if (user_id) {
 				const requestingUser = await c

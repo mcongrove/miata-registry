@@ -229,9 +229,9 @@ export const Home = () => {
 						</div>
 
 						<div className="lg:w-1/2 p-8 lg:px-24 lg:pt-24 lg:pb-8">
-							<h1 className="hidden lg:block text-4xl font-bold text-brg mb-6">
+							<h2 className="hidden lg:block text-4xl font-bold text-brg mb-6">
 								The Miata Registry
-							</h1>
+							</h2>
 
 							<p className="text-brg-mid">
 								We're a community-driven database dedicated to

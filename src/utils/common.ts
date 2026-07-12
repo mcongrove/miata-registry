@@ -38,6 +38,19 @@ export const toTitleCase = (str: string): string => {
 		.join(' ');
 };
 
+export const toIsoDateTime = (
+	date: string | number | null | undefined
+): string | undefined => {
+	if (date == null || date === '') {
+		return undefined;
+	}
+
+	const value = typeof date === 'number' ? `${date}-01-01` : date;
+	const parsed = new Date(value);
+
+	return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+};
+
 export const toPrettyDate = (
 	timestamp: Date | string | null | undefined,
 	options?: { dateOnly?: boolean }

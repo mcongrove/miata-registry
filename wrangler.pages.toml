@@ -1,0 +1,12 @@
+name = "miata-registry-web"
+compatibility_date = "2025-04-01"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "registry"
+database_id = "0c327009-68c1-4f80-9b88-9f8ef2fbfcaa"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "7fda99700a024497bc3da8172120a3d5"

@@ -64,16 +64,43 @@ export const Card = ({ edition }: CardProps) => {
 				).replace(/%20/g, '+')}`}
 				className="flex flex-col gap-4 p-4 flex-1"
 			>
-				<div className="flex flex-col">
-					<p className="text-xs text-brg-mid">
-						{edition.year} {edition.generation}
-					</p>
-
+				<div className="flex flex-col gap-2">
 					<h3 className="text-lg font-semibold text-brg">
 						{edition.name}
 					</h3>
 
-					<p className="text-xs text-brg-mid">{edition.color}</p>
+					{edition.description && (
+						<p className="text-sm text-brg-mid line-clamp-2">
+							{edition.description.split('\n')[0]}
+						</p>
+					)}
+
+					<dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-brg-mid">
+						<div>
+							<dt className="sr-only">Year</dt>
+							<dd>{edition.year}</dd>
+						</div>
+
+						<div>
+							<dt className="sr-only">Generation</dt>
+							<dd>{edition.generation}</dd>
+						</div>
+
+						<div className="col-span-2">
+							<dt className="sr-only">Color</dt>
+							<dd>{edition.color}</dd>
+						</div>
+
+						{edition.total_produced != null && (
+							<div className="col-span-2">
+								<dt className="sr-only">Production</dt>
+								<dd>
+									{edition.total_produced.toLocaleString()}{' '}
+									produced
+								</dd>
+							</div>
+						)}
+					</dl>
 				</div>
 
 				<Stats edition={edition} />

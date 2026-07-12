@@ -17,9 +17,10 @@
  */
 
 import { useAuth, useUser } from '@clerk/clerk-react';
-import { lazy, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { JsonLd } from '../components/JsonLd';
 import { Chip } from '../components/rarity/Chip';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -31,7 +32,9 @@ import {
 	hasSequence,
 	TVinDetails,
 } from '../utils/car';
-import { handleApiError, toPrettyDate, toTitleCase } from '../utils/common';
+import { handleApiError, toIsoDateTime, toPrettyDate, toTitleCase } from '../utils/common';
+import { vehicleJsonLd } from '../utils/jsonLd';
+import { isCarIndexable } from '../utils/seoIndexing';
 import {
 	country,
 	countryNameToCode,
@@ -55,8 +58,17 @@ export const CarProfile = () => {
 	const { user } = useUser();
 	const { openModal } = useModal();
 	const [car, setCar] = useState<TCar | null>(null);
+	const [hasPhoto, setHasPhoto] = useState(false);
 	const [vinDetails, setVinDetails] = useState<TVinDetails | null>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
+
+	const isIndexable =
+		car != null &&
+		isCarIndexable({
+			...car,
+			hasPhoto,
+			owner_history_count: car.owner_history?.length,
+		});
 
 	usePageMeta({
 		path: `/registry/${id}`,
@@ -64,6 +76,7 @@ export const CarProfile = () => {
 			? `${car.edition?.year} ${car.edition?.name}${hasSequence(car.sequence) ? ` #${car.sequence}` : ''}`
 			: '',
 		description: car ? car.edition?.description?.split('\n')[0] : '',
+		noindex: car ? !isIndexable : true,
 	});
 
 	const manufactureLocation = useMemo(() => {
@@ -123,6 +136,26 @@ export const CarProfile = () => {
 	useEffect(() => {
 		loadCar();
 	}, [loadCar]);
+
+	useEffect(() => {
+		setHasPhoto(false);
+	}, [id]);
+
+	const formatCarDate = (
+		date: string | undefined,
+		fallbackYear?: number
+	): ReactNode => {
+		const iso = toIsoDateTime(date || fallbackYear);
+		const label = date
+			? toPrettyDate(date)
+			: fallbackYear?.toString() || '';
+
+		if (!iso) {
+			return label;
+		}
+
+		return <time dateTime={iso}>{label}</time>;
+	};
 
 	const timelineItems = useMemo(() => {
 		if (!car) return [];
@@ -198,8 +231,8 @@ export const CarProfile = () => {
 		}
 
 		const items: Array<{
-			name: string | React.ReactNode;
-			dateRange?: string;
+			name: string | ReactNode;
+			dateRange?: string | ReactNode;
 			location?: string;
 			isActive?: boolean;
 			isDestroyed?: boolean;
@@ -240,9 +273,10 @@ export const CarProfile = () => {
 							)}
 						</>
 					),
-					dateRange: car.manufacture_date
-						? toPrettyDate(car.manufacture_date)
-						: car.edition?.year.toString(),
+					dateRange: formatCarDate(
+						car.manufacture_date,
+						car.edition?.year
+					),
 					location: manufactureLocation
 						? manufactureLocation
 						: car.edition?.name.includes('M2-')
@@ -261,7 +295,13 @@ export const CarProfile = () => {
 							)}
 						</>
 					),
-					dateRange: toPrettyDate(car.shipping_date || ''),
+					dateRange: car.shipping_date ? (
+						<time dateTime={toIsoDateTime(car.shipping_date)}>
+							{toPrettyDate(car.shipping_date)}
+						</time>
+					) : (
+						''
+					),
 					location: formatLocation({
 						city: car.shipping_city,
 						state: car.shipping_state,
@@ -280,7 +320,13 @@ export const CarProfile = () => {
 							)}
 						</>
 					),
-					dateRange: toPrettyDate(car.sale_date || ''),
+					dateRange: car.sale_date ? (
+						<time dateTime={toIsoDateTime(car.sale_date)}>
+							{toPrettyDate(car.sale_date)}
+						</time>
+					) : (
+						''
+					),
 					location: formatLocation({
 						city: car.sale_dealer_city || '',
 						state: car.sale_dealer_state || '',
@@ -377,14 +423,16 @@ export const CarProfile = () => {
 
 	return (
 		<main className="flex-1 pt-20 pb-0 lg:pb-16">
+			{car && isIndexable ? <JsonLd data={vehicleJsonLd(car)} /> : null}
+
 			<div className="bg-brg-light/40 lg:border-b border-brg-light">
 				<div className="container mx-auto px-8 p-6 lg:px-0 lg:pt-8 lg:pb-6">
 					{car ? (
 						<div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
 							<div className="flex flex-col gap-1.5 lg:gap-1 items-start">
-								<h2 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
+								<h1 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
 									{car.edition?.year} {car.edition?.name}
-								</h2>
+								</h1>
 
 								{(car.edition?.total_produced ||
 									car.rarity_score) && (
@@ -544,6 +592,8 @@ export const CarProfile = () => {
 												const img =
 													e.target as HTMLImageElement;
 
+												setHasPhoto(true);
+
 												img.classList.add(
 													car.destroyed
 														? 'opacity-50'
@@ -635,7 +685,13 @@ export const CarProfile = () => {
 
 									{car.sale_date && (
 										<p className="font-medium whitespace-nowrap">
-											{toPrettyDate(car.sale_date)}
+											<time
+												dateTime={toIsoDateTime(
+													car.sale_date
+												)}
+											>
+												{toPrettyDate(car.sale_date)}
+											</time>
 										</p>
 									)}
 

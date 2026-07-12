@@ -288,6 +288,97 @@ export const About = () => {
 			</div>
 
 			<div className="container mx-auto">
+				<div id="faq" className="flex flex-col gap-8 py-0 lg:py-16">
+					<h2 className="text-3xl font-medium text-center text-brg">
+						Frequently Asked Questions
+					</h2>
+
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+						<div>
+							<h3 className="text-lg font-medium text-brg mb-2">
+								What is the Miata Registry?
+							</h3>
+
+							<p className="text-sm text-brg-mid">
+								The Miata Registry is a community-driven
+								database that documents limited edition Mazda
+								Miatas worldwide. It brings together production
+								numbers, ownership history, photos, and stories
+								for editions that were never collected in one
+								place before.
+							</p>
+						</div>
+
+						<div>
+							<h3 className="text-lg font-medium text-brg mb-2">
+								What counts as a limited edition Miata?
+							</h3>
+
+							<p className="text-sm text-brg-mid">
+								A limited edition Miata is a factory-built
+								variant with a defined production run, distinct
+								trim, color, or equipment, and documented
+								release by Mazda or a regional distributor.
+								Examples include the 1991 Special Edition, 10th
+								Anniversary, and 30th Anniversary editions.
+							</p>
+						</div>
+
+						<div>
+							<h3 className="text-lg font-medium text-brg mb-2">
+								How are cars verified?
+							</h3>
+
+							<p className="text-sm text-brg-mid">
+								Entries are reviewed by moderators before they
+								appear as claimed. Owners submit documentation
+								such as VIN records, window stickers, or title
+								information along with photos. Community tips
+								help surface cars that are not yet in the
+								registry, and corrections are updated after
+								review.
+							</p>
+						</div>
+
+						<div>
+							<h3 className="text-lg font-medium text-brg mb-2">
+								How is rarity calculated?
+							</h3>
+
+							<p className="text-sm text-brg-mid">
+								Each car receives a rarity score based on
+								production numbers, edition characteristics,
+								preservation, documentation, mileage, and age.
+								The methodology weights factory rarity against
+								how well an individual car has been preserved
+								over time. See our{' '}
+								<Link to="/rarity" className="underline">
+									rarity scoring guide
+								</Link>{' '}
+								for the full breakdown.
+							</p>
+						</div>
+
+						<div className="lg:col-span-2">
+							<h3 className="text-lg font-medium text-brg mb-2">
+								How do I register my car?
+							</h3>
+
+							<p className="text-sm text-brg-mid">
+								Create a free account, find your edition in the
+								registry or start a new claim, and submit your
+								VIN, sequence number, photos, and any ownership
+								documentation you have. A moderator will review
+								your submission and approve the claim once
+								verified. If your car is not listed yet, you can
+								submit a tip and our team will follow up.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="container mx-auto">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16">
 					<div id="open-source" className="prose">
 						<h2

@@ -29,6 +29,8 @@ import {
 import { CSP } from './components/CSP';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { JsonLd } from './components/JsonLd';
+import { organizationWebSite } from './utils/jsonLd';
 import { GoogleMapsProvider } from './context/GoogleMapsContext';
 import { ModalProvider } from './context/ModalContext';
 import { Home } from './pages/Home';
@@ -85,6 +87,7 @@ function ScrollToTop() {
 
 const Layout = () => (
 	<div className="min-h-screen flex flex-col">
+		<JsonLd data={organizationWebSite()} />
 		<ScrollToTop />
 		<Header />
 		<Outlet />

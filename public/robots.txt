@@ -1,3 +1,5 @@
+# LLM context: https://miataregistry.com/llms.txt
+
 # Main site
 User-agent: *
 

@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "ES2021",
+		"lib": ["ES2021"],
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"strict": true,
+		"noEmit": true,
+		"skipLibCheck": true,
+		"types": ["@cloudflare/workers-types"]
+	},
+	"include": ["./**/*.ts", "../src/seo/**/*.ts", "../src/db/**/*.ts"]
+}

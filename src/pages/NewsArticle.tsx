@@ -20,9 +20,11 @@ import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { JsonLd } from '../components/JsonLd';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TNewsArticle } from '../types/News';
 import { handleApiError } from '../utils/common';
+import { newsArticleJsonLd } from '../utils/jsonLd';
 
 export const NewsArticle = () => {
 	const { id } = useParams();
@@ -101,6 +103,8 @@ export const NewsArticle = () => {
 
 	return article.body ? (
 		<main className="flex-1 px-8 pt-24 lg:pt-32 lg:px-0 pb-16">
+			<JsonLd data={newsArticleJsonLd(article)} />
+
 			<div className="container mx-auto">
 				<div className="flex flex-col gap-6 max-w-4xl">
 					<div className="flex flex-col gap-6">
@@ -116,7 +120,10 @@ export const NewsArticle = () => {
 								{article.title}
 							</h1>
 
-							<div className="text-sm text-brg-mid">
+							<time
+								className="text-sm text-brg-mid"
+								dateTime={article.publish_date}
+							>
 								{new Date(
 									article.publish_date
 								).toLocaleDateString('en-US', {
@@ -124,7 +131,7 @@ export const NewsArticle = () => {
 									day: 'numeric',
 									year: 'numeric',
 								})}
-							</div>
+							</time>
 						</div>
 					</div>
 
