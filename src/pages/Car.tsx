@@ -34,7 +34,7 @@ import {
 } from '../utils/car';
 import { handleApiError, toIsoDateTime, toPrettyDate, toTitleCase } from '../utils/common';
 import { vehicleJsonLd } from '../utils/jsonLd';
-import { isCarIndexable } from '../utils/seoIndexing';
+import { isCarIndexable, isValidUuid } from '../utils/seoIndexing';
 import {
 	country,
 	countryNameToCode,
@@ -59,6 +59,8 @@ export const CarProfile = () => {
 	const { openModal } = useModal();
 	const [car, setCar] = useState<TCar | null>(null);
 	const [hasPhoto, setHasPhoto] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [notFound, setNotFound] = useState(false);
 	const [vinDetails, setVinDetails] = useState<TVinDetails | null>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
 
@@ -72,11 +74,13 @@ export const CarProfile = () => {
 
 	usePageMeta({
 		path: `/registry/${id}`,
-		title: car
-			? `${car.edition?.year} ${car.edition?.name}${hasSequence(car.sequence) ? ` #${car.sequence}` : ''}`
-			: '',
+		title: notFound
+			? 'Car Not Found'
+			: car
+				? `${car.edition?.year} ${car.edition?.name}${hasSequence(car.sequence) ? ` #${car.sequence}` : ''}`
+				: '',
 		description: car ? car.edition?.description?.split('\n')[0] : '',
-		noindex: car ? !isIndexable : true,
+		noindex: notFound || (car ? !isIndexable : true),
 	});
 
 	const manufactureLocation = useMemo(() => {
@@ -86,10 +90,29 @@ export const CarProfile = () => {
 	const loadCar = useCallback(async () => {
 		if (!id) return;
 
+		setIsLoading(true);
+		setNotFound(false);
+		setCar(null);
+		setVinDetails(null);
+		setTimelineOwners([]);
+
+		if (!isValidUuid(id)) {
+			setNotFound(true);
+			setIsLoading(false);
+
+			return;
+		}
+
 		try {
 			const response = await fetch(
 				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${id}`
 			);
+
+			if (response.status === 404) {
+				setNotFound(true);
+
+				return;
+			}
 
 			if (!response.ok) {
 				throw new Error('Failed to fetch car');
@@ -130,6 +153,8 @@ export const CarProfile = () => {
 			}
 		} catch (error) {
 			handleApiError(error);
+		} finally {
+			setIsLoading(false);
 		}
 	}, [id]);
 
@@ -420,6 +445,44 @@ export const CarProfile = () => {
 		car?.sale_dealer_country,
 		timelineOwners,
 	]);
+
+	if (notFound) {
+		return (
+			<main className="flex-1 px-8 pt-24 lg:pt-40 lg:px-0 pb-16">
+				<div className="container mx-auto flex flex-col items-center gap-4">
+					<h1 className="text-2xl font-bold text-brg">Car Not Found</h1>
+
+					<p className="text-brg-mid mb-4">
+						This car isn&apos;t in the registry or the link may be
+						incorrect.
+					</p>
+
+					<Link to="/registry">
+						<Button>← Browse Cars</Button>
+					</Link>
+				</div>
+			</main>
+		);
+	}
+
+	if (isLoading) {
+		return (
+			<main className="flex-1 pt-20 pb-0 lg:pb-16">
+				<div className="bg-brg-light/40 lg:border-b border-brg-light">
+					<div className="container mx-auto px-8 p-6 lg:px-0 lg:pt-8 lg:pb-6">
+						<div className="space-y-2">
+							<div className="h-10 w-96 max-w-full bg-brg-light rounded-lg animate-pulse" />
+							<div className="h-6 w-48 bg-brg-light rounded-lg animate-pulse" />
+						</div>
+					</div>
+				</div>
+
+				<div className="container mx-auto px-8 pb-6 lg:px-0 lg:py-8">
+					<div className="aspect-video w-full h-72 md:h-96 lg:h-[550px] bg-brg-light rounded-lg animate-pulse" />
+				</div>
+			</main>
+		);
+	}
 
 	return (
 		<main className="flex-1 pt-20 pb-0 lg:pb-16">
