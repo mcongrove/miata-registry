@@ -33,7 +33,7 @@ import {
 	TVinDetails,
 } from '../utils/car';
 import { handleApiError, toIsoDateTime, toPrettyDate, toTitleCase } from '../utils/common';
-import { vehicleJsonLd } from '../utils/jsonLd';
+import { carPageJsonLd } from '../utils/jsonLd';
 import { isCarIndexable, isValidUuid } from '../utils/seoIndexing';
 import {
 	country,
@@ -486,7 +486,7 @@ export const CarProfile = () => {
 
 	return (
 		<main className="flex-1 pt-20 pb-0 lg:pb-16">
-			{car && isIndexable ? <JsonLd data={vehicleJsonLd(car)} /> : null}
+			{car && isIndexable ? <JsonLd data={carPageJsonLd(car)} /> : null}
 
 			<div className="bg-brg-light/40 lg:border-b border-brg-light">
 				<div className="container mx-auto px-8 p-6 lg:px-0 lg:pt-8 lg:pb-6">

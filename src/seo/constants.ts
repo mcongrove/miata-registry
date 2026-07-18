@@ -21,7 +21,7 @@ export const BASE_URL = 'https://miataregistry.com';
 export const DEFAULT_DESCRIPTION =
 	'A community-driven project documenting the history of limited edition Mazda Miatas.';
 
-export const SEO_SITEMAP_KEY = 'seo:sitemap:v3';
+export const SEO_SITEMAP_KEY = 'seo:sitemap:v4';
 export const SEO_EDITIONS_KEY = 'seo:editions.json';
 
 export const SEO_SITEMAP_TTL = 60 * 60 * 24;

@@ -52,21 +52,28 @@ export function organizationWebSite() {
 	};
 }
 
-export function vehicleJsonLd(car: TCar) {
+export function carPageJsonLd(car: TCar) {
 	const edition = car.edition;
 	const sequenceSuffix =
 		edition && hasSequence(car.sequence) ? ` #${car.sequence}` : '';
+	const name = edition
+		? `${edition.year} ${edition.name}${sequenceSuffix}`
+		: 'Mazda Miata';
+	const url = `${SITE_ORIGIN}/registry/${car.id}`;
+	const description = edition?.description?.split('\n')[0];
 
 	return {
 		'@context': 'https://schema.org',
-		'@type': 'Vehicle',
-		name: edition
-			? `${edition.year} ${edition.name}${sequenceSuffix}`
-			: 'Mazda Miata',
-		model: edition?.name,
-		productionDate: car.manufacture_date || String(edition?.year ?? ''),
-		color: edition?.color,
-		url: `${SITE_ORIGIN}/registry/${car.id}`,
+		'@type': 'WebPage',
+		name,
+		url,
+		...(description ? { description } : {}),
+		isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+		about: {
+			'@type': 'Thing',
+			name,
+			url,
+		},
 	};
 }
 

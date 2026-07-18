@@ -61,11 +61,14 @@ const renderUrl = (url: SitemapUrl): string => {
 	return `  <url>\n${parts.join('\n')}\n  </url>`;
 };
 
+const renderSitemapIndexEntry = (url: SitemapUrl): string =>
+	`  <sitemap>\n    <loc>${escapeXml(url.loc)}</loc>\n    <lastmod>${escapeXml(url.lastmod)}</lastmod>\n  </sitemap>`;
+
 export const renderUrlSet = (urls: SitemapUrl[]): string =>
 	`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(renderUrl).join('\n')}\n</urlset>`;
 
 export const renderSitemapIndex = (sitemaps: SitemapUrl[]): string =>
-	`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps.map(renderUrl).join('\n')}\n</sitemapindex>`;
+	`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps.map(renderSitemapIndexEntry).join('\n')}\n</sitemapindex>`;
 
 const toLastmod = (value?: string | null): string => {
 	if (!value) {
