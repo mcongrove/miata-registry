@@ -122,6 +122,14 @@ export const injectPageMeta = (html: string, meta: PageMeta): string => {
 export const buildBotArticle = (content: string): string =>
 	`<article id="bot-content">${content}</article>`;
 
+const buildBotHeading = (heading: string): string =>
+	`<h1>${escapeHtml(heading)}</h1>`;
+
+export const buildStaticBotContent = (
+	heading: string,
+	body = ''
+): string => buildBotArticle(`${buildBotHeading(heading)}${body}`);
+
 export type CarBotData = {
 	id: string;
 	sequence?: number | null;
@@ -160,7 +168,10 @@ export const buildCarBotContent = (car: CarBotData): string => {
 
 	const summary = `${year} ${name}${sequenceSuffix}. ${color}${produced}${rarity}${claimed}`;
 
-	const parts = [`<p>${escapeHtml(summary.trim())}</p>`];
+	const parts = [
+		`<h1>${escapeHtml(`${year} ${name}`.trim())}</h1>`,
+		`<p>${escapeHtml(summary.trim())}</p>`,
+	];
 
 	if (edition?.description) {
 		parts.push(
@@ -214,13 +225,13 @@ export const buildEditionsBotContent = (editions: EditionRow[]): string => {
 		.join('\n');
 
 	return buildBotArticle(
-		`<table><thead><tr><th>Year</th><th>Name</th><th>Generation</th><th>Color</th><th>Produced</th><th>In registry</th><th>Claimed</th></tr></thead><tbody>${rows}</tbody></table>`
+		`${buildBotHeading('Limited Edition Models')}<table><thead><tr><th>Year</th><th>Name</th><th>Generation</th><th>Color</th><th>Produced</th><th>In registry</th><th>Claimed</th></tr></thead><tbody>${rows}</tbody></table>`
 	);
 };
 
 export const buildRarityBotContent = (): string =>
 	buildBotArticle(
-		`<p>Miata Registry rarity scores combine production volume, preservation, age, characteristics, documentation, and mileage modifiers into a 0–100 score.</p>
+		`${buildBotHeading('Rarity Scores')}<p>Miata Registry rarity scores combine production volume, preservation, age, characteristics, documentation, and mileage modifiers into a 0–100 score.</p>
 <p>Production volume contributes up to 50 points (fewer than 100 units = 50 points). Preservation modifiers add points for original paint, tops, wheels, and single ownership. Age adds points per year since release. Factory performance mods, numbered editions, and unique colors add more. Documentation and low mileage provide additional bonuses.</p>`
 	);
 
@@ -233,7 +244,7 @@ export type SiteStats = {
 
 export const buildAboutBotContent = (stats: SiteStats): string =>
 	buildBotArticle(
-		`<p>Miata Registry is a community-driven project documenting limited edition Mazda Miatas.</p>
+		`${buildBotHeading('About the Miata Registry')}<p>Miata Registry is a community-driven project documenting limited edition Mazda Miatas.</p>
 <ul>
 <li>${stats.cars.toLocaleString('en-US')} cars in the registry</li>
 <li>${stats.claimedCars.toLocaleString('en-US')} claimed cars</li>
@@ -274,11 +285,19 @@ export const STATIC_PAGE_META: Record<
 		path: '/',
 		title: 'Miata Registry',
 		description: DEFAULT_DESCRIPTION,
+		botContent: buildStaticBotContent(
+			'Welcome to the Miata Registry',
+			`<p>${escapeHtml(DEFAULT_DESCRIPTION)}</p>`
+		),
 	},
 	'/registry': {
 		path: '/registry',
 		title: 'Cars',
 		description: 'A list of all Mazda Miatas in the Miata Registry.',
+		botContent: buildStaticBotContent(
+			'Browse Cars',
+			'<p>A list of all Mazda Miatas in the Miata Registry.</p>'
+		),
 	},
 	'/registry/editions': {
 		path: '/registry/editions',
@@ -289,6 +308,10 @@ export const STATIC_PAGE_META: Record<
 		path: '/news',
 		title: 'News',
 		description: 'News and updates from the Miata Registry.',
+		botContent: buildStaticBotContent(
+			'Latest Updates',
+			'<p>Stay up to date with the latest announcements and updates from the Registry.</p>'
+		),
 	},
 	'/rarity': {
 		path: '/rarity',
@@ -306,6 +329,10 @@ export const STATIC_PAGE_META: Record<
 		path: '/legal',
 		title: 'Legal',
 		description: 'Terms, privacy, and licensing for Miata Registry.',
+		botContent: buildStaticBotContent(
+			'Legal Information',
+			'<p>Terms, privacy, and licensing for Miata Registry.</p>'
+		),
 	},
 	'/moderation': {
 		path: '/moderation',
