@@ -185,24 +185,28 @@ export const RegistryTable = ({
 										</div>
 									</td>
 									{hasSequence(car.sequence) ? (
-										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40">
-											{car.sequence?.toLocaleString()}
-											{car.edition?.total_produced && (
-												<span className="text-brg-border">
-													of{' '}
-													{car.edition.total_produced.toLocaleString()}
-												</span>
-											)}
+										<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40">
+											<div className="flex items-center justify-between gap-2">
+												{car.sequence?.toLocaleString()}
+												{car.edition?.total_produced && (
+													<span className="text-brg-border">
+														of{' '}
+														{car.edition.total_produced.toLocaleString()}
+													</span>
+												)}
+											</div>
 										</td>
 									) : (
-										<td className="flex justify-between px-4 py-3 whitespace-nowrap font-mono max-w-40 text-brg-border">
-											Unknown{' '}
-											{car.edition?.total_produced && (
-												<span>
-													of{' '}
-													{car.edition.total_produced.toLocaleString()}
-												</span>
-											)}
+										<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40 text-brg-border">
+											<div className="flex items-center justify-between gap-2">
+												Unknown
+												{car.edition?.total_produced && (
+													<span>
+														of{' '}
+														{car.edition.total_produced.toLocaleString()}
+													</span>
+												)}
+											</div>
 										</td>
 									)}
 									<td className="px-4 py-3 whitespace-nowrap">
