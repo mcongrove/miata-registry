@@ -24,7 +24,6 @@ import { getCountryDisplayName } from '../../utils/location';
 import { Select } from '../form/Select';
 import { TextField } from '../form/TextField';
 import { FilterHeader } from './FilterHeader';
-import { FilterRadioGroup } from './FilterRadioGroup';
 
 const getCountries = async () => {
 	const response = await fetch(
@@ -65,8 +64,10 @@ export const FilterSidebar = ({
 
 	const [editionOptions, setEditionOptions] = useState<
 		Array<{
-			name: string;
 			count: number;
+			generation: string;
+			name: string;
+			year: number;
 		}>
 	>([]);
 	const [countries, setCountries] = useState<
@@ -104,6 +105,34 @@ export const FilterSidebar = ({
 		loadEditions();
 	}, []);
 
+	useEffect(() => {
+		if (!editionOptions.length) return;
+
+		const editionName = activeFilters.find((f) => f.type === 'edition')
+			?.value;
+		if (!editionName) return;
+
+		const edition = editionOptions.find((e) => e.name === editionName);
+		if (!edition) return;
+
+		const yearOk =
+			activeFilters.find((f) => f.type === 'year')?.value ===
+			String(edition.year);
+		const genOk =
+			activeFilters.find((f) => f.type === 'generation')?.value ===
+			edition.generation;
+		if (yearOk && genOk) return;
+
+		const next = activeFilters.filter(
+			(f) => f.type !== 'year' && f.type !== 'generation'
+		);
+		next.push(
+			{ type: 'year', value: String(edition.year) },
+			{ type: 'generation', value: edition.generation }
+		);
+		onFiltersChange(next);
+	}, [editionOptions, activeFilters, onFiltersChange]);
+
 	const getActiveValue = (type: TFilterOption['type']) =>
 		activeFilters.find((f) => f.type === type)?.value;
 
@@ -125,6 +154,89 @@ export const FilterSidebar = ({
 	const handleSelectChange = (value: string, type: TFilterOption['type']) => {
 		handleOptionChange({ type, value });
 	};
+
+	const findEdition = (displayName: string) =>
+		editionOptions.find((e) => e.name === displayName);
+
+	const activeYear = getActiveValue('year');
+	const activeGeneration = getActiveValue('generation');
+	const activeEdition = getActiveValue('edition');
+
+	const editionsForYearGen = editionOptions.filter((edition) => {
+		if (activeYear && String(edition.year) !== activeYear) {
+			return false;
+		}
+		if (activeGeneration && edition.generation !== activeGeneration) {
+			return false;
+		}
+		return true;
+	});
+
+	const yearsWithEditions = new Set(
+		editionOptions
+			.filter(
+				(edition) =>
+					!activeGeneration ||
+					edition.generation === activeGeneration
+			)
+			.map((edition) => edition.year)
+	);
+
+	const generationsWithEditions = new Set(
+		editionOptions
+			.filter(
+				(edition) =>
+					!activeYear || String(edition.year) === activeYear
+			)
+			.map((edition) => edition.generation)
+	);
+
+	const handleYearChange = (value: string) => {
+		let next = activeFilters.filter((f) => f.type !== 'year');
+		if (value) {
+			const edition = activeEdition ? findEdition(activeEdition) : null;
+			if (edition && String(edition.year) !== value) {
+				next = next.filter((f) => f.type !== 'edition');
+			}
+			next.push({ type: 'year', value });
+		}
+		onFiltersChange(next);
+	};
+
+	const handleGenerationChange = (value: string) => {
+		let next = activeFilters.filter((f) => f.type !== 'generation');
+		if (value) {
+			const edition = activeEdition ? findEdition(activeEdition) : null;
+			if (edition && edition.generation !== value) {
+				next = next.filter((f) => f.type !== 'edition');
+			}
+			next.push({ type: 'generation', value });
+		}
+		onFiltersChange(next);
+	};
+
+	const handleEditionChange = (value: string) => {
+		let next = activeFilters.filter((f) => f.type !== 'edition');
+		if (!value) {
+			onFiltersChange(next);
+			return;
+		}
+
+		const edition = findEdition(value);
+		next = next.filter(
+			(f) => f.type !== 'year' && f.type !== 'generation'
+		);
+		next.push({ type: 'edition', value });
+		if (edition) {
+			next.push(
+				{ type: 'year', value: String(edition.year) },
+				{ type: 'generation', value: edition.generation }
+			);
+		}
+		onFiltersChange(next);
+	};
+
+	const taxonomyLocked = !!activeEdition;
 
 	useEffect(() => {
 		if (isOpen) {
@@ -208,6 +320,7 @@ export const FilterSidebar = ({
 								title="Year"
 								onClear={() => handleClear('year')}
 								hasActiveFilter={!!getActiveValue('year')}
+								hideClear={taxonomyLocked}
 								id="field-year"
 							/>
 
@@ -215,17 +328,14 @@ export const FilterSidebar = ({
 								<Select
 									id="field-year"
 									value={getActiveValue('year') || ''}
+									disabled={taxonomyLocked}
 									onChange={(
 										e: ChangeEvent<HTMLSelectElement>
-									) =>
-										handleSelectChange(
-											e.target.value,
-											'year'
-										)
-									}
+									) => handleYearChange(e.target.value)}
 									options={years.map((year) => ({
 										value: String(year),
 										label: String(year),
+										disabled: !yearsWithEditions.has(year),
 									}))}
 									placeholder="Select year"
 									className="md:!text-xs"
@@ -238,6 +348,7 @@ export const FilterSidebar = ({
 								title="Generation"
 								onClear={() => handleClear('generation')}
 								hasActiveFilter={!!getActiveValue('generation')}
+								hideClear={taxonomyLocked}
 								id="field-generation"
 							/>
 
@@ -245,18 +356,18 @@ export const FilterSidebar = ({
 								<Select
 									id="field-generation"
 									value={getActiveValue('generation') || ''}
+									disabled={taxonomyLocked}
 									onChange={(
 										e: ChangeEvent<HTMLSelectElement>
-									) =>
-										handleSelectChange(
-											e.target.value,
-											'generation'
-										)
-									}
+									) => handleGenerationChange(e.target.value)}
 									options={['NA', 'NB', 'NC', 'ND'].map(
 										(gen) => ({
 											value: gen,
 											label: gen,
+											disabled:
+												!generationsWithEditions.has(
+													gen
+												),
 										})
 									)}
 									placeholder="Select generation"
@@ -279,17 +390,14 @@ export const FilterSidebar = ({
 									value={getActiveValue('edition') || ''}
 									onChange={(
 										e: ChangeEvent<HTMLSelectElement>
-									) =>
-										handleSelectChange(
-											e.target.value,
-											'edition'
-										)
-									}
-									options={editionOptions.map((edition) => ({
-										value: edition.name,
-										label: edition.name,
-										disabled: edition.count === 0,
-									}))}
+									) => handleEditionChange(e.target.value)}
+									options={editionsForYearGen.map(
+										(edition) => ({
+											value: edition.name,
+											label: edition.name,
+											disabled: edition.count === 0,
+										})
+									)}
 									placeholder="Select edition"
 									className="md:!text-xs"
 								/>
@@ -353,14 +461,38 @@ export const FilterSidebar = ({
 							</div>
 						</div>
 
-						<FilterRadioGroup
-							title="Claim Status"
-							type="claimStatus"
-							options={['Claimed', 'Unclaimed']}
-							activeValue={getActiveValue('claimStatus')}
-							onClear={handleClear}
-							onChange={handleOptionChange}
-						/>
+						<div>
+							<FilterHeader
+								title="Claim Status"
+								onClear={() => handleClear('claimStatus')}
+								hasActiveFilter={!!getActiveValue('claimStatus')}
+								id="field-claim-status"
+							/>
+
+							<div className="p-4 pt-0">
+								<Select
+									id="field-claim-status"
+									value={getActiveValue('claimStatus') || ''}
+									onChange={(
+										e: ChangeEvent<HTMLSelectElement>
+									) =>
+										handleSelectChange(
+											e.target.value,
+											'claimStatus'
+										)
+									}
+									options={[
+										{ value: 'Claimed', label: 'Claimed' },
+										{
+											value: 'Unclaimed',
+											label: 'Unclaimed',
+										},
+									]}
+									placeholder="Any"
+									className="md:!text-xs"
+								/>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

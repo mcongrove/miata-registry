@@ -20,6 +20,7 @@ interface FilterHeaderProps {
 	title: string;
 	onClear: () => void;
 	hasActiveFilter?: boolean;
+	hideClear?: boolean;
 	id?: string;
 }
 
@@ -27,6 +28,7 @@ export const FilterHeader = ({
 	title,
 	onClear,
 	hasActiveFilter,
+	hideClear = false,
 	id,
 }: FilterHeaderProps) => (
 	<div className="flex justify-between items-center p-3">
@@ -34,7 +36,7 @@ export const FilterHeader = ({
 			{title}
 		</label>
 
-		{hasActiveFilter && (
+		{hasActiveFilter && !hideClear && (
 			<button
 				onClick={onClear}
 				className="text-xs text-brg-mid hover:text-red-700"

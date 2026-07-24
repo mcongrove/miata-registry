@@ -27,6 +27,8 @@ const CACHE_TTL = {
 	EDITIONS_NAMES: 60 * 60 * 24 * 7, // 7 days
 };
 
+const EDITIONS_NAMES_CACHE_KEY = 'editions:names:v2';
+
 const editionsRouter = new Hono<{ Bindings: Bindings }>();
 
 editionsRouter.get('/', async (c) => {
@@ -99,7 +101,7 @@ editionsRouter.get('/', async (c) => {
 
 editionsRouter.get('/names', async (c) => {
 	try {
-		const cached = await c.env.CACHE.get('editions:names');
+		const cached = await c.env.CACHE.get(EDITIONS_NAMES_CACHE_KEY);
 
 		if (cached && c.env.NODE_ENV !== 'development') {
 			const response = c.json(JSON.parse(cached));
@@ -113,19 +115,23 @@ editionsRouter.get('/names', async (c) => {
 
 		const editionsWithCounts = await db
 			.select({
+				count: sql<number>`COUNT(${Cars.id})`.as('count'),
+				generation: Editions.generation,
 				id: Editions.id,
 				name: sql<string>`CONCAT(${Editions.year}, ' ', ${Editions.name})`.as(
 					'name'
 				),
-				count: sql<number>`COUNT(${Cars.id})`.as('count'),
+				year: Editions.year,
 			})
 			.from(Editions)
 			.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
 			.orderBy(asc(Editions.year), asc(Editions.name))
-			.groupBy(sql`${Editions.id}, ${Editions.year}, ${Editions.name}`);
+			.groupBy(
+				sql`${Editions.id}, ${Editions.year}, ${Editions.name}, ${Editions.generation}`
+			);
 
 		await c.env.CACHE.put(
-			'editions:names',
+			EDITIONS_NAMES_CACHE_KEY,
 			JSON.stringify(editionsWithCounts),
 			{
 				expirationTtl: CACHE_TTL.EDITIONS_NAMES,
