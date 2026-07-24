@@ -56,7 +56,7 @@ export default function Legal() {
 				This is a transactional email sent in response to your request
 				with Miata Registry. As it contains important information about
 				your account, it cannot be unsubscribed from. For questions
-				about your account, please contact{' '}
+				{`about your account, please contact `}
 				<Link
 					href="mailto:support@miataregistry.com"
 					className="text-brg-border underline"
@@ -67,7 +67,7 @@ export default function Legal() {
 
 			<Text className="text-xs text-brg-border text-center">
 				To report suspicious emails claiming to be from Miata Registry,
-				please forward them to{' '}
+				{`please forward them to `}
 				<Link
 					href="mailto:security@miataregistry.com"
 					className="text-brg-border underline"
@@ -78,7 +78,7 @@ export default function Legal() {
 
 			<Text className="text-xs text-brg-border text-center">
 				© {new Date().getFullYear()} Matthew Congrove. All rights
-				reserved.{' '}
+				{`reserved. `}
 				<Link
 					href="https://miataregistry.com/legal"
 					className="text-brg-border underline"

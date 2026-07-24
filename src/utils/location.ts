@@ -43,16 +43,6 @@ export const formatLocation = (
 	return parts.join(', ');
 };
 
-export const parseLocation = (location: string): TLocation => {
-	const parts = location.split(', ');
-
-	return {
-		city: parts[0],
-		state: parts[1],
-		country: parts[2],
-	};
-};
-
 export const countryNameToCode = (country: string): string => {
 	switch (country) {
 		case 'UNITED STATES':
@@ -570,6 +560,226 @@ export const States = {
 	WY: { name: 'Wyoming', latitude: 43.075968, longitude: -107.290284 },
 	YT: { name: 'Yukon', latitude: 63, longitude: -135 },
 } as const;
+
+const CA_PROVINCE_CODES = new Set([
+	'AB',
+	'BC',
+	'MB',
+	'NB',
+	'NL',
+	'NS',
+	'NT',
+	'NU',
+	'ON',
+	'PE',
+	'QC',
+	'SK',
+	'YT',
+]);
+
+const STATE_NAME_TO_CODE = Object.fromEntries(
+	Object.entries(States).map(([code, data]) => [
+		data.name.toLowerCase(),
+		code,
+	])
+);
+
+const COUNTRY_NAME_TO_CODE = Object.fromEntries(
+	Object.entries(Countries).map(([code, data]) => [
+		data.name.toLowerCase(),
+		code,
+	])
+);
+
+const lookupStateCode = (value: string): string | undefined => {
+	const trimmed = value.trim();
+
+	if (!trimmed) {
+		return undefined;
+	}
+
+	const upper = trimmed.toUpperCase();
+
+	if (upper in States) {
+		return upper;
+	}
+
+	return STATE_NAME_TO_CODE[trimmed.toLowerCase()];
+};
+
+const lookupCountryCode = (value: string): string | undefined => {
+	const trimmed = value.trim();
+
+	if (!trimmed) {
+		return undefined;
+	}
+
+	const upper = trimmed.toUpperCase();
+
+	if (upper in Countries) {
+		return upper;
+	}
+
+	const alias = COUNTRY_CODE_ALIASES[upper];
+
+	if (alias) {
+		return alias;
+	}
+
+	const fromNhtsa = countryNameToCode(upper);
+
+	if (fromNhtsa) {
+		return fromNhtsa;
+	}
+
+	if (upper === 'USA') {
+		return 'US';
+	}
+
+	const fromName = COUNTRY_NAME_TO_CODE[trimmed.toLowerCase()];
+
+	if (fromName) {
+		return fromName;
+	}
+
+	return undefined;
+};
+
+const splitLocationInput = (location: string): string[] =>
+	location
+		.split(/,\s*/)
+		.map((part) => part.trim())
+		.filter(Boolean);
+
+export const normalizeLocation = (location: TLocation): TLocation => {
+	const city = location.city?.trim() || undefined;
+	let state = location.state?.trim() || undefined;
+	let country = location.country?.trim() || undefined;
+
+	if (country) {
+		country = lookupCountryCode(country) ?? country;
+	}
+
+	if (state) {
+		state = lookupStateCode(state);
+	}
+
+	if (state && !(state in States)) {
+		state = undefined;
+	}
+
+	if (!country && state) {
+		country = CA_PROVINCE_CODES.has(state) ? 'CA' : 'US';
+	}
+
+	if (country && country !== 'US' && country !== 'CA') {
+		state = undefined;
+	}
+
+	return {
+		city,
+		state,
+		country: country ?? '',
+	};
+};
+
+export const ownerLocationFromClaimBody = (body: {
+	owner_city?: string | null;
+	owner_country?: string | null;
+	owner_state?: string | null;
+}) =>
+	normalizeLocation({
+		city: body.owner_city || '',
+		country: body.owner_country || '',
+		state: body.owner_state || '',
+	});
+
+export const parseLocation = (location: string): TLocation => {
+	const trimmed = location.trim();
+
+	if (!trimmed) {
+		return { country: '' };
+	}
+
+	const parts = splitLocationInput(trimmed);
+
+	if (parts.length === 1) {
+		return normalizeLocation({ city: parts[0], country: '' });
+	}
+
+	if (parts.length === 2) {
+		const asState = lookupStateCode(parts[1]);
+
+		if (asState) {
+			return normalizeLocation({
+				city: parts[0],
+				state: asState,
+				country: '',
+			});
+		}
+
+		const asCountry = lookupCountryCode(parts[1]);
+
+		if (asCountry) {
+			return normalizeLocation({
+				city: parts[0],
+				country: asCountry,
+			});
+		}
+
+		return normalizeLocation({
+			city: parts[0],
+			country: '',
+		});
+	}
+
+	const countryPart = parts[parts.length - 1];
+	const statePart = parts[parts.length - 2];
+	const cityPart = parts.slice(0, -2).join(', ');
+
+	return normalizeLocation({
+		city: cityPart,
+		state: statePart,
+		country: countryPart,
+	});
+};
+
+type TAddressComponent = {
+	long_name: string;
+	short_name: string;
+	types: string[];
+};
+
+export const locationFromAddressComponents = (
+	components: TAddressComponent[]
+): TLocation => {
+	const cityTypes = new Set([
+		'locality',
+		'postal_town',
+		'administrative_area_level_2',
+	]);
+	let city: string | undefined;
+	let state: string | undefined;
+	let country: string | undefined;
+
+	for (const component of components) {
+		const types = component.types;
+
+		if (!city && types.some((type) => cityTypes.has(type))) {
+			city = component.long_name;
+		} else if (types.includes('administrative_area_level_1')) {
+			state = component.short_name;
+		} else if (types.includes('country')) {
+			country = component.short_name;
+		}
+	}
+
+	return normalizeLocation({
+		city,
+		state,
+		country: country ?? '',
+	});
+};
 
 export const country = (country: string) =>
 	Countries[country as keyof typeof Countries] || null;

@@ -89,9 +89,7 @@ export const Welcome = () => {
 								</Text>
 
 								<Text>
-									If you have any questions or need
-									assistance, don't hesitate to reach out to
-									our team at{' '}
+									{`If you have any questions or need assistance, don't hesitate to reach out to our team at `}
 									<Link
 										href="mailto:support@miataregistry.com"
 										className="text-brg underline"

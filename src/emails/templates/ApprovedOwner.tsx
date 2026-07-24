@@ -67,9 +67,8 @@ export const ApprovedOwner = ({ car_id }: { car_id?: string }) => {
 								{link ? (
 									<>
 										<Text>
-											These updates are now live in our
-											registry at{' '}
-											<Link href={link}>{link}</Link>
+											{`These updates are now live in our registry at `}
+											<Link href={link}>{link}</Link>.
 										</Text>
 
 										<Text>
@@ -88,9 +87,7 @@ export const ApprovedOwner = ({ car_id }: { car_id?: string }) => {
 								)}
 
 								<Text>
-									If you have any questions about the changes
-									or need to make additional updates, please
-									don't hesitate to reach out to our team at{' '}
+									{`If you have any questions about the changes or need to make additional updates, please don't hesitate to reach out to our team at `}
 									<Link
 										href="mailto:support@miataregistry.com"
 										className="text-brg underline"

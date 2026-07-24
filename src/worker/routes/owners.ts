@@ -26,6 +26,7 @@ import {
 	Editions,
 	Owners,
 } from '../../db/schema';
+import { normalizeLocation } from '../../utils/location';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -249,6 +250,10 @@ ownersRouter.patch('/:id', withAuth(), async (c) => {
 		const userId = c.get('userId');
 		const ownerUserId = c.req.param('id');
 		const body = await c.req.json();
+
+		if (body.location) {
+			body.location = normalizeLocation(body.location);
+		}
 
 		if (userId !== ownerUserId) {
 			return c.json(

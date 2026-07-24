@@ -30,6 +30,7 @@ import {
 	Tips,
 } from '../../db/schema';
 import { parseSequence } from '../../utils/car';
+import { ownerLocationFromClaimBody } from '../../utils/location';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -77,16 +78,31 @@ claimsRouter.post('/existing', withAuth(), async (c) => {
 
 			ownerId = crypto.randomUUID();
 
+			const ownerLocation = ownerLocationFromClaimBody(body);
+
 			await db.insert(OwnersPending).values({
-				city: body.owner_city || null,
-				country: body.owner_country || null,
+				city: ownerLocation.city || null,
+				country: ownerLocation.country || null,
 				created_at: Math.floor(Date.now() / 1000),
 				id: ownerId,
 				name: body.owner_name,
-				state: body.owner_state || null,
+				state: ownerLocation.state || null,
 				status: 'pending',
 				user_id: userId,
 			});
+		} else {
+			const ownerLocation = ownerLocationFromClaimBody(body);
+
+			await db
+				.update(Owners)
+				.set({
+					city: ownerLocation.city || null,
+					country: ownerLocation.country || null,
+					state: ownerLocation.state || null,
+				})
+				.where(
+					and(eq(Owners.id, ownerId), eq(Owners.user_id, userId))
+				);
 		}
 
 		await db.insert(CarOwnersPending).values({
@@ -180,16 +196,31 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 
 			ownerId = crypto.randomUUID();
 
+			const ownerLocation = ownerLocationFromClaimBody(body);
+
 			await db.insert(OwnersPending).values({
-				city: body.owner_city || null,
-				country: body.owner_country || null,
+				city: ownerLocation.city || null,
+				country: ownerLocation.country || null,
 				created_at: Math.floor(Date.now() / 1000),
 				id: ownerId,
 				name: body.owner_name,
-				state: body.owner_state || null,
+				state: ownerLocation.state || null,
 				status: 'pending',
 				user_id: userId,
 			});
+		} else {
+			const ownerLocation = ownerLocationFromClaimBody(body);
+
+			await db
+				.update(Owners)
+				.set({
+					city: ownerLocation.city || null,
+					country: ownerLocation.country || null,
+					state: ownerLocation.state || null,
+				})
+				.where(
+					and(eq(Owners.id, ownerId), eq(Owners.user_id, userId))
+				);
 		}
 
 		await db.insert(CarOwnersPending).values({

@@ -19,7 +19,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { mapsEnabled } from '../../context/GoogleMapsContext';
-import { TAddress } from '../../types/Location';
+import { locationFromAddressComponents } from '../../utils/location';
 
 interface LocationProps {
 	className?: string;
@@ -75,31 +75,14 @@ export function Location({
 			if (fullAddress) {
 				formattedLocation = place.formatted_address || '';
 			} else {
-				const components = place.address_components;
-				const location: TAddress = { country: '' };
-
-				components.forEach((component) => {
-					const types = component.types;
-
-					if (types.includes('street_number')) {
-						location.streetNumber = component.long_name;
-					} else if (types.includes('route')) {
-						location.street = component.long_name;
-					} else if (types.includes('locality')) {
-						location.city = component.long_name;
-					} else if (types.includes('administrative_area_level_1')) {
-						location.state = component.short_name;
-					} else if (types.includes('country')) {
-						location.country = component.short_name;
-					} else if (types.includes('postal_code')) {
-						location.postalCode = component.long_name;
-					}
-				});
+				const parsed = locationFromAddressComponents(
+					place.address_components
+				);
 
 				formattedLocation = [
-					location.city,
-					location.state,
-					location.country,
+					parsed.city,
+					parsed.state,
+					parsed.country,
 				]
 					.filter(Boolean)
 					.join(', ');

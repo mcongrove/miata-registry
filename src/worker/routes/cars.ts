@@ -28,6 +28,7 @@ import {
 	Editions,
 	Owners,
 } from '../../db/schema';
+import { normalizeLocation } from '../../utils/location';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -500,6 +501,17 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		}
 
 		const body = await c.req.json();
+
+		if (body.shipping_location) {
+			body.shipping_location = normalizeLocation(body.shipping_location);
+		}
+
+		if (body.sale_dealer_location) {
+			body.sale_dealer_location = normalizeLocation(
+				body.sale_dealer_location
+			);
+		}
+
 		const accessConditions = [
 			eq(Cars.id, id),
 			eq(Owners.user_id, userId),

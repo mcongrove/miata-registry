@@ -28,7 +28,7 @@ import { Modal } from '../components/Modal';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
 import { handleApiError } from '../utils/common';
-import { formatLocation, parseLocation } from '../utils/location';
+import { formatLocation, normalizeLocation, parseLocation } from '../utils/location';
 import { parseMileageInput, convertMileageDisplay, TMileageUnit } from '../utils/car';
 
 interface CarEditProps {
@@ -542,11 +542,13 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 								id="shipping_location"
 								name="shipping_location"
 								placeholder="Enter a location"
-								value={formatLocation({
-									city: car.shipping_city,
-									state: car.shipping_state,
-									country: car.shipping_country || '',
-								})}
+								value={formatLocation(
+									normalizeLocation({
+										city: car.shipping_city,
+										state: car.shipping_state,
+										country: car.shipping_country || '',
+									})
+								)}
 							/>
 						</Field>
 					</div>
@@ -636,11 +638,13 @@ export function CarEdit({ isOpen, onClose, props }: CarEditProps) {
 								id="sale_dealer_location"
 								name="sale_dealer_location"
 								placeholder="Enter a location"
-								value={formatLocation({
-									city: car.sale_dealer_city,
-									state: car.sale_dealer_state,
-									country: car.sale_dealer_country || '',
-								})}
+								value={formatLocation(
+									normalizeLocation({
+										city: car.sale_dealer_city,
+										state: car.sale_dealer_state,
+										country: car.sale_dealer_country || '',
+									})
+								)}
 							/>
 						</Field>
 					</div>

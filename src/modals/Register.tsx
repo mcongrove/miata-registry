@@ -37,7 +37,11 @@ import {
 	VIN_VALIDATION_MESSAGE,
 } from '../utils/car';
 import { handleApiError } from '../utils/common';
-import { formatLocation, parseLocation } from '../utils/location';
+import {
+	formatLocation,
+	normalizeLocation,
+	parseLocation,
+} from '../utils/location';
 
 interface RegisterProps {
 	isOpen: boolean;
@@ -600,17 +604,19 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 									required
 									value={
 										existingOwner
-											? formatLocation({
-													city:
-														existingOwner.city ||
-														'',
-													state:
-														existingOwner.state ||
-														'',
-													country:
-														existingOwner.country ||
-														'',
-												})
+											? formatLocation(
+													normalizeLocation({
+														city:
+															existingOwner.city ||
+															'',
+														state:
+															existingOwner.state ||
+															'',
+														country:
+															existingOwner.country ||
+															'',
+													})
+												)
 											: undefined
 									}
 								/>
