@@ -17,7 +17,7 @@
  */
 
 import { and, count, eq, sql } from 'drizzle-orm';
-import { Context, Hono, Next } from 'hono';
+import { Hono } from 'hono';
 import { Resend } from 'resend';
 import { createDb } from '../../db';
 import { invalidateSeoCaches } from '../../seo/cache';
@@ -33,23 +33,11 @@ import ApprovedCar from '../../emails/templates/ApprovedCar';
 import ApprovedOwner from '../../emails/templates/ApprovedOwner';
 import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
+import { withModerator } from '../middleware/moderator';
 import { Bindings } from '../types';
 import { renderEmail } from '../utils/renderEmail';
 
 const moderationRouter = new Hono<{ Bindings: Bindings }>();
-
-const withModerator = () => async (c: Context<{ Bindings: Bindings }>, next: Next) => {
-	const isModerator = await c
-		.get('clerk')
-		.users.getUser(c.get('userId'))
-		.then((user) => user.publicMetadata?.moderator);
-
-	if (!isModerator) {
-		return c.json({ error: 'Unauthorized' }, 403);
-	}
-
-	await next();
-};
 
 moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 	try {

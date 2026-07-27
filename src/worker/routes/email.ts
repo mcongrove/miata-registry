@@ -20,6 +20,7 @@ import { Hono } from 'hono';
 import { Resend } from 'resend';
 import Single from '../../emails/templates/Single';
 import { withAuth } from '../middleware/auth';
+import { withModerator } from '../middleware/moderator';
 import type { Bindings } from '../types';
 import { renderEmail } from '../utils/renderEmail';
 
@@ -97,7 +98,7 @@ emailRouter.post('/contact', async (c) => {
 // 	}
 // });
 
-emailRouter.post('/send', withAuth(), async (c) => {
+emailRouter.post('/send', withAuth(), withModerator(), async (c) => {
 	try {
 		const resend = new Resend(c.env.RESEND_API_KEY);
 		const { to, subject, message } = await c.req.json();

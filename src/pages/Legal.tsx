@@ -17,12 +17,14 @@
  */
 
 import { usePageMeta } from '../hooks/usePageMeta';
+import { AGPL_LICENSE_URL } from '../constants/repo';
 
 export const Legal = () => {
 	usePageMeta({
 		path: '/legal',
 		title: 'Legal Information',
-		description: 'Legal information for the Miata Registry.',
+		description:
+			'License, terms of use, and privacy policy for the Miata Registry.',
 	});
 
 	return (
@@ -41,7 +43,7 @@ export const Legal = () => {
 							available under the same license terms.
 						</p>
 						<a
-							href="https://www.gnu.org/licenses/agpl-3.0.en.html"
+							href={AGPL_LICENSE_URL}
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -62,9 +64,118 @@ export const Legal = () => {
 					<hr />
 
 					<section>
+						<h2>Terms of Use</h2>
+
+						<p>Last updated: July 27, 2026</p>
+						<p>
+							These Terms of Use govern Your access to and use of
+							the Miata Registry (the &quot;Service&quot;). By
+							accessing or using the Service, You agree to be
+							bound by these Terms. If You do not agree, do not
+							use the Service. In these Terms, &quot;We&quot;,
+							&quot;Us&quot; and &quot;Our&quot; refer to Miata
+							Registry.
+						</p>
+						<h3>The Service</h3>
+						<p>
+							The Service is a free, community-maintained registry
+							of limited edition Mazda Miatas. The information in
+							the registry is largely submitted by members of the
+							community, and while submissions are reviewed by
+							moderators before publication, We do not guarantee
+							the accuracy, completeness, or availability of the
+							Service or of any information it contains.
+						</p>
+						<h3>Accounts</h3>
+						<p>
+							You must provide accurate information when creating
+							an account and are responsible for all activity that
+							occurs under it. We may suspend or terminate
+							accounts that violate these Terms.
+						</p>
+						<h3>Your Submissions</h3>
+						<p>
+							You retain ownership of the content You submit to
+							the Service, including photos, car histories,
+							ownership details, and tips. By submitting content,
+							You:
+						</p>
+						<ul>
+							<li>
+								grant Us a worldwide, non-exclusive,
+								royalty-free, perpetual, irrevocable license to
+								host, reproduce, display, and distribute that
+								content as part of the Service and its open
+								dataset, including distribution under the
+								AGPL-3.0 license and archival with third parties
+								such as the Internet Archive; and
+							</li>
+							<li>
+								represent that You have the necessary rights to
+								submit the content and that it is accurate to
+								the best of Your knowledge.
+							</li>
+						</ul>
+						<p>
+							All submissions are subject to moderation. We may
+							edit, reject, or remove any submission at Our sole
+							discretion.
+						</p>
+						<h3>Acceptable Use</h3>
+						<p>You agree not to:</p>
+						<ul>
+							<li>
+								submit false, misleading, or infringing content;
+							</li>
+							<li>use the Service for any unlawful purpose;</li>
+							<li>
+								interfere with or disrupt the operation of the
+								Service; or
+							</li>
+							<li>
+								collect personal information about other users
+								except as made available through the Service's
+								public registry and open dataset.
+							</li>
+						</ul>
+						<h3>
+							Disclaimer of Warranties; Limitation of Liability
+						</h3>
+						<p>
+							The Service is provided &quot;as is&quot; and
+							&quot;as available&quot;, without warranties of any
+							kind, express or implied, including warranties of
+							merchantability, fitness for a particular purpose,
+							and non-infringement. To the maximum extent
+							permitted by law, We will not be liable for any
+							indirect, incidental, special, consequential, or
+							punitive damages arising out of Your use of the
+							Service, and Our total liability for any claim will
+							not exceed the amount You have paid Us to use the
+							Service (which is zero).
+						</p>
+						<h3>Governing Law</h3>
+						<p>
+							These Terms are governed by the laws of the State of
+							Texas, United States, without regard to its conflict
+							of law provisions.
+						</p>
+						<h3>Changes to These Terms</h3>
+						<p>
+							We may update these Terms from time to time by
+							posting the revised Terms on this page and updating
+							the &quot;Last updated&quot; date above. Your
+							continued use of the Service after changes are
+							posted constitutes acceptance of the revised Terms.
+						</p>
+					</section>
+
+					<hr />
+
+					<section>
 						<h2>Privacy Policy</h2>
 
-						<p>Last updated: December 24, 2024</p>
+						<p>Last updated: July 27, 2026</p>
 						<p>
 							This Privacy Policy describes Our policies and
 							procedures on the collection, use and disclosure of
@@ -95,27 +206,6 @@ export const Legal = () => {
 									<strong>Account</strong> means a unique
 									account created for You to access our
 									Service or parts of our Service.
-								</p>
-							</li>
-							<li>
-								<p>
-									<strong>Affiliate</strong> means an entity
-									that controls, is controlled by or is under
-									common control with a party, where
-									&quot;control&quot; means ownership of 50%
-									or more of the shares, equity interest or
-									other securities entitled to vote for
-									election of directors or other managing
-									authority.
-								</p>
-							</li>
-							<li>
-								<p>
-									<strong>Company</strong> (referred to as
-									either &quot;the Company&quot;,
-									&quot;We&quot;, &quot;Us&quot; or
-									&quot;Our&quot; in this Agreement) refers to
-									Miata Registry.
 								</p>
 							</li>
 							<li>
@@ -157,12 +247,11 @@ export const Legal = () => {
 								<p>
 									<strong>Service Provider</strong> means any
 									natural or legal person who processes the
-									data on behalf of the Company. It refers to
-									third-party companies or individuals
-									employed by the Company to facilitate the
-									Service, to provide the Service on behalf of
-									the Company, to perform services related to
-									the Service or to assist the Company in
+									data on Our behalf. It refers to third-party
+									companies or individuals employed by Us to
+									facilitate the Service, to provide the
+									Service on Our behalf, to perform services
+									related to the Service or to assist Us in
 									analyzing how the Service is used.
 								</p>
 							</li>
@@ -173,6 +262,13 @@ export const Legal = () => {
 									the use of the Service or from the Service
 									infrastructure itself (for example, the
 									duration of a page visit).
+								</p>
+							</li>
+							<li>
+								<p>
+									<strong>We</strong>, <strong>Us</strong> or{' '}
+									<strong>Our</strong> refers to Miata
+									Registry.
 								</p>
 							</li>
 							<li>
@@ -216,7 +312,16 @@ export const Legal = () => {
 								<p>First name and last name</p>
 							</li>
 							<li>
-								<p>Address, State, Province, City</p>
+								<p>City, State or Province, and Country</p>
+							</li>
+							<li>
+								<p>Social media links You choose to share</p>
+							</li>
+							<li>
+								<p>
+									Information about Your vehicle, including
+									its VIN and ownership history
+								</p>
 							</li>
 							<li>
 								<p>Usage Data</p>
@@ -225,7 +330,9 @@ export const Legal = () => {
 						<h4>Usage Data</h4>
 						<p>
 							Usage Data is collected automatically when using the
-							Service.
+							Service, primarily by Our hosting provider,
+							Cloudflare, as part of the network traffic logs it
+							keeps in order to operate and secure the Service.
 						</p>
 						<p>
 							Usage Data may include information such as Your
@@ -250,115 +357,36 @@ export const Legal = () => {
 							sends whenever You visit our Service or when You
 							access the Service by or through a mobile device.
 						</p>
-						<h4>Tracking Technologies and Cookies</h4>
+						<h4>Information About Others</h4>
 						<p>
-							We use Cookies and similar tracking technologies to
-							track the activity on Our Service and store certain
-							information. Tracking technologies used are beacons,
-							tags, and scripts to collect and track information
-							and to improve and analyze Our Service. The
-							technologies We use may include:
+							The Service allows anyone, with or without an
+							account, to submit tips about limited edition
+							Miatas. Tips may include information about people
+							other than the person submitting them, such as the
+							name and general location of a car's owner. Tips are
+							reviewed by moderators before any information is
+							added to the public registry. If You believe someone
+							has submitted information about You and would like
+							it corrected or removed, please contact Us.
 						</p>
-						<ul>
-							<li>
-								<strong>Cookies or Browser Cookies.</strong> A
-								cookie is a small file placed on Your Device.
-								You can instruct Your browser to refuse all
-								Cookies or to indicate when a Cookie is being
-								sent. However, if You do not accept Cookies, You
-								may not be able to use some parts of our
-								Service. Unless you have adjusted Your browser
-								setting so that it will refuse Cookies, our
-								Service may use Cookies.
-							</li>
-							<li>
-								<strong>Web Beacons.</strong> Certain sections
-								of our Service and our emails may contain small
-								electronic files known as web beacons (also
-								referred to as clear gifs, pixel tags, and
-								single-pixel gifs) that permit the Company, for
-								example, to count users who have visited those
-								pages or opened an email and for other related
-								website statistics (for example, recording the
-								popularity of a certain section and verifying
-								system and server integrity).
-							</li>
-						</ul>
+						<h4>Cookies</h4>
 						<p>
-							Cookies can be &quot;Persistent&quot; or
-							&quot;Session&quot; Cookies. Persistent Cookies
-							remain on Your personal computer or mobile device
-							when You go offline, while Session Cookies are
-							deleted as soon as You close Your web browser.
+							We do not use analytics services, advertising
+							trackers, or web beacons. The only cookies used by
+							the Service are essential authentication cookies set
+							by Our authentication provider, Clerk, to keep You
+							signed in and to prevent fraudulent use of Your
+							account. Without these cookies, signed-in features
+							of the Service cannot be provided.
 						</p>
 						<p>
-							We use both Session and Persistent Cookies for the
-							purposes set out below:
-						</p>
-						<ul>
-							<li>
-								<p>
-									<strong>
-										Necessary / Essential Cookies
-									</strong>
-								</p>
-								<p>Type: Session Cookies</p>
-								<p>Administered by: Us</p>
-								<p>
-									Purpose: These Cookies are essential to
-									provide You with services available through
-									the Website and to enable You to use some of
-									its features. They help to authenticate
-									users and prevent fraudulent use of user
-									accounts. Without these Cookies, the
-									services that You have asked for cannot be
-									provided, and We only use these Cookies to
-									provide You with those services.
-								</p>
-							</li>
-							<li>
-								<p>
-									<strong>
-										Cookies Policy / Notice Acceptance
-										Cookies
-									</strong>
-								</p>
-								<p>Type: Persistent Cookies</p>
-								<p>Administered by: Us</p>
-								<p>
-									Purpose: These Cookies identify if users
-									have accepted the use of cookies on the
-									Website.
-								</p>
-							</li>
-							<li>
-								<p>
-									<strong>Functionality Cookies</strong>
-								</p>
-								<p>Type: Persistent Cookies</p>
-								<p>Administered by: Us</p>
-								<p>
-									Purpose: These Cookies allow us to remember
-									choices You make when You use the Website,
-									such as remembering your login details or
-									language preference. The purpose of these
-									Cookies is to provide You with a more
-									personal experience and to avoid You having
-									to re-enter your preferences every time You
-									use the Website.
-								</p>
-							</li>
-						</ul>
-						<p>
-							For more information about the cookies we use and
-							your choices regarding cookies, please visit our
-							Cookies Policy or the Cookies section of our Privacy
-							Policy.
+							Third-party content embedded in the Service, such as
+							Google Maps, may set its own cookies, which are
+							governed by those providers' privacy policies.
 						</p>
 						<h3>Use of Your Personal Data</h3>
 						<p>
-							The Company may use Personal Data for the following
-							purposes:
+							We may use Personal Data for the following purposes:
 						</p>
 						<ul>
 							<li>
@@ -382,37 +410,19 @@ export const Legal = () => {
 							</li>
 							<li>
 								<p>
-									<strong>
-										For the performance of a contract:
-									</strong>{' '}
-									the development, compliance and undertaking
-									of the purchase contract for the products,
-									items or services You have purchased or of
-									any other contract with Us through the
-									Service.
-								</p>
-							</li>
-							<li>
-								<p>
 									<strong>To contact You:</strong> To contact
-									You by email, telephone calls, SMS, or other
-									equivalent forms of electronic
-									communication, such as a mobile
-									application's push notifications regarding
-									updates or informative communications
-									related to the functionalities, products or
-									contracted services, including the security
-									updates, when necessary or reasonable for
-									their implementation.
+									You by email regarding updates or
+									informative communications related to the
+									Service, including security updates, when
+									necessary or reasonable for their
+									implementation.
 								</p>
 							</li>
 							<li>
 								<p>
-									<strong>To provide You</strong> with news,
-									special offers and general information about
-									other goods, services and events which we
-									offer that are similar to those that you
-									have already purchased or enquired about
+									<strong>To provide You</strong> with news
+									and general information about the Service,
+									the registry, and related community events,
 									unless You have opted not to receive such
 									information.
 								</p>
@@ -442,10 +452,8 @@ export const Legal = () => {
 									<strong>For other purposes</strong>: We may
 									use Your information for other purposes,
 									such as data analysis, identifying usage
-									trends, determining the effectiveness of our
-									promotional campaigns and to evaluate and
-									improve our Service, products, services,
-									marketing and your experience.
+									trends, and evaluating and improving our
+									Service and your experience.
 								</p>
 							</li>
 						</ul>
@@ -457,39 +465,34 @@ export const Legal = () => {
 							<li>
 								<strong>With Service Providers:</strong> We may
 								share Your personal information with Service
-								Providers to monitor and analyze the use of our
-								Service, to contact You.
+								Providers to operate the Service and to contact
+								You. The Service Providers We currently use are
+								Clerk (authentication and account management),
+								Resend (email delivery), Cloudflare (hosting,
+								database, and image storage), Google (maps,
+								location autocomplete, and fonts), Font Awesome
+								(icons), and the Internet Archive (public
+								dataset archival, described below). When You
+								look up a VIN, Your browser also sends that VIN
+								directly to the U.S. National Highway Traffic
+								Safety Administration's vehicle database.
 							</li>
 							<li>
 								<strong>For business transfers:</strong> We may
 								share or transfer Your personal information in
 								connection with, or during negotiations of, any
-								merger, sale of Company assets, financing, or
+								merger, sale of Our assets, financing, or
 								acquisition of all or a portion of Our business
 								to another company.
 							</li>
 							<li>
-								<strong>With Affiliates:</strong> We may share
-								Your information with Our affiliates, in which
-								case we will require those affiliates to honor
-								this Privacy Policy. Affiliates include Our
-								parent company and any other subsidiaries, joint
-								venture partners or other companies that We
-								control or that are under common control with
-								Us.
-							</li>
-							<li>
-								<strong>With business partners:</strong> We may
-								share Your information with Our business
-								partners to offer You certain products, services
-								or promotions.
-							</li>
-							<li>
-								<strong>With other users:</strong> when You
-								share personal information or otherwise interact
-								in the public areas with other users, such
-								information may be viewed by all users and may
-								be publicly distributed outside.
+								<strong>With other users:</strong> the registry
+								is public. When Your car is added to the
+								registry, Your name, general location (city,
+								state or province, and country), ownership
+								history, and any social media links You choose
+								to share are displayed publicly on the Service
+								and included in Our public dataset.
 							</li>
 							<li>
 								<strong>With Your consent</strong>: We may
@@ -497,37 +500,63 @@ export const Legal = () => {
 								purpose with Your consent.
 							</li>
 						</ul>
-						<h3>Retention of Your Personal Data</h3>
+						<h3>Open Data and the Internet Archive</h3>
 						<p>
-							The Company will retain Your Personal Data only for
-							as long as is necessary for the purposes set out in
-							this Privacy Policy. We will retain and use Your
-							Personal Data to the extent necessary to comply with
-							our legal obligations (for example, if we are
-							required to retain your data to comply with
-							applicable laws), resolve disputes, and enforce our
-							legal agreements and policies.
+							The registry is, by design, a public dataset.
+							Information displayed publicly on the Service —
+							including car details, VINs, ownership history,
+							owner names, general locations, and social media
+							links — is also published as an open dataset under
+							the AGPL-3.0 license.
 						</p>
 						<p>
-							The Company will also retain Usage Data for internal
-							analysis purposes. Usage Data is generally retained
-							for a shorter period of time, except when this data
-							is used to strengthen the security or to improve the
+							Once a week, We export the registry data and upload
+							it to the Internet Archive (archive.org), where it
+							is publicly downloadable. This export contains only
+							data that is already publicly visible on the
+							Service; it does not include email addresses,
+							account credentials, or submissions awaiting
+							moderation. Because the Internet Archive is an
+							independent organization whose archives are designed
+							to be permanent, We cannot modify or delete copies
+							of the dataset that have already been archived.
+						</p>
+						<h3>Retention of Your Personal Data</h3>
+						<p>
+							We will retain Your Personal Data only for as long
+							as is necessary for the purposes set out in this
+							Privacy Policy. We will retain and use Your Personal
+							Data to the extent necessary to comply with our
+							legal obligations (for example, if we are required
+							to retain your data to comply with applicable laws),
+							resolve disputes, and enforce our legal agreements
+							and policies.
+						</p>
+						<p>
+							We will also retain Usage Data for internal analysis
+							purposes. Usage Data is generally retained for a
+							shorter period of time, except when this data is
+							used to strengthen the security or to improve the
 							functionality of Our Service, or We are legally
 							obligated to retain this data for longer time
 							periods.
 						</p>
+						<p>
+							Data included in Our public dataset may persist
+							indefinitely in third-party archives, as described
+							in the Open Data section above.
+						</p>
 						<h3>Transfer of Your Personal Data</h3>
 						<p>
 							Your information, including Personal Data, is
-							processed at the Company's operating offices and in
-							any other places where the parties involved in the
-							processing are located. It means that this
-							information may be transferred to — and maintained
-							on — computers located outside of Your state,
-							province, country or other governmental jurisdiction
-							where the data protection laws may differ than those
-							from Your jurisdiction.
+							processed at Our operating offices and in any other
+							places where the parties involved in the processing
+							are located. It means that this information may be
+							transferred to — and maintained on — computers
+							located outside of Your state, province, country or
+							other governmental jurisdiction where the data
+							protection laws may differ than those from Your
+							jurisdiction.
 						</p>
 						<p>
 							Your consent to this Privacy Policy followed by Your
@@ -535,8 +564,8 @@ export const Legal = () => {
 							agreement to that transfer.
 						</p>
 						<p>
-							The Company will take all steps reasonably necessary
-							to ensure that Your data is treated securely and in
+							We will take all steps reasonably necessary to
+							ensure that Your data is treated securely and in
 							accordance with this Privacy Policy and no transfer
 							of Your Personal Data will take place to an
 							organization or a country unless there are adequate
@@ -545,57 +574,53 @@ export const Legal = () => {
 						</p>
 						<h3>Delete Your Personal Data</h3>
 						<p>
-							You have the right to delete or request that We
-							assist in deleting the Personal Data that We have
-							collected about You.
+							You may update Your account information, general
+							location, and social media links at any time through
+							the account settings section of the Service, and You
+							may delete Your Account entirely from the same
+							place.
 						</p>
 						<p>
-							Our Service may give You the ability to delete
-							certain information about You from within the
-							Service.
+							Because the registry is a historical record,
+							deleting Your Account does not remove registry
+							records such as Your name, general location, and
+							ownership history from car pages; these remain part
+							of the public registry. If You would like this
+							information corrected, anonymized, or removed,
+							please contact Us and We will make reasonable
+							efforts to accommodate Your request.
 						</p>
 						<p>
-							You may update, amend, or delete Your information at
-							any time by signing in to Your Account, if you have
-							one, and visiting the account settings section that
-							allows you to manage Your personal information. You
-							may also contact Us to request access to, correct,
-							or delete any personal information that You have
-							provided to Us.
-						</p>
-						<p>
-							Please note, however, that We may need to retain
-							certain information when we have a legal obligation
-							or lawful basis to do so.
+							Please note that We cannot remove data from copies
+							of Our public dataset already archived by third
+							parties such as the Internet Archive, and that We
+							may need to retain certain information when We have
+							a legal obligation or lawful basis to do so.
 						</p>
 						<h3>Disclosure of Your Personal Data</h3>
 						<h4>Business Transactions</h4>
 						<p>
-							If the Company is involved in a merger, acquisition
-							or asset sale, Your Personal Data may be
-							transferred. We will provide notice before Your
-							Personal Data is transferred and becomes subject to
-							a different Privacy Policy.
+							If We are involved in a merger, acquisition or asset
+							sale, Your Personal Data may be transferred. We will
+							provide notice before Your Personal Data is
+							transferred and becomes subject to a different
+							Privacy Policy.
 						</p>
 						<h4>Law enforcement</h4>
 						<p>
-							Under certain circumstances, the Company may be
-							required to disclose Your Personal Data if required
-							to do so by law or in response to valid requests by
-							public authorities (e.g. a court or a government
-							agency).
+							Under certain circumstances, We may be required to
+							disclose Your Personal Data if required to do so by
+							law or in response to valid requests by public
+							authorities (e.g. a court or a government agency).
 						</p>
 						<h4>Other legal requirements</h4>
 						<p>
-							The Company may disclose Your Personal Data in the
-							good faith belief that such action is necessary to:
+							We may disclose Your Personal Data in the good faith
+							belief that such action is necessary to:
 						</p>
 						<ul>
 							<li>Comply with a legal obligation</li>
-							<li>
-								Protect and defend the rights or property of the
-								Company
-							</li>
+							<li>Protect and defend Our rights or property</li>
 							<li>
 								Prevent or investigate possible wrongdoing in
 								connection with the Service
@@ -655,10 +680,9 @@ export const Legal = () => {
 							Privacy Policy on this page.
 						</p>
 						<p>
-							We will let You know via email and/or a prominent
-							notice on Our Service, prior to the change becoming
-							effective and update the &quot;Last updated&quot;
-							date at the top of this Privacy Policy.
+							When We make changes, We will update the &quot;Last
+							updated&quot; date at the top of this Privacy
+							Policy.
 						</p>
 						<p>
 							You are advised to review this Privacy Policy
