@@ -21,6 +21,7 @@ import { Hono } from 'hono';
 import { Resend } from 'resend';
 import { createDb } from '../../db';
 import { invalidateSeoCaches } from '../../seo/cache';
+import { recalculateAndStoreCarRarity } from '../utils/recalculateCarRarity';
 import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
@@ -326,9 +327,11 @@ moderationRouter.post(
 				.set({ status: 'approved' })
 				.where(eq(CarsPending.id, id));
 
+			await recalculateAndStoreCarRarity(db, car_id);
+
 			await c.env.CACHE.delete(`cars:details:${car_id}`);
 			await c.env.CACHE.delete(`cars:summary:${car_id}`);
-			await c.env.CACHE.delete('editions:all');
+			await c.env.CACHE.delete('editions:all:v2');
 			await c.env.CACHE.delete('stats:all');
 			await invalidateSeoCaches(c.env.CACHE);
 
@@ -473,7 +476,7 @@ moderationRouter.post(
 
 			await c.env.CACHE.delete(`cars:details:${pendingCarOwner.car_id}`);
 			await c.env.CACHE.delete(`cars:summary:${pendingCarOwner.car_id}`);
-			await c.env.CACHE.delete('editions:all');
+			await c.env.CACHE.delete('editions:all:v2');
 			await c.env.CACHE.delete('stats:all');
 			await invalidateSeoCaches(c.env.CACHE);
 

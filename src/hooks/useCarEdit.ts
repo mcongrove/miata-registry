@@ -21,6 +21,7 @@ import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 	type ChangeEvent,
@@ -31,6 +32,11 @@ import { parseMileageInput, type TMileageUnit } from '../utils/car';
 import { handleApiError } from '../utils/common';
 import { uploadCarPhoto } from '../utils/carPhoto';
 import { formatLocation, parseLocation } from '../utils/location';
+import {
+	attestationsFromCar,
+	attestationsFromFormData,
+	computeFullRarityBreakdown,
+} from '../utils/rarityScore';
 
 export const CAR_EDIT_FORM_ID = 'carEditForm';
 
@@ -56,6 +62,12 @@ export function useCarEdit(
 	const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
 	const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 	const photoPreviewRef = useRef<string | null>(null);
+	const [previewAttestations, setPreviewAttestations] = useState(() =>
+		attestationsFromCar(car)
+	);
+	const [previewDestroyed, setPreviewDestroyed] = useState(
+		Boolean(car.destroyed)
+	);
 
 	const revokePhotoPreview = useCallback(() => {
 		if (photoPreviewRef.current?.startsWith('blob:')) {
@@ -103,6 +115,8 @@ export function useCarEdit(
 		setIsFormDirty(false);
 		setWarningSequence(false);
 		setWarningOwnerDateEnd(false);
+		setPreviewAttestations(attestationsFromCar(car));
+		setPreviewDestroyed(Boolean(car.destroyed));
 		revokePhotoPreview();
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- reset when switching cars
 	}, [enabled, car.id]);
@@ -222,7 +236,24 @@ export function useCarEdit(
 			parseMileageInput(mileageDisplay, mileageUnit) !==
 			(car.mileage ?? null);
 
-		setIsFormDirty(hasChanges || mileageDirty);
+		const nextAttestations = attestationsFromFormData(formData);
+		const attestationsDirty = (
+			Object.keys(nextAttestations) as (keyof typeof nextAttestations)[]
+		).some(
+			(key) =>
+				nextAttestations[key] !==
+				Boolean(car[key as keyof TCarWithOwnerHistory])
+		);
+
+		const destroyedChecked = formData.get('destroyed') === 'on';
+		const destroyedDirty = destroyedChecked !== Boolean(car.destroyed);
+
+		setPreviewAttestations(nextAttestations);
+		setPreviewDestroyed(destroyedChecked);
+
+		setIsFormDirty(
+			hasChanges || mileageDirty || attestationsDirty || destroyedDirty
+		);
 	}, [car, mileageDisplay, mileageUnit]);
 
 	useEffect(() => {
@@ -230,6 +261,29 @@ export function useCarEdit(
 
 		handleFormChange();
 	}, [enabled, car.id, mileageDisplay, mileageUnit, handleFormChange]);
+
+	const rarityBreakdown = useMemo(() => {
+		const editionYear = car.edition?.year;
+
+		if (editionYear == null) return null;
+
+		return computeFullRarityBreakdown({
+			attestations: previewAttestations,
+			destroyed: previewDestroyed,
+			editionBase: car.edition?.rarity_score ?? 0,
+			editionYear,
+			mileage: parseMileageInput(mileageDisplay, mileageUnit),
+			ownerHistory: car.owner_history ?? [],
+		});
+	}, [
+		car.edition?.rarity_score,
+		car.edition?.year,
+		car.owner_history,
+		mileageDisplay,
+		mileageUnit,
+		previewAttestations,
+		previewDestroyed,
+	]);
 
 	const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
 		if (e) {
@@ -239,6 +293,13 @@ export function useCarEdit(
 		if (!isFormDirty && !pendingPhoto) {
 			return;
 		}
+
+		const form = document.getElementById(
+			CAR_EDIT_FORM_ID
+		) as HTMLFormElement | null;
+
+		const formData =
+			isFormDirty && form ? new FormData(form) : null;
 
 		setLoading(true);
 		setFormError(null);
@@ -250,13 +311,7 @@ export function useCarEdit(
 
 			if (!token) return;
 
-			if (isFormDirty) {
-				const form = document.getElementById(CAR_EDIT_FORM_ID);
-
-				if (!form) return;
-
-				const formData = new FormData(form as HTMLFormElement);
-
+			if (formData) {
 				const response = await fetch(
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${car.id}`,
 					{
@@ -317,6 +372,7 @@ export function useCarEdit(
 							shipping_vessel:
 								formData.get('shipping_vessel') || null,
 							story: formData.get('story') || null,
+							...attestationsFromFormData(formData),
 						}),
 					}
 				);
@@ -385,5 +441,6 @@ export function useCarEdit(
 		setIsSuccess,
 		warningOwnerDateEnd,
 		warningSequence,
+		rarityBreakdown,
 	};
 }

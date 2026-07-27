@@ -30,6 +30,12 @@ import {
 } from '../../hooks/useCarEdit';
 import { convertMileageDisplay, type TMileageUnit } from '../../utils/car';
 import { formatLocation, normalizeLocation } from '../../utils/location';
+import {
+	formatRarityLevelLabel,
+	getRarityLevelFromScore,
+	isOlderThanTenModelYears,
+	type RarityScoreBreakdown,
+} from '../../utils/rarityScore';
 
 type CarEditFormProps = {
 	car: TCarWithOwnerHistory;
@@ -49,7 +55,40 @@ type CarEditFormProps = {
 	onMileageUnitChange: (unit: TMileageUnit) => void;
 	warningOwnerDateEnd: boolean;
 	warningSequence: boolean;
+	rarityBreakdown: RarityScoreBreakdown | null;
 };
+
+function AttestationCheckbox({
+	checked,
+	disabled,
+	label,
+	name,
+	onChange,
+}: {
+	checked?: boolean;
+	disabled?: boolean;
+	label: string;
+	name: string;
+	onChange: () => void;
+}) {
+	return (
+		<label
+			className={`flex items-start gap-2 text-sm select-none ${
+				disabled ? 'text-brg-mid/50' : 'text-brg-mid'
+			}`}
+		>
+			<input
+				type="checkbox"
+				name={name}
+				defaultChecked={checked}
+				disabled={disabled}
+				onChange={onChange}
+				className="mt-0.5 shrink-0"
+			/>
+			<span>{label}</span>
+		</label>
+	);
+}
 
 function Section({
 	title,
@@ -95,8 +134,15 @@ export function CarEditForm({
 	onMileageUnitChange,
 	warningOwnerDateEnd,
 	warningSequence,
+	rarityBreakdown,
 }: CarEditFormProps) {
 	const hasProfilePhoto = useCarHasProfilePhoto(car.id);
+	const editionYear = car.edition?.year;
+	const preservationGated =
+		editionYear != null && isOlderThanTenModelYears(editionYear);
+	const rarityLevel = rarityBreakdown
+		? getRarityLevelFromScore(rarityBreakdown.total)
+		: null;
 
 	const ownerLocationDisplay =
 		formatLocation(
@@ -189,7 +235,7 @@ export function CarEditForm({
 				</div>
 			</Section>
 
-			<Section title="Manufacture">
+			<Section title="Manufacture & Shipping">
 				<div className="flex flex-wrap gap-6 items-start">
 					<Field
 						id="sequence"
@@ -261,9 +307,7 @@ export function CarEditForm({
 						</a>
 					</p>
 				)}
-			</Section>
 
-			<Section title="Shipping">
 				<div className="flex flex-wrap gap-x-4 gap-y-6 items-end">
 					<Field
 						id="shipping_date"
@@ -493,17 +537,122 @@ export function CarEditForm({
 				</Field>
 			</Section>
 
-			<Section title="Prior Owners and Rarity Scores">
+			<Section
+				title="Rarity"
+				intro={
+					<>
+						Points from your mileage and the items below are added to
+						this edition&apos;s base score and its age. See the{' '}
+						<a href="/rarity" className="underline">
+							rarity guide
+						</a>{' '}
+						for how scoring works.
+					</>
+				}
+			>
+				{rarityBreakdown ? (
+					<div className="rounded-lg border border-brg-light bg-brg-light/30 px-4 py-3 text-sm">
+						{rarityLevel ? (
+							<p className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+								<span className="font-medium text-brg">
+									{formatRarityLevelLabel(rarityLevel)}
+								</span>
+								<span className="text-brg-mid/70 tabular-nums">
+									{rarityBreakdown.total} points
+								</span>
+							</p>
+						) : (
+							<p className="text-brg-mid/70">
+								{rarityBreakdown.total} points
+							</p>
+						)}
+					</div>
+				) : null}
+
+				<div className="flex flex-col gap-3">
+					<p className="text-sm font-medium text-brg">Preservation</p>
+					{!preservationGated ? (
+						<p className="text-xs text-brg-mid/70">
+							These options apply when the car is more than 10
+							model years old.
+						</p>
+					) : null}
+					<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-6">
+						<AttestationCheckbox
+							name="rarity_original_paint"
+							label="Original Paint"
+							checked={car.rarity_original_paint}
+							disabled={disabled || !preservationGated}
+							onChange={onFormChange}
+						/>
+						<AttestationCheckbox
+							name="rarity_original_hardtop"
+							label="Original Hard Top"
+							checked={car.rarity_original_hardtop}
+							disabled={disabled || !preservationGated}
+							onChange={onFormChange}
+						/>
+						<AttestationCheckbox
+							name="rarity_original_softtop"
+							label="Original Soft Top"
+							checked={car.rarity_original_softtop}
+							disabled={disabled || !preservationGated}
+							onChange={onFormChange}
+						/>
+						<AttestationCheckbox
+							name="rarity_original_wheels"
+							label="Original Wheels"
+							checked={car.rarity_original_wheels}
+							disabled={disabled || !preservationGated}
+							onChange={onFormChange}
+						/>
+					</div>
+				</div>
+
+				<div className="flex flex-col gap-3">
+					<p className="text-sm font-medium text-brg">Documentation</p>
+					{!preservationGated ? (
+						<p className="text-xs text-brg-mid/70">
+							These options apply when the car is more than 10
+							model years old.
+						</p>
+					) : null}
+					<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-6">
+						<AttestationCheckbox
+							name="rarity_window_sticker"
+							label="Original Window Sticker"
+							checked={car.rarity_window_sticker}
+							disabled={disabled || !preservationGated}
+							onChange={onFormChange}
+						/>
+						<AttestationCheckbox
+							name="rarity_sale_documents"
+							label="Original Sales Documents"
+							checked={car.rarity_sale_documents}
+							disabled={disabled || !preservationGated}
+							onChange={onFormChange}
+						/>
+						<AttestationCheckbox
+							name="rarity_service_records"
+							label="Complete Service Records"
+							checked={car.rarity_service_records}
+							disabled={disabled || !preservationGated}
+							onChange={onFormChange}
+						/>
+					</div>
+				</div>
+			</Section>
+
+			<Section title="Prior Owners">
 				<p className="text-sm text-brg-mid/80">
-					Editing prior owner history and rarity scores is under
-					development. Send documentation to{' '}
+					To add or correct prior owners, send documentation to{' '}
 					<a
-						href={`mailto:support@miataregistry.com?subject=Prior%20Owners%20/%20Rarity%20Score%20Submission:%20${car.id}`}
+						href={`mailto:support@miataregistry.com?subject=Prior%20Owners%20Submission:%20${car.id}`}
 						className="underline"
 					>
 						support@miataregistry.com
-					</a>{' '}
-					and we'll add it for you.
+					</a>
+					.
 				</p>
 			</Section>
 

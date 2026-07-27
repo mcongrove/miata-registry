@@ -277,8 +277,9 @@ export function CarSettings() {
 							onMileageDisplayChange={edit.setMileageDisplay}
 							onMileageUnitChange={edit.setMileageUnit}
 							warningOwnerDateEnd={edit.warningOwnerDateEnd}
-							warningSequence={edit.warningSequence}
-						/>
+						warningSequence={edit.warningSequence}
+						rarityBreakdown={edit.rarityBreakdown}
+					/>
 					</fieldset>
 				</div>
 			</main>

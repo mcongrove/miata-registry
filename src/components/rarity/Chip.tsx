@@ -16,8 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { TRarityLevel } from '../../types/Car';
 import { Link } from 'react-router-dom';
-import { TRarityLevel } from '../../types/Car';
+import {
+	formatRarityLevelLabel,
+	getRarityLevelFromScore,
+} from '../../utils/rarityScore';
 
 const rarityColors: Record<
 	TRarityLevel,
@@ -50,24 +54,15 @@ const rarityColors: Record<
 	},
 };
 
-const getRarityLevel = (score: number): TRarityLevel => {
-	if (score >= 100) return 'historically-significant';
-	if (score >= 80) return 'exceptionally-rare';
-	if (score >= 60) return 'very-rare';
-	if (score >= 40) return 'rare';
-	return 'limited-edition';
-};
-
 type ChipProps = {
 	score: number;
 };
 
 export const Chip = ({ score }: ChipProps) => {
 	const numericScore = Number(score);
+	const level = getRarityLevelFromScore(numericScore);
 
-	if (!Number.isFinite(numericScore) || numericScore <= 0) return null;
-
-	const level = getRarityLevel(numericScore);
+	if (!level) return null;
 	const colors = rarityColors[level];
 
 	return (
@@ -75,10 +70,7 @@ export const Chip = ({ score }: ChipProps) => {
 			to={`/rarity`}
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors.bg} ${colors.text} ${colors.border}`}
 		>
-			{level
-				.split('-')
-				.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-				.join(' ')}
+			{formatRarityLevelLabel(level)}
 		</Link>
 	);
 };

@@ -29,6 +29,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { JsonLd } from '../components/JsonLd';
 import { Chip } from '../components/rarity/Chip';
+import { RarityScoreBreakdownTooltip } from '../components/rarity/RarityScoreBreakdownTooltip';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
@@ -513,7 +514,7 @@ export const CarProfile = () => {
 								</h1>
 
 								{(car.edition?.total_produced ||
-									car.rarity_score) && (
+									(car.rarity_score ?? 0) > 0) && (
 									<div className="flex gap-2 lg:gap-4 items-center">
 										{car.edition?.total_produced && (
 											<p className="text-sm lg:text-base text-brg-mid/60">
@@ -537,7 +538,9 @@ export const CarProfile = () => {
 											</p>
 										)}
 
-										<Chip score={car.rarity_score ?? 0} />
+										<RarityScoreBreakdownTooltip car={car}>
+											<Chip score={car.rarity_score ?? 0} />
+										</RarityScoreBreakdownTooltip>
 									</div>
 								)}
 							</div>

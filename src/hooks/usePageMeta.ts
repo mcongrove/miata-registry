@@ -17,6 +17,7 @@
  */
 
 import { useEffect } from 'react';
+import { isValidUuid } from '../seo/indexing';
 
 interface PageMetaProps {
 	title?: string;
@@ -143,15 +144,15 @@ export const usePageMeta = ({
 			document.head.appendChild(preloadLink);
 			cleanupFns.push(() => preloadLink.remove());
 		} else {
-			const registryMatch = path?.match(/^\/registry\/(.+)$/);
+			const carIdMatch = path?.match(/^\/registry\/([^/]+)\/?$/);
 
-			if (registryMatch) {
+			if (carIdMatch && isValidUuid(carIdMatch[1])) {
 				const preloadLink = document.createElement('link');
 
 				preloadLink.rel = 'preload';
 				preloadLink.fetchPriority = 'high';
 				preloadLink.as = 'image';
-				preloadLink.href = `https://store.miataregistry.com/car/${registryMatch[1]}.jpg`;
+				preloadLink.href = `https://store.miataregistry.com/car/${carIdMatch[1]}.jpg`;
 				preloadLink.type = 'image/jpeg';
 
 				document.head.appendChild(preloadLink);

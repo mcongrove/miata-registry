@@ -30,7 +30,28 @@ export const Cars = sqliteTable('cars', {
 	manufacture_date: text('manufacture_date'),
 	mileage: integer('mileage'),
 	mileage_date: text('mileage_date'),
+	rarity_original_hardtop: integer('rarity_original_hardtop', {
+		mode: 'boolean',
+	}).default(false),
+	rarity_original_paint: integer('rarity_original_paint', {
+		mode: 'boolean',
+	}).default(false),
+	rarity_original_softtop: integer('rarity_original_softtop', {
+		mode: 'boolean',
+	}).default(false),
+	rarity_original_wheels: integer('rarity_original_wheels', {
+		mode: 'boolean',
+	}).default(false),
+	rarity_sale_documents: integer('rarity_sale_documents', {
+		mode: 'boolean',
+	}).default(false),
 	rarity_score: integer('rarity_score'),
+	rarity_service_records: integer('rarity_service_records', {
+		mode: 'boolean',
+	}).default(false),
+	rarity_window_sticker: integer('rarity_window_sticker', {
+		mode: 'boolean',
+	}).default(false),
 	sale_date: text('sale_date'),
 	sale_dealer_city: text('sale_dealer_city'),
 	sale_dealer_country: text('sale_dealer_country'),

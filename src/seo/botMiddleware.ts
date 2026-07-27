@@ -67,7 +67,6 @@ const fetchCarForBot = async (db: D1Database, carId: string) => {
 		.select({
 			current_owner_id: Cars.current_owner_id,
 			id: Cars.id,
-			rarity_score: Cars.rarity_score,
 			sequence: Cars.sequence,
 			story: Cars.story,
 			vin: Cars.vin,

@@ -45,9 +45,9 @@ export const Card = ({ edition }: CardProps) => {
 					/>
 				</Link>
 
-				{edition.rarity_score && (
+				{(edition.rarity_score ?? 0) > 0 && (
 					<div className="absolute bottom-2 left-2">
-						<Chip score={edition.rarity_score} />
+						<Chip score={edition.rarity_score ?? 0} />
 					</div>
 				)}
 

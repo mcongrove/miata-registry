@@ -29,7 +29,10 @@ import {
 	Owners,
 } from '../../db/schema';
 import { normalizeLocation } from '../../utils/location';
+import { parseAttestationsFromBody } from '../../utils/rarityScore';
 import { allowLocalDevCarEditBypass } from '../utils/carEditAccess';
+import { carDisplayRarityScoreExpr } from '../utils/rarityScoreSql';
+import { recalculateAndStoreCarRarity } from '../utils/recalculateCarRarity';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -39,9 +42,9 @@ const CACHE_TTL = {
 	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
 };
 
-const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v5:';
+const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v6:';
 
-const rarityScoreExpr = sql`COALESCE(${Cars.rarity_score}, 0) + COALESCE(${Editions.rarity_score}, 0)`;
+const rarityScoreExpr = carDisplayRarityScoreExpr;
 
 const carsRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -321,6 +324,13 @@ carsRouter.get('/:id', async (c) => {
 				manufacture_date: Cars.manufacture_date,
 				mileage: Cars.mileage,
 				mileage_date: Cars.mileage_date,
+				rarity_original_hardtop: Cars.rarity_original_hardtop,
+				rarity_original_paint: Cars.rarity_original_paint,
+				rarity_original_softtop: Cars.rarity_original_softtop,
+				rarity_original_wheels: Cars.rarity_original_wheels,
+				rarity_sale_documents: Cars.rarity_sale_documents,
+				rarity_service_records: Cars.rarity_service_records,
+				rarity_window_sticker: Cars.rarity_window_sticker,
 				rarity_score: rarityScoreExpr,
 				sale_date: Cars.sale_date,
 				sale_dealer_city: Cars.sale_dealer_city,
@@ -529,6 +539,13 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					manufacture_date: Cars.manufacture_date,
 					mileage: Cars.mileage,
 					mileage_date: Cars.mileage_date,
+					rarity_original_hardtop: Cars.rarity_original_hardtop,
+					rarity_original_paint: Cars.rarity_original_paint,
+					rarity_original_softtop: Cars.rarity_original_softtop,
+					rarity_original_wheels: Cars.rarity_original_wheels,
+					rarity_sale_documents: Cars.rarity_sale_documents,
+					rarity_service_records: Cars.rarity_service_records,
+					rarity_window_sticker: Cars.rarity_window_sticker,
 					sale_date: Cars.sale_date,
 					sale_dealer_city: Cars.sale_dealer_city,
 					sale_dealer_country: Cars.sale_dealer_country,
@@ -640,7 +657,26 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				(body.owner_date_end ?? null),
 		};
 
-		const ownersLogChanged = Object.values(ownersLogChecks).some(Boolean);
+		const parsedAttestations = parseAttestationsFromBody(body);
+
+		const attestationsChanged =
+			Boolean(existing.car.rarity_original_paint) !==
+				parsedAttestations.rarity_original_paint ||
+			Boolean(existing.car.rarity_original_hardtop) !==
+				parsedAttestations.rarity_original_hardtop ||
+			Boolean(existing.car.rarity_original_softtop) !==
+				parsedAttestations.rarity_original_softtop ||
+			Boolean(existing.car.rarity_original_wheels) !==
+				parsedAttestations.rarity_original_wheels ||
+			Boolean(existing.car.rarity_window_sticker) !==
+				parsedAttestations.rarity_window_sticker ||
+			Boolean(existing.car.rarity_sale_documents) !==
+				parsedAttestations.rarity_sale_documents ||
+			Boolean(existing.car.rarity_service_records) !==
+				parsedAttestations.rarity_service_records;
+
+		const ownersLogChanged =
+			Object.values(ownersLogChecks).some(Boolean) || attestationsChanged;
 		const moderatedCarChanged =
 			Object.values(moderatedCarChecks).some(Boolean);
 		const carOwnerChanged = Object.values(ownerChecks).some(Boolean);
@@ -652,8 +688,11 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					mileage: parsedMileage,
 					mileage_date: resolvedMileageDate,
 					story: body.story ?? null,
+					...parsedAttestations,
 				})
 				.where(eq(Cars.id, id));
+
+			await recalculateAndStoreCarRarity(db, id);
 		}
 
 		if (moderatedCarChanged) {

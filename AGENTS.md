@@ -45,7 +45,7 @@ npm run format
 npm run build
 ```
 
-Other useful commands: `npm run email:dev` (preview emails), `npm run db:generate` / `npm run db:push` (schema — see boundaries below), `npm run worker:deploy` (API deploy).
+Other useful commands: `npm run email:dev` (preview emails), `npm run db:push` (apply schema to remote D1 — see boundaries below), `npm run worker:deploy` (API deploy).
 
 ## Architecture
 
@@ -142,7 +142,7 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 
 ## Boundaries — ask first
 
-- **Database writes** — there is no local D1. `worker:dev --remote` and `db:push` hit **production**. Never run migrations, backfills, or destructive SQL without explicit approval.
+- **Database writes** — there is no local D1. `worker:dev --remote` and `db:push` hit **production**. Never run schema pushes, backfills, or destructive SQL without explicit approval. Weekly [Internet Archive backups](https://archive.org/search?query=creator%3A%22Miata+Registry%22&sort=-addeddate) include full registry CSV exports for offline study; they are not a substitute for `worker:dev` against live D1.
 - **Archive cron** — never POST to `/heartbeat/archive/cron` without `ARCHIVE_DRY_RUN=true` in worker env. Real runs upload to Internet Archive.
 - **Secrets** — don't read, log, or commit `.env`, `.dev.vars`, or secret values. `.dev.vars.example` / `.env.example` are the safe references.
 - **Generated / vendor paths** — don't edit `dist/`, `.wrangler/`, `node_modules/`.
@@ -164,14 +164,14 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 
 ### KV cache keys
 
-Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape (currently `cars:list:v5:`).
+Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape (currently `cars:list:v6:`).
 
 | Key pattern | Purpose |
 |-------------|---------|
-| `cars:list:v5:{params}` | Registry browse list |
+| `cars:list:v6:{params}` | Registry browse list |
 | `cars:details:{id}` | Car profile |
 | `cars:summary:{id}` | Car summary |
-| `editions:all`, `editions:names` | Edition data |
+| `editions:all:v2`, `editions:names` | Edition data |
 | `stats:all` | Site stats |
 | `news:*` | News list/detail/featured |
 

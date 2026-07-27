@@ -129,7 +129,6 @@ export type CarBotData = {
 	id: string;
 	sequence?: number | null;
 	story?: string | null;
-	rarity_score?: number | null;
 	current_owner_id?: string | null;
 	edition?: {
 		year: number;
@@ -153,11 +152,9 @@ export const buildCarBotContent = (car: CarBotData): string => {
 		edition?.total_produced != null
 			? ` 1 of ${edition.total_produced.toLocaleString('en-US')} produced.`
 			: '';
-	const rarity =
-		car.rarity_score != null ? ` Rarity score: ${car.rarity_score}.` : '';
 	const claimed = car.current_owner_id ? ' Claimed.' : ' Unclaimed.';
 
-	const summary = `${year} ${name}${sequenceSuffix}. ${color}${produced}${rarity}${claimed}`;
+	const summary = `${year} ${name}${sequenceSuffix}. ${color}${produced}${claimed}`;
 
 	const parts = [
 		`<h1>${escapeHtml(`${year} ${name}`.trim())}</h1>`,

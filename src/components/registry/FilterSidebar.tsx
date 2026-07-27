@@ -257,12 +257,12 @@ export const FilterSidebar = ({
 		<>
 			<div
 				className={twMerge(
-					'fixed lg:relative inset-y-0 top-20 lg:top-0 left-0 z-50 lg:z-auto w-64 lg:translate-x-0 transition-transform duration-300 overflow-y-auto max-h-[calc(100vh-5rem)] lg:max-h-full',
+					'fixed lg:relative inset-y-0 top-20 lg:top-0 left-0 z-50 lg:z-auto w-64 shrink-0 flex-none min-w-64 max-w-64 lg:translate-x-0 transition-transform duration-300 overflow-y-auto max-h-[calc(100vh-5rem)] lg:max-h-full',
 					isOpen ? 'translate-x-0' : '-translate-x-full',
 					className
 				)}
 			>
-				<div className="flex flex-col h-full lg:border lg:rounded-md border-brg-light shadow-2xl lg:shadow-none bg-white">
+				<div className="flex flex-col h-full min-w-64 lg:border lg:rounded-md border-brg-light shadow-2xl lg:shadow-none bg-white">
 					<div className="lg:hidden flex items-center justify-between p-3 pr-4 border-b border-brg-light">
 						<h2 className="text-sm font-semibold">Filters</h2>
 

@@ -20,6 +20,7 @@ import { asc, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
 import { Cars, Editions } from '../../db/schema';
+import { editionRarityWithAgeExpr } from '../utils/rarityScoreSql';
 import type { Bindings } from '../types';
 
 const CACHE_TTL = {
@@ -27,13 +28,15 @@ const CACHE_TTL = {
 	EDITIONS_NAMES: 60 * 60 * 24 * 7, // 7 days
 };
 
+const EDITIONS_ALL_CACHE_KEY = 'editions:all:v2';
+
 const EDITIONS_NAMES_CACHE_KEY = 'editions:names:v2';
 
 const editionsRouter = new Hono<{ Bindings: Bindings }>();
 
 editionsRouter.get('/', async (c) => {
 	try {
-		const cached = await c.env.CACHE.get('editions:all');
+		const cached = await c.env.CACHE.get(EDITIONS_ALL_CACHE_KEY);
 
 		if (cached && c.env.NODE_ENV !== 'development') {
 			const response = c.json(JSON.parse(cached));
@@ -63,19 +66,19 @@ editionsRouter.get('/', async (c) => {
 					'in_registry'
 				),
 				name: Editions.name,
-				rarity_score: Editions.rarity_score,
+				rarity_score: editionRarityWithAgeExpr,
 				total_produced: Editions.total_produced,
 				year: Editions.year,
 			})
 			.from(Editions)
 			.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
 			.groupBy(
-				sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}, ${Editions.image_car_id}`
+				sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}, ${Editions.image_car_id}, ${Editions.rarity_score}`
 			)
 			.orderBy(asc(Editions.year), asc(Editions.name));
 
 		await c.env.CACHE.put(
-			'editions:all',
+			EDITIONS_ALL_CACHE_KEY,
 			JSON.stringify(editionsWithCounts),
 			{
 				expirationTtl: CACHE_TTL.EDITIONS,

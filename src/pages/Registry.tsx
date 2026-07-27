@@ -252,7 +252,7 @@ export const Registry = () => {
 						isOpen={isFilterDrawerOpen}
 					/>
 
-					<div className="flex flex-1 flex-col w-full">
+					<div className="flex flex-1 flex-col w-full min-w-0">
 						<h1 className="text-2xl font-bold text-brg mb-4">
 							Browse Cars
 						</h1>

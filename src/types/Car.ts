@@ -32,7 +32,14 @@ export type TCar = {
 	mileage?: number;
 	mileage_date?: string;
 	owner_history?: TCarOwner[];
+	rarity_original_hardtop?: boolean;
+	rarity_original_paint?: boolean;
+	rarity_original_softtop?: boolean;
+	rarity_original_wheels?: boolean;
+	rarity_sale_documents?: boolean;
 	rarity_score?: number;
+	rarity_service_records?: boolean;
+	rarity_window_sticker?: boolean;
 	sale_date?: string;
 	sale_dealer_city?: string;
 	sale_dealer_country?: string;
