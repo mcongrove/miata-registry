@@ -17,7 +17,7 @@
  */
 
 export function userCanEditCar(
-	carId: string,
+	_carId: string,
 	ownerClerkUserId: string | null | undefined,
 	signedInUserId: string | null | undefined
 ): boolean {
