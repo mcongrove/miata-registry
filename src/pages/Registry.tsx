@@ -171,7 +171,8 @@ export const Registry = () => {
 	}, [currentPage]);
 
 	const updateSearchParams = (
-		updates: Record<string, string | string[] | null>
+		updates: Record<string, string | string[] | null>,
+		options?: { replace?: boolean }
 	) => {
 		const newParams = new URLSearchParams(searchParams);
 
@@ -187,7 +188,7 @@ export const Registry = () => {
 			}
 		});
 
-		setSearchParams(newParams);
+		setSearchParams(newParams, { replace: options?.replace ?? false });
 	};
 
 	const handleSort = (column: string) => {
@@ -223,20 +224,26 @@ export const Registry = () => {
 		});
 	};
 
-	const handleFiltersChange = (newFilters: TFilterOption[]) => {
+	const handleFiltersChange = (
+		newFilters: TFilterOption[],
+		options?: { replace?: boolean }
+	) => {
 		setActiveFilters(newFilters);
 		setCurrentPage(1);
 
-		updateSearchParams({
-			filter: newFilters.map((f) => {
-				const value =
-					typeof f.value === 'object'
-						? JSON.stringify(f.value)
-						: f.value;
-				return `${f.type}:${value}`;
-			}),
-			page: '1',
-		});
+		updateSearchParams(
+			{
+				filter: newFilters.map((f) => {
+					const value =
+						typeof f.value === 'object'
+							? JSON.stringify(f.value)
+							: f.value;
+					return `${f.type}:${value}`;
+				}),
+				page: '1',
+			},
+			options
+		);
 	};
 
 	const itemsPerPage = 50;

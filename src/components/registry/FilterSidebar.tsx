@@ -44,7 +44,10 @@ const getEditionNames = async () => {
 interface FilterSidebarProps {
 	className?: string;
 	activeFilters: TFilterOption[];
-	onFiltersChange: (filters: TFilterOption[]) => void;
+	onFiltersChange: (
+		filters: TFilterOption[],
+		options?: { replace?: boolean }
+	) => void;
 	onClose?: () => void;
 	isOpen?: boolean;
 }
@@ -131,7 +134,7 @@ export const FilterSidebar = ({
 			{ type: 'year', value: String(edition.year) },
 			{ type: 'generation', value: edition.generation }
 		);
-		onFiltersChange(next);
+		onFiltersChange(next, { replace: true });
 	}, [editionOptions, activeFilters, onFiltersChange]);
 
 	const getActiveValue = (type: TFilterOption['type']) =>
