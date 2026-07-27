@@ -47,6 +47,7 @@ import {
 	toTitleCase,
 } from '../utils/common';
 import { userCanEditCar } from '../utils/carEditAccess';
+import { qualifiesAsSingleOwnerSinceNew } from '../utils/rarityScore';
 import { carPageJsonLd } from '../utils/jsonLd';
 import { isCarIndexable, isValidUuid } from '../utils/seoIndexing';
 import {
@@ -100,6 +101,19 @@ export const CarProfile = () => {
 	const manufactureLocation = useMemo(() => {
 		return vinDetails ? formatPlantLocation(vinDetails) : null;
 	}, [vinDetails]);
+
+	const singleOwnerSinceNew = useMemo(() => {
+		const editionYear = car?.edition?.year;
+
+		if (editionYear == null) {
+			return false;
+		}
+
+		return qualifiesAsSingleOwnerSinceNew(
+			editionYear,
+			car?.owner_history ?? []
+		);
+	}, [car]);
 
 	const loadCar = useCallback(async () => {
 		if (!id) return;
@@ -514,8 +528,9 @@ export const CarProfile = () => {
 								</h1>
 
 								{(car.edition?.total_produced ||
-									(car.rarity_score ?? 0) > 0) && (
-									<div className="flex gap-2 lg:gap-4 items-center">
+									(car.rarity_score ?? 0) > 0 ||
+									singleOwnerSinceNew) && (
+									<div className="flex flex-wrap gap-2 lg:gap-4 items-center">
 										{car.edition?.total_produced && (
 											<p className="text-sm lg:text-base text-brg-mid/60">
 												{hasSequence(car.sequence) ? (
@@ -537,6 +552,12 @@ export const CarProfile = () => {
 												)}
 											</p>
 										)}
+
+										{singleOwnerSinceNew ? (
+											<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-sky-50 text-sky-900 border-sky-200">
+												Single Owner
+											</span>
+										) : null}
 
 										<RarityScoreBreakdownTooltip car={car}>
 											<Chip score={car.rarity_score ?? 0} />

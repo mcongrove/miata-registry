@@ -125,7 +125,7 @@ export const Tooltip = ({
 	return (
 		<>
 			<div
-				className="w-fit h-fit"
+				className="inline-flex w-fit items-center"
 				ref={refs.setReference}
 				{...getReferenceProps()}
 			>

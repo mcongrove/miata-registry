@@ -68,7 +68,7 @@ export const Chip = ({ score }: ChipProps) => {
 	return (
 		<Link
 			to={`/rarity`}
-			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors.bg} ${colors.text} ${colors.border}`}
+			className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${colors.bg} ${colors.text} ${colors.border}`}
 		>
 			{formatRarityLevelLabel(level)}
 		</Link>

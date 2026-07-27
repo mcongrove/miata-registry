@@ -17,7 +17,6 @@
  */
 
 import { useMemo, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { Tooltip } from '../Tooltip';
 import { TCar } from '../../types/Car';
@@ -130,17 +129,11 @@ export function RarityScoreBreakdownTooltip({
 					/>
 				))}
 
-				<div className="-mx-3 flex justify-between gap-4 px-3 pt-2 pb-0 font-medium text-brg">
+				<div className="-mx-3 flex justify-between gap-4 rounded-b bg-brg-light px-3 py-2 font-medium text-brg">
 					<span>Total</span>
 					<span>{breakdown.total} points</span>
 				</div>
 			</div>
-
-			<hr className="-mx-3 my-2 border-0 border-t border-brg-light" />
-
-			<Link to="/rarity" className="text-brg-mid underline hover:text-brg">
-				How scoring works
-			</Link>
 		</div>
 	);
 
@@ -150,7 +143,7 @@ export function RarityScoreBreakdownTooltip({
 			interactive
 			showArrow={false}
 			placement="bottom-start"
-			className="px-3 pt-2.5 pb-2.5 max-w-[17rem] text-left"
+			className="max-w-[17rem] px-3 pt-2.5 pb-0 text-left"
 			content={content}
 		>
 			{children}

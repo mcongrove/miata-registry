@@ -39,6 +39,7 @@ export const EMPTY_RARITY_ATTESTATIONS: RarityAttestations = {
 };
 
 export type RarityOwnerHistoryEntry = {
+	date_end?: string | null;
 	date_start?: string | null;
 };
 
@@ -224,7 +225,7 @@ export function buildOwnerRarityBreakdownLines(
 		qualifiesAsSingleOwnerSinceNew(input.editionYear, input.ownerHistory)
 	) {
 		lines.push({
-			detail: 'Single Owner Since New',
+			detail: 'Single Owner',
 			points: 3,
 		});
 	}
@@ -238,7 +239,11 @@ export function qualifiesAsSingleOwnerSinceNew(
 ): boolean {
 	if (ownerHistory.length !== 1) return false;
 
-	const dateStart = ownerHistory[0]?.date_start;
+	const row = ownerHistory[0];
+
+	if (row.date_end) return false;
+
+	const dateStart = row.date_start;
 
 	if (!dateStart) return false;
 

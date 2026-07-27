@@ -76,11 +76,6 @@ export const Rarity = () => {
 			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">
 				<div className="relative z-10 flex flex-col gap-8 lg:w-1/2 lg:bg-white lg:pr-6">
 					<div className="flex flex-col gap-4">
-						<div className="w-fit flex gap-1.5 items-center bg-amber-100 border border-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
-							<i className="fa-regular fa-clock text-sm"></i> Work
-							in Progress
-						</div>
-
 						<h1 className="text-4xl lg:text-6xl font-medium text-brg">
 							Rarity Scores
 						</h1>
