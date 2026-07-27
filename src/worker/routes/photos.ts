@@ -28,6 +28,42 @@ import type { Bindings } from '../types';
 
 const photosRouter = new Hono<{ Bindings: Bindings }>();
 
+photosRouter.get('/index', async (c) => {
+	try {
+		const carIds: string[] = [];
+		let cursor: string | undefined;
+
+		do {
+			const listed = await c.env.IMAGES.list({
+				prefix: 'car/',
+				cursor,
+				limit: 1000,
+			});
+
+			for (const object of listed.objects) {
+				if (!object.key.endsWith('.jpg')) continue;
+
+				carIds.push(object.key.slice('car/'.length, -'.jpg'.length));
+			}
+
+			cursor = listed.truncated ? listed.cursor : undefined;
+		} while (cursor);
+
+		return c.json({ carIds });
+	} catch (error) {
+		console.error('Error listing car photos:', error);
+
+		return c.json(
+			{
+				error: 'Internal server error',
+				details:
+					error instanceof Error ? error.message : 'Unknown error',
+			},
+			500
+		);
+	}
+});
+
 photosRouter.post('/:id', withAuth(), async (c) => {
 	try {
 		const id = c.req.param('id');

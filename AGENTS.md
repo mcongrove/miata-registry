@@ -125,7 +125,7 @@ Local Clerk users usually have a different `user_id` than production, so the UI 
 - `src/utils/carEditAccess.ts` (show Edit + `/registry/:id/settings`)
 - `src/worker/utils/carEditAccess.ts` (allow `PATCH /cars/:id` and `POST /photos/:id`)
 
-Car UUID: `src/constants/local.ts` (`63621393-a540-46b5-b9fe-9231fea2730f`). Re-comment before merge unless you intend to ship the bypass (don't). Submissions still hit **production** data and moderation queues.
+Car UUID: `src/constants/local.ts` or optional `VITE_LOCAL_DEV_EDIT_CAR_ID` in `.env`. Re-comment before merge unless you intend to ship the bypass (don't). Submissions still hit **production** data and moderation queues.
 
 ## Deployment
 
@@ -146,7 +146,7 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 - **Archive cron** — never POST to `/heartbeat/archive/cron` without `ARCHIVE_DRY_RUN=true` in worker env. Real runs upload to Internet Archive.
 - **Secrets** — don't read, log, or commit `.env`, `.dev.vars`, or secret values. `.dev.vars.example` / `.env.example` are the safe references.
 - **Generated / vendor paths** — don't edit `dist/`, `.wrangler/`, `node_modules/`.
-- **Local-only docs** — don't commit scratch files like `MIGRATION-PLAN.md` unless asked.
+- **Local-only docs** — don't commit scratch files like `MIGRATION-PLAN.md` unless asked. Gitignored `/local` is for personal dev utilities (same idea as `/backups`); see [local/AGENTS.md](local/AGENTS.md).
 
 ## Gotchas
 

@@ -62,9 +62,12 @@ yarn-error.log*
 /backups
 /ingest
 /.notes
+/local/*
+!/local/AGENTS.md
 
 # Git files
 /.git
 
 # Marketing Plan
 /.marketing-plan.md
+/.impeccable/config.json

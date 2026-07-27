@@ -31,6 +31,7 @@ import {
 import { normalizeLocation } from '../../utils/location';
 import { parseAttestationsFromBody } from '../../utils/rarityScore';
 import { allowLocalDevCarEditBypass } from '../utils/carEditAccess';
+import { queuePriorOwnerHistoryChanges } from '../utils/priorOwnerPending';
 import { carDisplayRarityScoreExpr } from '../utils/rarityScoreSql';
 import { recalculateAndStoreCarRarity } from '../utils/recalculateCarRarity';
 import { withAuth } from '../middleware/auth';
@@ -366,10 +367,17 @@ carsRouter.get('/:id', async (c) => {
 					total_produced: Editions.total_produced,
 					year: Editions.year,
 				},
-				has_pending_changes: sql<number>`EXISTS (
-					SELECT 1 FROM cars_pending 
-					WHERE car_id = ${id} 
-					AND status = 'pending'
+				has_pending_changes: sql<number>`(
+					EXISTS (
+						SELECT 1 FROM cars_pending
+						WHERE car_id = ${id}
+						AND status = 'pending'
+					)
+					OR EXISTS (
+						SELECT 1 FROM car_owners_pending
+						WHERE car_id = ${id}
+						AND status = 'pending'
+					)
 				)`.as('has_pending_changes'),
 			})
 			.from(Cars)
@@ -595,91 +603,147 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				? Number(body.mileage)
 				: null;
 		const mileageChanged =
+			body.mileage !== undefined &&
 			(existing.car.mileage ?? null) !== (parsedMileage ?? null);
 		const resolvedMileageDate = mileageChanged
 			? `${new Date().toISOString().split('T')[0]}T00:00:00.000Z`
 			: (existing.car.mileage_date ?? null);
 
+		const storyChanged =
+			body.story !== undefined &&
+			(existing.car.story ?? null) !== (body.story ?? null);
+
 		const ownersLogChecks = {
 			mileage: mileageChanged,
 			mileage_date: mileageChanged,
-			story: (existing.car.story ?? null) !== (body.story ?? null),
+			story: storyChanged,
 		};
 
 		const moderatedCarChecks = {
 			destroyed:
+				body.destroyed !== undefined &&
 				(existing.car.destroyed ?? null) !== (body.destroyed ?? null),
 			manufacture_date:
+				body.manufacture_date !== undefined &&
 				(existing.car.manufacture_date ?? null) !==
-				(body.manufacture_date ?? null),
+					(body.manufacture_date ?? null),
 			sale_date:
+				body.sale_date !== undefined &&
 				(existing.car.sale_date?.split('T')[0] ?? null) !==
-				(body.sale_date ?? null),
+					(body.sale_date ?? null),
 			sale_dealer_city:
+				body.sale_dealer_location !== undefined &&
 				(existing.car.sale_dealer_city ?? null) !==
-				(body.sale_dealer_location?.city ?? null),
+					(body.sale_dealer_location?.city ?? null),
 			sale_dealer_country:
+				body.sale_dealer_location !== undefined &&
 				(existing.car.sale_dealer_country ?? null) !==
-				(body.sale_dealer_location?.country ?? null),
+					(body.sale_dealer_location?.country ?? null),
 			sale_dealer_name:
+				body.sale_dealer_name !== undefined &&
 				(existing.car.sale_dealer_name ?? null) !==
-				(body.sale_dealer_name ?? null),
+					(body.sale_dealer_name ?? null),
 			sale_dealer_state:
+				body.sale_dealer_location !== undefined &&
 				(existing.car.sale_dealer_state ?? null) !==
-				(body.sale_dealer_location?.state ?? null),
+					(body.sale_dealer_location?.state ?? null),
 			sale_msrp:
+				body.sale_msrp !== undefined &&
 				(existing.car.sale_msrp ?? null) !== (body.sale_msrp ?? null),
 			sequence:
+				body.sequence !== undefined &&
 				(existing.car.sequence ?? null) !== (body.sequence ?? null),
 			shipping_city:
+				body.shipping_location !== undefined &&
 				(existing.car.shipping_city ?? null) !==
-				(body.shipping_location?.city ?? null),
+					(body.shipping_location?.city ?? null),
 			shipping_country:
+				body.shipping_location !== undefined &&
 				(existing.car.shipping_country ?? null) !==
-				(body.shipping_location?.country ?? null),
+					(body.shipping_location?.country ?? null),
 			shipping_date:
+				body.shipping_date !== undefined &&
 				(existing.car.shipping_date?.split('T')[0] ?? null) !==
-				(body.shipping_date ?? null),
+					(body.shipping_date ?? null),
 			shipping_state:
+				body.shipping_location !== undefined &&
 				(existing.car.shipping_state ?? null) !==
-				(body.shipping_location?.state ?? null),
+					(body.shipping_location?.state ?? null),
 			shipping_vessel:
+				body.shipping_vessel !== undefined &&
 				(existing.car.shipping_vessel ?? null) !==
-				(body.shipping_vessel ?? null),
+					(body.shipping_vessel ?? null),
 		};
 
 		const ownerChecks = {
 			date_start:
+				body.owner_date_start !== undefined &&
 				(existing.owner.date_start?.split('T')[0] ?? null) !==
-				(body.owner_date_start ?? null),
+					(body.owner_date_start ?? null),
 			date_end:
+				body.owner_date_end !== undefined &&
 				(existing.owner.date_end?.split('T')[0] ?? null) !==
-				(body.owner_date_end ?? null),
+					(body.owner_date_end ?? null),
 		};
 
+		const hasAttestationFields = Object.keys(body).some((key) =>
+			key.startsWith('rarity_')
+		);
 		const parsedAttestations = parseAttestationsFromBody(body);
 
 		const attestationsChanged =
-			Boolean(existing.car.rarity_original_paint) !==
+			hasAttestationFields &&
+			(Boolean(existing.car.rarity_original_paint) !==
 				parsedAttestations.rarity_original_paint ||
-			Boolean(existing.car.rarity_original_hardtop) !==
-				parsedAttestations.rarity_original_hardtop ||
-			Boolean(existing.car.rarity_original_softtop) !==
-				parsedAttestations.rarity_original_softtop ||
-			Boolean(existing.car.rarity_original_wheels) !==
-				parsedAttestations.rarity_original_wheels ||
-			Boolean(existing.car.rarity_window_sticker) !==
-				parsedAttestations.rarity_window_sticker ||
-			Boolean(existing.car.rarity_sale_documents) !==
-				parsedAttestations.rarity_sale_documents ||
-			Boolean(existing.car.rarity_service_records) !==
-				parsedAttestations.rarity_service_records;
+				Boolean(existing.car.rarity_original_hardtop) !==
+					parsedAttestations.rarity_original_hardtop ||
+				Boolean(existing.car.rarity_original_softtop) !==
+					parsedAttestations.rarity_original_softtop ||
+				Boolean(existing.car.rarity_original_wheels) !==
+					parsedAttestations.rarity_original_wheels ||
+				Boolean(existing.car.rarity_window_sticker) !==
+					parsedAttestations.rarity_window_sticker ||
+				Boolean(existing.car.rarity_sale_documents) !==
+					parsedAttestations.rarity_sale_documents ||
+				Boolean(existing.car.rarity_service_records) !==
+					parsedAttestations.rarity_service_records);
 
 		const ownersLogChanged =
 			Object.values(ownersLogChecks).some(Boolean) || attestationsChanged;
 		const moderatedCarChanged =
 			Object.values(moderatedCarChecks).some(Boolean);
 		const carOwnerChanged = Object.values(ownerChecks).some(Boolean);
+
+		let priorOwnersChanged = false;
+
+		if (Array.isArray(body.prior_owners)) {
+			const existingPrior = await db
+				.select({
+					car_id: CarOwners.car_id,
+					city: Owners.city,
+					country: Owners.country,
+					date_end: CarOwners.date_end,
+					date_start: CarOwners.date_start,
+					name: Owners.name,
+					owner_id: CarOwners.owner_id,
+					state: Owners.state,
+				})
+				.from(CarOwners)
+				.innerJoin(Owners, eq(CarOwners.owner_id, Owners.id))
+				.where(
+					and(
+						eq(CarOwners.car_id, id),
+						sql`${CarOwners.date_end} IS NOT NULL`
+					)
+				);
+
+			priorOwnersChanged = await queuePriorOwnerHistoryChanges(
+				db,
+				id,
+				existingPrior,
+				body.prior_owners
+			);
+		}
 
 		if (ownersLogChanged) {
 			await db
@@ -766,7 +830,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 			});
 		}
 
-		if (moderatedCarChanged || carOwnerChanged) {
+		if (moderatedCarChanged || carOwnerChanged || priorOwnersChanged) {
 			const resend = new Resend(c.env.RESEND_API_KEY);
 
 			await resend.emails.send({
@@ -776,18 +840,20 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 				html: `
 				<h2>Car Change Request</h2>
 				${moderatedCarChanged ? `<p><strong>Car ID:</strong> ${existing.car.id}</p>` : ''}
+				${priorOwnersChanged ? `<p><strong>Prior ownership history updated for car:</strong> ${existing.car.id}</p>` : ''}
 			`,
 			});
 		}
 
-		if (ownersLogChanged || moderatedCarChanged || carOwnerChanged) {
+		if (ownersLogChanged || moderatedCarChanged || carOwnerChanged || priorOwnersChanged) {
 			await Promise.all([c.env.CACHE.delete(`cars:details:${id}`)]);
 		}
 
 		return c.json({
 			success: true,
 			owners_log_applied: ownersLogChanged,
-			pending_review: moderatedCarChanged || carOwnerChanged,
+			pending_review:
+				moderatedCarChanged || carOwnerChanged || priorOwnersChanged,
 		});
 	} catch (error: unknown) {
 		console.error('Error updating car:', error);

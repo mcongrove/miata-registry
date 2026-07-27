@@ -16,13 +16,52 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { createReadStream, existsSync } from 'node:fs';
+import { join, normalize } from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
+/** Dev-only: serve gitignored files from `/local` at `/local/*` (see local/AGENTS.md). */
+function serveLocalDevTools(): Plugin {
+	return {
+		name: 'serve-local-dev-tools',
+		configureServer(server) {
+			server.middlewares.use((req, res, next) => {
+				const raw = req.url?.split('?')[0] ?? '';
+
+				if (!raw.startsWith('/local/')) {
+					return next();
+				}
+
+				const relative = decodeURIComponent(raw.slice('/local/'.length));
+
+				if (!relative || relative.includes('..')) {
+					return next();
+				}
+
+				const root = join(process.cwd(), 'local');
+				const file = normalize(join(root, relative));
+
+				if (!file.startsWith(root) || !existsSync(file)) {
+					return next();
+				}
+
+				if (file.endsWith('.html')) {
+					res.setHeader('Content-Type', 'text/html; charset=utf-8');
+				}
+
+				createReadStream(file)
+					.on('error', () => next())
+					.pipe(res);
+			});
+		},
+	};
+}
+
 export default defineConfig({
-	plugins: [react(), svgr(), tailwindcss()],
+	plugins: [react(), svgr(), tailwindcss(), serveLocalDevTools()],
 	build: {
 		minify: 'terser',
 		terserOptions: {

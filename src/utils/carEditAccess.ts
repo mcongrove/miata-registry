@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCAL_DEV_EDIT_CAR_ID } from '../constants/local';
-
 export function userCanEditCar(
 	carId: string,
 	ownerClerkUserId: string | null | undefined,
@@ -31,10 +29,17 @@ export function userCanEditCar(
 		return true;
 	}
 
-	/* LOCAL DEV — block-comment this entire if-block before merge */
-	if (import.meta.env.DEV && carId === LOCAL_DEV_EDIT_CAR_ID) {
+	/* LOCAL DEV — uncomment for one-car testing (see AGENTS.md).
+	import { LOCAL_DEV_EDIT_CAR_ID } from '../constants/local';
+
+	const devCarId =
+		(import.meta.env.VITE_LOCAL_DEV_EDIT_CAR_ID as string | undefined)?.trim() ||
+		LOCAL_DEV_EDIT_CAR_ID;
+
+	if (import.meta.env.DEV && carId === devCarId) {
 		return true;
 	}
+	*/
 
 	return false;
 }

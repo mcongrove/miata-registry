@@ -781,6 +781,18 @@ export const locationFromAddressComponents = (
 	});
 };
 
+export function isLocationAcceptedForMaps(location: string): boolean {
+	const trimmed = location.trim();
+
+	if (!trimmed) {
+		return true;
+	}
+
+	const { city, country } = normalizeLocation(parseLocation(trimmed));
+
+	return Boolean(city && country && country in Countries);
+}
+
 export const country = (country: string) =>
 	Countries[country as keyof typeof Countries] || null;
 

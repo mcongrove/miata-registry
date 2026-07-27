@@ -236,7 +236,8 @@ export function CarSettings() {
 									disabled={
 										!edit.isSaveDirty ||
 										car.has_pending_changes ||
-										edit.loading
+										edit.loading ||
+										Boolean(edit.ownershipTimelineError)
 									}
 									className="shrink-0 rounded-md bg-brg py-2 px-3 text-sm text-white hover:bg-brg-dark disabled:opacity-50 lg:py-2 lg:px-3 lg:text-sm"
 								>
@@ -269,9 +270,12 @@ export function CarSettings() {
 							onFormChange={edit.handleFormChange}
 							onOwnerDateEndChange={edit.handleOwnerDateEndChange}
 							onPhotoStaged={edit.stagePhoto}
+							onPriorOwnersChange={edit.setPriorOwners}
 							onSequenceChange={edit.handleSequenceChange}
 							onSubmit={edit.handleSubmit}
 							photoPreviewUrl={edit.photoPreviewUrl}
+							priorOwners={edit.priorOwners}
+							timelineError={edit.ownershipTimelineError}
 							mileageDisplay={edit.mileageDisplay}
 							mileageUnit={edit.mileageUnit}
 							onMileageDisplayChange={edit.setMileageDisplay}

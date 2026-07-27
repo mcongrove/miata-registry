@@ -22,6 +22,10 @@ import { Resend } from 'resend';
 import { createDb } from '../../db';
 import { invalidateSeoCaches } from '../../seo/cache';
 import { recalculateAndStoreCarRarity } from '../utils/recalculateCarRarity';
+import {
+	applyPriorOwnerPendingApproval,
+	parsePriorOwnerIntent,
+} from '../utils/priorOwnerPending';
 import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
@@ -413,6 +417,41 @@ moderationRouter.post(
 
 			if (!pendingCarOwner) {
 				return c.json({ error: 'Not found' }, 404);
+			}
+
+			const priorOwnerIntent = parsePriorOwnerIntent(
+				pendingCarOwner.information
+			);
+
+			if (priorOwnerIntent) {
+				const {
+					created_at: _created_at,
+					id: _pendingId,
+					information,
+					status: _status,
+					user_id: _user_id,
+					...pendingRow
+				} = pendingCarOwner;
+
+				await applyPriorOwnerPendingApproval(
+					db,
+					{ ...pendingRow, information },
+					priorOwnerIntent
+				);
+
+				await db
+					.update(CarOwnersPending)
+					.set({ status: 'approved' })
+					.where(eq(CarOwnersPending.id, id));
+
+				await recalculateAndStoreCarRarity(db, pendingCarOwner.car_id);
+				await c.env.CACHE.delete(`cars:details:${pendingCarOwner.car_id}`);
+				await c.env.CACHE.delete(`cars:summary:${pendingCarOwner.car_id}`);
+				await c.env.CACHE.delete('editions:all:v2');
+				await c.env.CACHE.delete('stats:all');
+				await invalidateSeoCaches(c.env.CACHE);
+
+				return c.json({ success: true });
 			}
 
 			const {

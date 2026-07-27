@@ -53,7 +53,7 @@ app.use('*', async (c, next) => {
 	const ALLOWED_ORIGINS =
 		c.env.NODE_ENV !== 'development'
 			? ['https://miataregistry.com']
-			: ['https://miataregistry.com', 'http://localhost:5173'];
+			: ['https://miataregistry.com', 'http://localhost:5173', 'http://localhost:5199'];
 
 	const origin = c.req.header('Origin');
 

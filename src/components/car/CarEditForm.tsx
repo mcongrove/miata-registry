@@ -19,6 +19,7 @@
 import { type ChangeEvent } from 'react';
 import { useCarHasProfilePhoto } from '../../hooks/useCarProfilePhoto';
 import { ErrorBanner } from '../ErrorBanner';
+import { OwnershipHistoryEditor } from './OwnershipHistoryEditor';
 import { Field } from '../form/Field';
 import { Location } from '../form/Location';
 import { PhotoUpload } from '../form/PhotoUpload';
@@ -28,6 +29,7 @@ import {
 	CAR_EDIT_FORM_ID,
 	type TCarWithOwnerHistory,
 } from '../../hooks/useCarEdit';
+import type { TPriorOwnerFormRow } from '../../utils/ownershipHistory';
 import { convertMileageDisplay, type TMileageUnit } from '../../utils/car';
 import { formatLocation, normalizeLocation } from '../../utils/location';
 import {
@@ -53,6 +55,9 @@ type CarEditFormProps = {
 	mileageUnit: TMileageUnit;
 	onMileageDisplayChange: (value: string) => void;
 	onMileageUnitChange: (unit: TMileageUnit) => void;
+	onPriorOwnersChange: (rows: TPriorOwnerFormRow[]) => void;
+	priorOwners: TPriorOwnerFormRow[];
+	timelineError?: string | null;
 	warningOwnerDateEnd: boolean;
 	warningSequence: boolean;
 	rarityBreakdown: RarityScoreBreakdown | null;
@@ -132,6 +137,9 @@ export function CarEditForm({
 	mileageUnit,
 	onMileageDisplayChange,
 	onMileageUnitChange,
+	onPriorOwnersChange,
+	priorOwners,
+	timelineError = null,
 	warningOwnerDateEnd,
 	warningSequence,
 	rarityBreakdown,
@@ -153,6 +161,11 @@ export function CarEditForm({
 			})
 		) || 'Not set on your profile';
 
+	const currentOwnerName =
+		car.owner_history?.[0]?.name?.trim() ||
+		car.current_owner?.name?.trim() ||
+		'You';
+
 	return (
 		<form
 			id={CAR_EDIT_FORM_ID}
@@ -162,77 +175,25 @@ export function CarEditForm({
 		>
 			<ErrorBanner error={formError} onDismiss={onDismissError} />
 
-			<Section title="Your Ownership">
-				<div className="flex flex-wrap gap-6">
-					<Field
-						id="owner_date_state"
-						label="Purchase Date"
-						className="w-36"
-						required
-					>
-						<TextField
-							id="owner_date_start"
-							name="owner_date_start"
-							type="date"
-							placeholder="1990-01-01"
-							defaultValue={
-								car.owner_history?.[0]?.date_start
-									? car.owner_history[0].date_start
-											.toString()
-											.split('T')[0]
-									: undefined
-							}
-						/>
-					</Field>
-
-					<Field
-						id="owner_date_end"
-						label="Date Sold"
-						className="w-36"
-					>
-						<TextField
-							id="owner_date_end"
-							name="owner_date_end"
-							type="date"
-							placeholder="1990-01-01"
-							onChange={onOwnerDateEndChange}
-							defaultValue={
-								car.owner_history?.[0]?.date_end
-									? car.owner_history[0].date_end
-											.toString()
-											.split('T')[0]
-									: undefined
-							}
-						/>
-					</Field>
-				</div>
-
-				{warningOwnerDateEnd && (
-					<p className="text-xs text-brg-mid/80">
-						You will be removed as the owner of this car.
-					</p>
-				)}
-
-				<div className="flex flex-col gap-1">
-					<Field
-						id="owner_location_display"
-						label="Vehicle Location"
-						className="w-full max-w-sm"
-					>
-						<TextField
-							id="owner_location_display"
-							readOnly
-							disabled
-							value={ownerLocationDisplay}
-							className="bg-brg-light/40 text-brg-mid disabled:opacity-100 disabled:cursor-not-allowed"
-						/>
-					</Field>
-
-					<p className="text-brg-mid/70 text-xs">
-						To change the vehicle location, please update your
-						profile.
-					</p>
-				</div>
+			<Section
+				title="Ownership History"
+				intro="Changes are reviewed before they appear on the car profile. To change your name or location, update your profile."
+			>
+				<OwnershipHistoryEditor
+					currentOwner={{
+						name: currentOwnerName,
+						locationDisplay: ownerLocationDisplay,
+					}}
+					currentOwnerDateEnd={car.owner_history?.[0]?.date_end}
+					currentOwnerDateStart={car.owner_history?.[0]?.date_start}
+					disabled={disabled}
+					editionYear={car.edition?.year ?? null}
+					onChange={onPriorOwnersChange}
+					onOwnerDateEndChange={onOwnerDateEndChange}
+					rows={priorOwners}
+					timelineError={timelineError}
+					warningOwnerDateEnd={warningOwnerDateEnd}
+				/>
 			</Section>
 
 			<Section title="Manufacture & Shipping">
@@ -345,7 +306,7 @@ export function CarEditForm({
 					<Field
 						id="shipping_location"
 						label="Entry Port"
-						className="w-full min-w-0 shrink-0 sm:w-[10.5rem] sm:max-w-[10.5rem]"
+						className="w-full min-w-[12rem] flex-1 max-w-sm shrink-0"
 					>
 						<Location
 							id="shipping_location"
@@ -471,17 +432,14 @@ export function CarEditForm({
 			</Section>
 
 			<Section title="About This Miata">
-				<div className="flex flex-wrap gap-3 items-end">
-					<Field
-						id="mileage"
-						label="Current Mileage"
-						className="w-36 shrink-0"
-					>
+				<Field id="mileage" label="Current Mileage" className="shrink-0">
+					<div className="flex flex-wrap items-center gap-3">
 						<TextField
 							id="mileage"
 							name="mileage"
 							inputMode="numeric"
 							placeholder="42,500"
+							className="w-20 shrink-0"
 							value={mileageDisplay}
 							onChange={(e: ChangeEvent<HTMLInputElement>) => {
 								const value = e.target.value.replace(
@@ -494,36 +452,36 @@ export function CarEditForm({
 								);
 							}}
 						/>
-					</Field>
 
-					<Select
-						name="mileage_unit"
-						className="w-20"
-						value={mileageUnit}
-						onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-							const newUnit = e.target.value as TMileageUnit;
-							const raw = Number(
-								mileageDisplay.replace(/[^0-9]/g, '')
-							);
-
-							if (raw) {
-								onMileageDisplayChange(
-									convertMileageDisplay(
-										raw,
-										mileageUnit,
-										newUnit
-									).toLocaleString()
+						<Select
+							name="mileage_unit"
+							className="w-20 shrink-0"
+							value={mileageUnit}
+							onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+								const newUnit = e.target.value as TMileageUnit;
+								const raw = Number(
+									mileageDisplay.replace(/[^0-9]/g, '')
 								);
-							}
 
-							onMileageUnitChange(newUnit);
-						}}
-						options={[
-							{ value: 'mi', label: 'mi' },
-							{ value: 'km', label: 'km' },
-						]}
-					/>
-				</div>
+								if (raw) {
+									onMileageDisplayChange(
+										convertMileageDisplay(
+											raw,
+											mileageUnit,
+											newUnit
+										).toLocaleString()
+									);
+								}
+
+								onMileageUnitChange(newUnit);
+							}}
+							options={[
+								{ value: 'mi', label: 'mi' },
+								{ value: 'km', label: 'km' },
+							]}
+						/>
+					</div>
+				</Field>
 
 				<Field id="story" label="Your Car's Story" className="w-full">
 					<TextField
@@ -551,7 +509,7 @@ export function CarEditForm({
 				}
 			>
 				{rarityBreakdown ? (
-					<div className="rounded-lg border border-brg-light bg-brg-light/30 px-4 py-3 text-sm">
+					<div className="w-fit rounded-lg border border-brg-light bg-brg-light/30 px-4 py-3 text-sm">
 						{rarityLevel ? (
 							<p className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
 								<span className="font-medium text-brg">
@@ -641,19 +599,6 @@ export function CarEditForm({
 						/>
 					</div>
 				</div>
-			</Section>
-
-			<Section title="Prior Owners">
-				<p className="text-sm text-brg-mid/80">
-					To add or correct prior owners, send documentation to{' '}
-					<a
-						href={`mailto:support@miataregistry.com?subject=Prior%20Owners%20Submission:%20${car.id}`}
-						className="underline"
-					>
-						support@miataregistry.com
-					</a>
-					.
-				</p>
 			</Section>
 
 			<section className="flex flex-col gap-3 pt-10">

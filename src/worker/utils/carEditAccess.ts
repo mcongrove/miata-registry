@@ -16,16 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCAL_DEV_EDIT_CAR_ID } from '../../constants/local';
-
 export function allowLocalDevCarEditBypass(
-	nodeEnv: string | undefined,
-	carId: string
+	_nodeEnv: string | undefined,
+	_carId: string
 ): boolean {
-	/* LOCAL DEV — block-comment this entire if-block before merge */
+	/* LOCAL DEV — uncomment for one-car testing (see AGENTS.md).
+	import { LOCAL_DEV_EDIT_CAR_ID } from '../../constants/local';
+
 	if (nodeEnv === 'development' && carId === LOCAL_DEV_EDIT_CAR_ID) {
 		return true;
 	}
+	*/
 
 	return false;
 }

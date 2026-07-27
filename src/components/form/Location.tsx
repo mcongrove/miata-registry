@@ -18,8 +18,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { mapsEnabled } from '../../context/GoogleMapsContext';
-import { locationFromAddressComponents } from '../../utils/location';
+import { useGoogleMaps } from '../../context/GoogleMapsContext';
+import {
+	formatLocation,
+	locationFromAddressComponents,
+	parseLocation,
+} from '../../utils/location';
 
 interface LocationProps {
 	className?: string;
@@ -28,6 +32,7 @@ interface LocationProps {
 	name: string;
 	onLocationSelect?: (location: string) => void;
 	placeholder?: string;
+	requirePlaceSelection?: boolean;
 	required?: boolean;
 	value?: string;
 }
@@ -39,23 +44,32 @@ export function Location({
 	name,
 	onLocationSelect,
 	placeholder = '',
+	requirePlaceSelection,
 	required,
 	value,
 }: LocationProps) {
+	const { isLoaded, mapsEnabled } = useGoogleMaps();
+	const enforcePlaceSelection = requirePlaceSelection ?? mapsEnabled;
+
 	const [inputValue, setInputValue] = useState(value || '');
+	const [committedValue, setCommittedValue] = useState(value || '');
 	const inputRef = useRef<HTMLInputElement>(null);
 	const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(
 		null
 	);
+	const placeSelectedRef = useRef(false);
 
 	useEffect(() => {
 		if (value !== undefined) {
 			setInputValue(value);
+			setCommittedValue(value);
 		}
 	}, [value]);
 
 	useEffect(() => {
-		if (!mapsEnabled || !inputRef.current) return;
+		if (!mapsEnabled || !isLoaded || !inputRef.current) {
+			return;
+		}
 
 		autocompleteRef.current = new window.google.maps.places.Autocomplete(
 			inputRef.current,
@@ -68,7 +82,9 @@ export function Location({
 		autocompleteRef.current.addListener('place_changed', () => {
 			const place = autocompleteRef.current?.getPlace();
 
-			if (!place?.address_components) return;
+			if (!place?.address_components) {
+				return;
+			}
 
 			let formattedLocation: string;
 
@@ -79,16 +95,17 @@ export function Location({
 					place.address_components
 				);
 
-				formattedLocation = [parsed.city, parsed.state, parsed.country]
-					.filter(Boolean)
-					.join(', ');
+				formattedLocation = formatLocation(parsed);
 			}
 
+			if (!formattedLocation) {
+				return;
+			}
+
+			placeSelectedRef.current = true;
+			setCommittedValue(formattedLocation);
 			setInputValue(formattedLocation);
-
-			if (onLocationSelect && formattedLocation) {
-				onLocationSelect(formattedLocation);
-			}
+			onLocationSelect?.(formattedLocation);
 		});
 
 		return () => {
@@ -97,8 +114,53 @@ export function Location({
 					autocompleteRef.current
 				);
 			}
+
+			autocompleteRef.current = null;
 		};
-	}, [onLocationSelect, fullAddress]);
+	}, [fullAddress, isLoaded, mapsEnabled, onLocationSelect]);
+
+	const handleChange = (next: string) => {
+		placeSelectedRef.current = false;
+		setInputValue(next);
+	};
+
+	const handleBlur = () => {
+		if (!enforcePlaceSelection) {
+			const formatted = formatLocation(parseLocation(inputValue));
+
+			setInputValue(formatted);
+			setCommittedValue(formatted);
+
+			if (formatted !== committedValue) {
+				onLocationSelect?.(formatted);
+			}
+
+			return;
+		}
+
+		const trimmed = inputValue.trim();
+
+		if (!trimmed) {
+			if (committedValue) {
+				setCommittedValue('');
+				onLocationSelect?.('');
+			}
+
+			setInputValue('');
+			placeSelectedRef.current = false;
+
+			return;
+		}
+
+		if (placeSelectedRef.current || trimmed === committedValue) {
+			placeSelectedRef.current = false;
+
+			return;
+		}
+
+		setInputValue(committedValue);
+		placeSelectedRef.current = false;
+	};
 
 	return (
 		<input
@@ -109,9 +171,11 @@ export function Location({
 			placeholder={placeholder}
 			required={required}
 			value={inputValue}
-			onChange={(e) => setInputValue(e.target.value)}
+			onChange={(e) => handleChange(e.target.value)}
+			onBlur={handleBlur}
+			autoComplete="off"
 			className={twMerge(
-				'w-full p-2 !text-[16px] md:!text-sm text-brg border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid',
+				'w-full p-2 text-[16px] md:text-sm text-brg border border-brg-light rounded-lg focus:outline-none focus:border-brg-mid',
 				className
 			)}
 		/>

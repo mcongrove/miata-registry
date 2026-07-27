@@ -20,6 +20,7 @@ import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { createBrowserRouter, Outlet, useLocation } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { JsonLd } from './components/JsonLd';
 import { ModalProvider } from './context/ModalContext';
 import { Home } from './pages/Home';
@@ -98,9 +99,11 @@ const suspense = (page: ReactNode) => (
 );
 
 const AppShell = () => (
-	<ModalProvider>
-		<Layout />
-	</ModalProvider>
+	<ErrorBoundary>
+		<ModalProvider>
+			<Layout />
+		</ModalProvider>
+	</ErrorBoundary>
 );
 
 export const router = createBrowserRouter([
