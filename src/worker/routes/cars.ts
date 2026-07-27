@@ -43,7 +43,7 @@ const CACHE_TTL = {
 	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
 };
 
-const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v6:';
+const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v7:';
 
 const rarityScoreExpr = carDisplayRarityScoreExpr;
 
@@ -127,6 +127,9 @@ carsRouter.get('/', async (c) => {
 
 					break;
 				case 'rarity':
+					// Destroyed cars score 0 and have no rarity chip; never match rarity filters.
+					conditions.push(sql`NOT COALESCE(${Cars.destroyed}, 0)`);
+
 					switch (filter.value) {
 						case 'historically-significant':
 							conditions.push(sql`${rarityScoreExpr} >= 100`);
@@ -147,7 +150,9 @@ carsRouter.get('/', async (c) => {
 							);
 							break;
 						case 'limited-edition':
-							conditions.push(sql`${rarityScoreExpr} < 40`);
+							conditions.push(
+								sql`${rarityScoreExpr} > 0 AND ${rarityScoreExpr} < 40`
+							);
 							break;
 					}
 
@@ -171,6 +176,7 @@ carsRouter.get('/', async (c) => {
 					total_produced: Editions.total_produced,
 					year: Editions.year,
 				},
+				destroyed: Cars.destroyed,
 				id: Cars.id,
 				rarity_score: rarityScoreExpr,
 				sequence: Cars.sequence,

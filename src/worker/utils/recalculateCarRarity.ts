@@ -48,6 +48,7 @@ export async function recalculateAndStoreCarRarity(db: Db, carId: string) {
 
 	const ownerHistory = await db
 		.select({
+			date_end: CarOwners.date_end,
 			date_start: CarOwners.date_start,
 		})
 		.from(CarOwners)

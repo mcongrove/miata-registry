@@ -187,7 +187,15 @@ export const RegistryTable = ({
 									{hasSequence(car.sequence) ? (
 										<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40">
 											<div className="flex items-center justify-between gap-2">
-												{car.sequence?.toLocaleString()}
+												<span
+													className={
+														car.destroyed
+															? 'line-through text-brg-mid'
+															: undefined
+													}
+												>
+													{car.sequence?.toLocaleString()}
+												</span>
 												{car.edition
 													?.total_produced && (
 													<span className="text-brg-border">
@@ -200,7 +208,15 @@ export const RegistryTable = ({
 									) : (
 										<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40 text-brg-border">
 											<div className="flex items-center justify-between gap-2">
-												Unknown
+												<span
+													className={
+														car.destroyed
+															? 'line-through'
+															: undefined
+													}
+												>
+													Unknown
+												</span>
 												{car.edition
 													?.total_produced && (
 													<span>
@@ -212,7 +228,15 @@ export const RegistryTable = ({
 										</td>
 									)}
 									<td className="px-4 py-3 whitespace-nowrap">
-										<Chip score={car.rarity_score ?? 0} />
+										{car.destroyed ? (
+											<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200">
+												Destroyed
+											</span>
+										) : (
+											<Chip
+												score={car.rarity_score ?? 0}
+											/>
+										)}
 									</td>
 									<td className="px-4 py-3 whitespace-nowrap">
 										{car.current_owner?.name ? (
