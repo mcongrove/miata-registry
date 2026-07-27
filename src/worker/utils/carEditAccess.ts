@@ -16,11 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType = 'qrCode' | 'register' | 'socialGeneration' | 'tip';
+import { LOCAL_DEV_EDIT_CAR_ID } from '../../constants/local';
 
-export interface TModalState {
-	// Each modal type passes different props; validated at openModal call sites
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- polymorphic modal props
-	props?: any;
-	type: TModalType | null;
+export function allowLocalDevCarEditBypass(
+	nodeEnv: string | undefined,
+	carId: string
+): boolean {
+	/* LOCAL DEV — block-comment this entire if-block before merge */
+	if (nodeEnv === 'development' && carId === LOCAL_DEV_EDIT_CAR_ID) {
+		return true;
+	}
+
+	return false;
 }

@@ -113,9 +113,7 @@ export const Levels = () => {
 
 						<span className="inline-flex items-center gap-1 text-xs font-medium mt-1">
 							View cars
-							<i
-								className="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-0.5 transition-transform"
-							/>
+							<i className="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-0.5 transition-transform" />
 						</span>
 					</div>
 				</Link>

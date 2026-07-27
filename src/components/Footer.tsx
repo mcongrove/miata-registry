@@ -18,6 +18,7 @@
 
 import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
+import { AGPL_LICENSE_URL, GITHUB_REPO_URL } from '../constants/repo';
 import { useModal } from '../context/ModalContext';
 import { SitePulse } from './SitePulse';
 
@@ -55,7 +56,7 @@ export const Footer = () => {
 							</a>
 
 							<a
-								href="https://github.com/mcongrove/miata-registry"
+								href={GITHUB_REPO_URL}
 								className="text-brg-mid hover:text-brg-light transition-colors"
 								target="_blank"
 								rel="noopener noreferrer"
@@ -136,6 +137,14 @@ export const Footer = () => {
 								</li>
 								<li>
 									<Link
+										to="/news"
+										className="text-brg-mid hover:text-brg-light transition-colors"
+									>
+										News
+									</Link>
+								</li>
+								<li>
+									<Link
 										to="/rarity"
 										className="flex items-center gap-1.5 text-brg-mid hover:text-brg-light transition-colors"
 									>
@@ -177,16 +186,25 @@ export const Footer = () => {
 						</a>
 						.{' '}
 						<a
-							href="https://github.com/mcongrove/miata-registry"
+							href={GITHUB_REPO_URL}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-brg-mid underline whitespace-nowrap"
 						>
 							Source code
 						</a>{' '}
+						and{' '}
+						<a
+							href="https://archive.org/search?query=creator%3A%22Miata+Registry%22&sort=-addeddate"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-brg-mid underline whitespace-nowrap"
+						>
+							data
+						</a>{' '}
 						licensed under{' '}
 						<a
-							href="https://www.gnu.org/licenses/agpl-3.0.en.html"
+							href={AGPL_LICENSE_URL}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-brg-mid underline whitespace-nowrap"

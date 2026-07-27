@@ -27,11 +27,6 @@ import {
 import { TModalState, TModalType } from '../types/Modal';
 
 const MODAL_COMPONENTS = {
-	carEdit: lazy(() =>
-		import('../modals/CarEdit').then((module) => ({
-			default: module.CarEdit,
-		}))
-	),
 	qrCode: lazy(() =>
 		import('../modals/QrCode').then((module) => ({
 			default: module.QrCode,

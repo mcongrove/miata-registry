@@ -51,10 +51,7 @@ export const ScoreCard = ({ className, rows, title }: ScoreCardProps) => {
 
 				<tbody className="divide-y divide-brg-light">
 					{rows.map((row, index) => (
-						<tr
-							key={index}
-							className="hover:bg-brg-light/20"
-						>
+						<tr key={index} className="hover:bg-brg-light/20">
 							<td className="py-3 px-4 text-brg-mid">
 								{row.condition}
 							</td>

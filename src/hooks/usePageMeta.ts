@@ -164,7 +164,7 @@ export const usePageMeta = ({
 			document.querySelector('link[rel="prev"]')?.remove();
 			document.querySelector('link[rel="next"]')?.remove();
 		};
-	// path is reflected in metaUrl; omit path to avoid duplicate title/meta updates
-	// eslint-disable-next-line react-hooks/exhaustive-deps -- metaUrl derives from path
+		// path is reflected in metaUrl; omit path to avoid duplicate title/meta updates
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- metaUrl derives from path
 	}, [metaTitle, metaDescription, metaUrl, noindex, prev, next]);
 };

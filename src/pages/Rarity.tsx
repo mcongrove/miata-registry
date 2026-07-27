@@ -74,7 +74,7 @@ export const Rarity = () => {
 	return (
 		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-20">
 			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">
-				<div className="flex flex-col gap-8 lg:gap-16 z-10 lg:w-1/2">
+				<div className="relative z-10 flex flex-col gap-8 lg:w-1/2 lg:bg-white lg:pr-6">
 					<div className="flex flex-col gap-4">
 						<div className="w-fit flex gap-1.5 items-center bg-amber-100 border border-amber-300 text-amber-700 text-xs py-2 px-4 rounded-full">
 							<i className="fa-regular fa-clock text-sm"></i> Work
@@ -118,23 +118,23 @@ export const Rarity = () => {
 					</div>
 				</div>
 
-				<div className="flex items-center justify-center lg:w-1/2">
-					<div className="relative w-full h-[374px] lg:w-[544px] lg:h-[544px]">
+				<div className="flex w-full shrink-0 items-center justify-center overflow-visible lg:w-1/2">
+					<div className="relative mx-auto h-[30rem] w-full max-w-[22rem] overflow-visible sm:max-w-md lg:h-[34rem] lg:w-[34rem] lg:max-w-none">
 						<img
 							src="https://store.miataregistry.com/app/car/about-5.jpg"
-							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover object-left shadow-xl bg-brg-light rotate-6 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
+							className="absolute left-[10%] top-2 z-20 size-48 rotate-6 rounded-lg bg-brg-light object-cover object-left shadow-xl transition-all duration-500 ease-out hover:-translate-y-3 hover:translate-x-2 lg:left-auto lg:right-52 lg:top-4 lg:size-64"
 							alt="Miata in a valley"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-6.jpg"
-							className="absolute right-0 top-24 size-40 lg:right-0 lg:top-24 lg:size-72 rounded-lg object-cover object-bottom shadow-xl bg-brg-light -rotate-3 hover:-translate-y-3 hover:-translate-x-2 transition-all duration-500 ease-out"
+							className="absolute right-0 top-28 z-30 size-44 -rotate-3 rounded-lg bg-brg-light object-cover object-bottom shadow-xl transition-all duration-500 ease-out hover:-translate-y-3 hover:-translate-x-2 lg:top-24 lg:size-72"
 							alt="Miata in a field at dusk"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-7.jpg"
-							className="absolute top-44 left-0 w-64 h-48 lg:right-40 lg:top-72 lg:w-96 lg:h-64 rounded-lg object-cover shadow-xl bg-brg-light rotate-3 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
+							className="absolute bottom-2 left-0 z-10 h-52 w-64 rotate-3 rounded-lg bg-brg-light object-cover shadow-xl transition-all duration-500 ease-out hover:-translate-y-3 hover:translate-x-2 lg:bottom-auto lg:left-auto lg:right-32 lg:top-[17rem] lg:h-64 lg:w-96"
 							alt="A group of Miatas in a field"
 						/>
 					</div>
@@ -177,24 +177,24 @@ export const Rarity = () => {
 
 						<ScoreCard
 							title={
-								<span className="flex justify-between items-center">
+								<>
 									Preservation
-									<span className="text-xs text-brg-mid/70 font-normal">
+									<span className="mt-1 block text-xs font-normal text-brg-mid/70">
 										Good condition, car older than 10 years
 									</span>
-								</span>
+								</>
 							}
 							rows={preservationModifiers}
 						/>
 
 						<ScoreCard
 							title={
-								<span className="flex justify-between items-center">
+								<>
 									Documentation
-									<span className="text-xs text-brg-mid/70 font-normal">
+									<span className="mt-1 block text-xs font-normal text-brg-mid/70">
 										Car older than 10 years
 									</span>
-								</span>
+								</>
 							}
 							rows={documentationScores}
 						/>

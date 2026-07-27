@@ -16,107 +16,95 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useAuth } from '@clerk/clerk-react';
-import imageCompression from 'browser-image-compression';
 import { useState } from 'react';
-import { handleApiError } from '../../utils/common';
+import { compressCarPhoto } from '../../utils/carPhoto';
 
 interface PhotoUploadProps {
-	carId: string;
+	disabled?: boolean;
+	error?: string | null;
+	onClear: () => void;
+	onPhotoStaged: (file: File, previewUrl: string) => void;
+	previewUrl?: string | null;
 }
 
-export function PhotoUpload({ carId }: PhotoUploadProps) {
-	const { getToken } = useAuth();
-	const [loading, setLoading] = useState(false);
-	const [success, setSuccess] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
+export function PhotoUpload({
+	disabled = false,
+	error = null,
+	onClear,
+	onPhotoStaged,
+	previewUrl = null,
+}: PhotoUploadProps) {
+	const [preparing, setPreparing] = useState(false);
+	const [localError, setLocalError] = useState<string | null>(null);
+
+	const displayError = error ?? localError;
+	const hasPreview = Boolean(previewUrl);
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 
+		e.target.value = '';
+
 		if (!file) return;
 
-		if (!file.type.startsWith('image/')) {
-			setFormError('Please select an image file');
-
-			return;
-		}
-
-		if (file.size > 10 * 1024 * 1024) {
-			setFormError('File size must be less than 10MB');
-
-			return;
-		}
-
-		setLoading(true);
+		setLocalError(null);
+		setPreparing(true);
 
 		try {
-			const compressedFile = await imageCompression(file, {
-				maxSizeMB: 1,
-				maxWidthOrHeight: 1000,
-				useWebWorker: true,
-				fileType: 'image/jpeg',
-				initialQuality: 0.3,
-			});
+			const compressedFile = await compressCarPhoto(file);
+			const url = URL.createObjectURL(compressedFile);
 
-			const token = await getToken();
-			const formData = new FormData();
-
-			formData.append('photo', compressedFile);
-
-			const response = await fetch(
-				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/photos/${carId}`,
-				{
-					method: 'POST',
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-					body: formData,
-				}
+			onPhotoStaged(compressedFile, url);
+		} catch (err) {
+			setLocalError(
+				err instanceof Error ? err.message : 'Failed to process image'
 			);
-
-			if (!response.ok) {
-				throw new Error('Failed to upload photo');
-			}
-
-			setSuccess(true);
-		} catch (error) {
-			handleApiError(error);
-			setFormError('Failed to upload photo. Please try again.');
 		} finally {
-			setLoading(false);
+			setPreparing(false);
 		}
 	};
 
+	if (hasPreview && previewUrl) {
+		return (
+			<div className="relative w-full max-w-[300px] overflow-hidden rounded-lg border border-brg-border/60 bg-brg-light/20">
+				<img
+					src={previewUrl}
+					alt="Selected car photo preview"
+					className="aspect-[3/2] w-full object-cover bg-brg-light/30"
+				/>
+
+				<button
+					type="button"
+					onClick={onClear}
+					disabled={disabled || preparing}
+					className="absolute top-2 right-2 text-xs font-medium px-2.5 py-1 rounded-md bg-white/95 text-brg border border-brg-border/60 hover:bg-white disabled:opacity-50"
+				>
+					Remove
+				</button>
+			</div>
+		);
+	}
+
 	return (
-		<div className="relative">
+		<div className="relative w-full max-w-[300px]">
 			<input
 				type="file"
 				accept="image/*"
 				onChange={handleFileChange}
-				disabled={loading || success}
-				className="absolute inset-0 w-full h-full opacity-0 [&:not(:disabled)]:cursor-pointer"
+				disabled={disabled || preparing}
+				className="absolute inset-0 z-10 h-full w-full opacity-0 [&:not(:disabled)]:cursor-pointer"
 			/>
 
-			<div className="flex items-center justify-center h-32 border-2 border-dashed border-brg-light rounded-lg bg-brg-light/10 text-sm">
-				{loading ? (
+			<div className="flex aspect-[3/2] w-full items-center justify-center rounded-lg border-2 border-dashed border-brg-light bg-brg-light/10 text-sm">
+				{preparing ? (
 					<p className="flex gap-2 items-center text-brg-mid">
 						<i className="fa-solid fa-spinner fa-spin" />
-						Uploading...
+						Preparing image…
 					</p>
-				) : formError ? (
-					<p className="text-red-700">{formError}</p>
-				) : success ? (
-					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">
-						<i className="fa-solid fa-check text-2xl text-green-700" />
-
-						<p>Upload Complete</p>
-
-						<p className="text-xs text-brg-mid/60 text-center w-2/3">
-							The photo has been submitted, you can close the form
-							if you have no other changes
-						</p>
-					</div>
+				) : displayError ? (
+					<p className="text-red-700 px-4 text-center">
+						{displayError}
+					</p>
 				) : (
 					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">
 						<i className="fa-solid fa-camera-retro text-2xl" />
@@ -124,10 +112,6 @@ export function PhotoUpload({ carId }: PhotoUploadProps) {
 						<p>
 							Click or drag to upload{' '}
 							<span className="text-brg-border">10MB max</span>
-						</p>
-
-						<p className="text-xs text-brg-mid/60">
-							Photos will be <em>immediately submitted</em>
 						</p>
 					</div>
 				)}

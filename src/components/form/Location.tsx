@@ -79,11 +79,7 @@ export function Location({
 					place.address_components
 				);
 
-				formattedLocation = [
-					parsed.city,
-					parsed.state,
-					parsed.country,
-				]
+				formattedLocation = [parsed.city, parsed.state, parsed.country]
 					.filter(Boolean)
 					.join(', ');
 			}

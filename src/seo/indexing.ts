@@ -70,8 +70,7 @@ export const isCarIndexable = (car: CarIndexableFields): boolean => {
 		car.owner_history_count ?? car.owner_history?.length ?? 0;
 	const hasOwnerHistory = ownerHistoryCount > 0;
 	const hasPhoto = car.hasPhoto === true;
-	const hasSubstantive =
-		Boolean(car.vin?.trim()) || car.mileage != null;
+	const hasSubstantive = Boolean(car.vin?.trim()) || car.mileage != null;
 
 	return hasStory || hasOwnerHistory || hasPhoto || hasSubstantive;
 };

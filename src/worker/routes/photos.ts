@@ -22,6 +22,8 @@ import { Resend } from 'resend';
 import { createDb } from '../../db';
 import { Cars, Owners } from '../../db/schema';
 import { withAuth } from '../middleware/auth';
+import { allowLocalDevCarEditBypass } from '../utils/carEditAccess';
+import { stripJpegMetadata } from '../utils/stripJpegMetadata';
 import type { Bindings } from '../types';
 
 const photosRouter = new Hono<{ Bindings: Bindings }>();
@@ -49,6 +51,11 @@ photosRouter.post('/:id', withAuth(), async (c) => {
 		}
 
 		const db = createDb(c.env.DB);
+		const devBypass = allowLocalDevCarEditBypass(c.env.NODE_ENV, id);
+
+		const accessConditions = devBypass
+			? [eq(Cars.id, id)]
+			: [eq(Owners.user_id, userId), eq(Cars.id, id)];
 
 		const [car] = await db
 			.select({
@@ -56,7 +63,7 @@ photosRouter.post('/:id', withAuth(), async (c) => {
 			})
 			.from(Cars)
 			.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
-			.where(and(eq(Owners.user_id, userId), eq(Cars.id, id)));
+			.where(and(...accessConditions));
 
 		if (!car) {
 			return c.json(
@@ -68,16 +75,14 @@ photosRouter.post('/:id', withAuth(), async (c) => {
 			);
 		}
 
-		await c.env.IMAGES.put(
-			`car-pending/${id}.jpg`,
-			await file.arrayBuffer(),
-			{
-				httpMetadata: {
-					contentType: 'image/jpeg',
-					cacheControl: 'public, max-age=31536000',
-				},
-			}
-		);
+		const stripped = stripJpegMetadata(await file.arrayBuffer());
+
+		await c.env.IMAGES.put(`car-pending/${id}.jpg`, stripped, {
+			httpMetadata: {
+				contentType: 'image/jpeg',
+				cacheControl: 'public, max-age=31536000',
+			},
+		});
 
 		const resend = new Resend(c.env.RESEND_API_KEY);
 

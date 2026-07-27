@@ -17,85 +17,11 @@
  */
 
 import { ClerkProvider } from '@clerk/clerk-react';
-import { lazy, Suspense, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import {
-	BrowserRouter,
-	Outlet,
-	Route,
-	Routes,
-	useLocation,
-} from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { CSP } from './components/CSP';
-import { Footer } from './components/Footer';
-import { Header } from './components/Header';
-import { JsonLd } from './components/JsonLd';
-import { organizationWebSite } from './utils/jsonLd';
 import { GoogleMapsProvider } from './context/GoogleMapsContext';
-import { ModalProvider } from './context/ModalContext';
-import { Home } from './pages/Home';
-
-const About = lazy(() =>
-	import('./pages/About').then((module) => ({ default: module.About }))
-);
-
-const CarProfile = lazy(() =>
-	import('./pages/Car').then((module) => ({ default: module.CarProfile }))
-);
-
-const Editions = lazy(() =>
-	import('./pages/Editions').then((module) => ({ default: module.Editions }))
-);
-
-const Legal = lazy(() =>
-	import('./pages/Legal').then((module) => ({ default: module.Legal }))
-);
-
-const Moderation = lazy(() =>
-	import('./pages/Moderation').then((module) => ({
-		default: module.Moderation,
-	}))
-);
-
-const News = lazy(() =>
-	import('./pages/News').then((module) => ({ default: module.News }))
-);
-
-const NewsArticle = lazy(() =>
-	import('./pages/NewsArticle').then((module) => ({
-		default: module.NewsArticle,
-	}))
-);
-
-const Rarity = lazy(() =>
-	import('./pages/Rarity').then((module) => ({ default: module.Rarity }))
-);
-
-const Registry = lazy(() =>
-	import('./pages/Registry').then((module) => ({ default: module.Registry }))
-);
-
-function ScrollToTop() {
-	const { pathname } = useLocation();
-
-	useEffect(() => {
-		window.scrollTo(0, 0);
-	}, [pathname]);
-
-	return null;
-}
-
-const Layout = () => (
-	<div className="min-h-screen flex flex-col">
-		<JsonLd data={organizationWebSite()} />
-		<ScrollToTop />
-		<Header />
-		<Outlet />
-		<Footer />
-	</div>
-);
-
-const Fallback = () => <div className="min-h-screen" />;
+import { router } from './router';
 
 function App() {
 	return (
@@ -119,88 +45,7 @@ function App() {
 			>
 				<CSP />
 				<Toaster />
-
-				<BrowserRouter>
-					<ModalProvider>
-						<Routes>
-							<Route element={<Layout />}>
-								<Route path="/" element={<Home />} />
-								<Route
-									path="/about"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<About />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/legal"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<Legal />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/moderation"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<Moderation />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/news"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<News />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/news/:id"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<NewsArticle />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/rarity"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<Rarity />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/registry"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<Registry />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/registry/:id"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<CarProfile />
-										</Suspense>
-									}
-								/>
-								<Route
-									path="/registry/editions"
-									element={
-										<Suspense fallback={<Fallback />}>
-											<Editions />
-										</Suspense>
-									}
-								/>
-							</Route>
-						</Routes>
-					</ModalProvider>
-				</BrowserRouter>
+				<RouterProvider router={router} />
 			</ClerkProvider>
 		</GoogleMapsProvider>
 	);

@@ -63,7 +63,7 @@ src/
 
 - Frontend calls the worker via `VITE_CLOUDFLARE_WORKER_URL`.
 - Worker must `export default app` (Hono) for Wrangler/D1 deploy.
-- Production: SPA hosted on Cloudflare (dashboard); API worker deployed via GitHub Actions on push to `main`.
+- Production: SPA and API both auto-deploy on push to `main` (see Deployment).
 - Images served from R2 via `VITE_CLOUDFLARE_IMAGE_CDN_URL` (`store.miataregistry.com`).
 
 ## Code conventions
@@ -116,16 +116,27 @@ No automated E2E in CI — Cypress specs exist under `cypress/` but deps/scripts
 3. Email changes → `npm run email:dev`
 4. API changes → hit the route via curl or the UI
 
-**Hard to test locally without prod data:** car edit PATCH (needs a Clerk account that owns a car), moderator flows (needs moderator role), some claim/register flows.
+**Hard to test locally without prod data:** car edit PATCH (local Clerk `user_id` often differs from prod — see **Local car edit bypass** below), moderator flows (needs moderator role), some claim/register flows.
+
+### Local car edit bypass
+
+Local Clerk users usually have a different `user_id` than production, so the UI and `PATCH /cars/:id` deny edit even for your real car. For one-car testing against remote D1 (`worker:dev`), uncomment the matching `/* LOCAL DEV … */` blocks in:
+
+- `src/utils/carEditAccess.ts` (show Edit + `/registry/:id/settings`)
+- `src/worker/utils/carEditAccess.ts` (allow `PATCH /cars/:id` and `POST /photos/:id`)
+
+Car UUID: `src/constants/local.ts` (`63621393-a540-46b5-b9fe-9231fea2730f`). Re-comment before merge unless you intend to ship the bypass (don't). Submissions still hit **production** data and moderation queues.
 
 ## Deployment
 
+Both targets **auto-deploy on push to `main`**. No manual dashboard deploy is required for normal releases.
+
 | Target | How |
 |--------|-----|
-| API worker | Auto on push to `main` → `.github/workflows/deploy.yml` (lint, build, `worker:deploy`) |
-| Web frontend | Cloudflare dashboard (Pages/hosting), also auto-deploys from `main` |
+| API worker | GitHub Actions → `.github/workflows/deploy.yml` (lint, build, `worker:deploy`) |
+| Web frontend | Cloudflare dashboard **GitHub integration** (connected repo; builds/deploys `main` like CI) |
 
-After API changes that affect response shape, frontend may need a separate dashboard deploy. Coordinate with maintainer.
+Systems differ (Actions vs dashboard Git integration), but agents should assume **push to `main` ships API + web** unless the user says otherwise.
 
 **Do not commit, push, deploy, or run `db:push` unless the user explicitly asks.**
 
@@ -186,7 +197,7 @@ Worker logs may require a paid Cloudflare plan. For cron debugging, prefer `ARCH
 
 - Forgetting `worker:dev` → all APIs 404/fail.
 - Testing archive cron without dry run → spurious IA uploads.
-- Assuming both web and API deploy the same way — they don't (both auto-deploy, but via different systems).
+- Assuming web needs a manual Cloudflare deploy — it auto-deploys from `main` via dashboard Git integration (API via Actions).
 - Running `db:push` during local dev work — hits prod.
 - Changing registry sort/filter behavior without bumping list cache version.
 - Using ISO date helpers on pending `created_at` unix fields without `* 1000`.

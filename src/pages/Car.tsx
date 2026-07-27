@@ -17,7 +17,14 @@
  */
 
 import { useAuth, useUser } from '@clerk/clerk-react';
-import { lazy, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+	lazy,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type ReactNode,
+} from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { JsonLd } from '../components/JsonLd';
@@ -32,7 +39,13 @@ import {
 	hasSequence,
 	TVinDetails,
 } from '../utils/car';
-import { handleApiError, toIsoDateTime, toPrettyDate, toTitleCase } from '../utils/common';
+import {
+	handleApiError,
+	toIsoDateTime,
+	toPrettyDate,
+	toTitleCase,
+} from '../utils/common';
+import { userCanEditCar } from '../utils/carEditAccess';
 import { carPageJsonLd } from '../utils/jsonLd';
 import { isCarIndexable, isValidUuid } from '../utils/seoIndexing';
 import {
@@ -437,8 +450,8 @@ export const CarProfile = () => {
 							: null
 				),
 		].filter((location) => location !== null);
-	// Granular car fields — avoid re-running when unrelated car props change
-	// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional partial deps
+		// Granular car fields — avoid re-running when unrelated car props change
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional partial deps
 	}, [
 		vinDetails,
 		car?.sale_dealer_state,
@@ -450,7 +463,9 @@ export const CarProfile = () => {
 		return (
 			<main className="flex-1 px-8 pt-24 lg:pt-40 lg:px-0 pb-16">
 				<div className="container mx-auto flex flex-col items-center gap-4">
-					<h1 className="text-2xl font-bold text-brg">Car Not Found</h1>
+					<h1 className="text-2xl font-bold text-brg">
+						Car Not Found
+					</h1>
 
 					<p className="text-brg-mid mb-4">
 						This car isn&apos;t in the registry or the link may be
@@ -529,7 +544,12 @@ export const CarProfile = () => {
 
 							<div className="flex gap-2 lg:gap-4 items-center lg:justify-end">
 								{userId &&
-								car?.current_owner?.user_id === userId ? (
+								car &&
+								userCanEditCar(
+									car.id,
+									car.current_owner?.user_id,
+									userId
+								) ? (
 									<>
 										{car?.has_pending_changes && (
 											<p className="hidden md:flex text-sm text-brg items-center gap-2">
@@ -539,14 +559,8 @@ export const CarProfile = () => {
 										)}
 
 										<Button
-											onClick={() => {
-												openModal('carEdit', {
-													car,
-													onUpdate: () => loadCar(),
-												});
-											}}
-											disabled={car?.has_pending_changes}
-											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2 disabled:bg-white disabled:opacity-50"
+											href={`/registry/${car.id}/settings`}
+											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
 										>
 											<i className="fa-solid fa-fw fa-pen-to-square opacity-70" />
 											Edit Car
@@ -819,7 +833,9 @@ export const CarProfile = () => {
 											(
 												paragraph: string,
 												index: number
-											) => <p key={index}>{paragraph}</p>
+											) => (
+												<p key={index}>{paragraph}</p>
+											)
 										)}
 								</div>
 							</div>

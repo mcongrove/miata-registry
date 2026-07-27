@@ -29,6 +29,7 @@ import {
 	Owners,
 } from '../../db/schema';
 import { normalizeLocation } from '../../utils/location';
+import { allowLocalDevCarEditBypass } from '../utils/carEditAccess';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 
@@ -512,10 +513,11 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 			);
 		}
 
-		const accessConditions = [
-			eq(Cars.id, id),
-			eq(Owners.user_id, userId),
-		];
+		const devBypass = allowLocalDevCarEditBypass(c.env.NODE_ENV, id);
+
+		const accessConditions = devBypass
+			? [eq(Cars.id, id)]
+			: [eq(Cars.id, id), eq(Owners.user_id, userId)];
 
 		const [existing] = await db
 			.select({
@@ -639,9 +641,8 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		};
 
 		const ownersLogChanged = Object.values(ownersLogChecks).some(Boolean);
-		const moderatedCarChanged = Object.values(moderatedCarChecks).some(
-			Boolean
-		);
+		const moderatedCarChanged =
+			Object.values(moderatedCarChecks).some(Boolean);
 		const carOwnerChanged = Object.values(ownerChecks).some(Boolean);
 
 		if (ownersLogChanged) {

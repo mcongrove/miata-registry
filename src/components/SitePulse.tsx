@@ -20,15 +20,14 @@ import { useAuth } from '@clerk/clerk-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import { useArchiveHeartbeat } from '../hooks/useArchiveHeartbeat';
 import { toPrettyDate } from '../utils/common';
 
 export function SitePulse() {
 	const { isSignedIn, isLoaded, getToken } = useAuth();
 	const [lastActivity, setLastActivity] = useState<string>('');
 	const [isActive, setIsActive] = useState<boolean | null>(null);
-	const [lastArchive, setLastArchive] = useState<string>('');
-	const [isArchived, setIsArchived] = useState<boolean | null>(null);
-	const [archiveUrl, setArchiveUrl] = useState<string>('');
+	const { archiveUrl, isArchived, lastArchive } = useArchiveHeartbeat();
 
 	const applyPulseData = useCallback((timestamp: number) => {
 		const lastActivityDate = new Date(timestamp);
@@ -67,10 +66,6 @@ export function SitePulse() {
 					}
 				}
 
-				const archivePromise = fetch(
-					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/heartbeat/archive`
-				);
-
 				if (!pulseLoaded) {
 					try {
 						const pulseResponse = await fetch(
@@ -91,40 +86,8 @@ export function SitePulse() {
 						setIsActive(null);
 					}
 				}
-
-				try {
-					const archiveResponse = await archivePromise;
-
-					if (!archiveResponse.ok) {
-						if (archiveResponse.status === 404) {
-							setLastArchive('');
-							setIsArchived(false);
-						}
-					} else {
-						const archiveData = await archiveResponse.json();
-						const lastArchiveDate = new Date(archiveData.timestamp);
-						const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-
-						setIsArchived(
-							Date.now() - lastArchiveDate.getTime() <
-								thirtyDaysInMs
-						);
-						setLastArchive(
-							toPrettyDate(archiveData.timestamp).split(' at')[0]
-						);
-						setArchiveUrl(
-							`https://archive.org/details/${archiveData.filename.replace('.zip', '')}`
-						);
-					}
-				} catch {
-					setLastArchive('');
-					setIsArchived(null);
-					setArchiveUrl('');
-				}
 			} catch {
 				setLastActivity('');
-				setLastArchive('');
-				setArchiveUrl('');
 			}
 		};
 

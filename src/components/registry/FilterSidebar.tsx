@@ -108,8 +108,9 @@ export const FilterSidebar = ({
 	useEffect(() => {
 		if (!editionOptions.length) return;
 
-		const editionName = activeFilters.find((f) => f.type === 'edition')
-			?.value;
+		const editionName = activeFilters.find(
+			(f) => f.type === 'edition'
+		)?.value;
 		if (!editionName) return;
 
 		const edition = editionOptions.find((e) => e.name === editionName);
@@ -176,8 +177,7 @@ export const FilterSidebar = ({
 		editionOptions
 			.filter(
 				(edition) =>
-					!activeGeneration ||
-					edition.generation === activeGeneration
+					!activeGeneration || edition.generation === activeGeneration
 			)
 			.map((edition) => edition.year)
 	);
@@ -185,8 +185,7 @@ export const FilterSidebar = ({
 	const generationsWithEditions = new Set(
 		editionOptions
 			.filter(
-				(edition) =>
-					!activeYear || String(edition.year) === activeYear
+				(edition) => !activeYear || String(edition.year) === activeYear
 			)
 			.map((edition) => edition.generation)
 	);
@@ -223,9 +222,7 @@ export const FilterSidebar = ({
 		}
 
 		const edition = findEdition(value);
-		next = next.filter(
-			(f) => f.type !== 'year' && f.type !== 'generation'
-		);
+		next = next.filter((f) => f.type !== 'year' && f.type !== 'generation');
 		next.push({ type: 'edition', value });
 		if (edition) {
 			next.push(
@@ -465,7 +462,9 @@ export const FilterSidebar = ({
 							<FilterHeader
 								title="Claim Status"
 								onClear={() => handleClear('claimStatus')}
-								hasActiveFilter={!!getActiveValue('claimStatus')}
+								hasActiveFilter={
+									!!getActiveValue('claimStatus')
+								}
 								id="field-claim-status"
 							/>
 

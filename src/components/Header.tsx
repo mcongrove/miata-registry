@@ -51,7 +51,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 			>
 				{label}
 
-				<i className="fa-solid fa-fw fa-chevron-down text-[10px]" />
+				<i className="fa-solid fa-fw fa-chevron-down text-xs" />
 			</button>
 
 			<div className="absolute left-0 top-full invisible group-hover:visible">
@@ -171,8 +171,8 @@ export const Header = () => {
 				<Dropdown
 					label="About"
 					items={[
-						{ label: 'News & Updates', to: '/news' },
 						{ label: 'About the Registry', to: '/about' },
+						{ label: 'News & Updates', to: '/news' },
 						{
 							label: (
 								<span className="flex items-center gap-1.5">

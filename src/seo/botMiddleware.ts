@@ -204,7 +204,10 @@ export const resolveBotPageMeta = async (
 	if (STATIC_PAGE_META[pathname]) {
 		const meta = { ...STATIC_PAGE_META[pathname] };
 
-		if (pathname === '/registry' && registryHasNonDefaultView(searchParams)) {
+		if (
+			pathname === '/registry' &&
+			registryHasNonDefaultView(searchParams)
+		) {
 			return {
 				...meta,
 				noindex: true,

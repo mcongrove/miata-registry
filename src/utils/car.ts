@@ -54,8 +54,7 @@ export const parseSequence = (
 	return Number.isFinite(sequence) && sequence > 0 ? sequence : null;
 };
 
-export const VIN_INPUT_PATTERN =
-	'(?:[A-Z0-9]{5}-[A-Z0-9]{6}|JM[A-Z0-9]{15})';
+export const VIN_INPUT_PATTERN = '(?:[A-Z0-9]{5}-[A-Z0-9]{6}|JM[A-Z0-9]{15})';
 
 export const VIN_VALIDATION_MESSAGE =
 	'Enter a 17-character VIN starting with JM, or a chassis number as XXXXX-XXXXXX.';

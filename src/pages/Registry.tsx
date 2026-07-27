@@ -103,8 +103,7 @@ export const Registry = () => {
 		title: 'Cars',
 		description: 'A list of all Mazda Miatas in the Miata Registry.',
 		noindex: isNonDefaultView ? true : false,
-		prev:
-			currentPage > 1 ? buildRegistryPath(currentPage - 1) : undefined,
+		prev: currentPage > 1 ? buildRegistryPath(currentPage - 1) : undefined,
 		next:
 			currentPage < totalPages
 				? buildRegistryPath(currentPage + 1)

@@ -100,9 +100,7 @@ claimsRouter.post('/existing', withAuth(), async (c) => {
 					country: ownerLocation.country || null,
 					state: ownerLocation.state || null,
 				})
-				.where(
-					and(eq(Owners.id, ownerId), eq(Owners.user_id, userId))
-				);
+				.where(and(eq(Owners.id, ownerId), eq(Owners.user_id, userId)));
 		}
 
 		await db.insert(CarOwnersPending).values({
@@ -218,9 +216,7 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 					country: ownerLocation.country || null,
 					state: ownerLocation.state || null,
 				})
-				.where(
-					and(eq(Owners.id, ownerId), eq(Owners.user_id, userId))
-				);
+				.where(and(eq(Owners.id, ownerId), eq(Owners.user_id, userId)));
 		}
 
 		await db.insert(CarOwnersPending).values({
@@ -239,7 +235,10 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			.where(
 				and(
 					eq(Editions.name, body.edition_name.substring(5)),
-					eq(Editions.year, parseInt(body.edition_name.substring(0, 4)))
+					eq(
+						Editions.year,
+						parseInt(body.edition_name.substring(0, 4))
+					)
 				)
 			)
 			.get();

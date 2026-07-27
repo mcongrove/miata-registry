@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { StatisticItem } from '../components/about/StatisticItem';
+import { AGPL_LICENSE_URL, GITHUB_REPO_URL } from '../constants/repo';
 import { Button } from '../components/Button';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
@@ -171,7 +172,7 @@ export const About = () => {
 	return (
 		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-16">
 			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">
-				<div className="flex flex-col gap-8 lg:gap-16 z-10 lg:w-1/2">
+				<div className="relative z-10 flex flex-col gap-8 lg:w-1/2 lg:bg-white lg:pr-6">
 					<div id="introduction" className="flex flex-col gap-4">
 						<h1 className="text-4xl lg:text-6xl font-medium text-brg">
 							About the
@@ -223,23 +224,23 @@ export const About = () => {
 					</div>
 				</div>
 
-				<div className="flex items-center justify-center lg:w-1/2">
-					<div className="relative w-full h-[374px] lg:w-[544px] lg:h-[544px]">
+				<div className="flex w-full shrink-0 items-center justify-center overflow-visible lg:w-1/2">
+					<div className="relative mx-auto h-[30rem] w-full max-w-[22rem] overflow-visible sm:max-w-md lg:h-[34rem] lg:w-[34rem] lg:max-w-none">
 						<img
 							src="https://store.miataregistry.com/app/car/about-1.jpg"
-							className="absolute max-lg:left-1/4 top-0 size-48 lg:right-60 lg:top-0 lg:size-64 rounded-lg object-cover shadow-xl bg-brg-light rotate-6 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
+							className="absolute left-[10%] top-2 z-20 size-48 rotate-6 rounded-lg bg-brg-light object-cover object-left shadow-xl transition-all duration-500 ease-out hover:-translate-y-3 hover:translate-x-2 lg:left-auto lg:right-52 lg:top-4 lg:size-64"
 							alt="Miata in a valley"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-3.jpg"
-							className="absolute top-44 left-0 w-64 h-48 lg:right-40 lg:top-72 lg:w-96 lg:h-64 rounded-lg object-cover shadow-xl bg-brg-light rotate-3 hover:-translate-y-3 hover:translate-x-2 transition-all duration-500 ease-out"
+							className="absolute bottom-2 left-0 z-10 h-52 w-64 rotate-3 rounded-lg bg-brg-light object-cover shadow-xl transition-all duration-500 ease-out hover:-translate-y-3 hover:translate-x-2 lg:bottom-auto lg:left-auto lg:right-32 lg:top-[17rem] lg:z-10 lg:h-64 lg:w-96"
 							alt="A group of Miatas in a field"
 						/>
 
 						<img
 							src="https://store.miataregistry.com/app/car/about-8.jpg"
-							className="absolute right-0 top-24 size-40 lg:right-0 lg:top-24 lg:size-72 rounded-lg object-cover shadow-xl bg-brg-light -rotate-3 hover:-translate-y-3 hover:-translate-x-2 transition-all duration-500 ease-out"
+							className="absolute right-0 top-28 z-30 size-44 -rotate-3 rounded-lg bg-brg-light object-cover object-bottom shadow-xl transition-all duration-500 ease-out hover:-translate-y-3 hover:-translate-x-2 lg:top-24 lg:size-72"
 							alt="Miata in a field at dusk"
 						/>
 					</div>
@@ -388,19 +389,26 @@ export const About = () => {
 						</h2>
 
 						<p className="text-sm text-brg-mid">
-							The Miata Registry is proudly open source under the
-							AGPL-3.0 license. This means our code is freely
-							available for anyone to inspect, modify, and
-							improve. We believe this transparency is crucial for
-							a community resource—it ensures the project can
-							continue to serve the Miata community regardless of
-							any individual's involvement. Whether you're a
-							developer wanting to contribute code or an
-							enthusiast interested in how we verify registry
-							entries, you can find everything about how we
-							operate on our{' '}
+							The Miata Registry is proudly open source under the{' '}
 							<a
-								href="https://github.com/mcongrove/miata-registry"
+								href={AGPL_LICENSE_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="underline font-normal text-brg-mid"
+							>
+								AGPL-3.0 license
+							</a>
+							. This means our code is freely available for anyone
+							to inspect, modify, and improve. We believe this
+							transparency is crucial for a community resource—it
+							ensures the project can continue to serve the Miata
+							community regardless of any individual's
+							involvement. Whether you're a developer wanting to
+							contribute code or an enthusiast interested in how
+							we verify registry entries, you can find everything
+							about how we operate on our{' '}
+							<a
+								href={GITHUB_REPO_URL}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="underline font-normal text-brg-mid"
@@ -493,7 +501,7 @@ export const About = () => {
 							For developers interested in improving the platform
 							itself, our codebase is open source on{' '}
 							<a
-								href="https://github.com/mcongrove/miata-registry"
+								href={GITHUB_REPO_URL}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="underline font-normal text-brg-mid"

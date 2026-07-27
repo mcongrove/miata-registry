@@ -16,11 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType = 'qrCode' | 'register' | 'socialGeneration' | 'tip';
+import { useEffect, useState } from 'react';
 
-export interface TModalState {
-	// Each modal type passes different props; validated at openModal call sites
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- polymorphic modal props
-	props?: any;
-	type: TModalType | null;
+const imageCdn =
+	import.meta.env.VITE_CLOUDFLARE_IMAGE_CDN_URL ??
+	'https://store.miataregistry.com';
+
+export function useCarHasProfilePhoto(carId: string | undefined): boolean {
+	const [hasProfilePhoto, setHasProfilePhoto] = useState(false);
+
+	useEffect(() => {
+		if (!carId) {
+			setHasProfilePhoto(false);
+
+			return;
+		}
+
+		setHasProfilePhoto(false);
+
+		const img = new Image();
+
+		img.onload = () => setHasProfilePhoto(true);
+		img.onerror = () => setHasProfilePhoto(false);
+		img.src = `${imageCdn}/car/${carId}.jpg`;
+	}, [carId]);
+
+	return hasProfilePhoto;
 }

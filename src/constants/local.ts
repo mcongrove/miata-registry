@@ -16,11 +16,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType = 'qrCode' | 'register' | 'socialGeneration' | 'tip';
-
-export interface TModalState {
-	// Each modal type passes different props; validated at openModal call sites
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- polymorphic modal props
-	props?: any;
-	type: TModalType | null;
-}
+/** Car used for local edit testing when Clerk user_id ≠ prod owner (see AGENTS.md). */
+export const LOCAL_DEV_EDIT_CAR_ID = '63621393-a540-46b5-b9fe-9231fea2730f';

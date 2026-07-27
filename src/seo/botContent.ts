@@ -110,10 +110,7 @@ export const injectPageMeta = (html: string, meta: PageMeta): string => {
 	);
 
 	if (meta.botContent) {
-		result = result.replace(
-			'</body>',
-			`${meta.botContent}\n\t</body>`
-		);
+		result = result.replace('</body>', `${meta.botContent}\n\t</body>`);
 	}
 
 	return result;
@@ -125,10 +122,8 @@ export const buildBotArticle = (content: string): string =>
 const buildBotHeading = (heading: string): string =>
 	`<h1>${escapeHtml(heading)}</h1>`;
 
-export const buildStaticBotContent = (
-	heading: string,
-	body = ''
-): string => buildBotArticle(`${buildBotHeading(heading)}${body}`);
+export const buildStaticBotContent = (heading: string, body = ''): string =>
+	buildBotArticle(`${buildBotHeading(heading)}${body}`);
 
 export type CarBotData = {
 	id: string;
@@ -152,18 +147,14 @@ export const buildCarBotContent = (car: CarBotData): string => {
 	const edition = car.edition;
 	const year = edition?.year ?? '';
 	const name = edition?.name ?? 'Unknown edition';
-	const sequenceSuffix = hasSequence(car.sequence)
-		? ` #${car.sequence}`
-		: '';
+	const sequenceSuffix = hasSequence(car.sequence) ? ` #${car.sequence}` : '';
 	const color = edition?.color ? `${edition.color}.` : '';
 	const produced =
 		edition?.total_produced != null
 			? ` 1 of ${edition.total_produced.toLocaleString('en-US')} produced.`
 			: '';
 	const rarity =
-		car.rarity_score != null
-			? ` Rarity score: ${car.rarity_score}.`
-			: '';
+		car.rarity_score != null ? ` Rarity score: ${car.rarity_score}.` : '';
 	const claimed = car.current_owner_id ? ' Claimed.' : ' Unclaimed.';
 
 	const summary = `${year} ${name}${sequenceSuffix}. ${color}${produced}${rarity}${claimed}`;
@@ -174,9 +165,7 @@ export const buildCarBotContent = (car: CarBotData): string => {
 	];
 
 	if (edition?.description) {
-		parts.push(
-			`<p>${escapeHtml(edition.description.split('\n')[0])}</p>`
-		);
+		parts.push(`<p>${escapeHtml(edition.description.split('\n')[0])}</p>`);
 	}
 
 	if (car.story?.trim()) {

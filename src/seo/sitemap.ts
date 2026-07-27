@@ -49,9 +49,7 @@ const renderUrl = (url: SitemapUrl): string => {
 	];
 
 	if (url.changefreq) {
-		parts.push(
-			`    <changefreq>${escapeXml(url.changefreq)}</changefreq>`
-		);
+		parts.push(`    <changefreq>${escapeXml(url.changefreq)}</changefreq>`);
 	}
 
 	if (url.priority) {
@@ -154,9 +152,7 @@ export const generateSitemap = async (
 ): Promise<SitemapGeneration> => {
 	const carUrls = await fetchIndexableCarUrls(db);
 	const chunkCount =
-		carUrls.length === 0
-			? 0
-			: Math.ceil(carUrls.length / SITEMAP_MAX_URLS);
+		carUrls.length === 0 ? 0 : Math.ceil(carUrls.length / SITEMAP_MAX_URLS);
 	const indexEntries: SitemapUrl[] = [
 		{
 			loc: `${BASE_URL}/sitemap/static.xml`,
