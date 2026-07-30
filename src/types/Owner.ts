@@ -39,4 +39,7 @@ export type TCarOwner = TOwner & {
 	owner_id: string;
 };
 
-export type TCarOwnerPending = TCarOwner & TPending;
+export type TCarOwnerPending = TCarOwner &
+	TPending & {
+		information?: string | null;
+	};

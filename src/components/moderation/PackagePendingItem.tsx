@@ -37,10 +37,15 @@ const PACKAGE_DIFF_PRIORITY = [
 	'state',
 	'country',
 	'date_start',
-	'car_owners.id',
+	'information',
+	'instagram',
+	'mileage',
+	'story',
 ] as const;
 
 const EDITABLE_OWNER_FIELDS = ['name', 'city', 'state', 'country'] as const;
+
+const NOTES_CAR_FIELDS = new Set(['mileage', 'mileage_date', 'story']);
 
 const sortByFieldOrder = (keys: string[], order: readonly string[]) => {
 	const priority = new Map(order.map((field, index) => [field, index]));
@@ -81,7 +86,7 @@ export type TPackage = {
 		| (TCarOwnerPending & {
 				car_current_owner_id?: string | null;
 				current: TCarOwner | null;
-				proposed: TCarOwner;
+				proposed: TCarOwner & { information?: string | null };
 		  })
 		| null;
 	owner: (TOwnerPending & { proposed: TOwner }) | null;
@@ -91,8 +96,13 @@ export type PackageApproveOverrides = {
 	owner?: {
 		city?: string | null;
 		country?: string | null;
+		instagram?: string | null;
 		name?: string | null;
 		state?: string | null;
+	};
+	car?: {
+		mileage?: number | null;
+		story?: string | null;
 	};
 };
 
@@ -112,11 +122,17 @@ export const PackagePendingItem = ({
 	status?: 'approved' | 'rejected';
 }) => {
 	const initialOwner = pkg.owner?.proposed;
+	const information = pkg.carOwner?.proposed?.information;
+	const hasInformation =
+		typeof information === 'string' && information.trim().length > 0;
 
 	const [name, setName] = useState(initialOwner?.name ?? '');
 	const [city, setCity] = useState(initialOwner?.city ?? '');
 	const [state, setState] = useState(initialOwner?.state ?? '');
 	const [country, setCountry] = useState(initialOwner?.country ?? '');
+	const [instagram, setInstagram] = useState('');
+	const [mileage, setMileage] = useState('');
+	const [story, setStory] = useState('');
 
 	const ownerEdits = useMemo(
 		() => ({
@@ -138,13 +154,40 @@ export const PackagePendingItem = ({
 	const buildOverrides = (): PackageApproveOverrides => {
 		const overrides: PackageApproveOverrides = {};
 
-		if (pkg.owner) {
+		if (pkg.owner || hasInformation) {
 			overrides.owner = {
-				name: name || null,
-				city: city || null,
-				state: state || null,
-				country: country || null,
+				...(pkg.owner
+					? {
+							name: name || null,
+							city: city || null,
+							state: state || null,
+							country: country || null,
+						}
+					: {}),
+				...(hasInformation
+					? {
+							instagram:
+								instagram.trim().replace(/^@+/, '') || null,
+						}
+					: {}),
 			};
+		}
+
+		if (hasInformation) {
+			const parsedMileage = Number(mileage.replace(/,/g, '').trim());
+			const carOverride: NonNullable<PackageApproveOverrides['car']> = {};
+
+			if (mileage.trim() && Number.isFinite(parsedMileage)) {
+				carOverride.mileage = parsedMileage;
+			}
+
+			if (story.trim()) {
+				carOverride.story = story.trim();
+			}
+
+			if (Object.keys(carOverride).length > 0) {
+				overrides.car = carOverride;
+			}
 		}
 
 		return overrides;
@@ -160,7 +203,8 @@ export const PackagePendingItem = ({
 		copyValue?: string;
 		editValue?: string;
 		onEditChange?: (value: string) => void;
-		editType?: 'text' | 'date';
+		editPlaceholder?: string;
+		editType?: 'text' | 'date' | 'textarea';
 		edited?: boolean;
 	};
 
@@ -180,6 +224,7 @@ export const PackagePendingItem = ({
 			'manufacture_prefecture',
 			'vin_decode_status',
 			'vin_details',
+			...(hasInformation ? NOTES_CAR_FIELDS : []),
 		]);
 
 		for (const field of orderedCarDiffFields(pkg.car)) {
@@ -218,7 +263,7 @@ export const PackagePendingItem = ({
 		const ownerId = pkg.owner.proposed.id;
 
 		for (const field of orderedOwnerDiffFields(pkg.owner.proposed)) {
-			if (field === 'user_id') continue;
+			if (field === 'user_id' || field === 'links') continue;
 
 			if ((EDITABLE_OWNER_FIELDS as readonly string[]).includes(field)) {
 				const key = field as (typeof EDITABLE_OWNER_FIELDS)[number];
@@ -262,16 +307,8 @@ export const PackagePendingItem = ({
 	}
 
 	if (pkg.carOwner) {
-		if (pkg.carOwner.id) {
-			addDiff({
-				key: 'car_owners.id',
-				label: 'car_owners.id',
-				newValue: pkg.carOwner.id,
-			});
-		}
-
 		for (const field of Object.keys(pkg.carOwner.proposed)) {
-			if (field === 'car_id' || field === 'owner_id') {
+			if (field === 'car_id' || field === 'owner_id' || field === 'id') {
 				continue;
 			}
 
@@ -287,6 +324,55 @@ export const PackagePendingItem = ({
 				label: field,
 				oldValue: pkg.carOwner.current?.[field as keyof TCarOwner],
 				newValue: pkg.carOwner.proposed[field as keyof TCarOwner],
+			});
+		}
+
+		if (hasInformation) {
+			addDiff({
+				key: 'instagram',
+				label: 'instagram',
+				oldValue: undefined,
+				newValue: instagram,
+				...(status
+					? {}
+					: {
+							editValue: instagram,
+							onEditChange: setInstagram,
+							editPlaceholder: 'Instagram handle',
+							edited: Boolean(instagram.trim()),
+						}),
+			});
+
+			addDiff({
+				key: 'mileage',
+				label: 'mileage',
+				oldValue: undefined,
+				newValue: mileage,
+				...(status
+					? {}
+					: {
+							editValue: mileage,
+							onEditChange: setMileage,
+							editPlaceholder: 'Mileage',
+							editType: 'text',
+							edited: Boolean(mileage.trim()),
+						}),
+			});
+
+			addDiff({
+				key: 'story',
+				label: 'story',
+				oldValue: undefined,
+				newValue: story,
+				...(status
+					? {}
+					: {
+							editValue: story,
+							onEditChange: setStory,
+							editPlaceholder: 'Story / condition notes',
+							editType: 'textarea',
+							edited: Boolean(story.trim()),
+						}),
 			});
 		}
 	}
@@ -321,6 +407,7 @@ export const PackagePendingItem = ({
 						copyValue={diff.copyValue}
 						editValue={diff.editValue}
 						onEditChange={diff.onEditChange}
+						editPlaceholder={diff.editPlaceholder}
 						editType={diff.editType}
 						edited={diff.edited}
 					/>

@@ -81,6 +81,44 @@ export async function sendApprovedCarEmail({
 	});
 }
 
+const normalizeInstagramHandle = (
+	value: string | null | undefined
+): string | null => {
+	if (value == null) return null;
+
+	const handle = value.trim().replace(/^@+/, '');
+
+	return handle || null;
+};
+
+/** owners_pending.links is text; owners.links is JSON blob — normalize either shape. */
+export const parseOwnerLinks = (
+	raw: unknown
+): { instagram: string | null } | null => {
+	if (raw == null || raw === '') return null;
+
+	let parsed: unknown = raw;
+
+	if (typeof raw === 'string') {
+		try {
+			parsed = JSON.parse(raw);
+		} catch {
+			return null;
+		}
+	}
+
+	if (!parsed || typeof parsed !== 'object') return null;
+
+	const instagram = normalizeInstagramHandle(
+		(parsed as { instagram?: string | null }).instagram
+	);
+
+	return { instagram };
+};
+
+const ownerLinksPendingValue = (instagram: string | null): string | null =>
+	instagram ? JSON.stringify({ instagram }) : null;
+
 export async function approvePendingOwner(db: DrizzleDb, pendingId: string) {
 	const pendingOwner = await db
 		.select()
@@ -95,10 +133,14 @@ export async function approvePendingOwner(db: DrizzleDb, pendingId: string) {
 	const {
 		created_at: _created_at,
 		status: _status,
+		links: rawLinks,
 		...ownerData
 	} = pendingOwner;
 
-	await db.insert(Owners).values(ownerData);
+	await db.insert(Owners).values({
+		...ownerData,
+		links: parseOwnerLinks(rawLinks),
+	});
 
 	await db
 		.update(OwnersPending)
@@ -332,8 +374,13 @@ export type PackageApproveOverrides = {
 	owner?: {
 		city?: string | null;
 		country?: string | null;
+		instagram?: string | null;
 		name?: string | null;
 		state?: string | null;
+	};
+	car?: {
+		mileage?: number | null;
+		story?: string | null;
 	};
 };
 
@@ -370,7 +417,18 @@ export async function approvePendingPackage(
 		.get();
 
 	if (overrides?.owner && pendingOwner) {
-		const ownerPatch = {
+		const instagram =
+			overrides.owner.instagram !== undefined
+				? normalizeInstagramHandle(overrides.owner.instagram)
+				: undefined;
+
+		const ownerPatch: {
+			city?: string | null;
+			country?: string | null;
+			links?: { instagram: string | null } | null;
+			name?: string | null;
+			state?: string | null;
+		} = {
 			...(overrides.owner.name !== undefined
 				? { name: overrides.owner.name }
 				: {}),
@@ -384,6 +442,13 @@ export async function approvePendingPackage(
 				? { country: overrides.owner.country }
 				: {}),
 		};
+
+		if (instagram !== undefined) {
+			// Column is text; store JSON string (typed as object for Drizzle $type)
+			ownerPatch.links = ownerLinksPendingValue(instagram) as unknown as {
+				instagram: string | null;
+			} | null;
+		}
 
 		if (Object.keys(ownerPatch).length > 0) {
 			await db
@@ -410,6 +475,64 @@ export async function approvePendingPackage(
 		const approvedOwner = await approvePendingOwner(db, pendingOwner.id);
 
 		userId = approvedOwner?.userId ?? userId;
+	} else if (overrides?.owner?.instagram !== undefined) {
+		const instagram = normalizeInstagramHandle(overrides.owner.instagram);
+		const linksJson = JSON.stringify({ instagram });
+
+		await db
+			.update(Owners)
+			.set({
+				links: instagram ? sql`json(${linksJson})` : null,
+			})
+			.where(eq(Owners.id, pendingCarOwner.owner_id));
+
+		const ownedCars = await db
+			.select({ id: Cars.id })
+			.from(Cars)
+			.where(eq(Cars.current_owner_id, pendingCarOwner.owner_id));
+
+		await Promise.all(
+			ownedCars.flatMap((car) => [
+				cache.delete(`cars:details:${car.id}`),
+				cache.delete(`cars:summary:${car.id}`),
+			])
+		);
+	}
+
+	if (overrides?.car) {
+		const carPatch: {
+			mileage?: number | null;
+			mileage_date?: string | null;
+			story?: string | null;
+		} = {};
+
+		if (overrides.car.mileage !== undefined) {
+			carPatch.mileage = overrides.car.mileage;
+
+			if (overrides.car.mileage != null) {
+				carPatch.mileage_date = `${new Date().toISOString().split('T')[0]}T00:00:00.000Z`;
+			}
+		}
+
+		if (overrides.car.story !== undefined) {
+			carPatch.story = overrides.car.story;
+		}
+
+		if (Object.keys(carPatch).length > 0) {
+			if (pendingCar) {
+				await db
+					.update(CarsPending)
+					.set(carPatch)
+					.where(eq(CarsPending.id, pendingCar.id));
+			} else {
+				await db
+					.update(Cars)
+					.set(carPatch)
+					.where(eq(Cars.id, pendingCarOwner.car_id));
+
+				await invalidateCarCaches(cache, pendingCarOwner.car_id);
+			}
+		}
 	}
 
 	if (pendingCar) {

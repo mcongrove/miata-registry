@@ -32,6 +32,7 @@ const DIFF_FIELD_LABELS: Record<string, string> = {
 	edition_id: 'Edition',
 	id: 'ID',
 	information: 'Information',
+	instagram: 'Instagram',
 	links: 'Links',
 	manufacture_city: 'Manufacture City',
 	manufacture_date: 'Manufacture Date',
@@ -96,6 +97,7 @@ export const Diff = ({
 	copyValue,
 	editValue,
 	onEditChange,
+	editPlaceholder,
 	editType = 'text',
 	edited = false,
 }: {
@@ -108,7 +110,8 @@ export const Diff = ({
 	copyValue?: string;
 	editValue?: string;
 	onEditChange?: (value: string) => void;
-	editType?: 'text' | 'date';
+	editPlaceholder?: string;
+	editType?: 'text' | 'date' | 'textarea';
 	edited?: boolean;
 }) => {
 	const formatValue = (value: unknown) => {
@@ -162,15 +165,33 @@ export const Diff = ({
 
 			{isEditable ? (
 				<span className="w-1/3 font-mono text-sm text-brg">
-					<input
-						type={editType}
-						value={editValue ?? ''}
-						onChange={(event) => onEditChange(event.target.value)}
-						className={twMerge(
-							'w-full bg-transparent p-0 font-mono text-sm text-brg outline-none border-0 border-b border-transparent focus:border-brg-border',
-							edited && 'border-brg-border/70'
-						)}
-					/>
+					{editType === 'textarea' ? (
+						<textarea
+							value={editValue ?? ''}
+							placeholder={editPlaceholder}
+							onChange={(event) =>
+								onEditChange(event.target.value)
+							}
+							rows={3}
+							className={twMerge(
+								'w-full resize-y bg-transparent p-0 font-mono text-sm text-brg outline-none border-0 border-b border-transparent focus:border-brg-border placeholder:text-brg-border',
+								edited && 'border-brg-border/70'
+							)}
+						/>
+					) : (
+						<input
+							type={editType}
+							value={editValue ?? ''}
+							placeholder={editPlaceholder}
+							onChange={(event) =>
+								onEditChange(event.target.value)
+							}
+							className={twMerge(
+								'w-full bg-transparent p-0 font-mono text-sm text-brg outline-none border-0 border-b border-transparent focus:border-brg-border placeholder:text-brg-border',
+								edited && 'border-brg-border/70'
+							)}
+						/>
+					)}
 					{subTextNode}
 				</span>
 			) : copyValue ? (
