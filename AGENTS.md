@@ -4,19 +4,13 @@ Community registry for limited edition Mazda Miatas. React 19 SPA (Vite 6, Tailw
 
 Human-oriented docs: [README.md](README.md), [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Session start (new chats only)
+## Keeping this file current
 
-At the **start of a new agent chat session** — not on every follow-up message — run:
+When the user corrects you on something that is likely to come up again in future sessions, update this file in the same turn (don't wait to be asked):
 
-```bash
-npm audit
-```
-
-Cross-reference findings against **direct** dependencies only (`dependencies` and `devDependencies` in `package.json`). If a direct package has an advisory, mention it briefly so the user can decide whether to upgrade during this session.
-
-- **Do** flag direct-dependency vulnerabilities to the user.
-- **Don't** report or act on transitive-only findings.
-- **Don't** run `npm audit fix`, `npm audit fix --force`, or bump packages unless the user asks.
+- Prefer folding into an existing section if one fits.
+- Otherwise add a bullet under **Common mistakes**, or a short dedicated section/subsection if the topic needs more room.
+- Keep entries terse and actionable — same tone as the rest of this file.
 
 ## Setup
 
@@ -31,8 +25,8 @@ Cross-reference findings against **direct** dependencies only (`dependencies` an
 
 ```bash
 npm install
-npm run dev          # Vite on :5173
-npm run worker:dev   # Wrangler remote worker on :8788
+npm run dev # Vite on :5173
+npm run worker:dev # Wrangler remote worker on :8788
 ```
 
 Without `worker:dev`, all API calls fail (`failed to fetch`).
@@ -45,32 +39,19 @@ npm run format
 npm run build
 ```
 
-Other useful commands: `npm run email:dev` (preview emails), `npm run db:push` (apply schema to remote D1 — see boundaries below), `npm run worker:deploy` (API deploy).
-
-## Prettier / format
-
-**Do not** run Prettier after every edit or as routine task wrap-up. Format only when preparing a **commit** (or when the user explicitly asks):
-
-1. Format touched files (prefer scoped write so you don't rewrite unrelated `src/`):
-    ```bash
-    npx prettier --write path/to/changed.ts path/to/other.tsx
-    ```
-    `npm run format` rewrites all of `src/**/*.{js,jsx,ts,tsx}` — fine right before a PR/commit if you intend a full pass.
-2. Confirm it applied: `npx prettier --check` on those same paths (or `git diff` looks like formatting-only where expected). Fix anything still failing check before committing.
-
-Mid-task: match existing file style by hand; don't kick off format/lint/build just to say you're done unless the user asked or you're about to commit.
+Other useful commands: `npm run email:dev` (preview emails), `npm run db:push` (apply schema to remote D1 — see Boundaries), `npm run worker:deploy` (API deploy).
 
 ## Architecture
 
 ```
 src/
-├── pages/              # Route-level components (lazy-loaded in App.tsx)
-├── components/         # Shared UI
-├── modals/             # Modal dialogs
-├── worker/routes/      # Hono API handlers → mounted in worker/index.ts
-├── worker/middleware/  # Clerk auth, moderator checks
-├── db/schema/          # Drizzle table definitions
-├── emails/             # react-email templates (+ separate tailwind.config.ts)
+├── pages/ # Route-level components (lazy-loaded in App.tsx)
+├── components/ # Shared UI
+├── modals/ # Modal dialogs
+├── worker/routes/ # Hono API handlers → mounted in worker/index.ts
+├── worker/middleware/ # Clerk auth, moderator checks
+├── db/schema/ # Drizzle table definitions
+├── emails/ # react-email templates (+ separate tailwind.config.ts)
 └── types/, utils/, hooks/, context/
 ```
 
@@ -93,6 +74,36 @@ src/
 - **edition** — not "model"
 - **brg** — use `brg` Tailwind color tokens for UI; don't use `gray-*` classes. CSS `grayscale` filter on images is fine.
 
+### Before commit
+
+**Do not** run these mid-task as routine wrap-up. Only when preparing a **commit** (or when the user explicitly asks).
+
+**Prettier / format**
+
+1. Format touched files (prefer scoped write so you don't rewrite unrelated `src/`):
+
+```bash
+npx prettier --write path/to/changed.ts path/to/other.tsx
+```
+
+`npm run format` rewrites all of `src/**/*.{js,jsx,ts,tsx}` — fine right before a PR/commit if you intend a full pass.
+
+2. Confirm it applied: `npx prettier --check` on those same paths (or `git diff` looks like formatting-only where expected). Fix anything still failing check before committing.
+
+Mid-task: match existing file style by hand; don't kick off format/lint/build just to say you're done unless the user asked or you're about to commit.
+
+**npm audit**
+
+```bash
+npm audit
+```
+
+Cross-reference findings against **direct** dependencies only (`dependencies` and `devDependencies` in `package.json`). If a direct package has an advisory, mention it briefly so the user can decide whether to upgrade before/with the commit.
+
+- **Do** flag direct-dependency vulnerabilities to the user.
+- **Don't** report or act on transitive-only findings.
+- **Don't** run `npm audit fix`, `npm audit fix --force`, or bump packages unless the user asks.
+
 ## Design (Impeccable)
 
 UI/design work is guided by [Impeccable](https://impeccable.style/) — installed in `.cursor/skills/impeccable/`. Read these before changing frontend visuals or copy tone:
@@ -111,7 +122,7 @@ Don't overwrite `PRODUCT.md` or `DESIGN.md` without asking. If design context is
 
 **Slop detector:** `npx impeccable detect src/` — deterministic anti-pattern rules; useful before UI PRs.
 
-### Domain logic worth knowing
+## Domain logic
 
 - **Moderation approval order:** owner → car → car_owner.
 - **`cars.updated_date`** is set only when a **car_owner** submission is approved (initial claim or new ownership), not on field edits or car-only approvals. Backfill source: `car_owners_pending.created_at` (unix seconds → ISO).
