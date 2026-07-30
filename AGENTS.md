@@ -12,6 +12,12 @@ When the user corrects you on something that is likely to come up again in futur
 - Otherwise add a bullet under **Common mistakes**, or a short dedicated section/subsection if the topic needs more room.
 - Keep entries terse and actionable — same tone as the rest of this file.
 
+## Plan vs build
+
+If the user asks to **plan**, **discuss**, **design**, **weigh options**, or “how would you go about…”, **do not implement**. Stay in planning: research, propose, ask clarifying questions, write/update a plan. Wait for an explicit build/implement go-ahead (or Plan-mode acceptance that clearly means “build this”) before writing product code, schema, or migrations.
+
+Same bar for irreversible/prod steps (`db:push`, seed, deploy, push) — ask even after a build go-ahead unless they already said to do that step.
+
 ## Setup
 
 **Prerequisites:** Node.js 22, npm.
@@ -67,6 +73,7 @@ src/
 - Prettier: tabs, single quotes, semicolons (`.prettierrc`).
 - Prefix intentionally unused vars/args with `_` for ESLint. Use inline `eslint-disable` only when context warrants it (intentional `any`, hook dep tricks, etc.) — don't blindly "fix" lint.
 - No section-divider comments. Only comment non-obvious business logic.
+- New D1 tables: order columns for human scanning (identity → discriminators → content → payload → housekeeping), not alphabetical. Match that order in `CREATE TABLE` and the Drizzle schema object — the console shows declaration order.
 
 ### Terminology (user-facing copy)
 
@@ -166,7 +173,7 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 
 ## Boundaries — ask first
 
-- **Database writes** — there is no local D1. `worker:dev --remote` and `db:push` hit **production**. Never run schema pushes, backfills, or destructive SQL without explicit approval. Weekly [Internet Archive backups](https://archive.org/search?query=creator%3A%22Miata+Registry%22&sort=-addeddate) include full registry CSV exports for offline study; they are not a substitute for `worker:dev` against live D1.
+- **Database writes** — there is no local D1. `worker:dev --remote` and `db:push` hit **production**. Never run schema pushes, backfills, or destructive SQL without explicit approval. Weekly [Internet Archive backups](https://archive.org/details/@miataregistry) include full registry CSV exports for offline study; they are not a substitute for `worker:dev` against live D1.
 - **Archive cron** — never POST to `/heartbeat/archive/cron` without `ARCHIVE_DRY_RUN=true` in worker env. Real runs upload to Internet Archive.
 - **Secrets** — don't read, log, or commit `.env`, `.dev.vars`, or secret values. `.dev.vars.example` / `.env.example` are the safe references.
 - **Generated / vendor paths** — don't edit `dist/`, `.wrangler/`, `node_modules/`.
@@ -190,16 +197,32 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 
 Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape (currently `cars:list:v7:`).
 
-| Key pattern                         | Purpose                   |
-| ----------------------------------- | ------------------------- |
-| `cars:list:v7:{params}`             | Registry browse list      |
-| `cars:details:{id}`                 | Car profile               |
-| `cars:summary:{id}`                 | Car summary               |
-| `editions:all:v2`, `editions:names` | Edition data              |
-| `stats:all`                         | Site stats                |
-| `news:*`                            | News list/detail/featured |
+| Key pattern                                       | Purpose                   |
+| ------------------------------------------------- | ------------------------- |
+| `cars:list:v7:{params}`                           | Registry browse list      |
+| `cars:details:{id}`                               | Car profile               |
+| `cars:summary:{id}`                               | Car summary               |
+| `editions:all:v2`, `editions:names`               | Edition data              |
+| `stats:all`                                       | Site stats                |
+| `news:*`                                          | News list/detail/featured |
+| `resources:list:v4:…`, `resources:detail:v2:{id}` | Resources catalog         |
+| `seo:sitemap:v8`                                  | Sitemap XML               |
 
 Moderation approvals invalidate relevant car/edition/stats keys. Stale registry data after deploy? suspect KV — list prefix above.
+
+### Resources catalog
+
+Public catalog at `/resources` (D1 `resources` + `resource_associations`). Kinds: `link` (external `href`), `registry` (owner/community registries — external `href`), `file` (R2 via `file_key`), `page` (internal path in `href`). Associations are mainly `edition` + edition UUID (junction kept open for other types later — don't invent tag taxonomies unless needed).
+
+**Naming:** descriptive `id` doubles as the public path (`/resources/{id}`) — e.g. `factory-colors-by-model-year`, `m-edition-field-guide`, `miata-registry-data-archive`. Prefer consistent patterns; don’t repeat `miata` in every id (the whole site is Miata). Keep `miata-registry-*` for this product, and proper names (`miatas-in-america`, `yellow-miata-registry`). Avoid hostnames (`github`) and pointless prefixes (`res_`). No separate `slug` column.
+
+**sort_order shelves:** 100 Miata Registry, 200 registries, 300 VINs, 800 historic, 900 FAQ. List API: `sort_order` → `kind` → `title`.
+
+**R2:** binding `RESOURCES` → bucket `miata-registry-resources` (not `IMAGES`). Public CDN: `https://resources.miataregistry.com` (`VITE_CLOUDFLARE_RESOURCES_CDN_URL`). Object keys: `{id}/{filename}` (no host) in `file_key`.
+
+**SEO/AEO:** every published `/resources/:id` is sitemap’d / bot-bodied / JSON-LD’d (indexes our catalog page). Bot HTML for `link`/`registry` states the destination is third-party / not operated by us. Outbound CTAs (external `href` + R2 downloads) use `rel="nofollow noopener noreferrer"`; bot HTML and JSON-LD must not emit those URLs (`relatedLink` / `contentUrl` omitted).
+
+**Editorial writes:** no in-app CMS — insert D1 rows + upload to `RESOURCES` offline (ask before prod writes).
 
 ### CORS
 
@@ -219,6 +242,7 @@ Worker logs may require a paid Cloudflare plan. For cron debugging, prefer `ARCH
 
 ## Common mistakes from past sessions
 
+- Jumping from plan/discuss language into implementation without an explicit build go-ahead.
 - Forgetting `worker:dev` → all APIs 404/fail.
 - Testing archive cron without dry run → spurious IA uploads.
 - Assuming web needs a manual Cloudflare deploy — it auto-deploys from `main` via dashboard Git integration (API via Actions).

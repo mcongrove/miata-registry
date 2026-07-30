@@ -76,6 +76,16 @@ const Registry = lazy(() =>
 	import('./pages/Registry').then((module) => ({ default: module.Registry }))
 );
 
+const Resource = lazy(() =>
+	import('./pages/Resource').then((module) => ({ default: module.Resource }))
+);
+
+const Resources = lazy(() =>
+	import('./pages/Resources').then((module) => ({
+		default: module.Resources,
+	}))
+);
+
 function ScrollToTop() {
 	const { pathname } = useLocation();
 
@@ -121,6 +131,11 @@ export const router = createBrowserRouter([
 			{ path: '/news', element: suspense(<News />) },
 			{ path: '/news/:id', element: suspense(<NewsArticle />) },
 			{ path: '/rarity', element: suspense(<Rarity />) },
+			{ path: '/resources', element: suspense(<Resources />) },
+			{
+				path: '/resources/:id',
+				element: suspense(<Resource />),
+			},
 			{ path: '/registry', element: suspense(<Registry />) },
 			{ path: '/registry/editions', element: suspense(<Editions />) },
 			{

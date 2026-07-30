@@ -27,6 +27,7 @@ import moderationRouter from './routes/moderation';
 import newsRouter from './routes/news';
 import ownersRouter from './routes/owners';
 import photosRouter from './routes/photos';
+import resourcesRouter from './routes/resources';
 import seoRouter from './routes/seo';
 import statsRouter from './routes/stats';
 import webhooksRouter from './routes/webhooks';
@@ -93,6 +94,7 @@ app.route('/moderation', moderationRouter);
 app.route('/news', newsRouter);
 app.route('/owners', ownersRouter);
 app.route('/photos', photosRouter);
+app.route('/resources', resourcesRouter);
 app.route('/stats', statsRouter);
 app.route('/webhooks', webhooksRouter);
 

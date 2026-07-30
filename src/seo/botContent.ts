@@ -408,6 +408,54 @@ export const buildNewsPageMeta = (article: NewsBotData): PageMeta => ({
 	botContent: buildNewsBotContent(article),
 });
 
+export type ResourceBotData = {
+	id: string;
+	title: string;
+	summary: string;
+	body?: string | null;
+	kind: string;
+	href?: string | null;
+	publish_date: string;
+};
+
+export const buildResourceBotContent = (resource: ResourceBotData): string => {
+	const body =
+		resource.body?.split('\n').filter(Boolean)[0] || resource.summary;
+	const isThirdParty =
+		(resource.kind === 'link' || resource.kind === 'registry') &&
+		Boolean(resource.href?.startsWith('http'));
+
+	const parts = [
+		`<h1>${escapeHtml(resource.title)}</h1>`,
+		`<p><time datetime="${escapeHtml(resource.publish_date)}">${escapeHtml(resource.publish_date)}</time></p>`,
+		`<p>${escapeHtml(body)}</p>`,
+	];
+
+	if (isThirdParty) {
+		parts.push(
+			'<p>This page catalogs a third-party resource. The destination is not operated by the Miata Registry.</p>'
+		);
+	}
+
+	// Internal pages only — never emit external hrefs or file CDN URLs for bots.
+	if (resource.kind === 'page' && resource.href?.startsWith('/')) {
+		parts.push(
+			`<p><a href="${escapeHtml(resource.href)}">Open page</a></p>`
+		);
+	} else if (resource.kind === 'file') {
+		parts.push('<p>A file download is available on this catalog page.</p>');
+	}
+
+	return buildBotArticle(parts.join('\n'));
+};
+
+export const buildResourcePageMeta = (resource: ResourceBotData): PageMeta => ({
+	title: resource.title,
+	description: resource.summary,
+	path: `/resources/${resource.id}`,
+	botContent: buildResourceBotContent(resource),
+});
+
 export const STATIC_PAGE_META: Record<
 	string,
 	Omit<PageMeta, 'path'> & { path: string }
@@ -442,6 +490,16 @@ export const STATIC_PAGE_META: Record<
 		botContent: buildStaticBotContent(
 			'Latest Updates',
 			'<p>Stay up to date with the latest announcements and updates from the Registry.</p>'
+		),
+	},
+	'/resources': {
+		path: '/resources',
+		title: 'Resources',
+		description:
+			'Historical documentation for limited edition Miatas, preserved for the long term, including archives of community registries whose data now lives on in the Miata Registry.',
+		botContent: buildStaticBotContent(
+			'Resources',
+			'<p>Catalog of historical documentation for limited edition Miatas, including community registries and reference material. Third-party destinations listed here are not operated by the Miata Registry.</p>'
 		),
 	},
 	'/rarity': {

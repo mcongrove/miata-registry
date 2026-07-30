@@ -16,36 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ClerkClient } from '@clerk/backend';
-import { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
+export type TResourceKind =
+	'link' | 'registry' | 'file' | 'page' | (string & {});
 
-declare module 'hono' {
-	interface ContextVariableMap {
-		clerk: ClerkClient;
-		clerkWebhookBody: string;
-		userId: string;
-	}
-}
-
-export type ApiError = {
-	details?: string;
-	error: string;
+export type TResourceAssociation = {
+	type: string;
+	value: string;
+	label?: string | null;
+	/** Edition path slug when type is `edition`. */
+	slug?: string | null;
 };
 
-export interface Bindings {
-	ADMIN_USER_ID: string;
-	ARCHIVE_ORG_ACCESS_KEY: string;
-	ARCHIVE_ORG_SECRET_KEY: string;
-	ARCHIVE_ORG_CRON_SECRET: string;
-	ARCHIVE_DRY_RUN?: string;
-	CACHE: KVNamespace;
-	CLERK_PUBLISHABLE_KEY: string;
-	CLERK_SECRET_KEY: string;
-	CLERK_WEBHOOK_SECRET: string;
-	DB: D1Database;
-	IMAGES: R2Bucket;
-	NODE_ENV: string;
-	RESEND_API_KEY: string;
-	RESEND_AUDIENCE_ID: string;
-	RESOURCES: R2Bucket;
-}
+export type TResource = {
+	id: string;
+	title: string;
+	summary: string;
+	body?: string | null;
+	kind: TResourceKind;
+	href?: string | null;
+	file_key?: string | null;
+	file_mime?: string | null;
+	file_bytes?: number | null;
+	file_name?: string | null;
+	publish_date: string;
+	sort_order: number;
+	featured: number;
+	updated_at?: string | null;
+	associations: TResourceAssociation[];
+};

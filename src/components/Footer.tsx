@@ -123,7 +123,7 @@ export const Footer = () => {
 
 						<div>
 							<h3 className="font-medium text-white mb-4">
-								Resources
+								About
 							</h3>
 
 							<ul className="space-y-2">
@@ -141,6 +141,14 @@ export const Footer = () => {
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
 										News
+									</Link>
+								</li>
+								<li>
+									<Link
+										to="/resources"
+										className="text-brg-mid hover:text-brg-light transition-colors"
+									>
+										Resources
 									</Link>
 								</li>
 								<li>
@@ -195,7 +203,7 @@ export const Footer = () => {
 						</a>{' '}
 						and{' '}
 						<a
-							href="https://archive.org/search?query=creator%3A%22Miata+Registry%22&sort=-addeddate"
+							href="https://archive.org/details/@miataregistry"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-brg-mid underline whitespace-nowrap"
