@@ -16,30 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export function userCanEditCar(
-	_carId: string,
-	ownerClerkUserId: string | null | undefined,
-	signedInUserId: string | null | undefined
-): boolean {
-	if (!signedInUserId) {
-		return false;
-	}
+const CLERK_DASHBOARD_APP_ID = 'app_2qlkRWWWSQ3B907dV0QOvoNvdIP';
+const CLERK_DASHBOARD_INSTANCE_ID = 'ins_2qlnRWm1Ysz2qIILDJk53fPGOFR';
 
-	if (ownerClerkUserId === signedInUserId) {
-		return true;
-	}
-
-	/* LOCAL DEV — uncomment for one-car testing (see AGENTS.md).
-	import { LOCAL_DEV_EDIT_CAR_ID } from '../constants/local';
-
-	const devCarId =
-		(import.meta.env.VITE_LOCAL_DEV_EDIT_CAR_ID as string | undefined)?.trim() ||
-		LOCAL_DEV_EDIT_CAR_ID;
-
-	if (import.meta.env.DEV && _carId === devCarId) {
-		return true;
-	}
-	*/
-
-	return false;
-}
+export const clerkDashboardUserUrl = (userId: string) =>
+	`https://dashboard.clerk.com/apps/${CLERK_DASHBOARD_APP_ID}/instances/${CLERK_DASHBOARD_INSTANCE_ID}/users/${userId}`;

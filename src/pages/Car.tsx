@@ -34,12 +34,7 @@ import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar } from '../types/Car';
 import { TCarOwner } from '../types/Owner';
-import {
-	formatPlantLocation,
-	getVinDetails,
-	hasSequence,
-	TVinDetails,
-} from '../utils/car';
+import { formatManufactureLocation, hasSequence } from '../utils/car';
 import {
 	handleApiError,
 	toIsoDateTime,
@@ -50,12 +45,7 @@ import { userCanEditCar } from '../utils/carEditAccess';
 import { qualifiesAsSingleOwnerSinceNew } from '../utils/rarityScore';
 import { carPageJsonLd } from '../utils/jsonLd';
 import { isCarIndexable, isValidUuid } from '../utils/seoIndexing';
-import {
-	country,
-	countryNameToCode,
-	formatLocation,
-	state,
-} from '../utils/location';
+import { country, formatLocation, state } from '../utils/location';
 
 const Map = lazy(() =>
 	import('../components/car/Map').then((module) => ({ default: module.Map }))
@@ -76,7 +66,6 @@ export const CarProfile = () => {
 	const [hasPhoto, setHasPhoto] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
-	const [vinDetails, setVinDetails] = useState<TVinDetails | null>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
 
 	const isIndexable =
@@ -99,8 +88,15 @@ export const CarProfile = () => {
 	});
 
 	const manufactureLocation = useMemo(() => {
-		return vinDetails ? formatPlantLocation(vinDetails) : null;
-	}, [vinDetails]);
+		if (!car?.manufacture_city && !car?.manufacture_prefecture) {
+			return null;
+		}
+
+		return formatManufactureLocation(
+			car.manufacture_city,
+			car.manufacture_prefecture
+		);
+	}, [car?.manufacture_city, car?.manufacture_prefecture]);
 
 	const singleOwnerSinceNew = useMemo(() => {
 		const editionYear = car?.edition?.year;
@@ -121,7 +117,6 @@ export const CarProfile = () => {
 		setIsLoading(true);
 		setNotFound(false);
 		setCar(null);
-		setVinDetails(null);
 		setTimelineOwners([]);
 
 		if (!isValidUuid(id)) {
@@ -169,15 +164,6 @@ export const CarProfile = () => {
 				}
 
 				setTimelineOwners(ownerHistory);
-			}
-
-			if (carData?.vin) {
-				const details = await getVinDetails(
-					carData.vin,
-					carData.edition.year
-				);
-
-				setVinDetails(details);
 			}
 		} catch (error) {
 			handleApiError(error);
@@ -315,15 +301,9 @@ export const CarProfile = () => {
 					name: (
 						<>
 							Built{' '}
-							{vinDetails?.Manufacturer ? (
-								<span className="text-brg-border">
-									by {toTitleCase(vinDetails.Manufacturer)}
-								</span>
-							) : (
-								<span className="text-brg-border">
-									by Mazda Motor Corporation
-								</span>
-							)}
+							<span className="text-brg-border">
+								by Mazda Motor Corporation
+							</span>
 						</>
 					),
 					dateRange: formatCarDate(
@@ -435,15 +415,13 @@ export const CarProfile = () => {
 					showConnector={index !== lastValidIndex}
 				/>
 			));
-	}, [car, timelineOwners, vinDetails, manufactureLocation]);
+	}, [car, timelineOwners, manufactureLocation]);
 
 	const mapLocations = useMemo(() => {
-		if (!car && !vinDetails) return [];
+		if (!car) return [];
 
 		return [
-			vinDetails?.PlantCountry
-				? country(countryNameToCode(vinDetails.PlantCountry))
-				: country('JP'),
+			country('JP'),
 			car?.shipping_state
 				? state(car.shipping_state)
 				: car?.shipping_country
@@ -467,12 +445,7 @@ export const CarProfile = () => {
 		].filter((location) => location !== null);
 		// Granular car fields — avoid re-running when unrelated car props change
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentional partial deps
-	}, [
-		vinDetails,
-		car?.sale_dealer_state,
-		car?.sale_dealer_country,
-		timelineOwners,
-	]);
+	}, [car, car?.sale_dealer_state, car?.sale_dealer_country, timelineOwners]);
 
 	if (notFound) {
 		return (
@@ -560,7 +533,9 @@ export const CarProfile = () => {
 										) : null}
 
 										<RarityScoreBreakdownTooltip car={car}>
-											<Chip score={car.rarity_score ?? 0} />
+											<Chip
+												score={car.rarity_score ?? 0}
+											/>
 										</RarityScoreBreakdownTooltip>
 									</div>
 								)}

@@ -20,6 +20,21 @@ import { TPending } from './Common';
 import { TEdition } from './Edition';
 import { TCarOwner, TOwner } from './Owner';
 
+export type TVinDecodeStatus = 'ok' | 'invalid' | 'error' | 'skipped';
+
+export type TStoredVinDetails = {
+	bodyClass?: string;
+	displacementL?: string;
+	engineCylinders?: string;
+	engineHP?: string;
+	engineHP_to?: string;
+	engineModel?: string;
+	fuelTypePrimary?: string;
+	model?: string;
+	modelYear?: string;
+	vehicleDescriptor?: string;
+};
+
 export type TCar = {
 	current_owner_id?: string;
 	current_owner?: TOwner;
@@ -28,7 +43,9 @@ export type TCar = {
 	edition?: TEdition;
 	has_pending_changes?: boolean;
 	id: string;
+	manufacture_city?: string | null;
 	manufacture_date?: string;
+	manufacture_prefecture?: string | null;
 	mileage?: number;
 	mileage_date?: string;
 	owner_history?: TCarOwner[];
@@ -55,6 +72,8 @@ export type TCar = {
 	story?: string;
 	updated_date?: string;
 	vin?: string;
+	vin_decode_status?: TVinDecodeStatus | null;
+	vin_details?: TStoredVinDetails | null;
 };
 
 export type TCarPending = TCar &

@@ -18,11 +18,11 @@
 
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { Resend } from 'resend';
 import { createDb } from '../../db';
-import { Cars, Owners } from '../../db/schema';
+import { Cars, Editions, Owners } from '../../db/schema';
 import { withAuth } from '../middleware/auth';
 import { allowLocalDevCarEditBypass } from '../utils/carEditAccess';
+import { formatEditionLabel, notifyModerator } from '../utils/notifyModerator';
 import { stripJpegMetadata } from '../utils/stripJpegMetadata';
 import type { Bindings } from '../types';
 
@@ -96,6 +96,7 @@ photosRouter.post('/:id', withAuth(), async (c) => {
 		const [car] = await db
 			.select({
 				id: Cars.id,
+				edition_id: Cars.edition_id,
 			})
 			.from(Cars)
 			.innerJoin(Owners, eq(Cars.current_owner_id, Owners.id))
@@ -120,16 +121,15 @@ photosRouter.post('/:id', withAuth(), async (c) => {
 			},
 		});
 
-		const resend = new Resend(c.env.RESEND_API_KEY);
+		const edition = await db
+			.select({ year: Editions.year, name: Editions.name })
+			.from(Editions)
+			.where(eq(Editions.id, car.edition_id))
+			.get();
 
-		await resend.emails.send({
-			from: 'Miata Registry <support@miataregistry.com>',
-			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: Photo Submission',
-			html: `
-				<h2>Photo Submission</h2>
-				<p><strong>Car ID:</strong> ${id}</p>
-			`,
+		await notifyModerator(c.env.RESEND_API_KEY, {
+			kind: 'photo_upload',
+			edition: formatEditionLabel(edition?.year, edition?.name),
 		});
 
 		return c.json({ success: true });

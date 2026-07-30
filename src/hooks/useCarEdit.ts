@@ -61,15 +61,13 @@ function resolveCurrentOwnerDatesFromDom(car: TCarWithOwnerHistory): {
 		CAR_EDIT_FORM_ID
 	) as HTMLFormElement | null;
 	const start =
-		(
-			form?.querySelector('#owner_date_start') as HTMLInputElement | null
-		)?.value ||
+		(form?.querySelector('#owner_date_start') as HTMLInputElement | null)
+			?.value ||
 		dateToFormValue(car.owner_history?.[0]?.date_start) ||
 		null;
 	const end =
-		(
-			form?.querySelector('#owner_date_end') as HTMLInputElement | null
-		)?.value ||
+		(form?.querySelector('#owner_date_end') as HTMLInputElement | null)
+			?.value ||
 		dateToFormValue(car.owner_history?.[0]?.date_end) ||
 		null;
 
@@ -113,6 +111,7 @@ export function useCarEdit(
 	const [ownershipTimelineError, setOwnershipTimelineError] = useState<
 		string | null
 	>(null);
+	const initializedCarIdRef = useRef<string | null>(null);
 
 	const revokePhotoPreview = useCallback(() => {
 		if (photoPreviewRef.current?.startsWith('blob:')) {
@@ -150,6 +149,10 @@ export function useCarEdit(
 	useLayoutEffect(() => {
 		if (!enabled) return;
 
+		// Same car after a soft/hard reload (e.g. post-save) — keep success UI
+		if (initializedCarIdRef.current === car.id) return;
+
+		initializedCarIdRef.current = car.id;
 		setMileageUnit('mi');
 		setMileageDisplay(
 			car.mileage != null ? car.mileage.toLocaleString() : ''
@@ -367,8 +370,7 @@ export function useCarEdit(
 			CAR_EDIT_FORM_ID
 		) as HTMLFormElement | null;
 
-		const formData =
-			isFormDirty && form ? new FormData(form) : null;
+		const formData = isFormDirty && form ? new FormData(form) : null;
 
 		const { end: currentOwnerEnd, start: currentOwnerStart } =
 			resolveCurrentOwnerDatesFromDom(car);
@@ -428,6 +430,7 @@ export function useCarEdit(
 		setFormError(null);
 
 		let detailsSaved = false;
+		let needsReview = false;
 
 		try {
 			const token = await getToken();
@@ -533,18 +536,18 @@ export function useCarEdit(
 
 				const result = await response.json();
 
-				setPendingReview(Boolean(result.pending_review));
+				needsReview = Boolean(result.pending_review);
 				detailsSaved = true;
-			} else {
-				setPendingReview(false);
 			}
 
 			if (pendingPhoto) {
 				try {
 					await uploadCarPhoto(car.id, pendingPhoto, token);
+					needsReview = true;
 					clearPendingPhoto();
 				} catch (photoError) {
 					if (detailsSaved) {
+						setPendingReview(needsReview);
 						setFormError(
 							'Details saved, but the photo could not be uploaded. Try saving again.'
 						);
@@ -557,6 +560,11 @@ export function useCarEdit(
 				}
 			}
 
+			setPendingReview(needsReview);
+			setIsFormDirty(false);
+			setBaselinePriorOwners(priorOwners);
+			setWarningSequence(false);
+			setWarningOwnerDateEnd(false);
 			setIsSuccess(true);
 			onUpdate?.();
 		} catch (error) {

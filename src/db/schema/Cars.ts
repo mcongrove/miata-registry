@@ -17,6 +17,7 @@
  */
 
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import type { TStoredVinDetails } from '../../types/Car';
 import { Editions } from './Editions';
 import { Owners } from './Owners';
 
@@ -27,7 +28,9 @@ export const Cars = sqliteTable('cars', {
 		.notNull()
 		.references(() => Editions.id),
 	id: text('id').primaryKey(),
+	manufacture_city: text('manufacture_city'),
 	manufacture_date: text('manufacture_date'),
+	manufacture_prefecture: text('manufacture_prefecture'),
 	mileage: integer('mileage'),
 	mileage_date: text('mileage_date'),
 	rarity_original_hardtop: integer('rarity_original_hardtop', {
@@ -67,4 +70,10 @@ export const Cars = sqliteTable('cars', {
 	story: text('story'),
 	updated_date: text('updated_date'),
 	vin: text('vin'),
+	vin_decode_status: text('vin_decode_status', {
+		enum: ['ok', 'invalid', 'error', 'skipped'],
+	}),
+	vin_details: text('vin_details', {
+		mode: 'json',
+	}).$type<TStoredVinDetails>(),
 });

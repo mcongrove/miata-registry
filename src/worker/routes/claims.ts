@@ -18,7 +18,6 @@
 
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { Resend } from 'resend';
 import { createDb } from '../../db';
 import {
 	CarOwnersPending,
@@ -29,12 +28,54 @@ import {
 	OwnersPending,
 	Tips,
 } from '../../db/schema';
-import { parseSequence } from '../../utils/car';
+import {
+	buildVinDecodeFields,
+	parseEditionYear,
+	parseSequence,
+} from '../../utils/car';
 import { ownerLocationFromClaimBody } from '../../utils/location';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
+import { formatEditionLabel, notifyModerator } from '../utils/notifyModerator';
 
 const claimsRouter = new Hono<{ Bindings: Bindings }>();
+
+async function updateOwnerProfileAndInvalidateCars(
+	db: ReturnType<typeof createDb>,
+	cache: Bindings['CACHE'],
+	ownerId: string,
+	userId: string,
+	body: {
+		owner_name: string;
+		owner_city?: string;
+		owner_state?: string;
+		owner_country?: string;
+	}
+) {
+	const ownerLocation = ownerLocationFromClaimBody(body);
+
+	await db
+		.update(Owners)
+		.set({
+			city: ownerLocation.city || null,
+			country: ownerLocation.country || null,
+			name: body.owner_name,
+			state: ownerLocation.state || null,
+		})
+		.where(and(eq(Owners.id, ownerId), eq(Owners.user_id, userId)));
+
+	const ownedCars = await db
+		.select({ id: Cars.id })
+		.from(Cars)
+		.where(eq(Cars.current_owner_id, ownerId));
+
+	await Promise.all(
+		ownedCars.flatMap((car) => [
+			cache.delete(`cars:details:${car.id}`),
+			cache.delete(`cars:summary:${car.id}`),
+		])
+	);
+}
 
 claimsRouter.post('/existing', withAuth(), async (c) => {
 	try {
@@ -91,16 +132,13 @@ claimsRouter.post('/existing', withAuth(), async (c) => {
 				user_id: userId,
 			});
 		} else {
-			const ownerLocation = ownerLocationFromClaimBody(body);
-
-			await db
-				.update(Owners)
-				.set({
-					city: ownerLocation.city || null,
-					country: ownerLocation.country || null,
-					state: ownerLocation.state || null,
-				})
-				.where(and(eq(Owners.id, ownerId), eq(Owners.user_id, userId)));
+			await updateOwnerProfileAndInvalidateCars(
+				db,
+				c.env.CACHE,
+				ownerId,
+				userId,
+				body
+			);
 		}
 
 		await db.insert(CarOwnersPending).values({
@@ -120,16 +158,15 @@ claimsRouter.post('/existing', withAuth(), async (c) => {
 			});
 		}
 
-		const resend = new Resend(c.env.RESEND_API_KEY);
+		const edition = await db
+			.select({ year: Editions.year, name: Editions.name })
+			.from(Editions)
+			.where(eq(Editions.id, existingCar.edition_id))
+			.get();
 
-		await resend.emails.send({
-			from: 'Miata Registry <support@miataregistry.com>',
-			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: Owner Change Request',
-			html: `
-				<h2>Owner Change Request</h2>
-				<p><strong>Owner ID:</strong> ${ownerId}</p>
-		 `,
+		await notifyModerator(c.env.RESEND_API_KEY, {
+			kind: 'ownership_claim',
+			edition: formatEditionLabel(edition?.year, edition?.name),
 		});
 
 		return c.json({ success: true, id: ownerId });
@@ -157,11 +194,15 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 		const db = createDb(c.env.DB);
 		const carId = crypto.randomUUID();
 		let ownerId = body.owner_id;
+		const vin =
+			typeof body.vin === 'string' && body.vin
+				? body.vin.toUpperCase()
+				: body.vin;
 
 		const existingCar = await db
 			.select()
 			.from(Cars)
-			.where(eq(Cars.vin, body.vin))
+			.where(eq(Cars.vin, vin))
 			.get();
 
 		if (existingCar) {
@@ -207,16 +248,13 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 				user_id: userId,
 			});
 		} else {
-			const ownerLocation = ownerLocationFromClaimBody(body);
-
-			await db
-				.update(Owners)
-				.set({
-					city: ownerLocation.city || null,
-					country: ownerLocation.country || null,
-					state: ownerLocation.state || null,
-				})
-				.where(and(eq(Owners.id, ownerId), eq(Owners.user_id, userId)));
+			await updateOwnerProfileAndInvalidateCars(
+				db,
+				c.env.CACHE,
+				ownerId,
+				userId,
+				body
+			);
 		}
 
 		await db.insert(CarOwnersPending).values({
@@ -255,6 +293,11 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			);
 		}
 
+		const vinDecode = await buildVinDecodeFields(
+			vin,
+			parseEditionYear(body.edition_name)
+		);
+
 		await db.insert(CarsPending).values({
 			car_id: carId,
 			created_at: Math.floor(Date.now() / 1000),
@@ -263,7 +306,8 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			id: crypto.randomUUID(),
 			sequence: parseSequence(body.sequence),
 			status: 'pending',
-			vin: body.vin,
+			vin,
+			...(vinDecode ?? {}),
 		});
 
 		if (`${user.firstName} ${user.lastName}` !== body.owner_name) {
@@ -273,16 +317,9 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			});
 		}
 
-		const resend = new Resend(c.env.RESEND_API_KEY);
-
-		await resend.emails.send({
-			from: 'Miata Registry <support@miataregistry.com>',
-			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: Owner Change Request',
-			html: `
-				<h2>Owner Change Request</h2>
-				<p><strong>Owner ID:</strong> ${ownerId}</p>
-		 `,
+		await notifyModerator(c.env.RESEND_API_KEY, {
+			kind: 'new_registration',
+			edition: body.edition_name || null,
 		});
 
 		return c.json({ success: true, id: ownerId });
@@ -331,16 +368,9 @@ claimsRouter.post('/tip', async (c) => {
 
 		await db.insert(Tips).values(values);
 
-		const resend = new Resend(c.env.RESEND_API_KEY);
-
-		await resend.emails.send({
-			from: 'Miata Registry <support@miataregistry.com>',
-			to: 'mattcongrove@gmail.com',
-			subject: 'Miata Registry: Tip Submission',
-			html: `
-                <h2>Tip Submission</h2>
-                <p><strong>Tip ID:</strong> ${tipId}</p>
-            `,
+		await notifyModerator(c.env.RESEND_API_KEY, {
+			kind: 'tip',
+			edition: values.edition_name,
 		});
 
 		return c.json({ success: true, tipId });

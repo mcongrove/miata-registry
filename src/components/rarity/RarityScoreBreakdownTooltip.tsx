@@ -85,8 +85,7 @@ export function RarityScoreBreakdownTooltip({
 		return <>{children}</>;
 	}
 
-	const ageLabel =
-		breakdown.age === 1 ? '1 year' : `${breakdown.age} years`;
+	const ageLabel = breakdown.age === 1 ? '1 year' : `${breakdown.age} years`;
 
 	const lineRows: { key: string; label: string; points: number }[] = [];
 

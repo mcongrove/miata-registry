@@ -18,11 +18,11 @@
 
 import {
 	Body,
+	Button,
 	Container,
 	Head,
 	Heading,
 	Html,
-	Link,
 	Section,
 	Tailwind,
 	Text,
@@ -32,20 +32,57 @@ import Header from '../components/Header';
 import Legal from '../components/Legal';
 import tailwindConfig from '../tailwind.config';
 
-export const ApprovedCar = ({ car_id }: { car_id?: string }) => {
-	const link = car_id ? `https://miataregistry.com/registry/${car_id}` : null;
+export type ModerationNoticeKind =
+	| 'new_registration'
+	| 'ownership_claim'
+	| 'car_update'
+	| 'photo_upload'
+	| 'tip';
+
+export type ModerationNoticeProps = {
+	kind: ModerationNoticeKind;
+	edition?: string | null;
+};
+
+export const MODERATION_NOTICE_COPY: Record<
+	ModerationNoticeKind,
+	{ title: string; subject: string; summary: string }
+> = {
+	new_registration: {
+		title: 'New registration',
+		subject: 'New registration pending',
+		summary: 'An owner submitted a new Miata.',
+	},
+	ownership_claim: {
+		title: 'Ownership claim',
+		subject: 'Ownership claim pending',
+		summary: 'An owner claimed a Miata.',
+	},
+	car_update: {
+		title: 'Car update',
+		subject: 'Car update pending',
+		summary: 'An owner submitted changes that need review.',
+	},
+	photo_upload: {
+		title: 'Photo upload',
+		subject: 'Photo upload pending',
+		summary: 'An owner uploaded a new photo.',
+	},
+	tip: {
+		title: 'Tip submission',
+		subject: 'Tip pending',
+		summary: 'Someone submitted a tip about a limited edition Miata.',
+	},
+};
+
+export const ModerationNotice = ({ kind, edition }: ModerationNoticeProps) => {
+	const copy = MODERATION_NOTICE_COPY[kind];
 
 	return (
 		<Html lang="en" dir="ltr">
 			<Head>
-				<title>Submission approved</title>
-				<link
-					href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-					rel="stylesheet"
-				/>
+				<title>{copy.title}</title>
 			</Head>
-
-			{/* <Preview>Your recently submitted changes have been approved.</Preview> */}
 
 			<Tailwind config={tailwindConfig}>
 				<Body className="bg-brg-light font-sans text-brg py-6">
@@ -54,49 +91,27 @@ export const ApprovedCar = ({ car_id }: { car_id?: string }) => {
 							<Header />
 
 							<Heading as="h2" className="font-medium mb-0">
-								Submission approved
+								{copy.title}
 							</Heading>
 
 							<Section>
-								<Text>
-									Your recently submitted changes have been
-									reviewed and approved by our team.
-								</Text>
+								<Text>{copy.summary}</Text>
 
-								{link ? (
-									<>
-										<Text>
-											{`These updates are now live in our registry at `}
-											<Link href={link}>{link}</Link>.
-										</Text>
-
-										<Text>
-											Thank you for helping us maintain
-											accurate records of limited edition
-											Miatas.
-										</Text>
-									</>
-								) : (
-									<Text>
-										These updates are now live in our
-										registry. Thank you for helping us
-										maintain accurate records of limited
-										edition Miatas.
+								{edition ? (
+									<Text className="font-medium">
+										{edition}
 									</Text>
-								)}
+								) : null}
 
-								<Text>
-									{`If you have any questions about the changes or need to make additional updates, please don't hesitate to reach out to our team at `}
-									<Link
-										href="mailto:support@miataregistry.com"
-										className="text-brg underline"
-									>
-										support@miataregistry.com
-									</Link>
-								</Text>
+								<Button
+									href="https://miataregistry.com/moderation"
+									className="bg-brg text-white rounded-lg px-5 py-3 mt-4 box-border"
+								>
+									Open Moderation Panel
+								</Button>
 
 								<Text className="text-brg-mid">
-									— The Miata Registry Team
+									— Miata Registry
 								</Text>
 							</Section>
 						</Section>
@@ -111,4 +126,4 @@ export const ApprovedCar = ({ car_id }: { car_id?: string }) => {
 	);
 };
 
-export default ApprovedCar;
+export default ModerationNotice;

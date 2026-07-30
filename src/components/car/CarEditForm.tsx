@@ -432,7 +432,11 @@ export function CarEditForm({
 			</Section>
 
 			<Section title="About This Miata">
-				<Field id="mileage" label="Current Mileage" className="shrink-0">
+				<Field
+					id="mileage"
+					label="Current Mileage"
+					className="shrink-0"
+				>
 					<div className="flex flex-wrap items-center gap-3">
 						<TextField
 							id="mileage"
@@ -499,8 +503,8 @@ export function CarEditForm({
 				title="Rarity"
 				intro={
 					<>
-						Points from your mileage and the items below are added to
-						this edition&apos;s base score and its age. See the{' '}
+						Points from your mileage and the items below are added
+						to this edition&apos;s base score and its age. See the{' '}
 						<a href="/rarity" className="underline">
 							rarity guide
 						</a>{' '}
@@ -568,7 +572,9 @@ export function CarEditForm({
 				</div>
 
 				<div className="flex flex-col gap-3">
-					<p className="text-sm font-medium text-brg">Documentation</p>
+					<p className="text-sm font-medium text-brg">
+						Documentation
+					</p>
 					{!preservationGated ? (
 						<p className="text-xs text-brg-mid/70">
 							These options apply when the car is more than 10

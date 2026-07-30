@@ -44,19 +44,17 @@ type TooltipProps = {
 	interactive?: boolean;
 };
 
-const variantStyles: Record<
-	TooltipVariant,
-	{ arrow: string; panel: string }
-> = {
-	dark: {
-		panel: 'bg-brg-dark text-white',
-		arrow: 'bg-brg-dark',
-	},
-	light: {
-		panel: 'bg-white text-brg border border-brg-light shadow-md',
-		arrow: 'bg-white',
-	},
-};
+const variantStyles: Record<TooltipVariant, { arrow: string; panel: string }> =
+	{
+		dark: {
+			panel: 'bg-brg-dark text-white',
+			arrow: 'bg-brg-dark',
+		},
+		light: {
+			panel: 'bg-white text-brg border border-brg-light shadow-md',
+			arrow: 'bg-white',
+		},
+	};
 
 function arrowStaticSide(placement: Placement): string {
 	const base = placement.split('-')[0];

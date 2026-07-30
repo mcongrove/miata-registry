@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TRarityLevel } from '../types/Car';
+import {
+	TRarityLevel,
+	TStoredVinDetails,
+	TVinDecodeStatus,
+} from '../types/Car';
 import { toTitleCase } from './common';
 import { countryNameToCode } from './location';
 
@@ -93,12 +97,57 @@ export const parseEditionYear = (
 };
 
 export type TVinDetails = {
+	BodyClass?: string;
+	DisplacementL?: string;
+	EngineCylinders?: string;
+	EngineHP?: string;
+	EngineHP_to?: string;
+	EngineModel?: string;
 	ErrorCode?: string;
+	FuelTypePrimary?: string;
 	Manufacturer?: string;
+	Model?: string;
+	ModelYear?: string;
 	PlantCity?: string;
 	PlantCountry?: string;
 	PlantState?: string;
+	VehicleDescriptor?: string;
 	VIN?: string;
+};
+
+export type TVinDecodeFields = {
+	manufacture_city: string | null;
+	manufacture_prefecture: string | null;
+	vin_decode_status: TVinDecodeStatus;
+	vin_details: TStoredVinDetails | null;
+};
+
+const emptyVinDecodeFields = (status: TVinDecodeStatus): TVinDecodeFields => ({
+	manufacture_city: null,
+	manufacture_prefecture: null,
+	vin_decode_status: status,
+	vin_details: null,
+});
+
+const toStoredVinDetails = (details: TVinDetails): TStoredVinDetails => {
+	const pick = (value?: string) => {
+		if (!value || value === 'Not Applicable') return undefined;
+
+		return value;
+	};
+
+	return {
+		bodyClass: pick(details.BodyClass),
+		displacementL: pick(details.DisplacementL),
+		engineCylinders: pick(details.EngineCylinders),
+		engineHP: pick(details.EngineHP),
+		engineHP_to: pick(details.EngineHP_to),
+		engineModel: pick(details.EngineModel),
+		fuelTypePrimary: pick(details.FuelTypePrimary),
+		model: pick(details.Model),
+		modelYear: pick(details.ModelYear),
+		vehicleDescriptor: pick(details.VehicleDescriptor),
+	};
 };
 
 export const getVinDetails = async (
@@ -128,10 +177,75 @@ export const getVinDetails = async (
 	}
 };
 
-export const isVinApiValid = (details: TVinDetails | null): boolean => {
-	if (!details?.ErrorCode) return false;
+export const parseVinApiErrorCodes = (
+	details: TVinDetails | null
+): string[] => {
+	if (!details?.ErrorCode) return [];
 
-	return details.ErrorCode.split(';').every((code) => code.trim() === '0');
+	// NHTSA joins codes with "," (sometimes ";")
+	return details.ErrorCode.split(/[;,]/)
+		.map((code) => code.trim())
+		.filter(Boolean);
+};
+
+/** VIN decoded cleanly. Code 12 (year mismatch) is allowed here — check separately. */
+export const isVinApiValid = (details: TVinDetails | null): boolean => {
+	const codes = parseVinApiErrorCodes(details);
+
+	if (!codes.includes('0')) return false;
+
+	return codes.every((code) => code === '0' || code === '12');
+};
+
+/** Edition year ≠ VIN model year (NHTSA code 12 and/or ModelYear field). */
+export const hasVinModelYearMismatch = (
+	details: TVinDetails | null,
+	editionYear: number | null | undefined
+): boolean => {
+	if (!details || editionYear == null) return false;
+
+	if (parseVinApiErrorCodes(details).includes('12')) return true;
+
+	const modelYear = details.ModelYear ? Number(details.ModelYear) : NaN;
+
+	return Number.isFinite(modelYear) && modelYear !== editionYear;
+};
+
+export const buildVinDecodeFields = async (
+	vin: string | null | undefined,
+	year: number | null | undefined
+): Promise<TVinDecodeFields | null> => {
+	if (!vin?.trim()) return null;
+
+	if (!isFullVin(vin)) {
+		return emptyVinDecodeFields('skipped');
+	}
+
+	if (!year) {
+		return emptyVinDecodeFields('error');
+	}
+
+	const details = await getVinDetails(vin.trim(), year);
+
+	if (!details) {
+		return emptyVinDecodeFields('error');
+	}
+
+	if (!isVinApiValid(details)) {
+		return emptyVinDecodeFields('invalid');
+	}
+
+	const city = details.PlantCity ? toTitleCase(details.PlantCity) : null;
+	const prefecture = details.PlantState
+		? toTitleCase(details.PlantState)
+		: null;
+
+	return {
+		manufacture_city: city,
+		manufacture_prefecture: prefecture,
+		vin_decode_status: 'ok',
+		vin_details: toStoredVinDetails(details),
+	};
 };
 
 export type TMileageUnit = 'mi' | 'km';
@@ -207,6 +321,13 @@ export const formatPlantLocation = (details: TVinDetails | null) => {
 			: '';
 
 	return [city, state, country].filter(Boolean).join(', ');
+};
+
+export const formatManufactureLocation = (
+	city?: string | null,
+	prefecture?: string | null
+) => {
+	return [city, prefecture, 'JP'].filter(Boolean).join(', ');
 };
 
 export const colorMap: Record<string, string> = {

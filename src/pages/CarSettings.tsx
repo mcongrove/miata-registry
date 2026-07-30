@@ -37,42 +37,51 @@ export function CarSettings() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
 
-	const loadCar = useCallback(async () => {
-		if (!id) return;
+	const loadCar = useCallback(
+		async (opts?: { soft?: boolean }) => {
+			if (!id) return;
 
-		setIsLoading(true);
-		setNotFound(false);
-		setCar(null);
+			const soft = Boolean(opts?.soft);
 
-		if (!isValidUuid(id)) {
-			setNotFound(true);
-			setIsLoading(false);
+			if (!soft) {
+				setIsLoading(true);
+				setNotFound(false);
+				setCar(null);
+			}
 
-			return;
-		}
-
-		try {
-			const response = await fetch(
-				`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${id}`
-			);
-
-			if (response.status === 404) {
+			if (!isValidUuid(id)) {
 				setNotFound(true);
+				setIsLoading(false);
 
 				return;
 			}
 
-			if (!response.ok) {
-				throw new Error('Failed to fetch car');
-			}
+			try {
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/cars/${id}`
+				);
 
-			setCar(await response.json());
-		} catch (error) {
-			handleApiError(error);
-		} finally {
-			setIsLoading(false);
-		}
-	}, [id]);
+				if (response.status === 404) {
+					setNotFound(true);
+
+					return;
+				}
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch car');
+				}
+
+				setCar(await response.json());
+			} catch (error) {
+				handleApiError(error);
+			} finally {
+				if (!soft) {
+					setIsLoading(false);
+				}
+			}
+		},
+		[id]
+	);
 
 	useEffect(() => {
 		loadCar();
@@ -93,10 +102,11 @@ export function CarSettings() {
 
 	const edit = useCarEdit(car ?? ({} as TCarWithOwnerHistory), {
 		enabled: Boolean(car && canEdit),
-		onUpdate: loadCar,
+		onUpdate: () => loadCar({ soft: true }),
 	});
 
-	const warnOnLeave = edit.isSaveDirty && !edit.isSuccess;
+	const warnOnLeave =
+		edit.isSaveDirty && !edit.isSuccess && !car?.has_pending_changes;
 
 	const leaveGuardActive =
 		isLoaded &&
@@ -281,9 +291,9 @@ export function CarSettings() {
 							onMileageDisplayChange={edit.setMileageDisplay}
 							onMileageUnitChange={edit.setMileageUnit}
 							warningOwnerDateEnd={edit.warningOwnerDateEnd}
-						warningSequence={edit.warningSequence}
-						rarityBreakdown={edit.rarityBreakdown}
-					/>
+							warningSequence={edit.warningSequence}
+							rarityBreakdown={edit.rarityBreakdown}
+						/>
 					</fieldset>
 				</div>
 			</main>

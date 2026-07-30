@@ -18,14 +18,7 @@
 
 import { and, count, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { Resend } from 'resend';
 import { createDb } from '../../db';
-import { invalidateSeoCaches } from '../../seo/cache';
-import { recalculateAndStoreCarRarity } from '../utils/recalculateCarRarity';
-import {
-	applyPriorOwnerPendingApproval,
-	parsePriorOwnerIntent,
-} from '../utils/priorOwnerPending';
 import { CarOwners } from '../../db/schema/CarOwners';
 import { CarOwnersPending } from '../../db/schema/CarOwnersPending';
 import { Cars } from '../../db/schema/Cars';
@@ -34,13 +27,20 @@ import { Editions } from '../../db/schema/Editions';
 import { Owners } from '../../db/schema/Owners';
 import { OwnersPending } from '../../db/schema/OwnersPending';
 import { Tips } from '../../db/schema/Tips';
-import ApprovedCar from '../../emails/templates/ApprovedCar';
-import ApprovedOwner from '../../emails/templates/ApprovedOwner';
 import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
 import { withModerator } from '../middleware/moderator';
 import { Bindings } from '../types';
-import { renderEmail } from '../utils/renderEmail';
+import {
+	approvePendingCar,
+	approvePendingCarOwner,
+	approvePendingOwner,
+	approvePendingPackage,
+	invalidateCarCaches,
+	rejectPendingPackage,
+	sendApprovedCarEmail,
+	type PackageApproveOverrides,
+} from '../utils/moderationApprove';
 
 const moderationRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -50,30 +50,7 @@ moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 
 		const pendingChanges = await db
 			.select({
-				car_id: CarsPending.car_id,
-				created_at: CarsPending.created_at,
-				current_owner_id: CarsPending.current_owner_id,
-				destroyed: CarsPending.destroyed,
-				edition_id: CarsPending.edition_id,
-				id: CarsPending.id,
-				manufacture_date: CarsPending.manufacture_date,
-				mileage: CarsPending.mileage,
-				mileage_date: CarsPending.mileage_date,
-				sale_date: CarsPending.sale_date,
-				sale_dealer_city: CarsPending.sale_dealer_city,
-				sale_dealer_country: CarsPending.sale_dealer_country,
-				sale_dealer_name: CarsPending.sale_dealer_name,
-				sale_dealer_state: CarsPending.sale_dealer_state,
-				sale_msrp: CarsPending.sale_msrp,
-				sequence: CarsPending.sequence,
-				shipping_city: CarsPending.shipping_city,
-				shipping_country: CarsPending.shipping_country,
-				shipping_date: CarsPending.shipping_date,
-				shipping_state: CarsPending.shipping_state,
-				shipping_vessel: CarsPending.shipping_vessel,
-				story: CarsPending.story,
-				status: CarsPending.status,
-				vin: CarsPending.vin,
+				pending: CarsPending,
 				edition: sql<string>`${Editions.year} || ' ' || ${Editions.name}`,
 			})
 			.from(CarsPending)
@@ -81,7 +58,7 @@ moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 			.where(eq(CarsPending.status, 'pending'));
 
 		const formattedChanges = await Promise.all(
-			pendingChanges.map(async (pending) => {
+			pendingChanges.map(async ({ pending, edition }) => {
 				const current = await db
 					.select()
 					.from(Cars)
@@ -93,7 +70,6 @@ moderationRouter.get('/cars', withAuth(), withModerator(), async (c) => {
 					id,
 					status,
 					car_id,
-					edition,
 					...proposedWithoutMeta
 				} = pending;
 
@@ -137,16 +113,25 @@ moderationRouter.get('/carOwners', withAuth(), withModerator(), async (c) => {
 
 		const formattedChanges = await Promise.all(
 			pendingCarOwners.map(async (pending) => {
-				const current = await db
-					.select()
-					.from(CarOwners)
-					.where(
-						and(
-							eq(CarOwners.car_id, pending.car_id),
-							eq(CarOwners.owner_id, pending.owner_id)
+				const [current, car] = await Promise.all([
+					db
+						.select()
+						.from(CarOwners)
+						.where(
+							and(
+								eq(CarOwners.car_id, pending.car_id),
+								eq(CarOwners.owner_id, pending.owner_id)
+							)
 						)
-					)
-					.get();
+						.get(),
+					db
+						.select({
+							current_owner_id: Cars.current_owner_id,
+						})
+						.from(Cars)
+						.where(eq(Cars.id, pending.car_id))
+						.get(),
+				]);
 
 				const { created_at, id, status, ...proposedWithoutMeta } =
 					pending;
@@ -155,6 +140,7 @@ moderationRouter.get('/carOwners', withAuth(), withModerator(), async (c) => {
 					id,
 					created_at,
 					status,
+					car_current_owner_id: car?.current_owner_id ?? null,
 					current: current || null,
 					proposed: proposedWithoutMeta,
 				};
@@ -271,100 +257,19 @@ moderationRouter.post(
 
 		try {
 			const db = createDb(c.env.DB);
+			const approved = await approvePendingCar(db, id, c.env.CACHE);
 
-			const pendingCar = await db
-				.select({
-					car_id: CarsPending.car_id,
-					created_at: CarsPending.created_at,
-					current_owner_id: CarsPending.current_owner_id,
-					destroyed: CarsPending.destroyed,
-					edition_id: CarsPending.edition_id,
-					id: CarsPending.id,
-					manufacture_date: CarsPending.manufacture_date,
-					mileage: CarsPending.mileage,
-					mileage_date: CarsPending.mileage_date,
-					sale_date: CarsPending.sale_date,
-					sale_dealer_city: CarsPending.sale_dealer_city,
-					sale_dealer_country: CarsPending.sale_dealer_country,
-					sale_dealer_name: CarsPending.sale_dealer_name,
-					sale_dealer_state: CarsPending.sale_dealer_state,
-					sale_msrp: CarsPending.sale_msrp,
-					sequence: CarsPending.sequence,
-					shipping_city: CarsPending.shipping_city,
-					shipping_country: CarsPending.shipping_country,
-					shipping_date: CarsPending.shipping_date,
-					shipping_state: CarsPending.shipping_state,
-					shipping_vessel: CarsPending.shipping_vessel,
-					story: CarsPending.story,
-					status: CarsPending.status,
-					vin: CarsPending.vin,
-					user_id: Owners.user_id,
-				})
-				.from(CarsPending)
-				.leftJoin(Owners, eq(CarsPending.current_owner_id, Owners.id))
-				.where(eq(CarsPending.id, id))
-				.get();
-
-			if (!pendingCar) {
+			if (!approved) {
 				return c.json({ error: 'Not found' }, 404);
 			}
 
-			const {
-				created_at: _created_at,
-				id: _pendingId,
-				status: _status,
-				car_id,
-				user_id,
-				...carData
-			} = pendingCar;
-
-			await db
-				.insert(Cars)
-				.values({ id: car_id, ...carData })
-				.onConflictDoUpdate({
-					target: Cars.id,
-					set: carData,
+			if (!skipEmail && approved.userId) {
+				await sendApprovedCarEmail({
+					carId: approved.carId,
+					clerk: c.get('clerk'),
+					resendApiKey: c.env.RESEND_API_KEY,
+					userId: approved.userId,
 				});
-
-			await db
-				.update(CarsPending)
-				.set({ status: 'approved' })
-				.where(eq(CarsPending.id, id));
-
-			await recalculateAndStoreCarRarity(db, car_id);
-
-			await c.env.CACHE.delete(`cars:details:${car_id}`);
-			await c.env.CACHE.delete(`cars:summary:${car_id}`);
-			await c.env.CACHE.delete('editions:all:v2');
-			await c.env.CACHE.delete('stats:all');
-			await invalidateSeoCaches(c.env.CACHE);
-
-			if (user_id) {
-				const requestingUser = await c
-					.get('clerk')
-					.users.getUser(user_id);
-
-				if (!skipEmail) {
-					const primaryEmail = requestingUser.emailAddresses.find(
-						(email) =>
-							email.id === requestingUser.primaryEmailAddressId
-					);
-
-					if (primaryEmail) {
-						const resend = new Resend(c.env.RESEND_API_KEY);
-
-						await resend.emails.send({
-							from: 'Miata Registry <no-reply@miataregistry.com>',
-							to: primaryEmail.emailAddress,
-							subject: 'Miata Registry: Car update approved',
-							html: await renderEmail(
-								ApprovedCar({
-									car_id,
-								})
-							),
-						});
-					}
-				}
 			}
 
 			return c.json({ success: true });
@@ -386,166 +291,74 @@ moderationRouter.post(
 );
 
 moderationRouter.post(
+	'/package/:id/approve',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
+		const { skipEmail, overrides } = await c.req
+			.json<{
+				skipEmail?: boolean;
+				overrides?: PackageApproveOverrides;
+			}>()
+			.catch(() => ({
+				skipEmail: false,
+				overrides: undefined as PackageApproveOverrides | undefined,
+			}));
+
+		try {
+			const db = createDb(c.env.DB);
+			const approved = await approvePendingPackage(
+				db,
+				id,
+				c.env.CACHE,
+				overrides
+			);
+
+			if (!approved) {
+				return c.json({ error: 'Not found' }, 404);
+			}
+
+			if (!skipEmail && approved.userId) {
+				await sendApprovedCarEmail({
+					carId: approved.carId,
+					clerk: c.get('clerk'),
+					resendApiKey: c.env.RESEND_API_KEY,
+					userId: approved.userId,
+				});
+			}
+
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error approving package:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
+		}
+	}
+);
+
+moderationRouter.post(
 	'/carOwner/:id/approve',
 	withAuth(),
 	withModerator(),
 	async (c) => {
 		const { id } = c.req.param();
-		const { skipEmail } = await c.req
-			.json<{ skipEmail?: boolean }>()
-			.catch(() => ({ skipEmail: false }));
 
 		try {
 			const db = createDb(c.env.DB);
+			const approved = await approvePendingCarOwner(db, id, c.env.CACHE);
 
-			const pendingCarOwner = await db
-				.select({
-					car_id: CarOwnersPending.car_id,
-					created_at: CarOwnersPending.created_at,
-					date_end: CarOwnersPending.date_end,
-					date_start: CarOwnersPending.date_start,
-					id: CarOwnersPending.id,
-					information: CarOwnersPending.information,
-					owner_id: CarOwnersPending.owner_id,
-					status: CarOwnersPending.status,
-					user_id: Owners.user_id,
-				})
-				.from(CarOwnersPending)
-				.leftJoin(Owners, eq(CarOwnersPending.owner_id, Owners.id))
-				.where(eq(CarOwnersPending.id, id))
-				.get();
-
-			if (!pendingCarOwner) {
+			if (!approved) {
 				return c.json({ error: 'Not found' }, 404);
-			}
-
-			const priorOwnerIntent = parsePriorOwnerIntent(
-				pendingCarOwner.information
-			);
-
-			if (priorOwnerIntent) {
-				const {
-					created_at: _created_at,
-					id: _pendingId,
-					information,
-					status: _status,
-					user_id: _user_id,
-					...pendingRow
-				} = pendingCarOwner;
-
-				await applyPriorOwnerPendingApproval(
-					db,
-					{ ...pendingRow, information },
-					priorOwnerIntent
-				);
-
-				await db
-					.update(CarOwnersPending)
-					.set({ status: 'approved' })
-					.where(eq(CarOwnersPending.id, id));
-
-				await recalculateAndStoreCarRarity(db, pendingCarOwner.car_id);
-				await c.env.CACHE.delete(`cars:details:${pendingCarOwner.car_id}`);
-				await c.env.CACHE.delete(`cars:summary:${pendingCarOwner.car_id}`);
-				await c.env.CACHE.delete('editions:all:v2');
-				await c.env.CACHE.delete('stats:all');
-				await invalidateSeoCaches(c.env.CACHE);
-
-				return c.json({ success: true });
-			}
-
-			const {
-				created_at: _created_at,
-				id: _pendingId,
-				information: _information,
-				status: _status,
-				user_id,
-				...carOwnerData
-			} = pendingCarOwner;
-
-			const existingCarOwner = await db
-				.select()
-				.from(CarOwners)
-				.where(
-					and(
-						eq(CarOwners.car_id, pendingCarOwner.car_id),
-						eq(CarOwners.owner_id, pendingCarOwner.owner_id)
-					)
-				)
-				.get();
-
-			if (existingCarOwner) {
-				await db
-					.update(CarOwners)
-					.set(carOwnerData)
-					.where(
-						and(
-							eq(CarOwners.car_id, pendingCarOwner.car_id),
-							eq(CarOwners.owner_id, pendingCarOwner.owner_id)
-						)
-					);
-			} else {
-				await db
-					.update(CarOwners)
-					.set({ date_end: pendingCarOwner.date_start })
-					.where(
-						and(
-							eq(CarOwners.car_id, pendingCarOwner.car_id),
-							sql`${CarOwners.date_end} IS NULL`
-						)
-					);
-
-				await db.insert(CarOwners).values(carOwnerData);
-
-				await db
-					.update(Cars)
-					.set({
-						current_owner_id: pendingCarOwner.owner_id,
-						updated_date: new Date(
-							pendingCarOwner.created_at * 1000
-						).toISOString(),
-					})
-					.where(eq(Cars.id, pendingCarOwner.car_id));
-			}
-
-			await db
-				.update(CarOwnersPending)
-				.set({ status: 'approved' })
-				.where(eq(CarOwnersPending.id, id));
-
-			await c.env.CACHE.delete(`cars:details:${pendingCarOwner.car_id}`);
-			await c.env.CACHE.delete(`cars:summary:${pendingCarOwner.car_id}`);
-			await c.env.CACHE.delete('editions:all:v2');
-			await c.env.CACHE.delete('stats:all');
-			await invalidateSeoCaches(c.env.CACHE);
-
-			if (user_id) {
-				const requestingUser = await c
-					.get('clerk')
-					.users.getUser(user_id);
-
-				if (!skipEmail) {
-					const primaryEmail = requestingUser.emailAddresses.find(
-						(email) =>
-							email.id === requestingUser.primaryEmailAddressId
-					);
-
-					if (primaryEmail) {
-						const resend = new Resend(c.env.RESEND_API_KEY);
-
-						await resend.emails.send({
-							from: 'Miata Registry <no-reply@miataregistry.com>',
-							to: primaryEmail.emailAddress,
-							subject:
-								'Miata Registry: Ownership update approved',
-							html: await renderEmail(
-								ApprovedOwner({
-									car_id: pendingCarOwner.car_id,
-								})
-							),
-						});
-					}
-				}
 			}
 
 			return c.json({ success: true });
@@ -575,29 +388,11 @@ moderationRouter.post(
 
 		try {
 			const db = createDb(c.env.DB);
+			const approved = await approvePendingOwner(db, id);
 
-			const pendingOwner = await db
-				.select()
-				.from(OwnersPending)
-				.where(eq(OwnersPending.id, id))
-				.get();
-
-			if (!pendingOwner) {
+			if (!approved) {
 				return c.json({ error: 'Not found' }, 404);
 			}
-
-			const {
-				created_at: _created_at,
-				status: _status,
-				...ownerData
-			} = pendingOwner;
-
-			await db.insert(Owners).values(ownerData);
-
-			await db
-				.update(OwnersPending)
-				.set({ status: 'approved' })
-				.where(eq(OwnersPending.id, id));
 
 			return c.json({ success: true });
 		} catch (error) {
@@ -623,6 +418,9 @@ moderationRouter.post(
 	withModerator(),
 	async (c) => {
 		const { id } = c.req.param();
+		const { skipEmail } = await c.req
+			.json<{ skipEmail?: boolean }>()
+			.catch(() => ({ skipEmail: false }));
 
 		try {
 			const pendingPhoto = await c.env.IMAGES.get(
@@ -645,6 +443,28 @@ moderationRouter.post(
 			);
 
 			await c.env.IMAGES.delete(`car-pending/${id}.jpg`);
+			await invalidateCarCaches(c.env.CACHE, id, {
+				editionsAndStats: false,
+			});
+
+			if (!skipEmail) {
+				const db = createDb(c.env.DB);
+				const owner = await db
+					.select({ user_id: Owners.user_id })
+					.from(Cars)
+					.leftJoin(Owners, eq(Cars.current_owner_id, Owners.id))
+					.where(eq(Cars.id, id))
+					.get();
+
+				if (owner?.user_id) {
+					await sendApprovedCarEmail({
+						carId: id,
+						clerk: c.get('clerk'),
+						resendApiKey: c.env.RESEND_API_KEY,
+						userId: owner.user_id,
+					});
+				}
+			}
 
 			return c.json({ success: true });
 		} catch (error) {
@@ -674,14 +494,59 @@ moderationRouter.post(
 		try {
 			const db = createDb(c.env.DB);
 
+			const pendingCar = await db
+				.select({ car_id: CarsPending.car_id })
+				.from(CarsPending)
+				.where(eq(CarsPending.id, id))
+				.get();
+
 			await db
 				.update(CarsPending)
 				.set({ status: 'rejected' })
 				.where(eq(CarsPending.id, id));
 
+			if (pendingCar?.car_id) {
+				await invalidateCarCaches(c.env.CACHE, pendingCar.car_id, {
+					editionsAndStats: false,
+				});
+			}
+
 			return c.json({ success: true });
 		} catch (error) {
 			console.error('Error rejecting car:', error);
+
+			return c.json(
+				{
+					error: 'Internal server error',
+					details:
+						error instanceof Error
+							? error.message
+							: 'An unknown error occurred',
+				},
+				500
+			);
+		}
+	}
+);
+
+moderationRouter.post(
+	'/package/:id/reject',
+	withAuth(),
+	withModerator(),
+	async (c) => {
+		const { id } = c.req.param();
+
+		try {
+			const db = createDb(c.env.DB);
+			const rejected = await rejectPendingPackage(db, id, c.env.CACHE);
+
+			if (!rejected) {
+				return c.json({ error: 'Not found' }, 404);
+			}
+
+			return c.json({ success: true });
+		} catch (error) {
+			console.error('Error rejecting package:', error);
 
 			return c.json(
 				{
@@ -707,10 +572,22 @@ moderationRouter.post(
 		try {
 			const db = createDb(c.env.DB);
 
+			const pendingCarOwner = await db
+				.select({ car_id: CarOwnersPending.car_id })
+				.from(CarOwnersPending)
+				.where(eq(CarOwnersPending.id, id))
+				.get();
+
 			await db
 				.update(CarOwnersPending)
 				.set({ status: 'rejected' })
 				.where(eq(CarOwnersPending.id, id));
+
+			if (pendingCarOwner?.car_id) {
+				await invalidateCarCaches(c.env.CACHE, pendingCarOwner.car_id, {
+					editionsAndStats: false,
+				});
+			}
 
 			return c.json({ success: true });
 		} catch (error) {

@@ -48,7 +48,8 @@ export class ErrorBoundary extends Component<
 						Something went wrong
 					</h1>
 					<p className="max-w-md text-sm text-brg-mid">
-						{this.state.error.message || 'An unexpected error occurred.'}
+						{this.state.error.message ||
+							'An unexpected error occurred.'}
 					</p>
 					<a
 						href="/"

@@ -135,7 +135,9 @@ function GapPlaceholderRow({
 
 	return (
 		<div className="relative col-span-full grid grid-cols-subgrid py-1">
-			<div className={ownershipCellClass('pointer-events-none opacity-50')}>
+			<div
+				className={ownershipCellClass('pointer-events-none opacity-50')}
+			>
 				<TextField
 					readOnly
 					disabled
@@ -145,7 +147,9 @@ function GapPlaceholderRow({
 					className={ghostFieldClass}
 				/>
 			</div>
-			<div className={ownershipCellClass('pointer-events-none opacity-50')}>
+			<div
+				className={ownershipCellClass('pointer-events-none opacity-50')}
+			>
 				<TextField
 					readOnly
 					disabled
@@ -155,7 +159,9 @@ function GapPlaceholderRow({
 					className={ghostFieldClass}
 				/>
 			</div>
-			<div className={ownershipCellClass('pointer-events-none opacity-50')}>
+			<div
+				className={ownershipCellClass('pointer-events-none opacity-50')}
+			>
 				<TextField
 					readOnly
 					disabled
@@ -166,7 +172,9 @@ function GapPlaceholderRow({
 					className={`${dateFieldClass} ${ghostFieldClass}`}
 				/>
 			</div>
-			<div className={ownershipCellClass('pointer-events-none opacity-50')}>
+			<div
+				className={ownershipCellClass('pointer-events-none opacity-50')}
+			>
 				<TextField
 					readOnly
 					disabled
@@ -245,7 +253,11 @@ export function OwnershipHistoryEditor({
 	};
 
 	const priorBlocks: Array<
-		| { type: 'gap'; insertIndex: number; placeholder: TOwnershipGapPlaceholder }
+		| {
+				type: 'gap';
+				insertIndex: number;
+				placeholder: TOwnershipGapPlaceholder;
+		  }
 		| { type: 'prior'; row: TPriorOwnerFormRow }
 	> = [];
 
@@ -268,7 +280,10 @@ export function OwnershipHistoryEditor({
 
 	const gapInsertIndexes = new Set(
 		priorBlocks
-			.filter((block): block is Extract<typeof block, { type: 'gap' }> => block.type === 'gap')
+			.filter(
+				(block): block is Extract<typeof block, { type: 'gap' }> =>
+					block.type === 'gap'
+			)
 			.map((block) => block.insertIndex)
 	);
 
@@ -283,10 +298,16 @@ export function OwnershipHistoryEditor({
 						className="col-span-full grid grid-cols-subgrid text-left text-xs font-medium text-brg-mid"
 						role="row"
 					>
-						<div className="pb-1 pr-2 font-medium" role="columnheader">
+						<div
+							className="pb-1 pr-2 font-medium"
+							role="columnheader"
+						>
 							Name
 						</div>
-						<div className="pb-1 pr-2 font-medium" role="columnheader">
+						<div
+							className="pb-1 pr-2 font-medium"
+							role="columnheader"
+						>
 							Location
 						</div>
 						<div
@@ -306,7 +327,10 @@ export function OwnershipHistoryEditor({
 						</div>
 					</div>
 
-					<div className="col-span-full grid grid-cols-subgrid" role="row">
+					<div
+						className="col-span-full grid grid-cols-subgrid"
+						role="row"
+					>
 						<div className={ownershipCellClass()} role="cell">
 							<TextField
 								id="current_owner_name_display"
@@ -400,7 +424,10 @@ export function OwnershipHistoryEditor({
 									className="col-span-full grid grid-cols-subgrid"
 									role="row"
 								>
-									<div className={ownershipCellClass()} role="cell">
+									<div
+										className={ownershipCellClass()}
+										role="cell"
+									>
 										<label
 											htmlFor={`prior_owner_name_${row.key}`}
 											className="sr-only"
@@ -424,7 +451,10 @@ export function OwnershipHistoryEditor({
 											}
 										/>
 									</div>
-									<div className={ownershipCellClass()} role="cell">
+									<div
+										className={ownershipCellClass()}
+										role="cell"
+									>
 										<label
 											htmlFor={`prior_owner_location_${row.key}`}
 											className="sr-only"
@@ -443,7 +473,10 @@ export function OwnershipHistoryEditor({
 											}
 										/>
 									</div>
-									<div className={ownershipCellClass()} role="cell">
+									<div
+										className={ownershipCellClass()}
+										role="cell"
+									>
 										<label
 											htmlFor={`prior_owner_start_${row.key}`}
 											className="sr-only"
@@ -469,7 +502,10 @@ export function OwnershipHistoryEditor({
 											}
 										/>
 									</div>
-									<div className={ownershipCellClass()} role="cell">
+									<div
+										className={ownershipCellClass()}
+										role="cell"
+									>
 										<label
 											htmlFor={`prior_owner_end_${row.key}`}
 											className="sr-only"
@@ -488,7 +524,8 @@ export function OwnershipHistoryEditor({
 											) =>
 												onChange(
 													updateRow(rows, row.key, {
-														date_end: e.target.value,
+														date_end:
+															e.target.value,
 													})
 												)
 											}

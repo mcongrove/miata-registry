@@ -297,7 +297,9 @@ export function computeDisplayRarityScore(input: {
 }): RarityScoreBreakdown {
 	const now = input.now ?? new Date();
 	const editionBase = input.editionBase ?? 0;
-	const age = input.destroyed ? 0 : yearsSinceEditionYear(input.editionYear, now);
+	const age = input.destroyed
+		? 0
+		: yearsSinceEditionYear(input.editionYear, now);
 	const carModifiers = input.destroyed ? 0 : input.carModifiers;
 	const total = input.destroyed ? 0 : editionBase + age + carModifiers;
 
@@ -391,7 +393,9 @@ export function parseAttestationsFromBody(
 	};
 }
 
-export function attestationsFromCar(car: Partial<RarityAttestations>): RarityAttestations {
+export function attestationsFromCar(
+	car: Partial<RarityAttestations>
+): RarityAttestations {
 	return {
 		rarity_original_paint: Boolean(car.rarity_original_paint),
 		rarity_original_hardtop: Boolean(car.rarity_original_hardtop),
@@ -403,7 +407,9 @@ export function attestationsFromCar(car: Partial<RarityAttestations>): RarityAtt
 	};
 }
 
-export function attestationsFromFormData(formData: FormData): RarityAttestations {
+export function attestationsFromFormData(
+	formData: FormData
+): RarityAttestations {
 	return {
 		rarity_original_paint: formData.get('rarity_original_paint') === 'on',
 		rarity_original_hardtop:
@@ -413,7 +419,6 @@ export function attestationsFromFormData(formData: FormData): RarityAttestations
 		rarity_original_wheels: formData.get('rarity_original_wheels') === 'on',
 		rarity_window_sticker: formData.get('rarity_window_sticker') === 'on',
 		rarity_sale_documents: formData.get('rarity_sale_documents') === 'on',
-		rarity_service_records:
-			formData.get('rarity_service_records') === 'on',
+		rarity_service_records: formData.get('rarity_service_records') === 'on',
 	};
 }

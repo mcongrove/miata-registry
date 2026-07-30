@@ -47,7 +47,9 @@ export function dateToFormValue(date?: string | null): string {
 	return date.toString().split('T')[0];
 }
 
-export function isoDateFromForm(value: string | null | undefined): string | null {
+export function isoDateFromForm(
+	value: string | null | undefined
+): string | null {
 	if (!value?.trim()) {
 		return null;
 	}
@@ -223,9 +225,7 @@ export function suggestPriorOwnerDatesBetween(args: {
 		: '';
 
 	const untilBridgingToCurrent =
-		insertIndex === 0 && purchaseEnd
-			? purchaseEnd
-			: null;
+		insertIndex === 0 && purchaseEnd ? purchaseEnd : null;
 
 	const newerYear = newerOwnedFrom
 		? utcYearFromFormDate(newerOwnedFrom)
@@ -356,9 +356,9 @@ export function priorOwnersToSubmitPayload(
 function priorRowHasAnyData(row: TPriorOwnerFormRow): boolean {
 	return Boolean(
 		row.name.trim() ||
-			row.date_start.trim() ||
-			row.date_end.trim() ||
-			formatLocation(normalizeLocation(row.location)).trim()
+		row.date_start.trim() ||
+		row.date_end.trim() ||
+		formatLocation(normalizeLocation(row.location)).trim()
 	);
 }
 

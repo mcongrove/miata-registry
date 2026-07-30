@@ -18,7 +18,6 @@
 
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { Resend } from 'resend';
 import { createDb } from '../../db';
 import {
 	CarOwners,
@@ -28,9 +27,11 @@ import {
 	Editions,
 	Owners,
 } from '../../db/schema';
+import { buildVinDecodeFields } from '../../utils/car';
 import { normalizeLocation } from '../../utils/location';
 import { parseAttestationsFromBody } from '../../utils/rarityScore';
 import { allowLocalDevCarEditBypass } from '../utils/carEditAccess';
+import { formatEditionLabel, notifyModerator } from '../utils/notifyModerator';
 import { queuePriorOwnerHistoryChanges } from '../utils/priorOwnerPending';
 import { carDisplayRarityScoreExpr } from '../utils/rarityScoreSql';
 import { recalculateAndStoreCarRarity } from '../utils/recalculateCarRarity';
@@ -46,6 +47,38 @@ const CACHE_TTL = {
 const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v7:';
 
 const rarityScoreExpr = carDisplayRarityScoreExpr;
+
+async function getCarHasPendingChanges(
+	db: ReturnType<typeof createDb>,
+	carId: string
+): Promise<boolean> {
+	const [carPending, carOwnerPending] = await Promise.all([
+		db
+			.select({ id: CarsPending.id })
+			.from(CarsPending)
+			.where(
+				and(
+					eq(CarsPending.car_id, carId),
+					eq(CarsPending.status, 'pending')
+				)
+			)
+			.limit(1)
+			.get(),
+		db
+			.select({ id: CarOwnersPending.id })
+			.from(CarOwnersPending)
+			.where(
+				and(
+					eq(CarOwnersPending.car_id, carId),
+					eq(CarOwnersPending.status, 'pending')
+				)
+			)
+			.limit(1)
+			.get(),
+	]);
+
+	return Boolean(carPending || carOwnerPending);
+}
 
 const carsRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -312,15 +345,26 @@ carsRouter.get('/:id', async (c) => {
 		const cacheKey = `cars:details:${id}`;
 		const cached = await c.env.CACHE.get(cacheKey);
 
-		if (cached && c.env.NODE_ENV !== 'development') {
-			const response = c.json(JSON.parse(cached));
-
-			response.headers.set('X-Cache', 'HIT');
-
-			return response;
-		}
-
 		const db = createDb(c.env.DB);
+
+		if (cached && c.env.NODE_ENV !== 'development') {
+			const parsed = JSON.parse(cached);
+
+			// Stale cache without a decode attempt — fall through to fill
+			if (parsed.vin_decode_status != null || !parsed.vin) {
+				const { has_pending_changes: _stalePending, ...cachedCar } =
+					parsed;
+
+				const response = c.json({
+					...cachedCar,
+					has_pending_changes: await getCarHasPendingChanges(db, id),
+				});
+
+				response.headers.set('X-Cache', 'HIT');
+
+				return response;
+			}
+		}
 
 		const [carData] = await db
 			.select({
@@ -328,7 +372,9 @@ carsRouter.get('/:id', async (c) => {
 				destroyed: Cars.destroyed,
 				edition_id: Cars.edition_id,
 				id: Cars.id,
+				manufacture_city: Cars.manufacture_city,
 				manufacture_date: Cars.manufacture_date,
+				manufacture_prefecture: Cars.manufacture_prefecture,
 				mileage: Cars.mileage,
 				mileage_date: Cars.mileage_date,
 				rarity_original_hardtop: Cars.rarity_original_hardtop,
@@ -353,6 +399,8 @@ carsRouter.get('/:id', async (c) => {
 				shipping_vessel: Cars.shipping_vessel,
 				story: Cars.story,
 				vin: Cars.vin,
+				vin_decode_status: Cars.vin_decode_status,
+				vin_details: Cars.vin_details,
 				current_owner: {
 					city: sql`COALESCE(${Owners.city}, '')`.as('city'),
 					country: sql`COALESCE(${Owners.country}, '')`.as('country'),
@@ -373,18 +421,6 @@ carsRouter.get('/:id', async (c) => {
 					total_produced: Editions.total_produced,
 					year: Editions.year,
 				},
-				has_pending_changes: sql<number>`(
-					EXISTS (
-						SELECT 1 FROM cars_pending
-						WHERE car_id = ${id}
-						AND status = 'pending'
-					)
-					OR EXISTS (
-						SELECT 1 FROM car_owners_pending
-						WHERE car_id = ${id}
-						AND status = 'pending'
-					)
-				)`.as('has_pending_changes'),
 			})
 			.from(Cars)
 			.leftJoin(Editions, eq(Cars.edition_id, Editions.id))
@@ -399,6 +435,27 @@ carsRouter.get('/:id', async (c) => {
 				},
 				404
 			);
+		}
+
+		let manufactureCity = carData.manufacture_city;
+		let manufacturePrefecture = carData.manufacture_prefecture;
+		let vinDecodeStatus = carData.vin_decode_status;
+		let vinDetails = carData.vin_details;
+
+		if (carData.vin && vinDecodeStatus == null) {
+			const decoded = await buildVinDecodeFields(
+				carData.vin,
+				carData.edition?.year
+			);
+
+			if (decoded) {
+				await db.update(Cars).set(decoded).where(eq(Cars.id, id));
+
+				manufactureCity = decoded.manufacture_city;
+				manufacturePrefecture = decoded.manufacture_prefecture;
+				vinDecodeStatus = decoded.vin_decode_status;
+				vinDetails = decoded.vin_details;
+			}
 		}
 
 		const ownerHistory = await db
@@ -419,17 +476,23 @@ carsRouter.get('/:id', async (c) => {
 				desc(CarOwners.date_end)
 			);
 
-		const result = {
+		const cacheable = {
 			...carData,
-			has_pending_changes: Boolean(carData.has_pending_changes),
+			manufacture_city: manufactureCity,
+			manufacture_prefecture: manufacturePrefecture,
+			vin_decode_status: vinDecodeStatus,
+			vin_details: vinDetails,
 			owner_history: ownerHistory,
 		};
 
-		await c.env.CACHE.put(cacheKey, JSON.stringify(result), {
+		await c.env.CACHE.put(cacheKey, JSON.stringify(cacheable), {
 			expirationTtl: CACHE_TTL.CAR_DETAILS,
 		});
 
-		return c.json(result);
+		return c.json({
+			...cacheable,
+			has_pending_changes: await getCarHasPendingChanges(db, id),
+		});
 	} catch (error: unknown) {
 		console.error('Error fetching car:', error);
 
@@ -527,6 +590,10 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 
 		const body = await c.req.json();
 
+		if (typeof body.vin === 'string' && body.vin) {
+			body.vin = body.vin.toUpperCase();
+		}
+
 		if (body.shipping_location) {
 			body.shipping_location = normalizeLocation(body.shipping_location);
 		}
@@ -550,7 +617,9 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					destroyed: Cars.destroyed,
 					edition_id: Cars.edition_id,
 					id: Cars.id,
+					manufacture_city: Cars.manufacture_city,
 					manufacture_date: Cars.manufacture_date,
+					manufacture_prefecture: Cars.manufacture_prefecture,
 					mileage: Cars.mileage,
 					mileage_date: Cars.mileage_date,
 					rarity_original_hardtop: Cars.rarity_original_hardtop,
@@ -574,6 +643,8 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					shipping_vessel: Cars.shipping_vessel,
 					story: Cars.story,
 					vin: Cars.vin,
+					vin_decode_status: Cars.vin_decode_status,
+					vin_details: Cars.vin_details,
 				},
 				owner: {
 					car_id: CarOwners.car_id,
@@ -775,6 +846,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 					? null
 					: existing.car.current_owner_id,
 				destroyed: body.destroyed,
+				vin: existing.car.vin?.toUpperCase() ?? existing.car.vin,
 				manufacture_date: body.manufacture_date,
 				mileage: ownersLogChanged
 					? parsedMileage
@@ -837,21 +909,24 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		}
 
 		if (moderatedCarChanged || carOwnerChanged || priorOwnersChanged) {
-			const resend = new Resend(c.env.RESEND_API_KEY);
+			const edition = await db
+				.select({ year: Editions.year, name: Editions.name })
+				.from(Editions)
+				.where(eq(Editions.id, existing.car.edition_id))
+				.get();
 
-			await resend.emails.send({
-				from: 'Miata Registry <support@miataregistry.com>',
-				to: 'mattcongrove@gmail.com',
-				subject: 'Miata Registry: Car Change Request',
-				html: `
-				<h2>Car Change Request</h2>
-				${moderatedCarChanged ? `<p><strong>Car ID:</strong> ${existing.car.id}</p>` : ''}
-				${priorOwnersChanged ? `<p><strong>Prior ownership history updated for car:</strong> ${existing.car.id}</p>` : ''}
-			`,
+			await notifyModerator(c.env.RESEND_API_KEY, {
+				kind: 'car_update',
+				edition: formatEditionLabel(edition?.year, edition?.name),
 			});
 		}
 
-		if (ownersLogChanged || moderatedCarChanged || carOwnerChanged || priorOwnersChanged) {
+		if (
+			ownersLogChanged ||
+			moderatedCarChanged ||
+			carOwnerChanged ||
+			priorOwnersChanged
+		) {
 			await Promise.all([c.env.CACHE.delete(`cars:details:${id}`)]);
 		}
 

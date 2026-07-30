@@ -23,7 +23,7 @@ export function allowLocalDevCarEditBypass(
 	/* LOCAL DEV — uncomment for one-car testing (see AGENTS.md).
 	import { LOCAL_DEV_EDIT_CAR_ID } from '../../constants/local';
 
-	if (nodeEnv === 'development' && carId === LOCAL_DEV_EDIT_CAR_ID) {
+	if (_nodeEnv === 'development' && _carId === LOCAL_DEV_EDIT_CAR_ID) {
 		return true;
 	}
 	*/

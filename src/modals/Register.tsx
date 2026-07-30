@@ -29,6 +29,7 @@ import { Modal } from '../components/Modal';
 import { TOwner } from '../types/Owner';
 import {
 	getVinDetails,
+	hasVinModelYearMismatch,
 	isFullVin,
 	isVinApiValid,
 	parseEditionYear,
@@ -254,6 +255,14 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						if (details && !isVinApiValid(details)) {
 							setVinApiWarning(
 								'This VIN could not be verified by the NHTSA database. Please double-check it for typos. You can still submit if you are confident it is correct.'
+							);
+
+							return;
+						}
+
+						if (details && hasVinModelYearMismatch(details, year)) {
+							setVinApiWarning(
+								"This VIN's model year does not match the selected edition. Please double-check both. You can still submit if you are confident they are correct."
 							);
 
 							return;

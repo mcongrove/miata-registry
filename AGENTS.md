@@ -47,6 +47,19 @@ npm run build
 
 Other useful commands: `npm run email:dev` (preview emails), `npm run db:push` (apply schema to remote D1 — see boundaries below), `npm run worker:deploy` (API deploy).
 
+## Prettier / format
+
+**Do not** run Prettier after every edit or as routine task wrap-up. Format only when preparing a **commit** (or when the user explicitly asks):
+
+1. Format touched files (prefer scoped write so you don't rewrite unrelated `src/`):
+    ```bash
+    npx prettier --write path/to/changed.ts path/to/other.tsx
+    ```
+    `npm run format` rewrites all of `src/**/*.{js,jsx,ts,tsx}` — fine right before a PR/commit if you intend a full pass.
+2. Confirm it applied: `npx prettier --check` on those same paths (or `git diff` looks like formatting-only where expected). Fix anything still failing check before committing.
+
+Mid-task: match existing file style by hand; don't kick off format/lint/build just to say you're done unless the user asked or you're about to commit.
+
 ## Architecture
 
 ```
@@ -131,9 +144,9 @@ Car UUID: `src/constants/local.ts` or optional `VITE_LOCAL_DEV_EDIT_CAR_ID` in `
 
 Both targets **auto-deploy on push to `main`**. No manual dashboard deploy is required for normal releases.
 
-| Target | How |
-|--------|-----|
-| API worker | GitHub Actions → `.github/workflows/deploy.yml` (lint, build, `worker:deploy`) |
+| Target       | How                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| API worker   | GitHub Actions → `.github/workflows/deploy.yml` (lint, build, `worker:deploy`)              |
 | Web frontend | Cloudflare dashboard **GitHub integration** (connected repo; builds/deploys `main` like CI) |
 
 Systems differ (Actions vs dashboard Git integration), but agents should assume **push to `main` ships API + web** unless the user says otherwise.
@@ -166,14 +179,14 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 
 Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape (currently `cars:list:v7:`).
 
-| Key pattern | Purpose |
-|-------------|---------|
-| `cars:list:v7:{params}` | Registry browse list |
-| `cars:details:{id}` | Car profile |
-| `cars:summary:{id}` | Car summary |
-| `editions:all:v2`, `editions:names` | Edition data |
-| `stats:all` | Site stats |
-| `news:*` | News list/detail/featured |
+| Key pattern                         | Purpose                   |
+| ----------------------------------- | ------------------------- |
+| `cars:list:v7:{params}`             | Registry browse list      |
+| `cars:details:{id}`                 | Car profile               |
+| `cars:summary:{id}`                 | Car summary               |
+| `editions:all:v2`, `editions:names` | Edition data              |
+| `stats:all`                         | Site stats                |
+| `news:*`                            | News list/detail/featured |
 
 Moderation approvals invalidate relevant car/edition/stats keys. Stale registry data after deploy? suspect KV — list prefix above.
 
