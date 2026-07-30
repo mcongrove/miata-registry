@@ -16,8 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { editionPageJsonLd } from '../utils/jsonLd';
+import { formatEditionColor } from '../utils/car';
 import { editionPath } from '../utils/editionSlug';
+import { carPageJsonLd, editionPageJsonLd } from '../utils/jsonLd';
 import { BASE_URL, DEFAULT_DESCRIPTION } from './constants';
 
 export type PageMeta = {
@@ -148,20 +149,36 @@ export const buildCarBotContent = (car: CarBotData): string => {
 	const edition = car.edition;
 	const year = edition?.year ?? '';
 	const name = edition?.name ?? 'Unknown edition';
+	const editionLabel = `${year} ${name}`.trim();
 	const sequenceSuffix = hasSequence(car.sequence) ? ` #${car.sequence}` : '';
-	const color = edition?.color ? `${edition.color}.` : '';
+	const colorLabel = edition?.color
+		? `${formatEditionColor(edition.color)}.`
+		: '';
 	const produced =
 		edition?.total_produced != null
 			? ` 1 of ${edition.total_produced.toLocaleString('en-US')} produced.`
 			: '';
 	const claimed = car.current_owner_id ? ' Claimed.' : ' Unclaimed.';
 
-	const summary = `${year} ${name}${sequenceSuffix}. ${color}${produced}${claimed}`;
+	const summary = `${editionLabel}${sequenceSuffix}. ${colorLabel}${produced}${claimed}`;
+
+	const editionHref =
+		edition != null
+			? `${BASE_URL}${editionPath(edition.year, edition.name)}`
+			: null;
 
 	const parts = [
-		`<h1>${escapeHtml(`${year} ${name}`.trim())}</h1>`,
+		editionHref
+			? `<h1><a href="${escapeHtml(editionHref)}">${escapeHtml(editionLabel)}</a>${escapeHtml(sequenceSuffix)}</h1>`
+			: `<h1>${escapeHtml(editionLabel)}</h1>`,
 		`<p>${escapeHtml(summary.trim())}</p>`,
 	];
+
+	if (editionHref) {
+		parts.push(
+			`<p>Edition page: <a href="${escapeHtml(editionHref)}">${escapeHtml(editionLabel)}</a></p>`
+		);
+	}
 
 	if (edition?.description) {
 		parts.push(`<p>${escapeHtml(edition.description.split('\n')[0])}</p>`);
@@ -171,7 +188,19 @@ export const buildCarBotContent = (car: CarBotData): string => {
 		parts.push(`<p>${escapeHtml(car.story.trim())}</p>`);
 	}
 
-	return buildBotArticle(parts.join('\n'));
+	const jsonLd = carPageJsonLd({
+		id: car.id,
+		sequence: car.sequence,
+		edition: edition
+			? {
+					year: edition.year,
+					name: edition.name,
+					description: edition.description,
+				}
+			: null,
+	});
+
+	return `${buildBotArticle(parts.join('\n'))}\n<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
 };
 
 export const buildCarPageMeta = (
@@ -241,8 +270,12 @@ export const buildEditionBotContent = (edition: EditionBotData): string => {
 			? `${edition.total_produced.toLocaleString('en-US')} produced.`
 			: '';
 	const registryStats = `${(edition.in_registry ?? 0).toLocaleString('en-US')} in the registry; ${(edition.claimed ?? 0).toLocaleString('en-US')} claimed.`;
-	const summary =
-		`${title} is a ${edition.generation} generation limited edition Mazda Miata in ${edition.color}. ${produced} ${registryStats}`.trim();
+	const colorLabel = formatEditionColor(edition.color);
+	const colorSentence =
+		edition.color.toLowerCase() === 'various'
+			? `${title} is a ${edition.generation} generation limited edition Mazda Miata offered in multiple factory colors.`
+			: `${title} is a ${edition.generation} generation limited edition Mazda Miata in ${colorLabel}.`;
+	const summary = `${colorSentence} ${produced} ${registryStats}`.trim();
 
 	const parts = [
 		`<h1>${escapeHtml(title)}</h1>`,
@@ -259,6 +292,11 @@ export const buildEditionBotContent = (edition: EditionBotData): string => {
 		}
 	}
 
+	const colorFaq =
+		edition.color.toLowerCase() === 'various'
+			? 'Multiple factory colors.'
+			: `${colorLabel}.`;
+
 	parts.push(
 		'<h2>Frequently asked questions</h2>',
 		`<p><strong>How many ${escapeHtml(title)} Miatas were produced?</strong> ${
@@ -267,7 +305,7 @@ export const buildEditionBotContent = (edition: EditionBotData): string => {
 				: 'Production total is not confirmed in the registry.'
 		}</p>`,
 		`<p><strong>How many are in the Miata Registry?</strong> ${(edition.in_registry ?? 0).toLocaleString('en-US')} cars; ${(edition.claimed ?? 0).toLocaleString('en-US')} claimed by owners.</p>`,
-		`<p><strong>What color is the ${escapeHtml(title)}?</strong> ${escapeHtml(edition.color)}.</p>`
+		`<p><strong>What color is the ${escapeHtml(title)}?</strong> ${escapeHtml(colorFaq)}</p>`
 	);
 
 	if (edition.cars && edition.cars.length > 0) {

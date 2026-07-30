@@ -17,7 +17,7 @@
  */
 
 import type { D1Database } from '@cloudflare/workers-types';
-import { asc, desc, lte, sql } from 'drizzle-orm';
+import { asc, desc, eq, lte, sql } from 'drizzle-orm';
 import { createDb } from '../db';
 import { Cars, Editions, News } from '../db/schema';
 import { editionPath } from '../utils/editionSlug';
@@ -77,6 +77,7 @@ const toLastmod = (value?: string | null): string => {
 	return value.slice(0, 10);
 };
 
+/** Keep in sync with isCarIndexable in seo/indexing.ts. */
 export const INDEXABLE_CARS_SQL = sql`
 	${Cars.current_owner_id} IS NOT NULL
 	AND (
@@ -104,13 +105,18 @@ export const fetchEditionSitemapUrls = async (
 		.select({
 			name: Editions.name,
 			year: Editions.year,
+			updated_date: sql<string | null>`MAX(${Cars.updated_date})`.as(
+				'updated_date'
+			),
 		})
 		.from(Editions)
+		.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
+		.groupBy(Editions.id, Editions.name, Editions.year)
 		.orderBy(asc(Editions.year), asc(Editions.name));
 
 	return editions.map((edition) => ({
 		loc: `${BASE_URL}${editionPath(edition.year, edition.name)}`,
-		lastmod: STATIC_SITEMAP_LASTMOD,
+		lastmod: toLastmod(edition.updated_date),
 		changefreq: 'weekly',
 		priority: '0.7',
 	}));

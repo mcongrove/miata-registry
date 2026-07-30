@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TCar } from '../types/Car';
 import { TEdition } from '../types/Edition';
 import { TNewsArticle } from '../types/News';
-import { hasSequence } from './car';
+import { formatEditionColor, hasSequence } from './car';
 import { editionPath, editionSlug } from './editionSlug';
 
 const SITE_ORIGIN = 'https://miataregistry.com';
@@ -54,7 +53,17 @@ export function organizationWebSite() {
 	};
 }
 
-export function carPageJsonLd(car: TCar) {
+type CarJsonLdInput = {
+	id: string;
+	sequence?: number | null;
+	edition?: {
+		year: number;
+		name: string;
+		description?: string | null;
+	} | null;
+};
+
+export function carPageJsonLd(car: CarJsonLdInput) {
 	const edition = car.edition;
 	const sequenceSuffix =
 		edition && hasSequence(car.sequence) ? ` #${car.sequence}` : '';
@@ -63,6 +72,9 @@ export function carPageJsonLd(car: TCar) {
 		: 'Mazda Miata';
 	const url = `${SITE_ORIGIN}/registry/${car.id}`;
 	const description = edition?.description?.split('\n')[0];
+	const editionUrl = edition
+		? `${SITE_ORIGIN}${editionPath(edition.year, edition.name)}`
+		: undefined;
 
 	return {
 		'@context': 'https://schema.org',
@@ -75,6 +87,15 @@ export function carPageJsonLd(car: TCar) {
 			'@type': 'Thing',
 			name,
 			url,
+			...(editionUrl
+				? {
+						isPartOf: {
+							'@type': 'CollectionPage',
+							url: editionUrl,
+							name: `${edition!.year} ${edition!.name}`,
+						},
+					}
+				: {}),
 		},
 	};
 }
@@ -139,7 +160,10 @@ export function editionPageJsonLd(
 			name: `What color is the ${name} Miata?`,
 			acceptedAnswer: {
 				'@type': 'Answer',
-				text: `The ${name} was finished in ${edition.color}.`,
+				text:
+					edition.color.toLowerCase() === 'various'
+						? `The ${name} was offered in multiple factory colors.`
+						: `The ${name} was finished in ${formatEditionColor(edition.color)}.`,
 			},
 		},
 	].filter(Boolean);
@@ -185,7 +209,9 @@ export function editionPageJsonLd(
 									{
 										'@type': 'PropertyValue',
 										name: 'Color',
-										value: edition.color,
+										value: formatEditionColor(
+											edition.color
+										),
 									},
 								],
 							}

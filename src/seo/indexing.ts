@@ -43,6 +43,10 @@ const BOT_USER_AGENT_PATTERNS = [
 	/anthropic-ai/i,
 	/cohere-ai/i,
 	/applebot/i,
+	/google-extended/i,
+	/amazonbot/i,
+	/bytespider/i,
+	/meta-externalagent/i,
 	/semrushbot/i,
 	/ahrefsbot/i,
 ];
@@ -57,9 +61,9 @@ export type CarIndexableFields = {
 	owner_history_count?: number;
 	vin?: string | null;
 	mileage?: number | null;
-	hasPhoto?: boolean;
 };
 
+/** Keep in sync with INDEXABLE_CARS_SQL in seo/sitemap.ts (no CDN photo check). */
 export const isCarIndexable = (car: CarIndexableFields): boolean => {
 	if (!car.current_owner_id) {
 		return false;
@@ -69,10 +73,9 @@ export const isCarIndexable = (car: CarIndexableFields): boolean => {
 	const ownerHistoryCount =
 		car.owner_history_count ?? car.owner_history?.length ?? 0;
 	const hasOwnerHistory = ownerHistoryCount > 0;
-	const hasPhoto = car.hasPhoto === true;
 	const hasSubstantive = Boolean(car.vin?.trim()) || car.mileage != null;
 
-	return hasStory || hasOwnerHistory || hasPhoto || hasSubstantive;
+	return hasStory || hasOwnerHistory || hasSubstantive;
 };
 
 export const CAR_PHOTO_CDN_BASE = 'https://store.miataregistry.com/car';

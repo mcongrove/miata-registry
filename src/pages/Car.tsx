@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useAuth } from '@clerk/clerk-react';
 import {
 	lazy,
 	useCallback,
@@ -42,6 +42,7 @@ import {
 	toTitleCase,
 } from '../utils/common';
 import { userCanEditCar } from '../utils/carEditAccess';
+import { editionPath } from '../utils/editionSlug';
 import { qualifiesAsSingleOwnerSinceNew } from '../utils/rarityScore';
 import { carPageJsonLd } from '../utils/jsonLd';
 import { isCarIndexable, isValidUuid } from '../utils/seoIndexing';
@@ -60,10 +61,8 @@ const TimelineItem = lazy(() =>
 export const CarProfile = () => {
 	const { id } = useParams();
 	const { userId } = useAuth();
-	const { user } = useUser();
 	const { openModal } = useModal();
 	const [car, setCar] = useState<TCar | null>(null);
-	const [hasPhoto, setHasPhoto] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
@@ -72,9 +71,13 @@ export const CarProfile = () => {
 		car != null &&
 		isCarIndexable({
 			...car,
-			hasPhoto,
 			owner_history_count: car.owner_history?.length,
 		});
+
+	const editionHref =
+		car?.edition != null
+			? editionPath(car.edition.year, car.edition.name)
+			: null;
 
 	usePageMeta({
 		path: `/registry/${id}`,
@@ -175,10 +178,6 @@ export const CarProfile = () => {
 	useEffect(() => {
 		loadCar();
 	}, [loadCar]);
-
-	useEffect(() => {
-		setHasPhoto(false);
-	}, [id]);
 
 	const formatCarDate = (
 		date: string | undefined,
@@ -497,7 +496,17 @@ export const CarProfile = () => {
 						<div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
 							<div className="flex flex-col gap-1.5 lg:gap-1 items-start">
 								<h1 className="text-2xl lg:text-4xl leading-[1.1] font-bold">
-									{car.edition?.year} {car.edition?.name}
+									{editionHref ? (
+										<Link to={editionHref}>
+											{car.edition?.year}{' '}
+											{car.edition?.name}
+										</Link>
+									) : (
+										<>
+											{car.edition?.year}{' '}
+											{car.edition?.name}
+										</>
+									)}
 								</h1>
 
 								{(car.edition?.total_produced ||
@@ -606,19 +615,6 @@ export const CarProfile = () => {
 										</Button>
 									</Link>
 								)}
-
-								{user?.publicMetadata?.moderator ? (
-									<Button
-										onClick={() =>
-											openModal('socialGeneration', {
-												car,
-											})
-										}
-										className="size-9 flex items-center justify-center rounded-md lg:p-2 bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark"
-									>
-										<i className="fa-solid fa-share-nodes" />
-									</Button>
-								) : null}
 							</div>
 						</div>
 					) : (
@@ -667,8 +663,6 @@ export const CarProfile = () => {
 											onLoad={(e) => {
 												const img =
 													e.target as HTMLImageElement;
-
-												setHasPhoto(true);
 
 												img.classList.add(
 													car.destroyed
@@ -820,9 +814,25 @@ export const CarProfile = () => {
 						{car?.edition?.description ? (
 							<div className="hidden lg:flex flex-col gap-4">
 								<h3 className="text-xl font-semibold">
-									About the {car.edition.year}{' '}
-									{car.edition.name.replace('Edition', '')}{' '}
-									Edition
+									{editionHref ? (
+										<Link to={editionHref}>
+											About the {car.edition.year}{' '}
+											{car.edition.name.replace(
+												'Edition',
+												''
+											)}{' '}
+											Edition
+										</Link>
+									) : (
+										<>
+											About the {car.edition.year}{' '}
+											{car.edition.name.replace(
+												'Edition',
+												''
+											)}{' '}
+											Edition
+										</>
+									)}
 								</h3>
 
 								<div className="prose max-w-none">
@@ -956,9 +966,25 @@ export const CarProfile = () => {
 					{car?.edition?.description ? (
 						<div className="flex lg:hidden flex-col gap-4">
 							<h3 className="text-xl font-semibold">
-								About the {car.edition.year}{' '}
-								{car.edition.name.replace('Edition', '')}{' '}
-								Edition
+								{editionHref ? (
+									<Link to={editionHref}>
+										About the {car.edition.year}{' '}
+										{car.edition.name.replace(
+											'Edition',
+											''
+										)}{' '}
+										Edition
+									</Link>
+								) : (
+									<>
+										About the {car.edition.year}{' '}
+										{car.edition.name.replace(
+											'Edition',
+											''
+										)}{' '}
+										Edition
+									</>
+								)}
 							</h3>
 
 							<div className="prose max-w-none space-y-4">
