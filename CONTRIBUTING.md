@@ -109,7 +109,7 @@ When referring to registry cars in user-facing copy or docs:
 
 Schema lives in `src/db/schema/`. After editing, coordinate with a maintainer — `npm run db:push` applies to **production** D1. Include schema changes in your PR; do not push the database yourself unless you are a maintainer.
 
-There is no checked-in SQL migration history. Contributors use `npm run worker:dev --remote` against production D1 for API work. For a static copy of registry data, use the weekly [Internet Archive backups](https://archive.org/search?query=creator%3A%22Miata+Registry%22&sort=-addeddate) (CSV zip), not a local D1 bootstrap.
+There is no checked-in SQL migration history. Contributors use `npm run worker:dev --remote` against production D1 for API work. For a static copy of registry data, use the weekly [Internet Archive backups](https://archive.org/details/@miataregistry) (CSV zip), not a local D1 bootstrap.
 
 ## Email templates
 

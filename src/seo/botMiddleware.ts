@@ -19,7 +19,14 @@
 import type { D1Database } from '@cloudflare/workers-types';
 import { desc, eq, sql } from 'drizzle-orm';
 import { createDb } from '../db';
-import { CarOwners, Cars, Editions, News, Owners } from '../db/schema';
+import {
+	CarOwners,
+	Cars,
+	Editions,
+	News,
+	Owners,
+	Resources,
+} from '../db/schema';
 import { findEditionBySlug } from '../utils/editionSlug';
 import {
 	buildAboutBotContent,
@@ -29,6 +36,7 @@ import {
 	buildNewsPageMeta,
 	buildNotFoundHtml,
 	buildRarityBotContent,
+	buildResourcePageMeta,
 	injectPageMeta,
 	STATIC_PAGE_META,
 	type PageMeta,
@@ -185,6 +193,31 @@ const fetchNewsForBot = async (db: D1Database, articleId: string) => {
 	return article;
 };
 
+const fetchResourceForBot = async (db: D1Database, id: string) => {
+	const drizzle = createDb(db);
+	const now = new Date().toISOString();
+
+	const [resource] = await drizzle
+		.select({
+			id: Resources.id,
+			title: Resources.title,
+			summary: Resources.summary,
+			body: Resources.body,
+			kind: Resources.kind,
+			href: Resources.href,
+			publish_date: Resources.publish_date,
+		})
+		.from(Resources)
+		.where(eq(Resources.id, id))
+		.limit(1);
+
+	if (!resource || resource.publish_date > now) {
+		return null;
+	}
+
+	return resource;
+};
+
 const registryHasNonDefaultView = (searchParams: URLSearchParams): boolean => {
 	if (searchParams.has('filter')) {
 		return true;
@@ -260,6 +293,18 @@ export const resolveBotPageMeta = async (
 		return buildNewsPageMeta(article);
 	}
 
+	const resourceMatch = pathname.match(/^\/resources\/([^/]+)$/);
+
+	if (resourceMatch) {
+		const resource = await fetchResourceForBot(db, resourceMatch[1]);
+
+		if (!resource) {
+			return 'not_found';
+		}
+
+		return buildResourcePageMeta(resource);
+	}
+
 	if (pathname === '/rarity') {
 		return {
 			...STATIC_PAGE_META['/rarity'],
@@ -310,6 +355,10 @@ export const isKnownSpaRoute = (pathname: string): boolean => {
 	}
 
 	if (pathname.match(/^\/news\/[^/]+$/)) {
+		return true;
+	}
+
+	if (pathname.match(/^\/resources\/[^/]+$/)) {
 		return true;
 	}
 

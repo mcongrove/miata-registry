@@ -21,7 +21,14 @@ import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import JSZip from 'jszip';
 import { createDb } from '../../db';
-import { CarOwners, Cars, Editions, Owners } from '../../db/schema';
+import {
+	CarOwners,
+	Cars,
+	Editions,
+	Owners,
+	ResourceAssociations,
+	Resources,
+} from '../../db/schema';
 import { objectsToCSV } from '../../utils/data';
 import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
@@ -208,11 +215,17 @@ heartbeatRouter.post('/archive/cron', async (c) => {
 				links: sql<string>`json(${Owners.links})`.as('links'),
 			})
 			.from(Owners);
+		const resources = await db.select().from(Resources);
+		const resourceAssociations = await db
+			.select()
+			.from(ResourceAssociations);
 
 		const carOwnersCSV = objectsToCSV(carOwners);
 		const carsCSV = objectsToCSV(cars);
 		const editionsCSV = objectsToCSV(editions);
 		const ownersCSV = objectsToCSV(owners);
+		const resourcesCSV = objectsToCSV(resources);
+		const resourceAssociationsCSV = objectsToCSV(resourceAssociations);
 
 		const zip = new JSZip();
 
@@ -220,6 +233,8 @@ heartbeatRouter.post('/archive/cron', async (c) => {
 		zip.file('cars.csv', carsCSV);
 		zip.file('editions.csv', editionsCSV);
 		zip.file('owners.csv', ownersCSV);
+		zip.file('resources.csv', resourcesCSV);
+		zip.file('resource_associations.csv', resourceAssociationsCSV);
 
 		const zipBlob = await zip.generateAsync({
 			type: 'blob',

@@ -24,4 +24,5 @@ export * from './schema/Editions';
 export * from './schema/News';
 export * from './schema/Owners';
 export * from './schema/OwnersPending';
+export * from './schema/Resources';
 export * from './schema/Tips';

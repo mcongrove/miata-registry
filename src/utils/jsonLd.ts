@@ -18,9 +18,9 @@
 
 import { TEdition } from '../types/Edition';
 import { TNewsArticle } from '../types/News';
+import { TResource } from '../types/Resource';
 import { formatEditionColor, hasSequence } from './car';
 import { editionPath, editionSlug } from './editionSlug';
-
 const SITE_ORIGIN = 'https://miataregistry.com';
 
 export function organizationWebSite() {
@@ -112,6 +112,51 @@ export function newsArticleJsonLd(article: TNewsArticle) {
 		},
 		url: `${SITE_ORIGIN}/news/${article.id}`,
 	};
+}
+
+export function resourcePageJsonLd(resource: TResource) {
+	const url = `${SITE_ORIGIN}/resources/${resource.id}`;
+	const base = {
+		'@context': 'https://schema.org',
+		'@type': 'WebPage',
+		name: resource.title,
+		description: resource.summary,
+		datePublished: resource.publish_date,
+		url,
+		isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+		...(resource.kind === 'link' || resource.kind === 'registry'
+			? {
+					about: {
+						'@type': 'WebPage',
+						name: resource.title,
+						description:
+							'Third-party resource cataloged by the Miata Registry; not operated by the Miata Registry.',
+					},
+				}
+			: {}),
+	};
+
+	// Describe hosted files without contentUrl so crawlers are not handed a download URL.
+	if (
+		resource.file_name ||
+		resource.file_mime ||
+		resource.file_bytes != null
+	) {
+		return {
+			...base,
+			mainEntity: {
+				'@type': 'DataDownload',
+				name: resource.file_name || resource.title,
+				encodingFormat: resource.file_mime || undefined,
+				contentSize:
+					resource.file_bytes != null
+						? String(resource.file_bytes)
+						: undefined,
+			},
+		};
+	}
+
+	return base;
 }
 
 type EditionJsonLdCar = {

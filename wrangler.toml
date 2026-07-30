@@ -24,6 +24,11 @@ binding = "IMAGES"
 bucket_name = "miata-registry-images"
 preview_bucket_name = "miata-registry-images"
 
+[[r2_buckets]]
+binding = "RESOURCES"
+bucket_name = "miata-registry-resources"
+preview_bucket_name = "miata-registry-resources"
+
 # Development Environment
 [env.development]
 vars = { NODE_ENV = "development", ENVIRONMENT = "development" }
@@ -42,6 +47,11 @@ preview_id = "7fda99700a024497bc3da8172120a3d5"
 binding = "IMAGES"
 bucket_name = "miata-registry-images"
 preview_bucket_name = "miata-registry-images"
+
+[[env.development.r2_buckets]]
+binding = "RESOURCES"
+bucket_name = "miata-registry-resources"
+preview_bucket_name = "miata-registry-resources"
 
 # Production Environment
 [env.production]

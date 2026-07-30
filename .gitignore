@@ -61,13 +61,13 @@ yarn-error.log*
 # Data files
 /backups
 /ingest
+/resources
 /.notes
-/local/*
-!/local/AGENTS.md
 
 # Git files
 /.git
 
-# Marketing Plan
-/.marketing-plan.md
+# Agents
 /.impeccable/config.json
+/local/*
+!/local/AGENTS.md

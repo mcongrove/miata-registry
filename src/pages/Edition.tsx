@@ -29,10 +29,12 @@ import { Stats } from '../components/edition/Stats';
 import { Chip } from '../components/rarity/Chip';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TEdition } from '../types/Edition';
+import type { TResource } from '../types/Resource';
 import { formatEditionColor } from '../utils/car';
 import { handleApiError } from '../utils/common';
 import { editionRegistryFilterPath } from '../utils/editionSlug';
 import { editionPageJsonLd } from '../utils/jsonLd';
+import { resourceKindIcon, resourceKindLabel } from '../utils/resource';
 
 type EditionPayload = {
 	edition: TEdition & { slug: string };
@@ -42,6 +44,7 @@ type EditionPayload = {
 export const Edition = () => {
 	const { slug } = useParams<{ slug: string }>();
 	const [payload, setPayload] = useState<EditionPayload | null>(null);
+	const [resources, setResources] = useState<TResource[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
 
@@ -67,6 +70,7 @@ export const Edition = () => {
 			setIsLoading(true);
 			setNotFound(false);
 			setPayload(null);
+			setResources([]);
 
 			try {
 				const response = await fetch(
@@ -86,9 +90,56 @@ export const Edition = () => {
 				const data = (await response.json()) as EditionPayload;
 
 				setPayload(data);
+
+				try {
+					const base = import.meta.env.VITE_CLOUDFLARE_WORKER_URL;
+					const [editionResponse, generationResponse] =
+						await Promise.all([
+							fetch(
+								`${base}/resources?edition=${encodeURIComponent(data.edition.id)}`
+							),
+							data.edition.generation
+								? fetch(
+										`${base}/resources?generation=${encodeURIComponent(data.edition.generation)}`
+									)
+								: Promise.resolve(null),
+						]);
+
+					const editionResources: TResource[] = editionResponse.ok
+						? await editionResponse.json()
+						: [];
+					const generationResources: TResource[] =
+						generationResponse?.ok
+							? await generationResponse.json()
+							: [];
+
+					const editionList = Array.isArray(editionResources)
+						? editionResources
+						: [];
+					const generationList = Array.isArray(generationResources)
+						? generationResources
+						: [];
+					const editionIds = new Set(
+						editionList.map((resource) => resource.id)
+					);
+
+					// Gen-wide FAQ/historic shelves are too broad for an edition page.
+					setResources([
+						...editionList,
+						...generationList.filter(
+							(resource) =>
+								!editionIds.has(resource.id) &&
+								resource.sort_order !== 800 &&
+								resource.sort_order !== 900
+						),
+					]);
+				} catch {
+					setResources([]);
+				}
 			} catch (error) {
 				handleApiError(error);
 				setNotFound(true);
+				setResources([]);
 			} finally {
 				setIsLoading(false);
 			}
@@ -197,6 +248,62 @@ export const Edition = () => {
 										<p key={index}>{paragraph}</p>
 									))}
 								</div>
+							</section>
+						)}
+
+						{resources.length > 0 && (
+							<section>
+								<div className="flex items-baseline justify-between gap-4 mb-4">
+									<h2 className="text-xl font-bold">
+										Resources
+									</h2>
+									<Link
+										to={`/resources?edition=${encodeURIComponent(edition.id)}`}
+										className="text-sm text-brg-mid hover:text-brg"
+									>
+										View all
+									</Link>
+								</div>
+								<ul className="flex flex-col divide-y divide-brg-light border-y border-brg-light">
+									{resources.map((resource) => (
+										<li key={resource.id}>
+											<Link
+												to={`/resources/${resource.id}`}
+												className="flex items-start justify-between gap-3 py-4 group"
+											>
+												<div className="flex gap-3 min-w-0">
+													<span
+														className="flex size-8 items-center justify-center rounded-lg bg-brg-light text-brg-mid shrink-0"
+														title={resourceKindLabel(
+															resource.kind
+														)}
+													>
+														<i
+															className={`${resourceKindIcon(resource.kind)} text-xs`}
+															aria-hidden
+														/>
+														<span className="sr-only">
+															{resourceKindLabel(
+																resource.kind
+															)}
+														</span>
+													</span>
+													<div className="flex flex-col gap-0.5 min-w-0">
+														<span className="text-sm font-medium text-brg group-hover:text-brg-dark">
+															{resource.title}
+														</span>
+														<p className="text-sm text-brg-mid line-clamp-2">
+															{resource.summary}
+														</p>
+													</div>
+												</div>
+												<span className="text-brg-mid text-sm shrink-0 mt-1.5 group-hover:text-brg">
+													→
+												</span>
+											</Link>
+										</li>
+									))}
+								</ul>
 							</section>
 						)}
 					</div>

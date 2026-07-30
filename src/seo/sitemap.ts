@@ -19,7 +19,7 @@
 import type { D1Database } from '@cloudflare/workers-types';
 import { asc, desc, eq, lte, sql } from 'drizzle-orm';
 import { createDb } from '../db';
-import { Cars, Editions, News } from '../db/schema';
+import { Cars, Editions, News, Resources } from '../db/schema';
 import { editionPath } from '../utils/editionSlug';
 import {
 	BASE_URL,
@@ -145,6 +145,30 @@ export const fetchNewsSitemapUrls = async (
 	}));
 };
 
+export const fetchResourcesSitemapUrls = async (
+	db: D1Database
+): Promise<SitemapUrl[]> => {
+	const drizzle = createDb(db);
+	const now = new Date().toISOString();
+
+	const resources = await drizzle
+		.select({
+			id: Resources.id,
+			publish_date: Resources.publish_date,
+			updated_at: Resources.updated_at,
+		})
+		.from(Resources)
+		.where(lte(Resources.publish_date, now))
+		.orderBy(desc(Resources.publish_date));
+
+	return resources.map((resource) => ({
+		loc: `${BASE_URL}/resources/${resource.id}`,
+		lastmod: toLastmod(resource.updated_at || resource.publish_date),
+		changefreq: 'monthly',
+		priority: '0.6',
+	}));
+};
+
 export const fetchIndexableCarUrls = async (
 	db: D1Database
 ): Promise<SitemapUrl[]> => {
@@ -204,13 +228,21 @@ export const generateSitemap = async (
 export const generateStaticSitemapXml = async (
 	db: D1Database
 ): Promise<string> => {
-	const [staticUrls, editionUrls, newsUrls] = await Promise.all([
-		Promise.resolve(fetchStaticSitemapUrls()),
-		fetchEditionSitemapUrls(db),
-		fetchNewsSitemapUrls(db),
-	]);
+	const [staticUrls, editionUrls, newsUrls, resourceUrls] = await Promise.all(
+		[
+			Promise.resolve(fetchStaticSitemapUrls()),
+			fetchEditionSitemapUrls(db),
+			fetchNewsSitemapUrls(db),
+			fetchResourcesSitemapUrls(db),
+		]
+	);
 
-	return renderUrlSet([...staticUrls, ...editionUrls, ...newsUrls]);
+	return renderUrlSet([
+		...staticUrls,
+		...editionUrls,
+		...newsUrls,
+		...resourceUrls,
+	]);
 };
 
 export const generateCarChunkSitemapXml = async (
@@ -229,12 +261,19 @@ export const generateCarChunkSitemapXml = async (
 };
 
 export const countSitemapUrls = async (db: D1Database): Promise<number> => {
-	const [staticCount, editions, news, cars] = await Promise.all([
+	const [staticCount, editions, news, resources, cars] = await Promise.all([
 		Promise.resolve(STATIC_SITEMAP_PAGES.length),
 		fetchEditionSitemapUrls(db),
 		fetchNewsSitemapUrls(db),
+		fetchResourcesSitemapUrls(db),
 		fetchIndexableCarUrls(db),
 	]);
 
-	return staticCount + editions.length + news.length + cars.length;
+	return (
+		staticCount +
+		editions.length +
+		news.length +
+		resources.length +
+		cars.length
+	);
 };

@@ -155,24 +155,12 @@ export const Header = () => {
 					isActive={isActive('/registry')}
 				/>
 
-				{/*
-				<Link
-					to="/resources/docs"
-					className={`text-sm ${
-						isActive('/resources')
-							? 'text-brg'
-							: 'text-brg-mid hover:text-brg'
-					} transition-colors`}
-				>
-					Resources
-				</Link>
-				*/}
-
 				<Dropdown
 					label="About"
 					items={[
 						{ label: 'About the Registry', to: '/about' },
 						{ label: 'News & Updates', to: '/news' },
+						{ label: 'Resources', to: '/resources' },
 						{
 							label: (
 								<span className="flex items-center gap-1.5">
@@ -187,6 +175,7 @@ export const Header = () => {
 					isActive={
 						isActive('/about') ||
 						isActive('/news') ||
+						isActive('/resources') ||
 						isActive('/rarity')
 					}
 				/>

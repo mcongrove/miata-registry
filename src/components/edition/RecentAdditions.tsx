@@ -138,7 +138,7 @@ export const RecentAdditions = ({
 								>
 									<td className="px-3 py-2 whitespace-nowrap font-mono">
 										{hasSequence(car.sequence) ? (
-											<div className="flex items-center justify-between gap-2">
+											<div className="flex items-center gap-1.5">
 												<span
 													className={
 														car.destroyed
