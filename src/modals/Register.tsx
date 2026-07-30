@@ -138,11 +138,12 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 			if (form) {
 				const editionSelect = form.querySelector(
-					'[name="edition"]'
+					'[name="edition_name"]'
 				) as HTMLSelectElement;
 
 				if (editionSelect) {
 					editionSelect.value = prefilledData.edition_name;
+					setSelectedEdition(prefilledData.edition_name);
 				}
 			}
 		}

@@ -17,9 +17,10 @@
  */
 
 import type { D1Database } from '@cloudflare/workers-types';
-import { desc, lte, sql } from 'drizzle-orm';
+import { asc, desc, lte, sql } from 'drizzle-orm';
 import { createDb } from '../db';
-import { Cars, News } from '../db/schema';
+import { Cars, Editions, News } from '../db/schema';
+import { editionPath } from '../utils/editionSlug';
 import {
 	BASE_URL,
 	SITEMAP_MAX_URLS,
@@ -93,6 +94,27 @@ export const fetchStaticSitemapUrls = (): SitemapUrl[] =>
 		changefreq: page.changefreq,
 		priority: page.priority,
 	}));
+
+export const fetchEditionSitemapUrls = async (
+	db: D1Database
+): Promise<SitemapUrl[]> => {
+	const drizzle = createDb(db);
+
+	const editions = await drizzle
+		.select({
+			name: Editions.name,
+			year: Editions.year,
+		})
+		.from(Editions)
+		.orderBy(asc(Editions.year), asc(Editions.name));
+
+	return editions.map((edition) => ({
+		loc: `${BASE_URL}${editionPath(edition.year, edition.name)}`,
+		lastmod: STATIC_SITEMAP_LASTMOD,
+		changefreq: 'weekly',
+		priority: '0.7',
+	}));
+};
 
 export const fetchNewsSitemapUrls = async (
 	db: D1Database
@@ -176,12 +198,13 @@ export const generateSitemap = async (
 export const generateStaticSitemapXml = async (
 	db: D1Database
 ): Promise<string> => {
-	const [staticUrls, newsUrls] = await Promise.all([
+	const [staticUrls, editionUrls, newsUrls] = await Promise.all([
 		Promise.resolve(fetchStaticSitemapUrls()),
+		fetchEditionSitemapUrls(db),
 		fetchNewsSitemapUrls(db),
 	]);
 
-	return renderUrlSet([...staticUrls, ...newsUrls]);
+	return renderUrlSet([...staticUrls, ...editionUrls, ...newsUrls]);
 };
 
 export const generateCarChunkSitemapXml = async (
@@ -200,11 +223,12 @@ export const generateCarChunkSitemapXml = async (
 };
 
 export const countSitemapUrls = async (db: D1Database): Promise<number> => {
-	const [staticCount, news, cars] = await Promise.all([
+	const [staticCount, editions, news, cars] = await Promise.all([
 		Promise.resolve(STATIC_SITEMAP_PAGES.length),
+		fetchEditionSitemapUrls(db),
 		fetchNewsSitemapUrls(db),
 		fetchIndexableCarUrls(db),
 	]);
 
-	return staticCount + news.length + cars.length;
+	return staticCount + editions.length + news.length + cars.length;
 };

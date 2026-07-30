@@ -330,6 +330,9 @@ export const formatManufactureLocation = (
 	return [city, prefecture, 'JP'].filter(Boolean).join(', ');
 };
 
+export const formatEditionColor = (color: string): string =>
+	color.toLowerCase() === 'various' ? 'Various Colors' : color;
+
 export const colorMap: Record<string, string> = {
 	'black mica': '#000000',
 	'blazing yellow mica': '#FFD700',

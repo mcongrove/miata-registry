@@ -17,12 +17,14 @@
  */
 
 import type { D1Database } from '@cloudflare/workers-types';
-import { eq, sql } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 import { createDb } from '../db';
 import { CarOwners, Cars, Editions, News, Owners } from '../db/schema';
+import { findEditionBySlug } from '../utils/editionSlug';
 import {
 	buildAboutBotContent,
 	buildCarPageMeta,
+	buildEditionPageMeta,
 	buildEditionsBotContent,
 	buildNewsPageMeta,
 	buildNotFoundHtml,
@@ -99,6 +101,68 @@ const fetchCarForBot = async (db: D1Database, carId: string) => {
 	};
 };
 
+const fetchEditionForBot = async (db: D1Database, slug: string) => {
+	const drizzle = createDb(db);
+
+	const editionRows = await drizzle
+		.select({
+			id: Editions.id,
+			name: Editions.name,
+			year: Editions.year,
+		})
+		.from(Editions);
+
+	const matched = findEditionBySlug(editionRows, slug);
+
+	if (!matched) {
+		return null;
+	}
+
+	const [edition] = await drizzle
+		.select({
+			claimed:
+				sql<number>`COUNT(DISTINCT CASE WHEN ${Cars.current_owner_id} IS NOT NULL THEN ${Cars.id} END)`.as(
+					'claimed'
+				),
+			color: Editions.color,
+			description: Editions.description,
+			generation: Editions.generation,
+			id: Editions.id,
+			in_registry: sql<number>`COUNT(DISTINCT ${Cars.id})`.as(
+				'in_registry'
+			),
+			name: Editions.name,
+			total_produced: Editions.total_produced,
+			year: Editions.year,
+		})
+		.from(Editions)
+		.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
+		.where(eq(Editions.id, matched.id))
+		.groupBy(
+			sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.description}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}`
+		)
+		.limit(1);
+
+	if (!edition) {
+		return null;
+	}
+
+	const cars = await drizzle
+		.select({
+			id: Cars.id,
+			sequence: Cars.sequence,
+		})
+		.from(Cars)
+		.where(eq(Cars.edition_id, matched.id))
+		.orderBy(desc(Cars.updated_date))
+		.limit(20);
+
+	return {
+		...edition,
+		cars,
+	};
+};
+
 const fetchNewsForBot = async (db: D1Database, articleId: string) => {
 	const drizzle = createDb(db);
 	const now = new Date().toISOString();
@@ -143,6 +207,18 @@ export const resolveBotPageMeta = async (
 			...STATIC_PAGE_META['/registry/editions'],
 			botContent: buildEditionsBotContent(editionsToBotRows(editions)),
 		};
+	}
+
+	const editionMatch = pathname.match(/^\/registry\/editions\/([^/]+)$/);
+
+	if (editionMatch) {
+		const edition = await fetchEditionForBot(db, editionMatch[1]);
+
+		if (!edition) {
+			return 'not_found';
+		}
+
+		return buildEditionPageMeta(edition);
 	}
 
 	const carMatch = pathname.match(/^\/registry\/([^/]+)$/);
@@ -222,6 +298,10 @@ export const resolveBotPageMeta = async (
 
 export const isKnownSpaRoute = (pathname: string): boolean => {
 	if (STATIC_PAGE_META[pathname]) {
+		return true;
+	}
+
+	if (pathname.match(/^\/registry\/editions\/[^/]+$/)) {
 		return true;
 	}
 

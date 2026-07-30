@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { editionPageJsonLd } from '../utils/jsonLd';
+import { editionPath } from '../utils/editionSlug';
 import { BASE_URL, DEFAULT_DESCRIPTION } from './constants';
 
 export type PageMeta = {
@@ -200,19 +202,124 @@ export type EditionRow = {
 	total_produced: number | null;
 	in_registry: number;
 	claimed: number;
+	slug?: string;
+};
+
+export type EditionBotData = {
+	id: string;
+	year: number;
+	name: string;
+	generation: string;
+	color: string;
+	description?: string | null;
+	total_produced?: number | null;
+	in_registry?: number;
+	claimed?: number;
+	rarity_score?: number | null;
+	cars?: Array<{ id: string; sequence?: number | null }>;
 };
 
 export const buildEditionsBotContent = (editions: EditionRow[]): string => {
 	const rows = editions
-		.map(
-			(edition) =>
-				`<tr><td>${edition.year}</td><td>${escapeHtml(edition.name)}</td><td>${escapeHtml(edition.generation)}</td><td>${escapeHtml(edition.color)}</td><td>${edition.total_produced?.toLocaleString('en-US') ?? '—'}</td><td>${edition.in_registry}</td><td>${edition.claimed}</td></tr>`
-		)
+		.map((edition) => {
+			const path = editionPath(edition.year, edition.name);
+			const href = `${BASE_URL}${path}`;
+
+			return `<tr><td>${edition.year}</td><td><a href="${escapeHtml(href)}">${escapeHtml(edition.name)}</a></td><td>${escapeHtml(edition.generation)}</td><td>${escapeHtml(edition.color)}</td><td>${edition.total_produced?.toLocaleString('en-US') ?? '—'}</td><td>${edition.in_registry}</td><td>${edition.claimed}</td></tr>`;
+		})
 		.join('\n');
 
 	return buildBotArticle(
-		`${buildBotHeading('Limited Edition Models')}<table><thead><tr><th>Year</th><th>Name</th><th>Generation</th><th>Color</th><th>Produced</th><th>In registry</th><th>Claimed</th></tr></thead><tbody>${rows}</tbody></table>`
+		`${buildBotHeading('Limited Editions')}<p>Index of limited edition Mazda Miatas tracked by the Miata Registry. Each name links to a dedicated edition page.</p><table><thead><tr><th>Year</th><th>Name</th><th>Generation</th><th>Color</th><th>Produced</th><th>In registry</th><th>Claimed</th></tr></thead><tbody>${rows}</tbody></table>`
 	);
+};
+
+export const buildEditionBotContent = (edition: EditionBotData): string => {
+	const title = `${edition.year} ${edition.name}`;
+	const produced =
+		edition.total_produced != null
+			? `${edition.total_produced.toLocaleString('en-US')} produced.`
+			: '';
+	const registryStats = `${(edition.in_registry ?? 0).toLocaleString('en-US')} in the registry; ${(edition.claimed ?? 0).toLocaleString('en-US')} claimed.`;
+	const summary =
+		`${title} is a ${edition.generation} generation limited edition Mazda Miata in ${edition.color}. ${produced} ${registryStats}`.trim();
+
+	const parts = [
+		`<h1>${escapeHtml(title)}</h1>`,
+		`<p>${escapeHtml(summary)}</p>`,
+	];
+
+	if (edition.description?.trim()) {
+		for (const paragraph of edition.description.split('\n')) {
+			const trimmed = paragraph.trim();
+
+			if (trimmed) {
+				parts.push(`<p>${escapeHtml(trimmed)}</p>`);
+			}
+		}
+	}
+
+	parts.push(
+		'<h2>Frequently asked questions</h2>',
+		`<p><strong>How many ${escapeHtml(title)} Miatas were produced?</strong> ${
+			edition.total_produced != null
+				? `${edition.total_produced.toLocaleString('en-US')}.`
+				: 'Production total is not confirmed in the registry.'
+		}</p>`,
+		`<p><strong>How many are in the Miata Registry?</strong> ${(edition.in_registry ?? 0).toLocaleString('en-US')} cars; ${(edition.claimed ?? 0).toLocaleString('en-US')} claimed by owners.</p>`,
+		`<p><strong>What color is the ${escapeHtml(title)}?</strong> ${escapeHtml(edition.color)}.</p>`
+	);
+
+	if (edition.cars && edition.cars.length > 0) {
+		const items = edition.cars
+			.map((car) => {
+				const label =
+					car.sequence != null && car.sequence !== 0
+						? `${title} #${car.sequence}`
+						: title;
+
+				return `<li><a href="${BASE_URL}/registry/${escapeHtml(car.id)}">${escapeHtml(label)}</a></li>`;
+			})
+			.join('\n');
+
+		parts.push('<h2>Example cars</h2>', `<ul>${items}</ul>`);
+	}
+
+	const jsonLd = editionPageJsonLd(
+		{
+			id: edition.id,
+			year: edition.year,
+			name: edition.name,
+			generation: edition.generation,
+			color: edition.color,
+			description: edition.description ?? undefined,
+			total_produced: edition.total_produced ?? undefined,
+			in_registry: edition.in_registry,
+			claimed: edition.claimed,
+			rarity_score: edition.rarity_score ?? undefined,
+		},
+		edition.cars ?? []
+	);
+
+	return `${buildBotArticle(parts.join('\n'))}\n<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
+};
+
+export const buildEditionPageMeta = (edition: EditionBotData): PageMeta => {
+	const title = `${edition.year} ${edition.name}`;
+	const description =
+		edition.description?.split('\n')[0] ||
+		`${title} — limited edition Mazda Miata. ${
+			edition.total_produced != null
+				? `${edition.total_produced.toLocaleString('en-US')} produced;`
+				: ''
+		} ${(edition.in_registry ?? 0).toLocaleString('en-US')} in the Miata Registry.`;
+
+	return {
+		title,
+		description,
+		path: editionPath(edition.year, edition.name),
+		botContent: buildEditionBotContent(edition),
+	};
 };
 
 export const buildRarityBotContent = (): string =>

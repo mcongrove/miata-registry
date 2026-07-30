@@ -21,14 +21,14 @@ export const BASE_URL = 'https://miataregistry.com';
 export const DEFAULT_DESCRIPTION =
 	'A community-driven project documenting the history of limited edition Mazda Miatas.';
 
-export const SEO_SITEMAP_KEY = 'seo:sitemap:v4';
-export const SEO_EDITIONS_KEY = 'seo:editions.json';
+export const SEO_SITEMAP_KEY = 'seo:sitemap:v5';
+export const SEO_EDITIONS_KEY = 'seo:editions.json:v2';
 
 export const SEO_SITEMAP_TTL = 60 * 60 * 24;
 export const SEO_EDITIONS_TTL = 60 * 60 * 24 * 7;
 
 export const SITEMAP_MAX_URLS = 5000;
-export const STATIC_SITEMAP_LASTMOD = '2026-07-12';
+export const STATIC_SITEMAP_LASTMOD = '2026-07-29';
 
 export const STATIC_SITEMAP_PAGES = [
 	{ path: '/', changefreq: 'weekly', priority: '1.0' },

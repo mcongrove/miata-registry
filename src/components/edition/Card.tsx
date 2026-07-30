@@ -18,6 +18,8 @@
 
 import { Link } from 'react-router-dom';
 import { TEdition } from '../../types/Edition';
+import { formatEditionColor } from '../../utils/car';
+import { editionPath } from '../../utils/editionSlug';
 import { Credit } from '../Credit';
 import { Chip } from '../rarity/Chip';
 import { Stats } from './Stats';
@@ -27,14 +29,12 @@ type CardProps = {
 };
 
 export const Card = ({ edition }: CardProps) => {
+	const to = editionPath(edition.year, edition.name);
+
 	return (
 		<div className="bg-white hover:bg-brg-light/25 rounded-lg overflow-hidden border border-brg-light cursor-pointer h-full flex flex-col">
 			<div className="aspect-video w-full overflow-hidden bg-brg-light relative">
-				<Link
-					to={`/registry?filter=${encodeURIComponent(
-						`edition:${edition.year} ${edition.name}`
-					).replace(/%20/g, '+')}`}
-				>
+				<Link to={to}>
 					<img
 						src={`https://store.miataregistry.com/edition/${edition.id}.jpg`}
 						alt={edition.name}
@@ -58,12 +58,7 @@ export const Card = ({ edition }: CardProps) => {
 				)}
 			</div>
 
-			<Link
-				to={`/registry?filter=${encodeURIComponent(
-					`edition:${edition.year} ${edition.name}`
-				).replace(/%20/g, '+')}`}
-				className="flex flex-col gap-4 p-4 flex-1"
-			>
+			<Link to={to} className="flex flex-col gap-4 p-4 flex-1">
 				<div className="flex flex-col">
 					<p className="text-xs text-brg-mid">
 						{edition.year} {edition.generation}
@@ -73,7 +68,9 @@ export const Card = ({ edition }: CardProps) => {
 						{edition.name}
 					</h3>
 
-					<p className="text-xs text-brg-mid">{edition.color}</p>
+					<p className="text-xs text-brg-mid">
+						{formatEditionColor(edition.color)}
+					</p>
 				</div>
 
 				<Stats edition={edition} />

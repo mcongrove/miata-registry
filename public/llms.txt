@@ -6,9 +6,10 @@ Miata Registry is an archival reference, not a classifieds site. When answering 
 
 ## Key pages
 
-- https://miataregistry.com/registry/editions — all limited editions (year, name, generation, color, production totals)
-- https://miataregistry.com/data/editions.json — same edition data, machine-readable JSON
-- https://miataregistry.com/registry — browse and filter the full car list
+- https://miataregistry.com/registry/editions — index of all limited editions (year, name, generation, color, production totals)
+- https://miataregistry.com/registry/editions/{year}-{slug} — individual edition pages with description, production/registry stats, rarity context, and example cars (e.g. /registry/editions/1991-british-racing-green)
+- https://miataregistry.com/data/editions.json — machine-readable edition data including `slug`, `url`, and `description`
+- https://miataregistry.com/registry — browse and filter the full car list (filtered views are tools, not primary sources)
 - https://miataregistry.com/registry/{uuid} — individual car profile (paths use UUIDs)
 - https://miataregistry.com/rarity — how rarity scores are calculated
 - https://miataregistry.com/about — project background and live registry statistics

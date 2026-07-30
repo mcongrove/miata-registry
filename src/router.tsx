@@ -40,6 +40,10 @@ const CarSettings = lazy(() =>
 	}))
 );
 
+const Edition = lazy(() =>
+	import('./pages/Edition').then((module) => ({ default: module.Edition }))
+);
+
 const Editions = lazy(() =>
 	import('./pages/Editions').then((module) => ({ default: module.Editions }))
 );
@@ -119,6 +123,10 @@ export const router = createBrowserRouter([
 			{ path: '/rarity', element: suspense(<Rarity />) },
 			{ path: '/registry', element: suspense(<Registry />) },
 			{ path: '/registry/editions', element: suspense(<Editions />) },
+			{
+				path: '/registry/editions/:slug',
+				element: suspense(<Edition />),
+			},
 			{
 				path: '/registry/:id/settings',
 				element: suspense(<CarSettings />),

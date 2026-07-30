@@ -140,7 +140,6 @@ export function RarityScoreBreakdownTooltip({
 		<Tooltip
 			variant="light"
 			interactive
-			showArrow={false}
 			placement="bottom-start"
 			className="max-w-[17rem] px-3 pt-2.5 pb-0 text-left"
 			content={content}

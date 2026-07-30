@@ -20,6 +20,8 @@ import type { D1Database } from '@cloudflare/workers-types';
 import { asc, eq, sql } from 'drizzle-orm';
 import { createDb } from '../db';
 import { Cars, Editions } from '../db/schema';
+import { editionPath, editionSlug } from '../utils/editionSlug';
+import { BASE_URL } from './constants';
 import type { EditionRow } from './botContent';
 
 export type EditionJson = {
@@ -27,9 +29,12 @@ export type EditionJson = {
 	name: string;
 	generation: string;
 	color: string;
+	description: string | null;
 	total_produced: number | null;
 	in_registry: number;
 	claimed: number;
+	slug: string;
+	url: string;
 };
 
 export const fetchEditionsData = async (
@@ -44,6 +49,7 @@ export const fetchEditionsData = async (
 					'claimed'
 				),
 			color: Editions.color,
+			description: Editions.description,
 			generation: Editions.generation,
 			in_registry: sql<number>`COUNT(DISTINCT ${Cars.id})`.as(
 				'in_registry'
@@ -55,20 +61,36 @@ export const fetchEditionsData = async (
 		.from(Editions)
 		.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
 		.groupBy(
-			sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}`
+			sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.description}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}`
 		)
 		.orderBy(asc(Editions.year), asc(Editions.name));
 
-	return rows.map((row) => ({
-		year: row.year,
-		name: row.name,
-		generation: row.generation,
-		color: row.color,
-		total_produced: row.total_produced,
-		in_registry: row.in_registry,
-		claimed: row.claimed,
-	}));
+	return rows.map((row) => {
+		const slug = editionSlug(row.year, row.name);
+
+		return {
+			year: row.year,
+			name: row.name,
+			generation: row.generation,
+			color: row.color,
+			description: row.description,
+			total_produced: row.total_produced,
+			in_registry: row.in_registry,
+			claimed: row.claimed,
+			slug,
+			url: `${BASE_URL}${editionPath(row.year, row.name)}`,
+		};
+	});
 };
 
 export const editionsToBotRows = (editions: EditionJson[]): EditionRow[] =>
-	editions;
+	editions.map((edition) => ({
+		year: edition.year,
+		name: edition.name,
+		generation: edition.generation,
+		color: edition.color,
+		total_produced: edition.total_produced,
+		in_registry: edition.in_registry,
+		claimed: edition.claimed,
+		slug: edition.slug,
+	}));

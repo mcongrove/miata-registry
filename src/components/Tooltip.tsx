@@ -17,7 +17,7 @@
  */
 
 import {
-	arrow,
+	autoUpdate,
 	flip,
 	FloatingPortal,
 	offset,
@@ -29,7 +29,7 @@ import {
 	useHover,
 	useInteractions,
 } from '@floating-ui/react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 type TooltipVariant = 'dark' | 'light';
@@ -39,62 +39,32 @@ type TooltipProps = {
 	content: React.ReactNode;
 	placement?: Placement;
 	className?: string;
-	showArrow?: boolean;
 	variant?: TooltipVariant;
 	interactive?: boolean;
 };
 
-const variantStyles: Record<TooltipVariant, { arrow: string; panel: string }> =
-	{
-		dark: {
-			panel: 'bg-brg-dark text-white',
-			arrow: 'bg-brg-dark',
-		},
-		light: {
-			panel: 'bg-white text-brg border border-brg-light shadow-md',
-			arrow: 'bg-white',
-		},
-	};
-
-function arrowStaticSide(placement: Placement): string {
-	const base = placement.split('-')[0];
-
-	switch (base) {
-		case 'top':
-			return 'bottom';
-		case 'bottom':
-			return 'top';
-		case 'left':
-			return 'right';
-		case 'right':
-			return 'left';
-		default:
-			return 'top';
-	}
-}
+const variantStyles: Record<TooltipVariant, string> = {
+	dark: 'bg-brg-dark text-white',
+	light: 'bg-white text-brg border border-brg-light shadow-md',
+};
 
 export const Tooltip = ({
 	children,
 	content,
 	placement = 'top',
 	className,
-	showArrow = true,
 	variant = 'dark',
 	interactive = false,
 }: TooltipProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const arrowRef = useRef(null);
 
-	const { refs, floatingStyles, context, middlewareData } = useFloating({
+	const { refs, floatingStyles, context } = useFloating({
 		open: isOpen,
 		onOpenChange: setIsOpen,
 		placement,
-		middleware: [
-			offset(showArrow ? (interactive ? 6 : 10) : 8),
-			flip(),
-			shift({ padding: 8 }),
-			...(showArrow ? [arrow({ element: arrowRef })] : []),
-		],
+		strategy: 'fixed',
+		whileElementsMounted: autoUpdate,
+		middleware: [offset(8), flip(), shift({ padding: 8 })],
 	});
 
 	const hover = useHover(
@@ -116,10 +86,6 @@ export const Tooltip = ({
 		click,
 	]);
 
-	const styles = variantStyles[variant];
-	const arrowData = middlewareData.arrow;
-	const staticSide = arrowStaticSide(context.placement);
-
 	return (
 		<>
 			<div
@@ -135,51 +101,14 @@ export const Tooltip = ({
 					<div
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className="relative z-[52]"
-					>
-						{showArrow && arrowData && (
-							<div
-								ref={arrowRef}
-								className="pointer-events-none absolute z-0"
-								style={{
-									left:
-										arrowData.x != null
-											? `${arrowData.x}px`
-											: undefined,
-									top:
-										arrowData.y != null
-											? `${arrowData.y}px`
-											: undefined,
-									[staticSide]:
-										variant === 'light' ? '-6px' : '-4px',
-								}}
-							>
-								{variant === 'light' ? (
-									<>
-										<div className="absolute left-0 top-0 size-3 rotate-45 bg-brg-light" />
-										<div className="absolute left-0.5 top-0.5 size-2.5 rotate-45 bg-white" />
-									</>
-								) : (
-									<div
-										className={twMerge(
-											'absolute left-0 top-0 size-2 rotate-45',
-											styles.arrow
-										)}
-									/>
-								)}
-							</div>
+						className={twMerge(
+							'z-[52] rounded px-2 py-1 text-xs',
+							variantStyles[variant],
+							className
 						)}
-
-						<div
-							className={twMerge(
-								'relative z-10 rounded px-2 py-1 text-xs',
-								styles.panel,
-								className
-							)}
-							{...(interactive ? getFloatingProps() : {})}
-						>
-							{content}
-						</div>
+						{...getFloatingProps()}
+					>
+						{content}
 					</div>
 				)}
 			</FloatingPortal>

@@ -24,14 +24,13 @@ type StatsProps = {
 };
 
 export const Stats = ({ edition, showText = true }: StatsProps) => {
-	const inRegistryPercentage = Math.max(
-		((edition.in_registry ?? 0) / (edition.total_produced ?? 0)) * 100,
-		3
-	);
-	const claimedPercentage = Math.max(
-		((edition.claimed ?? 0) / (edition.total_produced ?? 0)) * 100,
-		3
-	);
+	const produced = edition.total_produced ?? 0;
+	const claimed = edition.claimed ?? 0;
+	const inRegistry = edition.in_registry ?? 0;
+
+	const claimedPercentage = produced > 0 ? (claimed / produced) * 100 : 0;
+	const inRegistryPercentage =
+		produced > 0 ? (inRegistry / produced) * 100 : 0;
 
 	return (
 		<div className="w-full">
@@ -40,21 +39,21 @@ export const Stats = ({ edition, showText = true }: StatsProps) => {
 					<div className="flex justify-between text-xs">
 						<span>
 							<span className="font-bold">
-								{edition.claimed?.toLocaleString()}
+								{claimed.toLocaleString()}
 							</span>{' '}
 							Claimed
 						</span>
 
 						<span>
 							<span className="font-bold">
-								{edition.in_registry?.toLocaleString()}
+								{inRegistry.toLocaleString()}
 							</span>{' '}
 							in Registry
 						</span>
 
 						<span>
 							<span className="font-bold">
-								{edition.total_produced?.toLocaleString()}
+								{produced.toLocaleString()}
 							</span>{' '}
 							Produced
 						</span>
@@ -64,12 +63,12 @@ export const Stats = ({ edition, showText = true }: StatsProps) => {
 				<div className="w-full h-2 bg-brg-light rounded-full overflow-hidden">
 					<div className="relative h-full flex">
 						<div
-							className="absolute top-0 left-0 bg-brg h-full z-20 rounded-r-full"
+							className="absolute top-0 left-0 bg-brg h-full z-20 min-w-2 rounded-full"
 							style={{ width: `${claimedPercentage}%` }}
 						/>
 
 						<div
-							className="absolute top-0 left-0 bg-brg-mid/50 h-full z-10 rounded-r-full"
+							className="absolute top-0 left-0 bg-brg-mid/50 h-full z-10 min-w-2 rounded-full"
 							style={{
 								width: `${inRegistryPercentage}%`,
 							}}
