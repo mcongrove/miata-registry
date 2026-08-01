@@ -19,6 +19,7 @@
 import { Levels } from '../components/rarity/Levels';
 import { ScoreCard } from '../components/rarity/ScoreCard';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { EDITION_REFERENCE_SPECIMEN_POINTS } from '../utils/rarityScore';
 
 export const Rarity = () => {
 	const productionScore = [
@@ -143,6 +144,14 @@ export const Rarity = () => {
 					</h2>
 
 					<Levels />
+
+					<p className="text-xs text-brg-border text-center max-w-2xl mx-auto">
+						Edition badges use the same tiers, with a +
+						{EDITION_REFERENCE_SPECIMEN_POINTS} point offset for a
+						complete original specimen (original paint, tops,
+						wheels, and documentation). Individual cars earn those
+						points only when attested.
+					</p>
 				</div>
 
 				<div className="flex flex-col gap-4">

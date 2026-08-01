@@ -224,7 +224,10 @@ export const Edition = () => {
 
 							{(edition.rarity_score ?? 0) > 0 && (
 								<div className="absolute bottom-3 left-3">
-									<Chip score={edition.rarity_score ?? 0} />
+									<Chip
+										scope="edition"
+										score={edition.rarity_score ?? 0}
+									/>
 								</div>
 							)}
 

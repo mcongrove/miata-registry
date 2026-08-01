@@ -73,6 +73,17 @@ export function getRarityLevelFromScore(score: number): TRarityLevel | null {
 	return 'limited-edition';
 }
 
+/** Assumed complete original specimen (preservation + docs) for edition-only chips. */
+export const EDITION_REFERENCE_SPECIMEN_POINTS = 21;
+
+export function getEditionRarityLevelFromScore(
+	score: number
+): TRarityLevel | null {
+	if (!Number.isFinite(score) || score <= 0) return null;
+
+	return getRarityLevelFromScore(score + EDITION_REFERENCE_SPECIMEN_POINTS);
+}
+
 export function formatRarityLevelLabel(level: TRarityLevel): string {
 	return level
 		.split('-')

@@ -20,6 +20,7 @@ import type { TRarityLevel } from '../../types/Car';
 import { Link } from 'react-router-dom';
 import {
 	formatRarityLevelLabel,
+	getEditionRarityLevelFromScore,
 	getRarityLevelFromScore,
 } from '../../utils/rarityScore';
 
@@ -56,11 +57,16 @@ const rarityColors: Record<
 
 type ChipProps = {
 	score: number;
+	/** Edition chips classify with a +21 complete-specimen offset. */
+	scope?: 'car' | 'edition';
 };
 
-export const Chip = ({ score }: ChipProps) => {
+export const Chip = ({ score, scope = 'car' }: ChipProps) => {
 	const numericScore = Number(score);
-	const level = getRarityLevelFromScore(numericScore);
+	const level =
+		scope === 'edition'
+			? getEditionRarityLevelFromScore(numericScore)
+			: getRarityLevelFromScore(numericScore);
 
 	if (!level) return null;
 	const colors = rarityColors[level];
