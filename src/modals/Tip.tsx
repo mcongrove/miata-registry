@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useEffect, useState } from 'react';
+import { ClipboardEvent, FormEvent, useEffect, useState } from 'react';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
@@ -310,7 +310,9 @@ export function Tip({
 											placeholder="JM1NA3510M1221538"
 											spellCheck={false}
 											autoCapitalize="characters"
-											onPaste={(event) => {
+											onPaste={(
+												event: ClipboardEvent<HTMLInputElement>
+											) => {
 												event.preventDefault();
 
 												const input =
@@ -341,7 +343,9 @@ export function Tip({
 													})
 												);
 											}}
-											onInput={(event) => {
+											onInput={(
+												event: FormEvent<HTMLInputElement>
+											) => {
 												const input =
 													event.currentTarget;
 												const next = normalizeVinInput(

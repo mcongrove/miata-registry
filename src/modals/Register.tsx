@@ -17,7 +17,13 @@
  */
 
 import { useAuth, useClerk, useUser } from '@clerk/clerk-react';
-import { ReactNode, useEffect, useState } from 'react';
+import {
+	ClipboardEvent,
+	FormEvent,
+	ReactNode,
+	useEffect,
+	useState,
+} from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { ErrorBanner } from '../components/ErrorBanner';
@@ -587,7 +593,9 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 									readOnly={!!prefilledData?.vin}
 									spellCheck={false}
 									autoCapitalize="characters"
-									onPaste={(event) => {
+									onPaste={(
+										event: ClipboardEvent<HTMLInputElement>
+									) => {
 										if (prefilledData?.vin) {
 											return;
 										}
@@ -616,7 +624,9 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 											})
 										);
 									}}
-									onInput={(event) => {
+									onInput={(
+										event: FormEvent<HTMLInputElement>
+									) => {
 										if (prefilledData?.vin) {
 											return;
 										}
