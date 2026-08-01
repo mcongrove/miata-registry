@@ -147,10 +147,10 @@ export const Rarity = () => {
 
 					<p className="text-xs text-brg-border text-center max-w-2xl mx-auto">
 						Edition badges use the same tiers, with a +
-						{EDITION_REFERENCE_SPECIMEN_POINTS} point offset for a
-						complete original specimen (original paint, tops,
-						wheels, and documentation). Individual cars earn those
-						points only when attested.
+						{EDITION_REFERENCE_SPECIMEN_POINTS} point offset for an
+						original specimen (original paint, wheels, and factory
+						top). Individual cars earn those points only when
+						verified.
 					</p>
 				</div>
 

@@ -57,7 +57,7 @@ const rarityColors: Record<
 
 type ChipProps = {
 	score: number;
-	/** Edition chips classify with a +21 complete-specimen offset. */
+	/** Edition chips classify with a +11 original-specimen offset. */
 	scope?: 'car' | 'edition';
 };
 

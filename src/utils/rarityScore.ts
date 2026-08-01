@@ -73,8 +73,8 @@ export function getRarityLevelFromScore(score: number): TRarityLevel | null {
 	return 'limited-edition';
 }
 
-/** Assumed complete original specimen (preservation + docs) for edition-only chips. */
-export const EDITION_REFERENCE_SPECIMEN_POINTS = 21;
+/** Assumed original paint (5) + wheels (3) + factory top (3) for edition-only chips. */
+export const EDITION_REFERENCE_SPECIMEN_POINTS = 11;
 
 export function getEditionRarityLevelFromScore(
 	score: number
