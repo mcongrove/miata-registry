@@ -32,6 +32,7 @@ import {
 	hasVinModelYearMismatch,
 	isFullVin,
 	isVinApiValid,
+	normalizeVinInput,
 	parseEditionYear,
 	parseSequence,
 	VIN_INPUT_PATTERN,
@@ -75,6 +76,16 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 	const resetVinApiWarning = () => {
 		setVinApiWarning(null);
+	};
+
+	const syncVinInputValue = (input: HTMLInputElement, next: string) => {
+		const normalized = normalizeVinInput(next).slice(0, 17);
+
+		if (input.value !== normalized) {
+			input.value = normalized;
+		}
+
+		resetVinApiWarning();
 	};
 
 	useEffect(() => {
@@ -240,7 +251,9 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 
 				setIsSuccess(true);
 			} else {
-				const vin = String(formData.get('vin') ?? '').trim();
+				const vin = normalizeVinInput(
+					String(formData.get('vin') ?? '')
+				);
 
 				if (isFullVin(vin)) {
 					if (vinApiWarning) {
@@ -291,7 +304,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 								.trim(),
 							owner_state: owner_location?.state,
 							sequence: parseSequence(formData.get('sequence')),
-							vin: formData.get('vin'),
+							vin: vin || undefined,
 						}),
 					}
 				);
@@ -572,7 +585,47 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 									required={!prefilledData?.id}
 									defaultValue={prefilledData?.vin}
 									readOnly={!!prefilledData?.vin}
-									onInput={resetVinApiWarning}
+									spellCheck={false}
+									autoCapitalize="characters"
+									onPaste={(event) => {
+										if (prefilledData?.vin) {
+											return;
+										}
+
+										event.preventDefault();
+
+										const input = event.currentTarget;
+										const pasted =
+											event.clipboardData.getData('text');
+										const start =
+											input.selectionStart ??
+											input.value.length;
+										const end =
+											input.selectionEnd ??
+											input.value.length;
+
+										syncVinInputValue(
+											input,
+											input.value.slice(0, start) +
+												pasted +
+												input.value.slice(end)
+										);
+										input.dispatchEvent(
+											new Event('input', {
+												bubbles: true,
+											})
+										);
+									}}
+									onInput={(event) => {
+										if (prefilledData?.vin) {
+											return;
+										}
+
+										syncVinInputValue(
+											event.currentTarget,
+											event.currentTarget.value
+										);
+									}}
 									className={twMerge(
 										prefilledData?.vin &&
 											'bg-brg-light text-brg-mid'

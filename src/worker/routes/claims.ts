@@ -30,6 +30,7 @@ import {
 } from '../../db/schema';
 import {
 	buildVinDecodeFields,
+	normalizeVinInput,
 	parseEditionYear,
 	parseSequence,
 } from '../../utils/car';
@@ -196,7 +197,7 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 		let ownerId = body.owner_id;
 		const vin =
 			typeof body.vin === 'string' && body.vin
-				? body.vin.toUpperCase()
+				? normalizeVinInput(body.vin)
 				: body.vin;
 
 		const existingCar = await db
@@ -357,7 +358,7 @@ claimsRouter.post('/tip', async (c) => {
 			owner_name: (formData.get('owner_name') as string) || null,
 			sequence: (formData.get('sequence') as string) || null,
 			user_id: (formData.get('user_id') as string) || null,
-			vin: (formData.get('vin') as string).toUpperCase() || null,
+			vin: normalizeVinInput(String(formData.get('vin') ?? '')) || null,
 		};
 
 		if (values.owner_name === 'Cypress Test') {

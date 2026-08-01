@@ -24,6 +24,7 @@ import { SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { useModal } from '../context/ModalContext';
+import { normalizeVinInput } from '../utils/car';
 import { handleApiError } from '../utils/common';
 
 export function Tip({
@@ -305,7 +306,52 @@ export function Tip({
 										<TextField
 											id="vin"
 											name="vin"
+											maxLength={17}
 											placeholder="JM1NA3510M1221538"
+											spellCheck={false}
+											autoCapitalize="characters"
+											onPaste={(event) => {
+												event.preventDefault();
+
+												const input =
+													event.currentTarget;
+												const pasted =
+													event.clipboardData.getData(
+														'text'
+													);
+												const start =
+													input.selectionStart ??
+													input.value.length;
+												const end =
+													input.selectionEnd ??
+													input.value.length;
+												const next = normalizeVinInput(
+													input.value.slice(
+														0,
+														start
+													) +
+														pasted +
+														input.value.slice(end)
+												).slice(0, 17);
+
+												input.value = next;
+												input.dispatchEvent(
+													new Event('input', {
+														bubbles: true,
+													})
+												);
+											}}
+											onInput={(event) => {
+												const input =
+													event.currentTarget;
+												const next = normalizeVinInput(
+													input.value
+												).slice(0, 17);
+
+												if (input.value !== next) {
+													input.value = next;
+												}
+											}}
 										/>
 									</Field>
 								</div>

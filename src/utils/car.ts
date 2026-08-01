@@ -65,25 +65,31 @@ export const VIN_VALIDATION_MESSAGE =
 
 const VIN_PATTERN = new RegExp(`^${VIN_INPUT_PATTERN}$`, 'i');
 
-export const isValidVin = (vin: string | null | undefined): boolean => {
-	if (!vin?.trim()) return false;
+/** Strip whitespace and uppercase so pasted VINs like "JM1 NDAC …" stay valid. */
+export const normalizeVinInput = (value: string): string =>
+	value.replace(/\s+/g, '').toUpperCase();
 
-	return VIN_PATTERN.test(vin.trim());
+export const isValidVin = (vin: string | null | undefined): boolean => {
+	if (!vin) return false;
+
+	const normalized = normalizeVinInput(vin);
+
+	return normalized.length > 0 && VIN_PATTERN.test(normalized);
 };
 
 const CHASSIS_PATTERN = /^[A-Z0-9]{5}-[A-Z0-9]{6}$/i;
 const FULL_VIN_PATTERN = /^JM[A-Z0-9]{15}$/i;
 
 export const isChassisNumber = (vin: string | null | undefined): boolean => {
-	if (!vin?.trim()) return false;
+	if (!vin) return false;
 
-	return CHASSIS_PATTERN.test(vin.trim());
+	return CHASSIS_PATTERN.test(normalizeVinInput(vin));
 };
 
 export const isFullVin = (vin: string | null | undefined): boolean => {
-	if (!vin?.trim()) return false;
+	if (!vin) return false;
 
-	return FULL_VIN_PATTERN.test(vin.trim());
+	return FULL_VIN_PATTERN.test(normalizeVinInput(vin));
 };
 
 export const parseEditionYear = (
