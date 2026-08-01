@@ -25,6 +25,7 @@ interface CreditProps {
 	className?: string;
 	direction?: 'left' | 'right';
 	id: string;
+	showEdition?: boolean;
 }
 
 interface CarSummary {
@@ -33,56 +34,85 @@ interface CarSummary {
 		name: string;
 		state: string;
 	};
-	editionName: string;
-	sequence?: number;
-	year: number;
+	editionName?: string;
+	year?: number;
+}
+
+/** Match rarity Chip: text-xs + py-1 + 1px border. */
+const CREDIT_HEIGHT = 'h-[calc(1rem+0.5rem+2px)]';
+
+function creditLabel(car: CarSummary, showEdition: boolean): string | null {
+	const parts: string[] = [];
+
+	if (showEdition && car.year != null && car.editionName) {
+		parts.push(`${car.year} ${car.editionName}`);
+	}
+
+	if (car.current_owner?.name) {
+		parts.push(car.current_owner.name);
+	}
+
+	if (car.current_owner?.country) {
+		parts.push(
+			formatLocation(
+				{
+					state: car.current_owner.state,
+					country: car.current_owner.country,
+				},
+				true
+			)
+		);
+	}
+
+	if (parts.length === 0) return null;
+
+	return parts.join(' • ');
 }
 
 const CreditText = ({
 	car,
 	direction,
+	expanded,
+	showEdition,
 }: {
 	car: CarSummary | null;
 	direction: 'left' | 'right';
-}) => (
-	<div
-		className={twMerge(
-			'flex items-center overflow-hidden bg-white w-0 h-10 z-10 group-hover:w-auto',
-			direction === 'left'
-				? 'rounded-l-full -mr-5'
-				: 'rounded-r-full -ml-5'
-		)}
-	>
+	expanded?: boolean;
+	showEdition: boolean;
+}) => {
+	const label = car ? creditLabel(car, showEdition) : null;
+
+	return (
 		<div
 			className={twMerge(
-				'text-brg py-2',
-				direction === 'left' ? 'pr-5 pl-4' : 'pl-5 pr-4',
-				'whitespace-nowrap text-[10px]'
+				'flex items-center overflow-hidden bg-white border border-white w-0 group-hover:w-auto z-10',
+				expanded && 'w-auto',
+				CREDIT_HEIGHT,
+				direction === 'left'
+					? 'rounded-l-full -mr-3 border-r-0'
+					: 'rounded-r-full -ml-3 border-l-0'
 			)}
 		>
-			<p>
-				{car?.year} {car?.editionName}
-				{car?.sequence && ` #${car.sequence}`}
-			</p>
-
-			{car?.current_owner && (
-				<p>
-					{car.current_owner.name}
-					{car.current_owner.country &&
-						` • ${formatLocation(
-							{
-								state: car.current_owner.state,
-								country: car.current_owner.country,
-							},
-							true
-						)}`}
-				</p>
+			{label && (
+				<div
+					className={twMerge(
+						'text-brg text-xs font-medium whitespace-nowrap leading-4',
+						direction === 'left' ? 'pr-3 pl-2.5' : 'pl-3 pr-2.5'
+					)}
+				>
+					<p>{label}</p>
+				</div>
 			)}
 		</div>
-	</div>
-);
+	);
+};
 
-export const Credit = ({ className, direction = 'right', id }: CreditProps) => {
+export const Credit = ({
+	className,
+	direction = 'right',
+	id,
+	showEdition = false,
+}: CreditProps) => {
 	const [car, setCar] = useState<CarSummary | null>(null);
 	const [isExpanded, setIsExpanded] = useState(false);
 
@@ -146,21 +176,36 @@ export const Credit = ({ className, direction = 'right', id }: CreditProps) => {
 			onClick={handleClick}
 			data-credit-id={id}
 			className={twMerge(
-				'group flex items-center h-10 opacity-60 hover:opacity-100',
-				isExpanded ? 'opacity-100' : '',
+				'group flex items-center',
+				CREDIT_HEIGHT,
 				className
 			)}
 		>
 			{direction === 'left' && (
-				<CreditText car={car} direction={direction} />
+				<CreditText
+					car={car}
+					direction={direction}
+					expanded={isExpanded}
+					showEdition={showEdition}
+				/>
 			)}
 
-			<div className="flex items-center justify-center bg-white size-10 rounded-full z-20 relative">
+			<div
+				className={twMerge(
+					'flex items-center justify-center bg-white rounded-full z-20 relative text-xs border border-white aspect-square',
+					CREDIT_HEIGHT
+				)}
+			>
 				<i className="fa-solid fa-car"></i>
 			</div>
 
 			{direction === 'right' && (
-				<CreditText car={car} direction={direction} />
+				<CreditText
+					car={car}
+					direction={direction}
+					expanded={isExpanded}
+					showEdition={showEdition}
+				/>
 			)}
 		</Link>
 	);

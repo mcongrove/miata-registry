@@ -133,6 +133,7 @@ export const Home = () => {
 						<Credit
 							id="63621393-a540-46b5-b9fe-9231fea2730f"
 							direction="left"
+							showEdition
 						/>
 					</div>
 
