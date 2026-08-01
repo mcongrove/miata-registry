@@ -480,7 +480,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 										<select
 											className={SelectStyles(
 												false,
-												'w-full border-brg-light text-sm z-10'
+												'relative z-10 w-full border-brg-light text-sm'
 											)}
 											name="edition_name"
 											required
@@ -514,7 +514,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 										{selectedEdition ===
 											'1990 Color Test Cars' && (
 											<ErrorBanner
-												className="p-2 pt-3.5 pb-2.5 -mt-3 rounded-t-none z-0"
+												className="relative z-0 -mt-3 rounded-t-none p-2 pt-3.5 pb-2.5"
 												error={
 													<span className="text-xs font-medium">
 														No, it probably isn't.{' '}

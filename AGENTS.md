@@ -250,4 +250,5 @@ Worker logs may require a paid Cloudflare plan. For cron debugging, prefer `ARCH
 - Changing registry sort/filter behavior without bumping list cache version.
 - Using ISO date helpers on pending `created_at` unix fields without `* 1000`.
 - "Fixing" intentional lint suppressions or hook dependency patterns without reading context.
+- `twMerge` treats `bg-[right_…]` / similar position arbitrary `bg-*` as conflicting with `bg-white` and drops the fill — use `[background-position:…]` (etc.) for select chevrons.
 - Treat news articles as D1 records; `body` may use Markdown, but don't create root Markdown source files.
