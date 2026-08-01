@@ -57,8 +57,30 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 			<div className="absolute left-0 top-full invisible group-hover:visible">
 				<div className="mt-2 p-2 w-48 bg-white rounded-lg shadow-lg border border-brg-border">
 					{items.map((item, index) => {
+						const path = item.to?.split('#')[0];
+						const matches =
+							!!path &&
+							(location.pathname === path ||
+								location.pathname.startsWith(`${path}/`));
+						// Prefer the longest matching path so /registry/editions
+						// doesn't also bold /registry
+						const longerMatch = items.some((other) => {
+							const otherPath = other.to?.split('#')[0];
+							if (
+								!otherPath ||
+								otherPath.length <= (path?.length ?? 0)
+							) {
+								return false;
+							}
+							return (
+								location.pathname === otherPath ||
+								location.pathname.startsWith(`${otherPath}/`)
+							);
+						});
+						const itemIsActive = matches && !longerMatch;
+
 						const className = `block w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-							item.to && location.pathname === item.to
+							itemIsActive
 								? 'text-brg font-medium'
 								: 'text-brg-mid hover:text-brg hover:bg-brg-light'
 						}`;
@@ -159,8 +181,6 @@ export const Header = () => {
 					label="About"
 					items={[
 						{ label: 'About the Registry', to: '/about' },
-						{ label: 'News & Updates', to: '/news' },
-						{ label: 'Resources', to: '/resources' },
 						{
 							label: (
 								<span className="flex items-center gap-1.5">
@@ -170,6 +190,8 @@ export const Header = () => {
 							),
 							to: '/rarity',
 						},
+						{ label: 'News & Updates', to: '/news' },
+						{ label: 'Resources', to: '/resources' },
 						{ label: 'Contact us', to: '/about#contact' },
 					]}
 					isActive={

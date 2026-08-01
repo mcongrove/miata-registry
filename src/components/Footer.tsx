@@ -137,6 +137,15 @@ export const Footer = () => {
 								</li>
 								<li>
 									<Link
+										to="/rarity"
+										className="flex items-center gap-1.5 text-brg-mid hover:text-brg-light transition-colors"
+									>
+										Rarity Scores{' '}
+										<i className="fa-solid fa-crown text-sm text-yellow-300/50" />
+									</Link>
+								</li>
+								<li>
+									<Link
 										to="/news"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
@@ -153,27 +162,10 @@ export const Footer = () => {
 								</li>
 								<li>
 									<Link
-										to="/rarity"
-										className="flex items-center gap-1.5 text-brg-mid hover:text-brg-light transition-colors"
-									>
-										Rarity Scores{' '}
-										<i className="fa-solid fa-crown text-sm text-yellow-300/50" />
-									</Link>
-								</li>
-								<li>
-									<Link
 										to="/about#contact"
 										className="text-brg-mid hover:text-brg-light transition-colors"
 									>
 										Contact
-									</Link>
-								</li>
-								<li>
-									<Link
-										to="/legal"
-										className="text-brg-mid hover:text-brg-light transition-colors"
-									>
-										Privacy Policy and Terms
 									</Link>
 								</li>
 							</ul>
@@ -182,52 +174,63 @@ export const Footer = () => {
 				</div>
 
 				<div className="flex flex-col items-center gap-8 border-t border-white/10 pt-8 text-xs lg:text-sm">
-					<p className="text-center text-brg-mid">
-						© {new Date().getFullYear()}{' '}
-						<a
-							href="https://mattcongrove.com"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-brg-mid underline whitespace-nowrap"
-						>
-							Matthew Congrove
-						</a>
-						.{' '}
-						<a
-							href={GITHUB_REPO_URL}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-brg-mid underline whitespace-nowrap"
-						>
-							Source code
-						</a>{' '}
-						and{' '}
-						<a
-							href="https://archive.org/details/@miataregistry"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-brg-mid underline whitespace-nowrap"
-						>
-							data
-						</a>{' '}
-						licensed under{' '}
-						<a
-							href={AGPL_LICENSE_URL}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-brg-mid underline whitespace-nowrap"
-						>
-							AGPL-3
-						</a>
-						. All other rights reserved. You can reach us at{' '}
-						<a
-							href="mailto:support@miataregistry.com"
-							className="text-brg-mid underline whitespace-nowrap"
-						>
-							support@miataregistry.com
-						</a>
-						.
-					</p>
+					<div className="flex flex-col items-center gap-1.5">
+						<p className="text-center text-brg-mid">
+							© {new Date().getFullYear()}{' '}
+							<a
+								href="https://mattcongrove.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-brg-mid underline whitespace-nowrap"
+							>
+								Matthew Congrove
+							</a>
+							.{' '}
+							<a
+								href={GITHUB_REPO_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-brg-mid underline whitespace-nowrap"
+							>
+								Source code
+							</a>{' '}
+							and{' '}
+							<a
+								href="https://archive.org/details/@miataregistry"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-brg-mid underline whitespace-nowrap"
+							>
+								data
+							</a>{' '}
+							licensed under{' '}
+							<a
+								href={AGPL_LICENSE_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-brg-mid underline whitespace-nowrap"
+							>
+								AGPL-3
+							</a>
+							. All other rights reserved. You can reach us at{' '}
+							<a
+								href="mailto:support@miataregistry.com"
+								className="text-brg-mid underline whitespace-nowrap"
+							>
+								support@miataregistry.com
+							</a>
+							.
+						</p>
+
+						<p className="text-center text-brg-mid">
+							<Link
+								to="/legal"
+								className="text-brg-mid underline whitespace-nowrap"
+							>
+								Privacy Policy and Terms
+							</Link>
+						</p>
+					</div>
 
 					<SitePulse />
 				</div>

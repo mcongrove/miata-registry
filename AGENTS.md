@@ -206,7 +206,7 @@ Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape
 | `stats:all`                                       | Site stats                |
 | `news:*`                                          | News list/detail/featured |
 | `resources:list:v4:…`, `resources:detail:v2:{id}` | Resources catalog         |
-| `seo:sitemap:v8`                                  | Sitemap XML               |
+| `seo:sitemap:v9`                                  | Sitemap XML               |
 
 Moderation approvals invalidate relevant car/edition/stats keys. Stale registry data after deploy? suspect KV — list prefix above.
 
@@ -250,3 +250,4 @@ Worker logs may require a paid Cloudflare plan. For cron debugging, prefer `ARCH
 - Changing registry sort/filter behavior without bumping list cache version.
 - Using ISO date helpers on pending `created_at` unix fields without `* 1000`.
 - "Fixing" intentional lint suppressions or hook dependency patterns without reading context.
+- Treat news articles as D1 records; `body` may use Markdown, but don't create root Markdown source files.
