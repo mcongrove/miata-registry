@@ -701,7 +701,7 @@ export const CarProfile = () => {
 
 								{car ? (
 									<p className="font-medium whitespace-nowrap">
-										{car.edition?.color}
+										{car.color || car.edition?.color}
 									</p>
 								) : (
 									<div className="h-6 w-24 bg-brg-light rounded animate-pulse" />

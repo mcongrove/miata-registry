@@ -368,6 +368,7 @@ carsRouter.get('/:id', async (c) => {
 
 		const [carData] = await db
 			.select({
+				color: Cars.color,
 				current_owner_id: Cars.current_owner_id,
 				destroyed: Cars.destroyed,
 				edition_id: Cars.edition_id,
@@ -412,6 +413,7 @@ carsRouter.get('/:id', async (c) => {
 				},
 				edition: {
 					color: Editions.color,
+					colors: Editions.colors,
 					description: Editions.description,
 					generation: Editions.generation,
 					id: Editions.id,
@@ -613,6 +615,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		const [existing] = await db
 			.select({
 				car: {
+					color: Cars.color,
 					current_owner_id: Cars.current_owner_id,
 					destroyed: Cars.destroyed,
 					edition_id: Cars.edition_id,
@@ -690,7 +693,49 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 			body.story !== undefined &&
 			(existing.car.story ?? null) !== (body.story ?? null);
 
+		const parsedColor =
+			body.color !== undefined
+				? typeof body.color === 'string' && body.color.trim()
+					? body.color.trim()
+					: null
+				: undefined;
+		const colorChanged =
+			parsedColor !== undefined &&
+			(existing.car.color ?? null) !== parsedColor;
+
+		if (colorChanged) {
+			const [edition] = await db
+				.select({ color: Editions.color, colors: Editions.colors })
+				.from(Editions)
+				.where(eq(Editions.id, existing.car.edition_id))
+				.limit(1);
+
+			if (edition?.color?.toLowerCase() !== 'various') {
+				return c.json(
+					{
+						error: 'Bad request',
+						details:
+							'Color can only be set when the edition color is various',
+					},
+					400
+				);
+			}
+
+			const allowed = edition.colors ?? [];
+
+			if (parsedColor != null && !allowed.includes(parsedColor)) {
+				return c.json(
+					{
+						error: 'Bad request',
+						details: "Color must be one of this edition's colors",
+					},
+					400
+				);
+			}
+		}
+
 		const ownersLogChecks = {
+			color: colorChanged,
 			mileage: mileageChanged,
 			mileage_date: mileageChanged,
 			story: storyChanged,
@@ -826,6 +871,7 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 			await db
 				.update(Cars)
 				.set({
+					...(colorChanged ? { color: parsedColor ?? null } : {}),
 					mileage: parsedMileage,
 					mileage_date: resolvedMileageDate,
 					story: body.story ?? null,
@@ -837,8 +883,10 @@ carsRouter.patch('/:id', withAuth(), async (c) => {
 		}
 
 		if (moderatedCarChanged) {
+			const { color: _color, ...pendingCar } = existing.car;
+
 			await db.insert(CarsPending).values({
-				...existing.car,
+				...pendingCar,
 				id: crypto.randomUUID(),
 				car_id: existing.car.id,
 				created_at: Math.floor(Date.now() / 1000),

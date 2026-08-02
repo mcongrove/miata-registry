@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type ChangeEvent } from 'react';
+import { type ChangeEvent, useEffect, useState } from 'react';
 import { useCarHasProfilePhoto } from '../../hooks/useCarProfilePhoto';
 import { ErrorBanner } from '../ErrorBanner';
 import { OwnershipHistoryEditor } from './OwnershipHistoryEditor';
@@ -146,11 +146,20 @@ export function CarEditForm({
 }: CarEditFormProps) {
 	const hasProfilePhoto = useCarHasProfilePhoto(car.id);
 	const editionYear = car.edition?.year;
+	const editionColors = car.edition?.colors ?? [];
+	const showColorPicker =
+		car.edition?.color?.toLowerCase() === 'various' &&
+		editionColors.length > 0;
+	const [color, setColor] = useState(car.color || 'Various');
 	const preservationGated =
 		editionYear != null && isOlderThanTenModelYears(editionYear);
 	const rarityLevel = rarityBreakdown
 		? getRarityLevelFromScore(rarityBreakdown.total)
 		: null;
+
+	useEffect(() => {
+		setColor(car.color || 'Various');
+	}, [car.id, car.color]);
 
 	const ownerLocationDisplay =
 		formatLocation(
@@ -432,6 +441,27 @@ export function CarEditForm({
 			</Section>
 
 			<Section title="About This Miata">
+				{showColorPicker ? (
+					<Field id="color" label="Color" className="w-72 shrink-0">
+						<Select
+							id="color"
+							name="color"
+							value={color}
+							onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+								setColor(e.target.value);
+								onFormChange();
+							}}
+							options={[
+								{ value: 'Various', label: 'Various' },
+								...editionColors.map((editionColor) => ({
+									value: editionColor,
+									label: editionColor,
+								})),
+							]}
+						/>
+					</Field>
+				) : null}
+
 				<Field
 					id="mileage"
 					label="Current Mileage"

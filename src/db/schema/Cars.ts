@@ -31,6 +31,7 @@ export const Cars = sqliteTable('cars', {
 	manufacture_city: text('manufacture_city'),
 	manufacture_date: text('manufacture_date'),
 	manufacture_prefecture: text('manufacture_prefecture'),
+	color: text('color'),
 	mileage: integer('mileage'),
 	mileage_date: text('mileage_date'),
 	rarity_original_hardtop: integer('rarity_original_hardtop', {

@@ -20,6 +20,7 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const Editions = sqliteTable('editions', {
 	color: text('color').notNull(),
+	colors: text('colors', { mode: 'json' }).$type<string[]>(),
 	description: text('description'),
 	generation: text('generation').notNull(),
 	id: text('id').primaryKey(),

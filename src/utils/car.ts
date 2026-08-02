@@ -367,7 +367,7 @@ export const colorMap: Record<string, string> = {
 	'starlight mica blue': '#2E2787',
 	'strato blue mica': '#1B365D',
 	'sunburst yellow': '#FFD700',
-	'titanium gray metallic': '#6D6F64',
+	'titanium grey metallic': '#6D6F64',
 	'twilight blue mica': '#1B365D',
 	'velocity red': '#FF0000',
 	black: '#000000',

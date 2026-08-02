@@ -38,6 +38,7 @@ export type TStoredVinDetails = {
 export type TCar = {
 	current_owner_id?: string;
 	current_owner?: TOwner;
+	color?: string | null;
 	destroyed?: boolean;
 	edition_id: string;
 	edition?: TEdition;

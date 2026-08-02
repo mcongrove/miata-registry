@@ -33,11 +33,11 @@ const CACHE_TTL = {
 	EDITION_SLUG: 60 * 60 * 24, // 1 day
 };
 
-const EDITIONS_ALL_CACHE_KEY = 'editions:all:v2';
+const EDITIONS_ALL_CACHE_KEY = 'editions:all:v3';
 
 const EDITIONS_NAMES_CACHE_KEY = 'editions:names:v2';
 
-const editionSlugCacheKey = (slug: string) => `editions:slug:v2:${slug}`;
+const editionSlugCacheKey = (slug: string) => `editions:slug:v3:${slug}`;
 
 const editionsRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -62,6 +62,7 @@ editionsRouter.get('/', async (c) => {
 						'claimed'
 					),
 				color: Editions.color,
+				colors: Editions.colors,
 				display_name:
 					sql<string>`CONCAT(${Editions.year}, ' ', ${Editions.name})`.as(
 						'display_name'
@@ -80,7 +81,7 @@ editionsRouter.get('/', async (c) => {
 			.from(Editions)
 			.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
 			.groupBy(
-				sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}, ${Editions.image_car_id}, ${Editions.rarity_score}`
+				sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.colors}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}, ${Editions.image_car_id}, ${Editions.rarity_score}`
 			)
 			.orderBy(asc(Editions.year), asc(Editions.name));
 
@@ -146,6 +147,7 @@ editionsRouter.get('/slug/:slug', async (c) => {
 						'claimed'
 					),
 				color: Editions.color,
+				colors: Editions.colors,
 				description: Editions.description,
 				generation: Editions.generation,
 				id: Editions.id,
@@ -162,7 +164,7 @@ editionsRouter.get('/slug/:slug', async (c) => {
 			.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
 			.where(eq(Editions.id, matched.id))
 			.groupBy(
-				sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.description}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}, ${Editions.image_car_id}, ${Editions.rarity_score}`
+				sql`${Editions.id}, ${Editions.name}, ${Editions.color}, ${Editions.colors}, ${Editions.description}, ${Editions.generation}, ${Editions.year}, ${Editions.total_produced}, ${Editions.image_car_id}, ${Editions.rarity_score}`
 			)
 			.limit(1);
 

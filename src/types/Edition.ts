@@ -19,6 +19,7 @@
 export type TEdition = {
 	claimed?: number;
 	color: string;
+	colors?: string[] | null;
 	description?: string;
 	generation: string;
 	id: string;

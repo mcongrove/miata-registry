@@ -197,16 +197,16 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 
 Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape (currently `cars:list:v7:`).
 
-| Key pattern                                       | Purpose                   |
-| ------------------------------------------------- | ------------------------- |
-| `cars:list:v7:{params}`                           | Registry browse list      |
-| `cars:details:{id}`                               | Car profile               |
-| `cars:summary:{id}`                               | Car summary               |
-| `editions:all:v2`, `editions:names`               | Edition data              |
-| `stats:all`                                       | Site stats                |
-| `news:*`                                          | News list/detail/featured |
-| `resources:list:v4:…`, `resources:detail:v2:{id}` | Resources catalog         |
-| `seo:sitemap:v9`                                  | Sitemap XML               |
+| Key pattern                                              | Purpose                   |
+| -------------------------------------------------------- | ------------------------- |
+| `cars:list:v7:{params}`                                  | Registry browse list      |
+| `cars:details:{id}`                                      | Car profile               |
+| `cars:summary:{id}`                                      | Car summary               |
+| `editions:all:v3`, `editions:names`, `editions:slug:v3:` | Edition data              |
+| `stats:all`                                              | Site stats                |
+| `news:*`                                                 | News list/detail/featured |
+| `resources:list:v4:…`, `resources:detail:v2:{id}`        | Resources catalog         |
+| `seo:sitemap:v9`                                         | Sitemap XML               |
 
 Moderation approvals invalidate relevant car/edition/stats keys. Stale registry data after deploy? suspect KV — list prefix above.
 

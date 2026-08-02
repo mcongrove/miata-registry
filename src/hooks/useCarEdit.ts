@@ -293,6 +293,8 @@ export function useCarEdit(
 						});
 						return currentValue !== currentShippingLocation;
 					}
+					case 'color':
+						return currentValue !== (car.color || 'Various');
 					case 'mileage':
 					case 'mileage_unit':
 						return false;
@@ -462,6 +464,21 @@ export function useCarEdit(
 														: 'T00:00:00.000Z'
 												}`
 											: null,
+										color: formData.has('color')
+											? (() => {
+													const selected = (
+														formData.get(
+															'color'
+														) as string
+													).trim();
+
+													return !selected ||
+														selected.toLowerCase() ===
+															'various'
+														? null
+														: selected;
+												})()
+											: undefined,
 										mileage: parseMileageInput(
 											mileageDisplay,
 											mileageUnit
