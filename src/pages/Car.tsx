@@ -451,7 +451,7 @@ export const CarProfile = () => {
 
 	if (notFound) {
 		return (
-			<main className="flex-1 px-8 pt-24 lg:pt-40 lg:px-0 pb-16">
+			<main className="flex-1 pt-24 lg:pt-40 pb-16">
 				<div className="container mx-auto flex flex-col items-center gap-4">
 					<h1 className="text-2xl font-bold text-brg">
 						Car Not Found
@@ -472,7 +472,7 @@ export const CarProfile = () => {
 
 	if (fetchError) {
 		return (
-			<main className="flex-1 px-8 pt-24 lg:pt-40 lg:px-0 pb-16">
+			<main className="flex-1 pt-24 lg:pt-40 pb-16">
 				<div className="container mx-auto flex flex-col items-center gap-4">
 					<i className="fa-solid fa-exclamation-triangle text-4xl text-red-500" />
 
@@ -498,7 +498,7 @@ export const CarProfile = () => {
 		return (
 			<main className="flex-1 pt-20 pb-0 lg:pb-16">
 				<div className="bg-brg-light/40 lg:border-b border-brg-light">
-					<div className="container mx-auto px-8 p-6 lg:px-0 lg:pt-8 lg:pb-6">
+					<div className="container mx-auto py-6 lg:py-8">
 						<div className="space-y-2">
 							<div className="h-10 w-96 max-w-full bg-brg-light rounded-lg animate-pulse" />
 							<div className="h-6 w-48 bg-brg-light rounded-lg animate-pulse" />
@@ -506,7 +506,7 @@ export const CarProfile = () => {
 					</div>
 				</div>
 
-				<div className="container mx-auto px-8 pb-6 lg:px-0 lg:py-8">
+				<div className="container mx-auto pb-6 lg:py-8">
 					<div className="aspect-video w-full h-72 md:h-96 lg:h-[550px] bg-brg-light rounded-lg animate-pulse" />
 				</div>
 			</main>
@@ -518,7 +518,7 @@ export const CarProfile = () => {
 			{car && isIndexable ? <JsonLd data={carPageJsonLd(car)} /> : null}
 
 			<div className="bg-brg-light/40 lg:border-b border-brg-light">
-				<div className="container mx-auto px-8 p-6 lg:px-0 lg:pt-8 lg:pb-6">
+				<div className="container mx-auto py-6 lg:py-8">
 					{car ? (
 						<div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
 							<div className="flex flex-col gap-1.5 lg:gap-1 items-start">
@@ -653,7 +653,7 @@ export const CarProfile = () => {
 				</div>
 			</div>
 
-			<div className="container mx-auto px-8 pb-6 lg:px-0 lg:py-8">
+			<div className="container mx-auto pb-6 lg:py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 					<div className="lg:col-span-8 flex flex-col gap-6 lg:gap-8">
 						<div className="aspect-video w-screen lg:w-full h-72 md:h-96 lg:h-[550px] relative lg:rounded-lg overflow-hidden lg:m-0 max-lg:relative max-lg:left-1/2 max-lg:w-dvw max-lg:max-w-none max-lg:-translate-x-1/2">

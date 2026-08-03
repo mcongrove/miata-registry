@@ -71,7 +71,7 @@ export const Editions = () => {
 
 	return (
 		<main className="flex-1 pt-20">
-			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
+			<div className="container mx-auto py-8">
 				<h1 className="flex items-center gap-2 justify-between text-2xl lg:text-3xl font-bold mb-4">
 					<span>Limited Edition Models</span>
 					<Tooltip

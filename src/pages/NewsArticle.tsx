@@ -63,7 +63,7 @@ export const NewsArticle = () => {
 
 	if (isLoading) {
 		return (
-			<main className="flex-1 px-8 pt-24 lg:pt-32 lg:px-0 pb-16">
+			<main className="flex-1 pt-24 lg:pt-32 pb-16">
 				<div className="container mx-auto">
 					<div className="animate-pulse max-w-4xl">
 						<div className="h-8 bg-brg-light rounded w-3/4 mb-4" />
@@ -82,7 +82,7 @@ export const NewsArticle = () => {
 
 	if (!article) {
 		return (
-			<main className="flex-1 px-8 pt-24 lg:pt-40 lg:px-0 pb-16">
+			<main className="flex-1 pt-24 lg:pt-40 pb-16">
 				<div className="container mx-auto flex flex-col items-center gap-4">
 					<h1 className="text-2xl font-bold text-brg">
 						Article Not Found
@@ -102,7 +102,7 @@ export const NewsArticle = () => {
 	}
 
 	return article.body ? (
-		<main className="flex-1 px-8 pt-24 lg:pt-32 lg:px-0 pb-16">
+		<main className="flex-1 pt-24 lg:pt-32 pb-16">
 			<JsonLd data={newsArticleJsonLd(article)} />
 
 			<div className="container mx-auto">

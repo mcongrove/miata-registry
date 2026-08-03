@@ -26,7 +26,7 @@ export const Footer = () => {
 	const { openModal } = useModal();
 
 	return (
-		<footer className="bg-brg-dark p-8 lg:pt-16 pb-8">
+		<footer className="bg-brg-dark py-8 lg:pt-16">
 			<div className="container mx-auto">
 				<div className="flex flex-col lg:flex-row gap-8 lg:gap-24 mb-8 lg:mb-16">
 					<div className="lg:w-1/4">

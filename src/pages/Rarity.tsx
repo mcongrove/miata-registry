@@ -73,7 +73,7 @@ export const Rarity = () => {
 	});
 
 	return (
-		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-20">
+		<main className="flex-1 pt-28 lg:pt-40 pb-16 flex flex-col gap-20">
 			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">
 				<div className="relative z-10 flex flex-col gap-8 lg:w-1/2 lg:bg-white lg:pr-6">
 					<div className="flex flex-col gap-4">

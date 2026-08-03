@@ -151,7 +151,7 @@ export const Edition = () => {
 	if (isLoading) {
 		return (
 			<main className="flex-1 pt-20">
-				<div className="container mx-auto p-8 lg:p-0 lg:py-8">
+				<div className="container mx-auto py-8">
 					<div className="h-72 lg:h-96 bg-brg-light rounded-lg animate-pulse mb-8" />
 					<div className="h-8 w-2/3 bg-brg-light rounded animate-pulse mb-4" />
 					<div className="h-24 bg-brg-light rounded animate-pulse" />
@@ -163,7 +163,7 @@ export const Edition = () => {
 	if (notFound || !edition) {
 		return (
 			<main className="flex-1 pt-20">
-				<div className="container mx-auto p-8 lg:p-0 lg:py-16 flex flex-col items-center text-center">
+				<div className="container mx-auto py-16 flex flex-col items-center text-center">
 					<h1 className="text-2xl font-bold mb-4">
 						Edition not found
 					</h1>
@@ -192,7 +192,7 @@ export const Edition = () => {
 		<main className="flex-1 pt-20">
 			<JsonLd data={editionPageJsonLd(edition, payload.cars)} />
 
-			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
+			<div className="container mx-auto py-8">
 				<Link
 					to="/registry/editions"
 					className="inline-flex items-center gap-1.5 text-sm text-brg-mid hover:text-brg mb-6"

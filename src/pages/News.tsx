@@ -55,7 +55,7 @@ export const News = () => {
 	}, []);
 
 	return (
-		<main className="flex-1 px-8 pt-28 lg:pt-32 lg:px-0 pb-16 flex flex-col gap-16">
+		<main className="flex-1 pt-28 lg:pt-32 pb-16 flex flex-col gap-16">
 			<div className="container mx-auto flex flex-col gap-12">
 				<div className="flex flex-col gap-2">
 					<h1 className="text-4xl font-bold text-brg">

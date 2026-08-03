@@ -170,7 +170,7 @@ export const About = () => {
 	};
 
 	return (
-		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-16">
+		<main className="flex-1 pt-28 lg:pt-40 pb-16 flex flex-col gap-16">
 			<JsonLd data={aboutPageJsonLd()} />
 
 			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">

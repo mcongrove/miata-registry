@@ -10,6 +10,12 @@
 	--color-brg-light: #e8ebea;
 }
 
+/* Always keep a gutter — never strip to edge at container max-width. */
+@utility container {
+	margin-inline: auto;
+	padding-inline: 2rem;
+}
+
 @layer base {
 	html {
 		@apply text-brg;

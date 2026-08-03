@@ -361,7 +361,7 @@ export const Moderation = () => {
 
 	return (
 		<main className="flex-1 pt-20">
-			<div className="container mx-auto p-8 lg:p-0 lg:py-8 min-h-[calc(100vh_-_80px)]">
+			<div className="container mx-auto py-8 min-h-[calc(100vh_-_80px)]">
 				<h1 className="mb-8 shrink-0 text-2xl lg:text-3xl font-bold">
 					Moderation Panel
 				</h1>

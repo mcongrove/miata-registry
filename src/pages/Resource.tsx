@@ -77,7 +77,7 @@ export const Resource = () => {
 	if (isLoading) {
 		return (
 			<main className="flex-1 pt-20">
-				<div className="container mx-auto p-8 lg:p-0 lg:py-8">
+				<div className="container mx-auto py-8">
 					<div className="h-4 w-40 bg-brg-light rounded animate-pulse mb-6" />
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 						<div className="flex flex-col gap-4">
@@ -95,7 +95,7 @@ export const Resource = () => {
 	if (!resource) {
 		return (
 			<main className="flex-1 pt-20">
-				<div className="container mx-auto p-8 lg:p-0 lg:py-16 flex flex-col items-center text-center">
+				<div className="container mx-auto py-16 flex flex-col items-center text-center">
 					<h1 className="text-2xl font-bold mb-4">
 						Resource not found
 					</h1>
@@ -139,7 +139,7 @@ export const Resource = () => {
 		<main className="flex-1 pt-20">
 			<JsonLd data={resourcePageJsonLd(resource)} />
 
-			<div className="container mx-auto p-8 lg:p-0 lg:py-8">
+			<div className="container mx-auto py-8">
 				<Link
 					to="/resources"
 					className="inline-flex items-center gap-1.5 text-sm text-brg-mid hover:text-brg mb-6"

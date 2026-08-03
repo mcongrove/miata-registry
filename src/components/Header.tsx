@@ -294,7 +294,7 @@ export const Header = () => {
 	return (
 		<>
 			<header className="fixed top-0 left-0 right-0 bg-white border-b border-brg-light z-50 h-20">
-				<div className="container mx-auto px-8 lg:px-0 py-4 relative">
+				<div className="container mx-auto py-4 relative">
 					<div className="flex items-center">
 						<Link to="/" className="mr-8 lg:mr-12">
 							<Symbol className="w-16 h-auto text-brg" />

@@ -340,7 +340,7 @@ export const Home = () => {
 					</div>
 				</div>
 
-				<div className="container mx-auto px-8 lg:px-24 pt-16 lg:pt-24 pb-16 lg:pb-40">
+				<div className="container mx-auto lg:px-24 pt-16 lg:pt-24 pb-16 lg:pb-40">
 					<blockquote className="max-w-2xl mx-auto text-center">
 						<p className="text-lg lg:text-xl italic text-brg">
 							&ldquo;Thanks for keeping the flame alive. It was

@@ -137,7 +137,7 @@ export function CarSettings() {
 	if (edit.isSuccess) {
 		return (
 			<main className="flex-1 pt-20 pb-16">
-				<div className="container mx-auto max-w-3xl px-8 lg:px-0 py-10 lg:py-14">
+				<div className="container mx-auto max-w-3xl py-10 lg:py-14">
 					<div className="flex flex-col items-center gap-6 text-center">
 						<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
 							<i className="fa-solid fa-fw fa-check text-brg text-3xl" />
@@ -195,7 +195,7 @@ export function CarSettings() {
 
 			<main className="flex-1 pt-20 pb-16">
 				<div className="sticky top-20 z-40 border-b border-brg-light bg-white">
-					<div className="container mx-auto max-w-5xl px-8 py-3 lg:px-0">
+					<div className="container mx-auto max-w-5xl py-3">
 						<div className="flex items-center justify-between gap-4">
 							<div className="min-w-0">
 								<p className="flex items-center gap-2 text-lg font-semibold text-brg">
@@ -258,7 +258,7 @@ export function CarSettings() {
 					</div>
 				</div>
 
-				<div className="container mx-auto max-w-5xl px-8 py-8 lg:px-0 lg:py-10">
+				<div className="container mx-auto max-w-5xl py-8 lg:py-10">
 					{car.has_pending_changes && (
 						<p className="mb-8 text-sm text-brg flex items-center gap-2 border border-yellow-200 bg-yellow-50/80 rounded-lg px-4 py-3">
 							<i className="fa-solid fa-fw fa-triangle-exclamation text-yellow-600" />

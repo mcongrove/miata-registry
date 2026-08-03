@@ -42,7 +42,7 @@ const ClerkProfile = lazy(() =>
 );
 
 const LoadingIndicator = () => (
-	<p className="text-[#B6B6B6] text-[13px]">Loading...</p>
+	<p className="text-[#B6B6B6] text-sm">Loading...</p>
 );
 
 export function Clerk() {
@@ -94,11 +94,14 @@ export function Clerk() {
 			<SignedOut>
 				<SignInButton mode="modal">
 					{isHomePage ? (
-						<button className="block bg-brg text-sm h-11 text-white hover:bg-brg-dark rounded-lg transition-colors py-3 px-4 border-r border-brg-mid">
+						<button className="block bg-brg text-sm h-11 text-white hover:bg-brg-dark rounded-lg transition-colors py-3 px-4 border-r border-brg-mid whitespace-nowrap">
 							Sign In
 						</button>
 					) : (
-						<Button variant="tertiary" className="text-sm h-11">
+						<Button
+							variant="tertiary"
+							className="text-sm h-11 whitespace-nowrap"
+						>
 							Sign In
 						</Button>
 					)}
@@ -151,7 +154,7 @@ export function Clerk() {
 							url="profile"
 						>
 							<>
-								<h1 className="mb-4 text-[#212126] leading-6 text-[17px] font-bold">
+								<h1 className="mb-4 text-[#212126] leading-6 text-base font-bold">
 									Profile Settings
 								</h1>
 
@@ -180,7 +183,7 @@ export function Clerk() {
 							url="cars"
 						>
 							<>
-								<h1 className="mb-4 text-[#212126] leading-6 text-[17px] font-bold">
+								<h1 className="mb-4 text-[#212126] leading-6 text-base font-bold">
 									My Cars
 								</h1>
 
