@@ -18,6 +18,7 @@
 
 import { useAuth, useClerk, useUser } from '@clerk/clerk-react';
 import {
+	ChangeEvent,
 	ClipboardEvent,
 	FormEvent,
 	ReactNode,
@@ -29,18 +30,21 @@ import { twMerge } from 'tailwind-merge';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
-import { SelectStyles } from '../components/form/Select';
+import { Select, SelectStyles } from '../components/form/Select';
 import { TextField } from '../components/form/TextField';
 import { Modal } from '../components/Modal';
 import { TOwner } from '../types/Owner';
 import {
+	convertMileageDisplay,
 	getVinDetails,
 	hasVinModelYearMismatch,
 	isFullVin,
 	isVinApiValid,
 	normalizeVinInput,
 	parseEditionYear,
+	parseMileageInput,
 	parseSequence,
+	type TMileageUnit,
 	VIN_INPUT_PATTERN,
 	VIN_VALIDATION_MESSAGE,
 } from '../utils/car';
@@ -72,13 +76,24 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [formError, setFormError] = useState<string | ReactNode | null>(null);
 	const [isFormValid, setIsFormValid] = useState(false);
-	const [editions, setEditions] = useState<Array<{ name: string }>>([]);
+	const [editions, setEditions] = useState<
+		Array<{ name: string; colors?: string[] | null }>
+	>([]);
 	const [showOtherInput, setShowOtherInput] = useState(false);
 	const [existingOwner, setExistingOwner] = useState<TOwner | null>(null);
 	const [formDataLoading, setFormDataLoading] = useState(false);
 	const prefilledData = props?.prefilledData;
 	const [selectedEdition, setSelectedEdition] = useState<string>('');
+	const [selectedColor, setSelectedColor] = useState('');
+	const [mileageDisplay, setMileageDisplay] = useState('');
+	const [mileageUnit, setMileageUnit] = useState<TMileageUnit>('mi');
 	const [vinApiWarning, setVinApiWarning] = useState<string | null>(null);
+	const selectedEditionColors =
+		editions.find((edition) => edition.name === selectedEdition)?.colors ??
+		null;
+	const showColorSelect =
+		Array.isArray(selectedEditionColors) &&
+		selectedEditionColors.length > 0;
 
 	const resetVinApiWarning = () => {
 		setVinApiWarning(null);
@@ -235,6 +250,10 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 						body: JSON.stringify({
 							car_id: prefilledData.id,
 							information: formData.get('information'),
+							mileage: parseMileageInput(
+								mileageDisplay,
+								mileageUnit
+							),
 							owner_city: owner_location?.city,
 							owner_country: owner_location?.country,
 							owner_date_start: formData.get('owner_date_start'),
@@ -299,8 +318,13 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 							Authorization: `Bearer ${token}`,
 						},
 						body: JSON.stringify({
+							color: formData.get('color') || undefined,
 							edition_name: formData.get('edition_name'),
 							information: formData.get('information'),
+							mileage: parseMileageInput(
+								mileageDisplay,
+								mileageUnit
+							),
 							owner_city: owner_location?.city,
 							owner_country: owner_location?.country,
 							owner_date_start: formData.get('owner_date_start'),
@@ -494,6 +518,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 												setSelectedEdition(
 													e.target.value
 												);
+												setSelectedColor('');
 											}}
 											defaultValue=""
 										>
@@ -552,6 +577,26 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 										</span>
 									</>
 								)}
+							</Field>
+						)}
+
+						{!prefilledData?.id && showColorSelect && (
+							<Field id="color" label="Color">
+								<Select
+									id="color"
+									name="color"
+									value={selectedColor}
+									onChange={(e) =>
+										setSelectedColor(e.target.value)
+									}
+									placeholder="Select a color"
+									options={selectedEditionColors.map(
+										(color) => ({
+											value: color,
+											label: color,
+										})
+									)}
+								/>
 							</Field>
 						)}
 
@@ -637,6 +682,7 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 										);
 									}}
 									className={twMerge(
+										'max-w-44',
 										prefilledData?.vin &&
 											'bg-brg-light text-brg-mid'
 									)}
@@ -696,20 +742,90 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 							</Field>
 						</div>
 
-						<Field
-							id="owner_date_start"
-							label="Purchase Date"
-							className="w-36"
-							required
-						>
-							<TextField
+						<div className="flex justify-between gap-4">
+							<Field
 								id="owner_date_start"
+								label="Purchase Date"
+								className="w-36 shrink-0"
 								required
-								name="owner_date_start"
-								type="date"
-								placeholder="1990-01-01"
-							/>
-						</Field>
+							>
+								<TextField
+									id="owner_date_start"
+									required
+									name="owner_date_start"
+									type="date"
+									placeholder="1990-01-01"
+								/>
+							</Field>
+
+							<Field
+								id="mileage"
+								label="Current Mileage"
+								className="w-full"
+							>
+								<div className="flex items-center gap-2">
+									<TextField
+										id="mileage"
+										name="mileage"
+										inputMode="numeric"
+										placeholder="42,500"
+										className="w-full max-w-24"
+										value={mileageDisplay}
+										onChange={(
+											e: ChangeEvent<HTMLInputElement>
+										) => {
+											const value =
+												e.target.value.replace(
+													/[^0-9]/g,
+													''
+												);
+
+											setMileageDisplay(
+												value
+													? Number(
+															value
+														).toLocaleString()
+													: ''
+											);
+										}}
+									/>
+
+									<Select
+										name="mileage_unit"
+										className="w-20 shrink-0"
+										value={mileageUnit}
+										onChange={(
+											e: ChangeEvent<HTMLSelectElement>
+										) => {
+											const newUnit = e.target
+												.value as TMileageUnit;
+											const raw = Number(
+												mileageDisplay.replace(
+													/[^0-9]/g,
+													''
+												)
+											);
+
+											if (raw) {
+												setMileageDisplay(
+													convertMileageDisplay(
+														raw,
+														mileageUnit,
+														newUnit
+													).toLocaleString()
+												);
+											}
+
+											setMileageUnit(newUnit);
+										}}
+										options={[
+											{ value: 'mi', label: 'mi' },
+											{ value: 'km', label: 'km' },
+										]}
+									/>
+								</div>
+							</Field>
+						</div>
 
 						<Field id="information" label="Additional Information">
 							<TextField

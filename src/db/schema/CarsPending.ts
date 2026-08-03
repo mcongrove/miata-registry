@@ -21,6 +21,7 @@ import type { TStoredVinDetails } from '../../types/Car';
 
 export const CarsPending = sqliteTable('cars_pending', {
 	car_id: text('car_id').notNull(),
+	color: text('color'),
 	created_at: integer('created_at').notNull(),
 	current_owner_id: text('current_owner_id'),
 	destroyed: integer('destroyed', { mode: 'boolean' }).default(false),

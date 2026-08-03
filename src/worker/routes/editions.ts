@@ -35,7 +35,7 @@ const CACHE_TTL = {
 
 const EDITIONS_ALL_CACHE_KEY = 'editions:all:v3';
 
-const EDITIONS_NAMES_CACHE_KEY = 'editions:names:v2';
+const EDITIONS_NAMES_CACHE_KEY = 'editions:names:v3';
 
 const editionSlugCacheKey = (slug: string) => `editions:slug:v3:${slug}`;
 
@@ -236,6 +236,7 @@ editionsRouter.get('/names', async (c) => {
 
 		const editionsWithCounts = await db
 			.select({
+				colors: Editions.colors,
 				count: sql<number>`COUNT(${Cars.id})`.as('count'),
 				generation: Editions.generation,
 				id: Editions.id,
@@ -248,7 +249,7 @@ editionsRouter.get('/names', async (c) => {
 			.leftJoin(Cars, eq(Cars.edition_id, Editions.id))
 			.orderBy(asc(Editions.year), asc(Editions.name))
 			.groupBy(
-				sql`${Editions.id}, ${Editions.year}, ${Editions.name}, ${Editions.generation}`
+				sql`${Editions.id}, ${Editions.year}, ${Editions.name}, ${Editions.generation}, ${Editions.colors}`
 			);
 
 		await c.env.CACHE.put(

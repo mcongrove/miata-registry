@@ -39,6 +39,29 @@ import { withAuth } from '../middleware/auth';
 import type { Bindings } from '../types';
 import { formatEditionLabel, notifyModerator } from '../utils/notifyModerator';
 
+function parseClaimMileage(body: {
+	mileage?: unknown;
+}): { mileage: number; mileage_date: string } | null {
+	if (
+		body.mileage === undefined ||
+		body.mileage === null ||
+		body.mileage === ''
+	) {
+		return null;
+	}
+
+	const mileage = Number(body.mileage);
+
+	if (!Number.isFinite(mileage) || mileage < 0) {
+		return null;
+	}
+
+	return {
+		mileage: Math.round(mileage),
+		mileage_date: `${new Date().toISOString().split('T')[0]}T00:00:00.000Z`,
+	};
+}
+
 const claimsRouter = new Hono<{ Bindings: Bindings }>();
 
 async function updateOwnerProfileAndInvalidateCars(
@@ -151,6 +174,41 @@ claimsRouter.post('/existing', withAuth(), async (c) => {
 			owner_id: ownerId,
 			status: 'pending',
 		});
+
+		const claimMileage = parseClaimMileage(body);
+
+		if (claimMileage) {
+			await db.insert(CarsPending).values({
+				car_id: existingCar.id,
+				created_at: Math.floor(Date.now() / 1000),
+				current_owner_id: existingCar.current_owner_id,
+				destroyed: existingCar.destroyed,
+				edition_id: existingCar.edition_id,
+				id: crypto.randomUUID(),
+				manufacture_city: existingCar.manufacture_city,
+				manufacture_date: existingCar.manufacture_date,
+				manufacture_prefecture: existingCar.manufacture_prefecture,
+				mileage: claimMileage.mileage,
+				mileage_date: claimMileage.mileage_date,
+				sale_date: existingCar.sale_date,
+				sale_dealer_city: existingCar.sale_dealer_city,
+				sale_dealer_country: existingCar.sale_dealer_country,
+				sale_dealer_name: existingCar.sale_dealer_name,
+				sale_dealer_state: existingCar.sale_dealer_state,
+				sale_msrp: existingCar.sale_msrp,
+				sequence: existingCar.sequence,
+				shipping_city: existingCar.shipping_city,
+				shipping_country: existingCar.shipping_country,
+				shipping_date: existingCar.shipping_date,
+				shipping_state: existingCar.shipping_state,
+				shipping_vessel: existingCar.shipping_vessel,
+				story: existingCar.story,
+				status: 'pending',
+				vin: existingCar.vin,
+				vin_decode_status: existingCar.vin_decode_status,
+				vin_details: existingCar.vin_details,
+			});
+		}
 
 		if (`${user.firstName} ${user.lastName}` !== body.owner_name) {
 			await c.get('clerk').users.updateUser(userId, {
@@ -269,7 +327,10 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 		});
 
 		const edition = await db
-			.select({ id: Editions.id })
+			.select({
+				colors: Editions.colors,
+				id: Editions.id,
+			})
 			.from(Editions)
 			.where(
 				and(
@@ -294,13 +355,41 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			);
 		}
 
+		const editionColors = Array.isArray(edition.colors)
+			? edition.colors
+			: [];
+		const requestedColor =
+			typeof body.color === 'string' ? body.color.trim() : '';
+		const parsedColor =
+			!requestedColor || requestedColor.toLowerCase() === 'various'
+				? null
+				: requestedColor;
+
+		if (parsedColor !== null) {
+			if (
+				editionColors.length === 0 ||
+				!editionColors.includes(parsedColor)
+			) {
+				return c.json(
+					{
+						error: 'Bad Request',
+						details: 'Invalid color for this edition',
+					},
+					400
+				);
+			}
+		}
+
 		const vinDecode = await buildVinDecodeFields(
 			vin,
 			parseEditionYear(body.edition_name)
 		);
 
+		const claimMileage = parseClaimMileage(body);
+
 		await db.insert(CarsPending).values({
 			car_id: carId,
+			color: parsedColor,
 			created_at: Math.floor(Date.now() / 1000),
 			current_owner_id: ownerId,
 			edition_id: editionId,
@@ -308,6 +397,7 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 			sequence: parseSequence(body.sequence),
 			status: 'pending',
 			vin,
+			...(claimMileage ?? {}),
 			...(vinDecode ?? {}),
 		});
 

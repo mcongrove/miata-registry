@@ -161,6 +161,7 @@ export async function approvePendingCar(
 	const pendingCar = await db
 		.select({
 			car_id: CarsPending.car_id,
+			color: CarsPending.color,
 			created_at: CarsPending.created_at,
 			current_owner_id: CarsPending.current_owner_id,
 			destroyed: CarsPending.destroyed,
@@ -226,12 +227,16 @@ export async function approvePendingCar(
 		}
 	}
 
+	// color is owners-log (not moderated); omit from conflict updates so
+	// pending car edits don't wipe a live cars.color value
+	const { color: _pendingColor, ...carDataWithoutColor } = carData;
+
 	await db
 		.insert(Cars)
 		.values({ id: car_id, ...carData })
 		.onConflictDoUpdate({
 			target: Cars.id,
-			set: carData,
+			set: carDataWithoutColor,
 		});
 
 	await db
