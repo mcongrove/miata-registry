@@ -102,15 +102,6 @@ export const Footer = () => {
 									</span>
 								</li>
 								<li>
-									<span
-										onClick={() => openModal('tip')}
-										className="text-brg-mid hover:text-brg-light transition-colors cursor-pointer"
-										data-cy="footer-submit-a-tip"
-									>
-										Register someone else's Miata
-									</span>
-								</li>
-								<li>
 									<Link
 										to="/about#statistics"
 										className="text-brg-mid hover:text-brg-light transition-colors"

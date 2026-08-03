@@ -461,30 +461,6 @@ export const Home = () => {
 							>
 								Claim your Miata
 							</Button>
-
-							<div className="flex flex-col items-start gap-3 mt-8 pt-8 border-t border-brg-border text-sm">
-								<h3 className="flex gap-2 items-center text-brg-mid font-bold">
-									<i className="fa-solid fa-circle-info text-lg text-brg-mid cursor-help" />
-									Know of a limited edition Miata?
-								</h3>
-
-								<p className="text-brg-mid lg:w-3/5">
-									If you know someone with a limited edition
-									Miata or have spotted one, you can help by
-									submitting information about the car. Every
-									detail helps build our registry.
-								</p>
-
-								<Button
-									variant="secondary"
-									withArrow
-									className="text-xs mt-2"
-									onClick={() => openModal('tip')}
-									data-cy="home-cta-submit-a-tip"
-								>
-									Submit a Tip
-								</Button>
-							</div>
 						</div>
 					</div>
 				</div>

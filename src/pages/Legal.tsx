@@ -96,9 +96,8 @@ export const Legal = () => {
 						<h3>Your Submissions</h3>
 						<p>
 							You retain ownership of the content You submit to
-							the Service, including photos, car histories,
-							ownership details, and tips. By submitting content,
-							You:
+							the Service, including photos, car histories, and
+							ownership details. By submitting content, You:
 						</p>
 						<ul>
 							<li>
@@ -359,15 +358,14 @@ export const Legal = () => {
 						</p>
 						<h4>Information About Others</h4>
 						<p>
-							The Service allows anyone, with or without an
-							account, to submit tips about limited edition
-							Miatas. Tips may include information about people
-							other than the person submitting them, such as the
-							name and general location of a car's owner. Tips are
-							reviewed by moderators before any information is
-							added to the public registry. If You believe someone
-							has submitted information about You and would like
-							it corrected or removed, please contact Us.
+							When registering or claiming a car, You may submit
+							information that relates to prior owners or other
+							people connected to that vehicle, such as a name or
+							general location. Submissions are reviewed by
+							moderators before information is added to the public
+							registry. If You believe someone has submitted
+							information about You and would like it corrected or
+							removed, please contact Us.
 						</p>
 						<h4>Cookies</h4>
 						<p>

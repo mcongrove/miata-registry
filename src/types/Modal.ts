@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TModalType = 'qrCode' | 'register' | 'socialGeneration' | 'tip';
+export type TModalType = 'qrCode' | 'register' | 'socialGeneration';
 
 export interface TModalState {
 	// Each modal type passes different props; validated at openModal call sites

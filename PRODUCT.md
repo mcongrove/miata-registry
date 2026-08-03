@@ -44,7 +44,7 @@ Calm, archival, enthusiast-confident. Understated and legible. Reads like a seri
 - **Familiar product patterns.** Tables, filters, forms, and modals should feel like tools people already know how to use.
 - **Heritage over hype.** The site should feel like a long-running club record, not a launch landing page — even on the home screen.
 - **Palette discipline.** The `brg` green family is the brand; don't decorate with extra accent colors.
-- **Terminology precision.** Say *limited edition* and *edition* in user-facing copy; avoid "special edition" and "model" for registry cars.
+- **Terminology precision.** Say _limited edition_ and _edition_ in user-facing copy; avoid "special edition" and "model" for registry cars.
 
 ## Accessibility & Inclusion
 

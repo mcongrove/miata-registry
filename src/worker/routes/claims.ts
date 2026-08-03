@@ -26,7 +26,6 @@ import {
 	Editions,
 	Owners,
 	OwnersPending,
-	Tips,
 } from '../../db/schema';
 import {
 	buildVinDecodeFields,
@@ -426,57 +425,6 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 						: 'An unknown error occurred',
 			},
 			501
-		);
-	}
-});
-
-claimsRouter.post('/tip', async (c) => {
-	try {
-		const formData = await c.req.formData();
-		const tipId = crypto.randomUUID();
-
-		const values = {
-			created_at: Math.floor(Date.now() / 1000),
-			edition_name: formData.get('edition_name') as string,
-			id: tipId,
-			information: (formData.get('information') as string) || null,
-			owner_date_start: formData.get('owner_date_start')
-				? (formData.get('owner_date_start') as string) +
-					'T00:00:00.000Z'
-				: null,
-			owner_location: (formData.get('owner_location') as string) || null,
-			owner_name: (formData.get('owner_name') as string) || null,
-			sequence: (formData.get('sequence') as string) || null,
-			user_id: (formData.get('user_id') as string) || null,
-			vin: normalizeVinInput(String(formData.get('vin') ?? '')) || null,
-		};
-
-		if (values.owner_name === 'Cypress Test') {
-			return c.json({ success: true, tipId, data: values });
-		}
-
-		const db = createDb(c.env.DB);
-
-		await db.insert(Tips).values(values);
-
-		await notifyModerator(c.env.RESEND_API_KEY, {
-			kind: 'tip',
-			edition: values.edition_name,
-		});
-
-		return c.json({ success: true, tipId });
-	} catch (error) {
-		console.error('Error submitting tip:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
 		);
 	}
 });

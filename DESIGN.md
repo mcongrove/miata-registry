@@ -2,62 +2,62 @@
 name: Miata Registry
 description: Archival registry UI for limited edition Mazda Miatas
 colors:
-  brg: "#172E28"
-  brg-dark: "#10201C"
-  brg-mid: "#5D6D69"
-  brg-border: "#BAC1BF"
-  brg-light: "#E8EBEA"
-  surface: "#FFFFFF"
-  overlay: "#000000B3"
+    brg: '#172E28'
+    brg-dark: '#10201C'
+    brg-mid: '#5D6D69'
+    brg-border: '#BAC1BF'
+    brg-light: '#E8EBEA'
+    surface: '#FFFFFF'
+    overlay: '#000000B3'
 typography:
-  display:
-    fontFamily: "Inter, sans-serif"
-    fontSize: "clamp(1.5rem, 4vw, 3.75rem)"
-    fontWeight: 500
-    lineHeight: 1.1
-    letterSpacing: "normal"
-  body:
-    fontFamily: "Inter, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
-    lineHeight: 1.5
-    letterSpacing: "normal"
-  label:
-    fontFamily: "Inter, sans-serif"
-    fontSize: "0.875rem"
-    fontWeight: 500
-    lineHeight: 1.25
-    letterSpacing: "normal"
+    display:
+        fontFamily: 'Inter, sans-serif'
+        fontSize: 'clamp(1.5rem, 4vw, 3.75rem)'
+        fontWeight: 500
+        lineHeight: 1.1
+        letterSpacing: 'normal'
+    body:
+        fontFamily: 'Inter, sans-serif'
+        fontSize: '1rem'
+        fontWeight: 400
+        lineHeight: 1.5
+        letterSpacing: 'normal'
+    label:
+        fontFamily: 'Inter, sans-serif'
+        fontSize: '0.875rem'
+        fontWeight: 500
+        lineHeight: 1.25
+        letterSpacing: 'normal'
 rounded:
-  md: "6px"
-  lg: "8px"
-  full: "9999px"
+    md: '6px'
+    lg: '8px'
+    full: '9999px'
 spacing:
-  sm: "8px"
-  md: "16px"
-  lg: "24px"
-  xl: "32px"
+    sm: '8px'
+    md: '16px'
+    lg: '24px'
+    xl: '32px'
 components:
-  button-primary:
-    backgroundColor: "{colors.brg}"
-    textColor: "{colors.surface}"
-    rounded: "{rounded.lg}"
-    padding: "12px 16px"
-  button-primary-hover:
-    backgroundColor: "#172E28E6"
-    textColor: "{colors.surface}"
-    rounded: "{rounded.lg}"
-    padding: "12px 16px"
-  button-tertiary:
-    backgroundColor: "transparent"
-    textColor: "{colors.brg}"
-    rounded: "{rounded.lg}"
-    padding: "12px 16px"
-  input-default:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.brg}"
-    rounded: "{rounded.lg}"
-    padding: "8px"
+    button-primary:
+        backgroundColor: '{colors.brg}'
+        textColor: '{colors.surface}'
+        rounded: '{rounded.lg}'
+        padding: '12px 16px'
+    button-primary-hover:
+        backgroundColor: '#172E28E6'
+        textColor: '{colors.surface}'
+        rounded: '{rounded.lg}'
+        padding: '12px 16px'
+    button-tertiary:
+        backgroundColor: 'transparent'
+        textColor: '{colors.brg}'
+        rounded: '{rounded.lg}'
+        padding: '12px 16px'
+    input-default:
+        backgroundColor: '{colors.surface}'
+        textColor: '{colors.brg}'
+        rounded: '{rounded.lg}'
+        padding: '8px'
 ---
 
 # Design System: Miata Registry
@@ -186,4 +186,4 @@ Product components should feel consistent screen to screen — same button radii
 - **Don't** add display serifs, gradient text, or oversized fluid type in app screens.
 - **Don't** ship inconsistent button styles on different pages — if it submits or navigates, it should look like `Button`.
 - **Don't** add decorative motion; transitions are for hover color, arrow nudge, and skeleton pulse only.
-- **Don't** call registry cars "special editions" or "models" in new copy — use *limited edition* and *edition*.
+- **Don't** call registry cars "special editions" or "models" in new copy — use _limited edition_ and _edition_.

@@ -33,11 +33,7 @@ import Legal from '../components/Legal';
 import tailwindConfig from '../tailwind.config';
 
 export type ModerationNoticeKind =
-	| 'new_registration'
-	| 'ownership_claim'
-	| 'car_update'
-	| 'photo_upload'
-	| 'tip';
+	'new_registration' | 'ownership_claim' | 'car_update' | 'photo_upload';
 
 export type ModerationNoticeProps = {
 	kind: ModerationNoticeKind;
@@ -67,11 +63,6 @@ export const MODERATION_NOTICE_COPY: Record<
 		title: 'Photo upload',
 		subject: 'Photo upload pending',
 		summary: 'An owner uploaded a new photo.',
-	},
-	tip: {
-		title: 'Tip submission',
-		subject: 'Tip pending',
-		summary: 'Someone submitted a tip about a limited edition Miata.',
 	},
 };
 

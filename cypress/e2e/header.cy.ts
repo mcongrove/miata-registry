@@ -36,10 +36,5 @@ describe('Header', () => {
 			.click();
 		cy.contains('Account Required').should('be.visible');
 		cy.contains('button', 'Cancel').should('be.visible').click();
-
-		cy.get('[data-cy="header-registry"]').realHover();
-		cy.get('[data-cy="header-submit-a-tip"]').should('be.visible').click();
-		cy.contains('Submit a Tip').should('be.visible');
-		cy.contains('button', 'Cancel').should('be.visible').click();
 	});
 });

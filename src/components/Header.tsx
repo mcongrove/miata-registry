@@ -169,10 +169,6 @@ export const Header = () => {
 							label: 'Register your Miata',
 							onClick: () => openModal('register'),
 						},
-						{
-							label: 'Submit a tip',
-							onClick: () => openModal('tip'),
-						},
 					]}
 					isActive={isActive('/registry')}
 				/>

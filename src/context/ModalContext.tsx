@@ -42,11 +42,6 @@ const MODAL_COMPONENTS = {
 			default: module.SocialGeneration,
 		}))
 	),
-	tip: lazy(() =>
-		import('../modals/Tip').then((module) => ({
-			default: module.Tip,
-		}))
-	),
 } as const;
 
 type TModalComponentKeys = keyof typeof MODAL_COMPONENTS;

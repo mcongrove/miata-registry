@@ -34,9 +34,5 @@ describe('Footer', () => {
 			.click();
 		cy.contains('Account Required').should('be.visible');
 		cy.contains('button', 'Cancel').should('be.visible').click();
-
-		cy.get('[data-cy="footer-submit-a-tip"]').should('be.visible').click();
-		cy.contains('Submit a Tip').should('be.visible');
-		cy.contains('button', 'Cancel').should('be.visible').click();
 	});
 });

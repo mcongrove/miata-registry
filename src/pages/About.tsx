@@ -24,7 +24,6 @@ import { Button } from '../components/Button';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
-import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { handleApiError } from '../utils/common';
 
@@ -44,7 +43,6 @@ const getCountCodeCommits = async (owner: string, repo: string) => {
 };
 
 export const About = () => {
-	const { openModal } = useModal();
 	const [highlightedSection, setHighlightedSection] = useState<string | null>(
 		null
 	);
@@ -334,10 +332,8 @@ export const About = () => {
 								Entries are reviewed by moderators before they
 								appear as claimed. Owners submit documentation
 								such as VIN records, window stickers, or title
-								information along with photos. Community tips
-								help surface cars that are not yet in the
-								registry, and corrections are updated after
-								review.
+								information along with photos. Corrections are
+								updated after review.
 							</p>
 						</div>
 
@@ -371,8 +367,7 @@ export const About = () => {
 								VIN, sequence number, photos, and any ownership
 								documentation you have. A moderator will review
 								your submission and approve the claim once
-								verified. If your car is not listed yet, you can
-								submit a tip and our team will follow up.
+								verified.
 							</p>
 						</div>
 					</div>
@@ -485,15 +480,9 @@ export const About = () => {
 						<p className="text-sm text-brg-mid">
 							There are several ways you can help grow and improve
 							the Miata Registry. If you own a limited edition
-							Miata, you can create an account and claim your
-							vehicle by providing documentation and photos. Know
-							of other limited edition Miatas in your area?{' '}
-							<span
-								onClick={() => openModal('tip')}
-								className="underline cursor-pointer"
-							>
-								Submit a tip
-							</span>{' '}
+							Miata, create an account and claim your vehicle by
+							providing documentation and photos. Spotted an error
+							or know of a car that should be listed? Contact us
 							and our verification team will follow up.
 						</p>
 
