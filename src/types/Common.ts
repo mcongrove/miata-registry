@@ -20,9 +20,3 @@ export type TPending = {
 	status: 'pending' | 'approved' | 'rejected';
 	created_at: number;
 };
-
-export type TModerationStats = {
-	pending: number;
-	approved: number;
-	rejected: number;
-};

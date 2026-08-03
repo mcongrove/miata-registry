@@ -38,7 +38,6 @@
 		"drizzle-orm": "^0.45.2",
 		"hono": "^4.12.25",
 		"jszip": "^3.10.1",
-		"qrcode.react": "^4.2.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-email": "^6.6.6",

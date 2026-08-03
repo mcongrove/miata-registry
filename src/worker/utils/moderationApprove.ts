@@ -47,7 +47,7 @@ export async function invalidateCarCaches(
 	await cache.delete(`cars:summary:${carId}`);
 
 	if (options.editionsAndStats !== false) {
-		await cache.delete('editions:all:v2');
+		await cache.delete('editions:all:v3');
 		await cache.delete('stats:all');
 		await invalidateSeoCaches(cache);
 	}

@@ -26,6 +26,7 @@ import { getCountryDisplayName } from '../../utils/location';
 
 interface RegistryTableProps {
 	cars: TCar[];
+	fetchError?: string | null;
 	isFiltered: boolean;
 	isLoading: boolean;
 	onSort: (column: string) => void;
@@ -35,6 +36,7 @@ interface RegistryTableProps {
 
 export const RegistryTable = ({
 	cars,
+	fetchError = null,
 	isFiltered = false,
 	isLoading = false,
 	onSort,
@@ -127,6 +129,29 @@ export const RegistryTable = ({
 									className="px-4 py-3 text-xs text-brg-border"
 								>
 									Loading...
+								</td>
+							</tr>
+						) : fetchError ? (
+							<tr>
+								<td
+									colSpan={columns.length}
+									className="px-4 py-8 text-center"
+								>
+									<div className="flex flex-col items-center gap-2">
+										<i className="fa-solid fa-exclamation-triangle text-2xl text-red-500" />
+										<p className="text-red-700 text-sm">
+											{fetchError}
+										</p>
+										<button
+											type="button"
+											onClick={() =>
+												window.location.reload()
+											}
+											className="text-sm text-brg hover:underline"
+										>
+											Try again
+										</button>
+									</div>
 								</td>
 							</tr>
 						) : cars.length === 0 ? (

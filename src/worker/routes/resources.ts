@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { and, asc, eq, inArray, lte } from 'drizzle-orm';
+import { and, asc, eq, inArray, like, lte, or } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
 import { Editions } from '../../db/schema/Editions';
@@ -140,13 +140,14 @@ const resourceIdsForAssociation = async (
 resourcesRouter.get('/', async (c) => {
 	try {
 		const isDev = c.env.NODE_ENV === 'development';
+		const q = c.req.query('q')?.trim() || '';
 		const edition = c.req.query('edition')?.trim() || '';
 		const generation = c.req.query('generation')?.trim() || '';
 		const tag = c.req.query('tag')?.trim() || '';
 		const kind = c.req.query('kind')?.trim() || '';
 		const featured = c.req.query('featured')?.trim() || '';
 
-		const cacheKey = `resources:list:v4:${edition}:${generation}:${tag}:${kind}:${featured}`;
+		const cacheKey = `resources:list:v5:${q}:${edition}:${generation}:${tag}:${kind}:${featured}`;
 
 		if (!isDev) {
 			const cached = await c.env.CACHE.get(cacheKey);
@@ -166,6 +167,16 @@ resourcesRouter.get('/', async (c) => {
 
 		if (!isDev) {
 			conditions.push(lte(Resources.publish_date, now));
+		}
+
+		if (q) {
+			const searchPattern = `%${q}%`;
+			conditions.push(
+				or(
+					like(Resources.title, searchPattern),
+					like(Resources.summary, searchPattern)
+				)
+			);
 		}
 
 		if (kind) {

@@ -18,11 +18,7 @@
 
 import { Hono } from 'hono';
 import { Resend } from 'resend';
-import Single from '../../emails/templates/Single';
-import { withAuth } from '../middleware/auth';
-import { withModerator } from '../middleware/moderator';
 import type { Bindings } from '../types';
-import { renderEmail } from '../utils/renderEmail';
 
 const emailRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -50,69 +46,6 @@ emailRouter.post('/contact', async (c) => {
 		return c.json({ success: true });
 	} catch (error) {
 		console.error('Error sending contact email:', error);
-
-		return c.json(
-			{
-				error: 'Failed to send email',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
-	}
-});
-
-// emailRouter.post('/sticker', async (c) => {
-// 	try {
-// 		const resend = new Resend(c.env.RESEND_API_KEY);
-// 		const { quantity, address, carId } = await c.req.json();
-
-// 		await resend.emails.send({
-// 			from: 'Miata Registry <support@miataregistry.com>',
-// 			to: 'mattcongrove@gmail.com',
-// 			subject: 'Miata Registry: Sticker Request',
-// 			html: `
-// 				<h2>Registry Sticker Request</h2>
-// 				<p><strong>Car ID:</strong> ${carId}</p>
-// 				<p><strong>Quantity:</strong> ${quantity} sticker(s)</p>
-// 				<p><strong>Shipping Address:</strong> ${address}</p>
-// 			`,
-// 		});
-
-// 		return c.json({ success: true });
-// 	} catch (error) {
-// 		console.error('Error sending sticker request email:', error);
-
-// 		return c.json(
-// 			{
-// 				error: 'Failed to send email',
-// 				details:
-// 					error instanceof Error
-// 						? error.message
-// 						: 'An unknown error occurred',
-// 			},
-// 			500
-// 		);
-// 	}
-// });
-
-emailRouter.post('/send', withAuth(), withModerator(), async (c) => {
-	try {
-		const resend = new Resend(c.env.RESEND_API_KEY);
-		const { to, subject, message } = await c.req.json();
-
-		await resend.emails.send({
-			from: 'Miata Registry <support@miataregistry.com>',
-			to,
-			subject,
-			html: await renderEmail(Single({ subject, message })),
-		});
-
-		return c.json({ success: true });
-	} catch (error) {
-		console.error('Error sending email:', error);
 
 		return c.json(
 			{

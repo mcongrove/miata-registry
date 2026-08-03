@@ -25,6 +25,11 @@ import { RegisterCta } from '../components/RegisterCta';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 
+type TStats = {
+	cars: number;
+	claimedCars: number;
+};
+
 const TimelineItem = lazy(() =>
 	import('../components/home/TimelineItem').then((module) => ({
 		default: module.TimelineItem,
@@ -38,6 +43,7 @@ export const Home = () => {
 		id: string;
 		title_short: string;
 	} | null>(null);
+	const [stats, setStats] = useState<TStats | null>(null);
 
 	usePageMeta({
 		path: '/',
@@ -62,7 +68,23 @@ export const Home = () => {
 			}
 		};
 
+		const fetchStats = async () => {
+			try {
+				const response = await fetch(
+					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/stats`
+				);
+
+				if (response.ok) {
+					const data = await response.json();
+					setStats(data);
+				}
+			} catch {
+				// Stats are non-critical; fail silently
+			}
+		};
+
 		fetchFeaturedNews();
+		fetchStats();
 	}, []);
 
 	return (
@@ -100,6 +122,17 @@ export const Home = () => {
 								and preserve the history of limited edition
 								Mazda Miatas.
 							</p>
+
+							{stats && (
+								<p className="text-sm text-brg-mid/50">
+									{stats.cars.toLocaleString()} cars
+									documented
+									<span className="mx-1.5 text-brg-border">
+										·
+									</span>
+									{stats.claimedCars.toLocaleString()} claimed
+								</p>
+							)}
 						</div>
 
 						<div className="flex items-center gap-2 lg:gap-4 text-sm">

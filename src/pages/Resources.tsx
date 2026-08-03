@@ -16,27 +16,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePageMeta } from '../hooks/usePageMeta';
 import type { TResource, TResourceKind } from '../types/Resource';
 import { handleApiError } from '../utils/common';
 import { resourceKindIcon, resourceKindLabel } from '../utils/resource';
 
+const GENERATION_OPTIONS = [
+	{ value: '', label: 'All generations' },
+	{ value: 'NA', label: 'NA (1989–1997)' },
+	{ value: 'NB', label: 'NB (1998–2005)' },
+	{ value: 'NC', label: 'NC (2006–2015)' },
+	{ value: 'ND', label: 'ND (2016–present)' },
+];
+
+const SELECT_CLASS =
+	"shrink-0 px-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg bg-white text-brg focus:outline-none focus:border-brg-mid appearance-none cursor-pointer [background-position:right_0.5rem_center] bg-no-repeat bg-[length:1rem] bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%235D6D69%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] pr-8";
+
 export const Resources = () => {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isLoading, setIsLoading] = useState(true);
 	const [resources, setResources] = useState<TResource[]>([]);
+	const [fetchError, setFetchError] = useState<string | null>(null);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 
+	const q = searchParams.get('q') ?? '';
 	const kind = searchParams.get('kind') ?? '';
 	const edition = searchParams.get('edition') ?? '';
-	const hasPages = resources.some((resource) => resource.kind === 'page');
+	const generation = searchParams.get('generation') ?? '';
 	const kindFilters: { value: '' | TResourceKind; label: string }[] = [
 		{ value: '', label: 'All' },
 		{ value: 'registry', label: 'Registries' },
 		{ value: 'link', label: 'Links' },
-		...(hasPages ? [{ value: 'page' as const, label: 'Pages' }] : []),
 	];
 	const visibleResources = kind
 		? resources.filter((resource) => resource.kind === kind)
@@ -52,22 +65,32 @@ export const Resources = () => {
 	useEffect(() => {
 		const load = async () => {
 			setIsLoading(true);
+			setFetchError(null);
 
 			try {
 				const params = new URLSearchParams();
 
+				if (q) params.set('q', q);
 				if (edition) params.set('edition', edition);
+				if (generation) params.set('generation', generation);
 
 				const query = params.toString();
 				const response = await fetch(
 					`${import.meta.env.VITE_CLOUDFLARE_WORKER_URL}/resources${query ? `?${query}` : ''}`
 				);
 
+				if (!response.ok) {
+					throw new Error('Failed to load resources');
+				}
+
 				const data = await response.json();
 
 				setResources(Array.isArray(data) ? data : []);
 			} catch (error) {
 				handleApiError(error);
+				setFetchError(
+					'Unable to load resources. Please try again later.'
+				);
 				setResources([]);
 			} finally {
 				setIsLoading(false);
@@ -75,27 +98,44 @@ export const Resources = () => {
 		};
 
 		load();
-	}, [edition]);
+	}, [q, edition, generation]);
 
-	useEffect(() => {
-		if (kind === 'page' && !isLoading && !hasPages) {
-			const next = new URLSearchParams(searchParams);
-			next.delete('kind');
-			setSearchParams(next, { replace: true });
-		}
-	}, [kind, hasPages, isLoading, searchParams, setSearchParams]);
-
-	const setKind = (value: string) => {
+	const setParam = (key: 'kind' | 'generation', value: string) => {
 		const next = new URLSearchParams(searchParams);
 
 		if (value) {
-			next.set('kind', value);
+			next.set(key, value);
 		} else {
-			next.delete('kind');
+			next.delete(key);
 		}
 
 		setSearchParams(next, { replace: true });
 	};
+
+	const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const formData = new FormData(e.currentTarget);
+		const searchValue = (formData.get('search') as string)?.trim() ?? '';
+		const next = new URLSearchParams(searchParams);
+
+		if (searchValue) {
+			next.set('q', searchValue);
+		} else {
+			next.delete('q');
+		}
+
+		setSearchParams(next, { replace: true });
+	};
+
+	const clearFilters = () => {
+		setSearchParams(new URLSearchParams(), { replace: true });
+
+		if (searchInputRef.current) {
+			searchInputRef.current.value = '';
+		}
+	};
+
+	const hasActiveFilters = Boolean(q || edition || generation || kind);
 
 	return (
 		<main className="flex-1 px-8 pt-28 lg:pt-32 lg:px-0 pb-16">
@@ -114,46 +154,72 @@ export const Resources = () => {
 				</div>
 
 				<div className="flex flex-col gap-4">
-					<div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-						<span className="text-sm font-medium text-brg shrink-0">
-							Filter by kind
-						</span>
-						<div className="flex gap-1 p-1 bg-brg-light rounded-lg w-full sm:w-auto">
-							{kindFilters.map(({ value, label }) => {
-								const active = kind === value;
-
-								return (
-									<button
-										key={label}
-										type="button"
-										onClick={() => setKind(value)}
-										className={`flex-1 sm:flex-none px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-											active
-												? 'bg-white text-brg shadow-sm'
-												: 'text-brg-mid hover:text-brg'
-										}`}
-									>
-										{label}
-									</button>
-								);
-							})}
+					<form
+						onSubmit={handleSearch}
+						className="flex flex-col xl:flex-row xl:items-center gap-2"
+					>
+						<div className="relative flex-1 min-w-0 xl:max-w-sm">
+							<input
+								ref={searchInputRef}
+								type="search"
+								name="search"
+								defaultValue={q}
+								placeholder="Search resources..."
+								className="w-full pl-9 pr-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg text-brg focus:outline-none focus:border-brg-mid"
+							/>
+							<i className="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brg-mid/60 text-sm" />
 						</div>
-						{edition && (
-							<button
-								type="button"
-								onClick={() => {
-									const next = new URLSearchParams(
-										searchParams
+
+						<select
+							value={generation}
+							onChange={(e) =>
+								setParam('generation', e.target.value)
+							}
+							className={SELECT_CLASS}
+							aria-label="Filter by generation"
+						>
+							{GENERATION_OPTIONS.map((opt) => (
+								<option key={opt.value} value={opt.value}>
+									{opt.label}
+								</option>
+							))}
+						</select>
+
+						<div className="flex items-center gap-2 min-w-0 flex-1">
+							<div className="flex gap-1 p-1 bg-brg-light rounded-lg min-w-0 overflow-x-auto">
+								{kindFilters.map(({ value, label }) => {
+									const active = kind === value;
+
+									return (
+										<button
+											key={label}
+											type="button"
+											onClick={() =>
+												setParam('kind', value)
+											}
+											className={`shrink-0 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+												active
+													? 'bg-white text-brg shadow-sm'
+													: 'text-brg-mid hover:text-brg'
+											}`}
+										>
+											{label}
+										</button>
 									);
-									next.delete('edition');
-									setSearchParams(next, { replace: true });
-								}}
-								className="text-sm text-brg-mid hover:text-brg"
-							>
-								Clear edition filter
-							</button>
-						)}
-					</div>
+								})}
+							</div>
+
+							{hasActiveFilters && (
+								<button
+									type="button"
+									onClick={clearFilters}
+									className="shrink-0 text-sm text-brg-mid hover:text-brg whitespace-nowrap"
+								>
+									Clear
+								</button>
+							)}
+						</div>
+					</form>
 
 					<div className="bg-white rounded-md border border-brg-light overflow-hidden">
 						<div className="overflow-x-auto">
@@ -188,7 +254,33 @@ export const Resources = () => {
 											))
 										: null}
 
+									{!isLoading && fetchError ? (
+										<tr>
+											<td
+												colSpan={2}
+												className="px-3 py-8 text-center"
+											>
+												<div className="flex flex-col items-center gap-2">
+													<i className="fa-solid fa-exclamation-triangle text-2xl text-red-500" />
+													<p className="text-red-700">
+														{fetchError}
+													</p>
+													<button
+														type="button"
+														onClick={() =>
+															window.location.reload()
+														}
+														className="text-sm text-brg hover:underline"
+													>
+														Try again
+													</button>
+												</div>
+											</td>
+										</tr>
+									) : null}
+
 									{!isLoading &&
+									!fetchError &&
 									visibleResources.length === 0 ? (
 										<tr>
 											<td
@@ -201,6 +293,7 @@ export const Resources = () => {
 									) : null}
 
 									{!isLoading &&
+										!fetchError &&
 										visibleResources.map((resource) => (
 											<tr
 												key={resource.id}

@@ -65,6 +65,7 @@ export const CarProfile = () => {
 	const [car, setCar] = useState<TCar | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
+	const [fetchError, setFetchError] = useState<string | null>(null);
 	const [timelineOwners, setTimelineOwners] = useState<TCarOwner[]>([]);
 
 	const isIndexable =
@@ -119,6 +120,7 @@ export const CarProfile = () => {
 
 		setIsLoading(true);
 		setNotFound(false);
+		setFetchError(null);
 		setCar(null);
 		setTimelineOwners([]);
 
@@ -170,6 +172,7 @@ export const CarProfile = () => {
 			}
 		} catch (error) {
 			handleApiError(error);
+			setFetchError('Unable to load this car. Please try again later.');
 		} finally {
 			setIsLoading(false);
 		}
@@ -462,6 +465,30 @@ export const CarProfile = () => {
 					<Link to="/registry">
 						<Button>← Browse Cars</Button>
 					</Link>
+				</div>
+			</main>
+		);
+	}
+
+	if (fetchError) {
+		return (
+			<main className="flex-1 px-8 pt-24 lg:pt-40 lg:px-0 pb-16">
+				<div className="container mx-auto flex flex-col items-center gap-4">
+					<i className="fa-solid fa-exclamation-triangle text-4xl text-red-500" />
+
+					<h1 className="text-2xl font-bold text-brg">
+						Error Loading Car
+					</h1>
+
+					<p className="text-brg-mid mb-4">{fetchError}</p>
+
+					<div className="flex gap-4">
+						<Button onClick={() => loadCar()}>Try again</Button>
+
+						<Link to="/registry">
+							<Button variant="secondary">← Browse Cars</Button>
+						</Link>
+					</div>
 				</div>
 			</main>
 		);

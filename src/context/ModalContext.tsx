@@ -27,19 +27,9 @@ import {
 import { TModalState, TModalType } from '../types/Modal';
 
 const MODAL_COMPONENTS = {
-	qrCode: lazy(() =>
-		import('../modals/QrCode').then((module) => ({
-			default: module.QrCode,
-		}))
-	),
 	register: lazy(() =>
 		import('../modals/Register').then((module) => ({
 			default: module.Register,
-		}))
-	),
-	socialGeneration: lazy(() =>
-		import('../modals/SocialGeneration').then((module) => ({
-			default: module.SocialGeneration,
 		}))
 	),
 } as const;

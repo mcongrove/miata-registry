@@ -16,6 +16,8 @@ Vite serves the gitignored `local/` folder in development only via `serveLocalDe
 
 Pick `image_car_id` values by edition (approved car photos from R2). Needs `/editions`, `/photos/index`, `/cars/:id`. Optional query: `?api=…`, `?cdn=…`.
 
+`GET /photos/index` requires a Clerk moderator Bearer token (`Authorization: Bearer …`). Sign in as a moderator in the main app, copy the session JWT, and pass it from the local tool (or call the API with that header).
+
 ## Paint chips (`paint.html`)
 
 Unique `edition.color` / `edition.colors[]` values, hex from an inlined `colorMap` (keep in sync with `src/utils/car.ts`). Sorted by hue (then greys by lightness). **1990 Color Test Cars** colors are split into their own section. Needs `/editions`. Optional: `?api=http://localhost:8788`.

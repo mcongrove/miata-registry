@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { and, count, eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { createDb } from '../../db';
 import { CarOwners } from '../../db/schema/CarOwners';
@@ -26,8 +26,6 @@ import { CarsPending } from '../../db/schema/CarsPending';
 import { Editions } from '../../db/schema/Editions';
 import { Owners } from '../../db/schema/Owners';
 import { OwnersPending } from '../../db/schema/OwnersPending';
-import { Tips } from '../../db/schema/Tips';
-import { TModerationStats } from '../../types/Common';
 import { withAuth } from '../middleware/auth';
 import { withModerator } from '../middleware/moderator';
 import { Bindings } from '../types';
@@ -667,91 +665,5 @@ moderationRouter.post(
 		}
 	}
 );
-
-moderationRouter.get('/stats', async (c) => {
-	try {
-		const db = createDb(c.env.DB);
-
-		const carStats = await db
-			.select({ status: CarsPending.status, count: count() })
-			.from(CarsPending)
-			.groupBy(CarsPending.status);
-
-		const carOwnerStats = await db
-			.select({ status: CarOwnersPending.status, count: count() })
-			.from(CarOwnersPending)
-			.groupBy(CarOwnersPending.status);
-
-		const ownerStats = await db
-			.select({ status: OwnersPending.status, count: count() })
-			.from(OwnersPending)
-			.groupBy(OwnersPending.status);
-
-		const tipsStats = await db
-			.select({ status: Tips.status, count: count() })
-			.from(Tips)
-			.groupBy(Tips.status);
-
-		const stats: TModerationStats = {
-			pending:
-				Number(
-					carStats.find((s) => s.status === 'pending')?.count || 0
-				) +
-				Number(
-					carOwnerStats.find((s) => s.status === 'pending')?.count ||
-						0
-				) +
-				Number(
-					ownerStats.find((s) => s.status === 'pending')?.count || 0
-				) +
-				Number(
-					tipsStats.find((s) => s.status === 'pending')?.count || 0
-				),
-			approved:
-				Number(
-					carStats.find((s) => s.status === 'approved')?.count || 0
-				) +
-				Number(
-					carOwnerStats.find((s) => s.status === 'approved')?.count ||
-						0
-				) +
-				Number(
-					ownerStats.find((s) => s.status === 'approved')?.count || 0
-				) +
-				Number(
-					tipsStats.find((s) => s.status === 'approved')?.count || 0
-				),
-			rejected:
-				Number(
-					carStats.find((s) => s.status === 'rejected')?.count || 0
-				) +
-				Number(
-					carOwnerStats.find((s) => s.status === 'rejected')?.count ||
-						0
-				) +
-				Number(
-					ownerStats.find((s) => s.status === 'rejected')?.count || 0
-				) +
-				Number(
-					tipsStats.find((s) => s.status === 'rejected')?.count || 0
-				),
-		};
-
-		return c.json(stats);
-	} catch (error) {
-		console.error('Error fetching moderation statistics:', error);
-
-		return c.json(
-			{
-				error: 'Internal server error',
-				details:
-					error instanceof Error
-						? error.message
-						: 'An unknown error occurred',
-			},
-			500
-		);
-	}
-});
 
 export default moderationRouter;

@@ -399,23 +399,3 @@ export const colorMap: Record<string, string> = {
 	'velocity red mica': '#C60505',
 	'vivid orange': '#FF5600',
 };
-
-export const colorMapSocial: Record<string, string> = {
-	...colorMap,
-	'aluminium silver metallic': '#6D6F64',
-	'blazing yellow mica': '#D79732',
-	'chaste white': '#6D6F64',
-	'classic white': '#6D6F64',
-	'crystal white pearlescent': '#6D6F64',
-	'evolution orange mica': '#DC7200',
-	'icy blue metallic': '#009799',
-	'light green': '#5F8A3E',
-	'lightning yellow': '#D79732',
-	'liquid silver metallic': '#6D6F64',
-	'metallic yellow': '#B89A2E',
-	'pure white': '#6D6F64',
-	'snowflake white pearl mica': '#6D6F64',
-	'sunburst yellow': '#D79732',
-	'sunlight silver metallic': '#6D6F64',
-	various: '#6D6F64',
-};

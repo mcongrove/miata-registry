@@ -21,6 +21,7 @@ import { Hono } from 'hono';
 import { createDb } from '../../db';
 import { Cars, Editions, Owners } from '../../db/schema';
 import { withAuth } from '../middleware/auth';
+import { withModerator } from '../middleware/moderator';
 import { allowLocalDevCarEditBypass } from '../utils/carEditAccess';
 import { formatEditionLabel, notifyModerator } from '../utils/notifyModerator';
 import { stripJpegMetadata } from '../utils/stripJpegMetadata';
@@ -28,7 +29,7 @@ import type { Bindings } from '../types';
 
 const photosRouter = new Hono<{ Bindings: Bindings }>();
 
-photosRouter.get('/index', async (c) => {
+photosRouter.get('/index', withAuth(), withModerator(), async (c) => {
 	try {
 		const carIds: string[] = [];
 		let cursor: string | undefined;

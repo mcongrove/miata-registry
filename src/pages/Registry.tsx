@@ -64,6 +64,7 @@ export const Registry = () => {
 		return 'asc';
 	});
 	const [isLoading, setIsLoading] = useState(true);
+	const [fetchError, setFetchError] = useState<string | null>(null);
 	const [cars, setCars] = useState<TCar[]>([]);
 	const [totalItems, setTotalItems] = useState(0);
 	const [totalPages, setTotalPages] = useState(1);
@@ -122,6 +123,7 @@ export const Registry = () => {
 	useEffect(() => {
 		const loadCars = async () => {
 			setIsLoading(true);
+			setFetchError(null);
 
 			try {
 				const params = new URLSearchParams({
@@ -158,6 +160,10 @@ export const Registry = () => {
 				setTotalPages(data.totalPages);
 			} catch (error) {
 				handleApiError(error);
+				setFetchError(
+					'Unable to load the registry. Please try again later.'
+				);
+				setCars([]);
 			} finally {
 				setIsLoading(false);
 			}
@@ -354,6 +360,7 @@ export const Registry = () => {
 						<div className="flex-1 my-3">
 							<RegistryTable
 								cars={isLoading ? [] : cars}
+								fetchError={fetchError}
 								isFiltered={activeFilters.length > 0}
 								isLoading={isLoading}
 								onSort={handleSort}
