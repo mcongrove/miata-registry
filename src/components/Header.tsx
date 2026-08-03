@@ -17,6 +17,17 @@
  */
 
 import { useAuth, useUser } from '@clerk/clerk-react';
+import {
+	flip,
+	FloatingPortal,
+	offset,
+	shift,
+	useClick,
+	useDismiss,
+	useFloating,
+	useHover,
+	useInteractions,
+} from '@floating-ui/react';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
@@ -38,76 +49,114 @@ interface DropdownProps {
 
 const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	const location = useLocation();
+	const [open, setOpen] = useState(false);
+
+	useEffect(() => {
+		setOpen(false);
+	}, [location.pathname]);
+
+	const { refs, floatingStyles, context } = useFloating({
+		open,
+		onOpenChange: setOpen,
+		placement: 'bottom-start',
+		middleware: [offset(8), flip(), shift({ padding: 16 })],
+	});
+
+	const click = useClick(context);
+	const hover = useHover(context);
+	const dismiss = useDismiss(context);
+	const { getReferenceProps, getFloatingProps } = useInteractions([
+		click,
+		hover,
+		dismiss,
+	]);
 
 	return (
-		<div className="relative group z-[60]">
+		<>
 			<button
+				ref={refs.setReference}
+				{...getReferenceProps()}
+				type="button"
 				className={`text-sm ${
 					isActive
 						? 'text-brg font-medium'
 						: 'text-brg-mid hover:text-brg'
 				} transition-colors flex items-center gap-1`}
 				data-cy={`header-${label.toLowerCase()}`}
+				aria-expanded={open}
 			>
 				{label}
 
 				<i className="fa-solid fa-fw fa-chevron-down text-xs" />
 			</button>
 
-			<div className="absolute left-0 top-full invisible group-hover:visible">
-				<div className="mt-2 p-2 w-48 bg-white rounded-lg shadow-lg border border-brg-border">
-					{items.map((item, index) => {
-						const path = item.to?.split('#')[0];
-						const matches =
-							!!path &&
-							(location.pathname === path ||
-								location.pathname.startsWith(`${path}/`));
-						// Prefer the longest matching path so /registry/editions
-						// doesn't also bold /registry
-						const longerMatch = items.some((other) => {
-							const otherPath = other.to?.split('#')[0];
-							if (
-								!otherPath ||
-								otherPath.length <= (path?.length ?? 0)
-							) {
-								return false;
-							}
-							return (
-								location.pathname === otherPath ||
-								location.pathname.startsWith(`${otherPath}/`)
+			{open && (
+				<FloatingPortal>
+					<div
+						ref={refs.setFloating}
+						style={floatingStyles}
+						{...getFloatingProps()}
+						className="z-[60] p-2 w-48 bg-white rounded-lg shadow-lg border border-brg-border"
+					>
+						{items.map((item, index) => {
+							const path = item.to?.split('#')[0];
+							const matches =
+								!!path &&
+								(location.pathname === path ||
+									location.pathname.startsWith(`${path}/`));
+							// Prefer the longest matching path so /registry/editions
+							// doesn't also bold /registry
+							const longerMatch = items.some((other) => {
+								const otherPath = other.to?.split('#')[0];
+								if (
+									!otherPath ||
+									otherPath.length <= (path?.length ?? 0)
+								) {
+									return false;
+								}
+								return (
+									location.pathname === otherPath ||
+									location.pathname.startsWith(
+										`${otherPath}/`
+									)
+								);
+							});
+							const itemIsActive = matches && !longerMatch;
+
+							const className = `block w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+								itemIsActive
+									? 'text-brg font-medium'
+									: 'text-brg-mid hover:text-brg hover:bg-brg-light'
+							}`;
+
+							return item.to ? (
+								<Link
+									key={item.to}
+									to={item.to}
+									className={className}
+									data-cy={`header-${item.label?.toString().toLowerCase().replace(/\s+/g, '-')}`}
+								>
+									{item.label}
+								</Link>
+							) : (
+								<button
+									key={index}
+									type="button"
+									onClick={() => {
+										item.onClick?.();
+										setOpen(false);
+									}}
+									className={className}
+									data-cy={`header-${item.label?.toString().toLowerCase().replace(/\s+/g, '-')}`}
+								>
+									{item.label}
+								</button>
 							);
-						});
-						const itemIsActive = matches && !longerMatch;
-
-						const className = `block w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-							itemIsActive
-								? 'text-brg font-medium'
-								: 'text-brg-mid hover:text-brg hover:bg-brg-light'
-						}`;
-
-						return item.to ? (
-							<Link
-								key={item.to}
-								to={item.to}
-								className={className}
-								data-cy={`header-${item.label?.toString().toLowerCase().replace(/\s+/g, '-')}`}
-							>
-								{item.label}
-							</Link>
-						) : (
-							<button
-								key={index}
-								onClick={item.onClick}
-								className={className}
-								data-cy={`header-${item.label?.toString().toLowerCase().replace(/\s+/g, '-')}`}
-							>
-								{item.label}
-							</button>
-						);
-					})}
-				</div>
-			</div>
-		</div>
+						})}
+					</div>
+				</FloatingPortal>
+			)}
+		</>
 	);
 };
 
