@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { Button } from '../components/Button';
 import { Credit } from '../components/Credit';
+import { RegisterCta } from '../components/RegisterCta';
 import { useModal } from '../context/ModalContext';
 import { usePageMeta } from '../hooks/usePageMeta';
 
@@ -421,49 +422,7 @@ export const Home = () => {
 				</div>
 				*/}
 
-				<div className="bg-brg-light">
-					<div className="flex flex-row items-stretch">
-						<div className="hidden lg:block w-1/3 relative overflow-hidden">
-							<img
-								src="https://store.miataregistry.com/app/car/about-4.jpg"
-								className="absolute inset-0 w-full h-full object-cover object-bottom scale-110"
-								alt="Miata at the Golden Gate Bridge"
-							/>
-
-							<svg
-								className="absolute inset-0 w-[calc(100%_-_1px)] h-full pointer-events-none"
-								preserveAspectRatio="none"
-								viewBox="0 0 100 100"
-							>
-								<path
-									d="M93 0 L100 100 L100 0 Z"
-									fill="#E8EBEA"
-								/>
-							</svg>
-						</div>
-
-						<div className="p-8 lg:w-2/3 lg:p-12 -ml-px bg-brg-light z-10">
-							<h2 className="text-xl lg:text-4xl font-bold text-brg mb-4">
-								Register your limited edition Miata
-							</h2>
-
-							<p className="text-brg-mid lg:text-lg mb-6 lg:mb-8">
-								Help preserve Miata history by registering your
-								limited edition model. Every registration adds
-								to our collective knowledge and helps document
-								these special cars for future generations.
-							</p>
-
-							<Button
-								withArrow
-								onClick={() => openModal('register')}
-								data-cy="home-cta-register-your-miata"
-							>
-								Claim your Miata
-							</Button>
-						</div>
-					</div>
-				</div>
+				<RegisterCta dataCy="home-cta-register-your-miata" />
 			</main>
 		</>
 	);

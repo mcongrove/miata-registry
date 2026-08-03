@@ -44,7 +44,7 @@ const CACHE_TTL = {
 	CAR_SUMMARY: 60 * 60 * 24 * 7, // 7 days
 };
 
-const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v7:';
+const CARS_LIST_CACHE_KEY_PREFIX = 'cars:list:v8:';
 
 const rarityScoreExpr = carDisplayRarityScoreExpr;
 
@@ -197,6 +197,7 @@ carsRouter.get('/', async (c) => {
 
 		const baseQuery = db
 			.select({
+				color: Cars.color,
 				current_owner: {
 					country: Owners.country,
 					id: Owners.id,

@@ -195,11 +195,11 @@ Systems differ (Actions vs dashboard Git integration), but agents should assume 
 
 ### KV cache keys
 
-Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape (currently `cars:list:v7:`).
+Bump `CARS_LIST_CACHE_KEY_PREFIX` in `cars.ts` when changing list response shape (currently `cars:list:v8:`).
 
 | Key pattern                                                 | Purpose                   |
 | ----------------------------------------------------------- | ------------------------- |
-| `cars:list:v7:{params}`                                     | Registry browse list      |
+| `cars:list:v8:{params}`                                     | Registry browse list      |
 | `cars:details:{id}`                                         | Car profile               |
 | `cars:summary:{id}`                                         | Car summary               |
 | `editions:all:v3`, `editions:names:v3`, `editions:slug:v3:` | Edition data              |

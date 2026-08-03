@@ -48,7 +48,12 @@ export const RegistryTable = ({
 		{ header: 'Year', key: 'edition.year', width: 'w-20' },
 		{ header: 'Gen.', key: 'edition.generation', width: 'w-20' },
 		{ header: 'Edition', key: 'edition.name', width: 'w-44' },
-		{ header: 'Color', key: 'edition.color', width: 'w-52' },
+		{
+			header: 'Color',
+			key: 'color',
+			width: 'w-52',
+			sortable: false,
+		},
 		{ header: 'Sequence #', key: 'sequence', width: 'w-36' },
 		{ header: 'Rarity', key: 'rarity_score', width: 'w-40' },
 		{ header: 'Owner', key: 'owner.name', width: 'w-44' },
@@ -74,31 +79,43 @@ export const RegistryTable = ({
 				<table className="min-w-full border-collapse">
 					<thead>
 						<tr className="bg-brg-light sticky top-0 z-10">
-							{columns.map(({ header, key, width }) => (
-								<th
-									key={header}
-									className={twMerge(
-										width,
-										'px-4 py-3 text-left text-xs font-semibold text-brg cursor-pointer border-b border-brg-light bg-brg-light whitespace-nowrap'
-									)}
-									onClick={handleSort(key)}
-								>
-									<div className="flex items-center">
-										{header}
-										<span
-											className={`ml-1 ${
-												sortColumn && sortColumn === key
-													? 'opacity-100'
-													: 'opacity-0'
-											}`}
-										>
-											{sortDirection === 'asc'
-												? '↑'
-												: '↓'}
-										</span>
-									</div>
-								</th>
-							))}
+							{columns.map(
+								({ header, key, width, sortable = true }) => (
+									<th
+										key={header}
+										className={twMerge(
+											width,
+											'px-4 py-3 text-left text-xs font-semibold text-brg border-b border-brg-light bg-brg-light whitespace-nowrap',
+											sortable
+												? 'cursor-pointer'
+												: 'cursor-default'
+										)}
+										onClick={
+											sortable
+												? handleSort(key)
+												: undefined
+										}
+									>
+										<div className="flex items-center">
+											{header}
+											{sortable ? (
+												<span
+													className={`ml-1 ${
+														sortColumn &&
+														sortColumn === key
+															? 'opacity-100'
+															: 'opacity-0'
+													}`}
+												>
+													{sortDirection === 'asc'
+														? '↑'
+														: '↓'}
+												</span>
+											) : null}
+										</div>
+									</th>
+								)
+							)}
 						</tr>
 					</thead>
 
@@ -122,172 +139,187 @@ export const RegistryTable = ({
 								</td>
 							</tr>
 						) : (
-							cars.map((car) => (
-								<tr
-									key={car.id}
-									className="bg-white hover:bg-brg-light/25 transition-colors cursor-pointer"
-									onClick={(e) => {
-										if (
-											!(e.target as HTMLElement).closest(
-												'a'
-											)
-										) {
-											if (e.metaKey || e.ctrlKey) {
-												window.open(
-													`/registry/${car.id}`,
-													'_blank'
-												);
-											} else {
-												navigate(`/registry/${car.id}`);
+							cars.map((car) => {
+								const displayColor =
+									car.color || car.edition?.color || '';
+								const isVarious =
+									displayColor.toLowerCase() === 'various';
+
+								return (
+									<tr
+										key={car.id}
+										className="bg-white hover:bg-brg-light/25 transition-colors cursor-pointer"
+										onClick={(e) => {
+											if (
+												!(
+													e.target as HTMLElement
+												).closest('a')
+											) {
+												if (e.metaKey || e.ctrlKey) {
+													window.open(
+														`/registry/${car.id}`,
+														'_blank'
+													);
+												} else {
+													navigate(
+														`/registry/${car.id}`
+													);
+												}
 											}
-										}
-									}}
-								>
-									<td className="px-4 py-3 whitespace-nowrap font-mono">
-										<div className="pointer-events-auto">
-											{car.edition?.year}
-										</div>
-									</td>
-									<td className="px-4 py-3 whitespace-nowrap">
-										{car.edition?.generation}
-									</td>
-									<td className="px-4 py-3 whitespace-nowrap">
-										<Link
-											to={`/registry/${car.id}`}
-											className="text-brg hover:underline"
-											onClick={(e) => e.stopPropagation()}
-										>
-											{car.edition?.name}
-										</Link>
-									</td>
-									<td className="px-4 py-3 whitespace-nowrap">
-										<div className="flex items-center gap-2">
-											<span
-												className={twMerge(
-													`w-4 h-3 rounded-sm inline-block`,
-													car.edition?.color?.toLowerCase() ===
-														'various'
-														? 'bg-gradient-to-r from-red-500 from-10% via-sky-500 via-50% to-purple-500 to-90%'
-														: ''
-												)}
-												style={{
-													backgroundColor:
-														car.edition?.color?.toLowerCase() !==
-														'various'
-															? colorMap[
-																	car.edition?.color?.toLowerCase() ||
-																		''
-																] || '#CCCCCC'
-															: undefined,
-												}}
-											/>
-											{car.edition?.color}
-										</div>
-									</td>
-									{hasSequence(car.sequence) ? (
-										<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40">
-											<div className="flex items-center justify-between gap-2">
-												<span
-													className={
-														car.destroyed
-															? 'line-through text-brg-mid'
-															: undefined
-													}
-												>
-													{car.sequence?.toLocaleString()}
-												</span>
-												{car.edition
-													?.total_produced && (
-													<span className="text-brg-border">
-														of{' '}
-														{car.edition.total_produced.toLocaleString()}
-													</span>
-												)}
+										}}
+									>
+										<td className="px-4 py-3 whitespace-nowrap font-mono">
+											<div className="pointer-events-auto">
+												{car.edition?.year}
 											</div>
 										</td>
-									) : (
-										<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40 text-brg-border">
-											<div className="flex items-center justify-between gap-2">
+										<td className="px-4 py-3 whitespace-nowrap">
+											{car.edition?.generation}
+										</td>
+										<td className="px-4 py-3 whitespace-nowrap">
+											<Link
+												to={`/registry/${car.id}`}
+												className="text-brg hover:underline"
+												onClick={(e) =>
+													e.stopPropagation()
+												}
+											>
+												{car.edition?.name}
+											</Link>
+										</td>
+										<td className="px-4 py-3 whitespace-nowrap">
+											<div className="flex items-center gap-2">
 												<span
-													className={
-														car.destroyed
-															? 'line-through'
-															: undefined
+													className={twMerge(
+														'inline-block h-3 w-4 rounded-sm',
+														isVarious
+															? 'bg-gradient-to-r from-red-500 from-10% via-sky-500 via-50% to-purple-500 to-90%'
+															: ''
+													)}
+													style={
+														isVarious
+															? undefined
+															: {
+																	backgroundColor:
+																		colorMap[
+																			displayColor.toLowerCase()
+																		] ||
+																		'#CCCCCC',
+																}
 													}
+												/>
+												{displayColor}
+											</div>
+										</td>
+										{hasSequence(car.sequence) ? (
+											<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40">
+												<div className="flex items-center justify-between gap-2">
+													<span
+														className={
+															car.destroyed
+																? 'line-through text-brg-mid'
+																: undefined
+														}
+													>
+														{car.sequence?.toLocaleString()}
+													</span>
+													{car.edition
+														?.total_produced && (
+														<span className="text-brg-border">
+															of{' '}
+															{car.edition.total_produced.toLocaleString()}
+														</span>
+													)}
+												</div>
+											</td>
+										) : (
+											<td className="px-4 py-3 whitespace-nowrap font-mono max-w-40 text-brg-border">
+												<div className="flex items-center justify-between gap-2">
+													<span
+														className={
+															car.destroyed
+																? 'line-through'
+																: undefined
+														}
+													>
+														Unknown
+													</span>
+													{car.edition
+														?.total_produced && (
+														<span>
+															of{' '}
+															{car.edition.total_produced.toLocaleString()}
+														</span>
+													)}
+												</div>
+											</td>
+										)}
+										<td className="px-4 py-3 whitespace-nowrap">
+											{car.destroyed ? (
+												<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200">
+													Destroyed
+												</span>
+											) : (
+												<Chip
+													score={
+														car.rarity_score ?? 0
+													}
+												/>
+											)}
+										</td>
+										<td className="px-4 py-3 whitespace-nowrap">
+											{car.current_owner?.name ? (
+												car.current_owner.name
+											) : (
+												<button
+													onClick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+
+														openModal('register', {
+															prefilledData: {
+																edition_name: `${car.edition?.year} ${car.edition?.name}`,
+																id: car.id,
+																sequence:
+																	car.sequence?.toString() ||
+																	'',
+																vin:
+																	car.vin ||
+																	'',
+															},
+														});
+													}}
+													className="text-brg-border hover:text-brg hover:underline relative z-0"
 												>
+													Claim
+												</button>
+											)}
+										</td>
+										<td className="px-4 py-3 whitespace-nowrap">
+											{car.current_owner?.country ? (
+												<span className="flex items-center gap-2">
+													<img
+														src={`https://flagcdn.com/16x12/${car.current_owner?.country.toLowerCase()}.png`}
+														alt={
+															car.current_owner
+																?.country
+														}
+														className="w-4 h-3"
+													/>
+													{getCountryDisplayName(
+														car.current_owner
+															?.country || ''
+													)}
+												</span>
+											) : (
+												<span className="text-brg-border">
 													Unknown
 												</span>
-												{car.edition
-													?.total_produced && (
-													<span>
-														of{' '}
-														{car.edition.total_produced.toLocaleString()}
-													</span>
-												)}
-											</div>
+											)}
 										</td>
-									)}
-									<td className="px-4 py-3 whitespace-nowrap">
-										{car.destroyed ? (
-											<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200">
-												Destroyed
-											</span>
-										) : (
-											<Chip
-												score={car.rarity_score ?? 0}
-											/>
-										)}
-									</td>
-									<td className="px-4 py-3 whitespace-nowrap">
-										{car.current_owner?.name ? (
-											car.current_owner.name
-										) : (
-											<button
-												onClick={(e) => {
-													e.preventDefault();
-													e.stopPropagation();
-
-													openModal('register', {
-														prefilledData: {
-															edition_name: `${car.edition?.year} ${car.edition?.name}`,
-															id: car.id,
-															sequence:
-																car.sequence?.toString() ||
-																'',
-															vin: car.vin || '',
-														},
-													});
-												}}
-												className="text-brg-border hover:text-brg hover:underline relative z-0"
-											>
-												Claim
-											</button>
-										)}
-									</td>
-									<td className="px-4 py-3 whitespace-nowrap">
-										{car.current_owner?.country ? (
-											<span className="flex items-center gap-2">
-												<img
-													src={`https://flagcdn.com/16x12/${car.current_owner?.country.toLowerCase()}.png`}
-													alt={
-														car.current_owner
-															?.country
-													}
-													className="w-4 h-3"
-												/>
-												{getCountryDisplayName(
-													car.current_owner
-														?.country || ''
-												)}
-											</span>
-										) : (
-											<span className="text-brg-border">
-												Unknown
-											</span>
-										)}
-									</td>
-								</tr>
-							))
+									</tr>
+								);
+							})
 						)}
 					</tbody>
 				</table>

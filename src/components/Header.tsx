@@ -21,6 +21,7 @@ import {
 	flip,
 	FloatingPortal,
 	offset,
+	safePolygon,
 	shift,
 	useClick,
 	useDismiss,
@@ -63,7 +64,9 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 	});
 
 	const click = useClick(context);
-	const hover = useHover(context);
+	const hover = useHover(context, {
+		handleClose: safePolygon({ blockPointerEvents: true }),
+	});
 	const dismiss = useDismiss(context);
 	const { getReferenceProps, getFloatingProps } = useInteractions([
 		click,

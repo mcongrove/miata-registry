@@ -311,3 +311,42 @@ export function editionPageJsonLd(
 		],
 	};
 }
+
+const ABOUT_FAQ = [
+	{
+		question: 'What is the Miata Registry?',
+		answer: 'The Miata Registry is a community-driven database that documents limited edition Mazda Miatas worldwide. It brings together production numbers, ownership history, photos, and stories for editions that were never collected in one place before.',
+	},
+	{
+		question: 'What counts as a limited edition Miata?',
+		answer: 'A limited edition Miata is a factory-built variant with a defined production run, distinct trim, color, or equipment, and documented release by Mazda or a regional distributor. Examples include the 1991 Special Edition, 10th Anniversary, and 30th Anniversary editions.',
+	},
+	{
+		question: 'How are cars verified?',
+		answer: 'Entries are reviewed by moderators before they appear as claimed. Owners submit documentation such as VIN records, window stickers, or title information along with photos. Corrections are updated after review.',
+	},
+	{
+		question: 'How is rarity calculated?',
+		answer: 'Each car receives a rarity score based on production numbers, edition characteristics, preservation, documentation, mileage, and age. The methodology weights factory rarity against how well an individual car has been preserved over time.',
+	},
+	{
+		question: 'How do I register my car?',
+		answer: "Create a free account, find your edition in the registry or start a new claim, and submit your car's information. A moderator will review your submission and approve the claim once verified.",
+	},
+] as const;
+
+export function aboutPageJsonLd() {
+	return {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		url: `${SITE_ORIGIN}/about`,
+		mainEntity: ABOUT_FAQ.map(({ question, answer }) => ({
+			'@type': 'Question',
+			name: question,
+			acceptedAnswer: {
+				'@type': 'Answer',
+				text: answer,
+			},
+		})),
+	};
+}

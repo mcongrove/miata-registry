@@ -24,8 +24,10 @@ import { Button } from '../components/Button';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Field } from '../components/form/Field';
 import { TextField } from '../components/form/TextField';
+import { JsonLd } from '../components/JsonLd';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { handleApiError } from '../utils/common';
+import { aboutPageJsonLd } from '../utils/jsonLd';
 
 const getCountCodeCommits = async (owner: string, repo: string) => {
 	const response = await fetch(
@@ -169,6 +171,8 @@ export const About = () => {
 
 	return (
 		<main className="flex-1 px-8 pt-28 lg:pt-40 lg:px-0 pb-16 flex flex-col gap-16">
+			<JsonLd data={aboutPageJsonLd()} />
+
 			<div className="container mx-auto flex flex-col gap-12 lg:gap-0 lg:flex-row">
 				<div className="relative z-10 flex flex-col gap-8 lg:w-1/2 lg:bg-white lg:pr-6">
 					<div id="introduction" className="flex flex-col gap-4">
@@ -248,7 +252,7 @@ export const About = () => {
 			<div className="container mx-auto">
 				<div
 					id="statistics"
-					className="flex flex-col gap-8 lg:gap-12 py-0 lg:py-24"
+					className="flex flex-col gap-8 py-0 lg:gap-12 lg:pt-24"
 				>
 					<h2
 						className={`text-3xl font-medium text-center ${getHighlightClass('statistics')}`}
@@ -287,18 +291,20 @@ export const About = () => {
 			</div>
 
 			<div className="container mx-auto">
-				<div id="faq" className="flex flex-col gap-8 py-0 lg:py-16">
-					<h2 className="text-3xl font-medium text-center text-brg">
+				<div
+					id="faq"
+					className="flex flex-col gap-8 py-8 lg:gap-12 lg:py-12"
+				>
+					<h2 className="text-3xl font-medium text-center text-brg text-balance">
 						Frequently Asked Questions
 					</h2>
 
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+					<div className="grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-2">
 						<div>
-							<h3 className="text-lg font-medium text-brg mb-2">
+							<h3 className="mb-2 text-lg font-medium text-brg text-balance">
 								What is the Miata Registry?
 							</h3>
-
-							<p className="text-sm text-brg-mid">
+							<p className="text-pretty text-sm text-brg-mid">
 								The Miata Registry is a community-driven
 								database that documents limited edition Mazda
 								Miatas worldwide. It brings together production
@@ -309,11 +315,10 @@ export const About = () => {
 						</div>
 
 						<div>
-							<h3 className="text-lg font-medium text-brg mb-2">
+							<h3 className="mb-2 text-lg font-medium text-brg text-balance">
 								What counts as a limited edition Miata?
 							</h3>
-
-							<p className="text-sm text-brg-mid">
+							<p className="text-pretty text-sm text-brg-mid">
 								A limited edition Miata is a factory-built
 								variant with a defined production run, distinct
 								trim, color, or equipment, and documented
@@ -324,25 +329,10 @@ export const About = () => {
 						</div>
 
 						<div>
-							<h3 className="text-lg font-medium text-brg mb-2">
-								How are cars verified?
-							</h3>
-
-							<p className="text-sm text-brg-mid">
-								Entries are reviewed by moderators before they
-								appear as claimed. Owners submit documentation
-								such as VIN records, window stickers, or title
-								information along with photos. Corrections are
-								updated after review.
-							</p>
-						</div>
-
-						<div>
-							<h3 className="text-lg font-medium text-brg mb-2">
+							<h3 className="mb-2 text-lg font-medium text-brg text-balance">
 								How is rarity calculated?
 							</h3>
-
-							<p className="text-sm text-brg-mid">
+							<p className="text-pretty text-sm text-brg-mid">
 								Each car receives a rarity score based on
 								production numbers, edition characteristics,
 								preservation, documentation, mileage, and age.
@@ -356,16 +346,14 @@ export const About = () => {
 							</p>
 						</div>
 
-						<div className="lg:col-span-2">
-							<h3 className="text-lg font-medium text-brg mb-2">
+						<div>
+							<h3 className="mb-2 text-lg font-medium text-brg text-balance">
 								How do I register my car?
 							</h3>
-
-							<p className="text-sm text-brg-mid">
+							<p className="text-pretty text-sm text-brg-mid">
 								Create a free account, find your edition in the
 								registry or start a new claim, and submit your
-								VIN, sequence number, photos, and any ownership
-								documentation you have. A moderator will review
+								car&apos;s information. A moderator will review
 								your submission and approve the claim once
 								verified.
 							</p>
@@ -452,16 +440,15 @@ export const About = () => {
 						<h2
 							className={`mb-3 lg:mb-5 text-xl font-medium ${getHighlightClass('verification')}`}
 						>
-							Community Verification
+							How are cars verified?
 						</h2>
 
 						<p className="text-sm text-brg-mid">
-							Community verification is a crucial aspect of our
-							registry. We strive to ensure the authenticity of
-							entries and the integrity of the data. This
-							verification process involves multiple layers of
-							review and validation to maintain the accuracy and
-							trustworthiness of the information.
+							Entries are reviewed by moderators before they
+							appear as claimed. Owners submit documentation such
+							as VIN records, window stickers, or title
+							information along with photos. Corrections are
+							updated after review.
 						</p>
 
 						<p className="text-sm text-brg-mid">
