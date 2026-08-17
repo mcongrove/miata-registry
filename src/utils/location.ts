@@ -636,6 +636,10 @@ const lookupCountryCode = (value: string): string | undefined => {
 		return 'US';
 	}
 
+	if (upper === 'DEUTSCHLAND') {
+		return 'DE';
+	}
+
 	const fromName = COUNTRY_NAME_TO_CODE[trimmed.toLowerCase()];
 
 	if (fromName) {
@@ -709,6 +713,17 @@ export const parseLocation = (location: string): TLocation => {
 
 	if (parts.length === 2) {
 		const asState = lookupStateCode(parts[1]);
+		const asCountry = lookupCountryCode(parts[1]);
+
+		// Autocomplete + formatLocation emit "Berlin, DE" (city, country) and
+		// "Wilmington, DE, US" (city, state, country). Prefer country on a
+		// 2-part collision so the Germany string doesn't become Delaware.
+		if (asCountry && asCountry !== 'US' && asCountry !== 'CA') {
+			return normalizeLocation({
+				city: parts[0],
+				country: asCountry,
+			});
+		}
 
 		if (asState) {
 			return normalizeLocation({
@@ -717,8 +732,6 @@ export const parseLocation = (location: string): TLocation => {
 				country: '',
 			});
 		}
-
-		const asCountry = lookupCountryCode(parts[1]);
 
 		if (asCountry) {
 			return normalizeLocation({

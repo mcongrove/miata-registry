@@ -252,3 +252,5 @@ Worker logs may require a paid Cloudflare plan. For cron debugging, prefer `ARCH
 - "Fixing" intentional lint suppressions or hook dependency patterns without reading context.
 - `twMerge` treats `bg-[right_…]` / similar position arbitrary `bg-*` as conflicting with `bg-white` and drops the fill — use `[background-position:…]` (etc.) for select chevrons.
 - Treat news articles as D1 records; `body` may use Markdown, but don't create root Markdown source files.
+- `owners.links` is `blob({ mode: 'json' })` — Drizzle serializes via `Buffer`, which Workers don't have. Write with `sql\`json(${jsonString})\`` (see `owners.ts` PATCH / `approvePendingOwner`). Don't pass a JS object.
+- `formatLocation` / `parseLocation` must round-trip. Autocomplete stores Germany as `Berlin, DE` and Delaware as `Berlin, DE, US` — 2-part `DE` is the country, not the state.

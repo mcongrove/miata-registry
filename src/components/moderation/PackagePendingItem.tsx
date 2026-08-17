@@ -125,14 +125,21 @@ export const PackagePendingItem = ({
 	const information = pkg.carOwner?.proposed?.information;
 	const hasInformation =
 		typeof information === 'string' && information.trim().length > 0;
+	const initialMileage =
+		pkg.car?.proposed?.mileage != null
+			? String(pkg.car.proposed.mileage)
+			: '';
+	const initialStory = pkg.car?.proposed?.story?.trim() ?? '';
+	const showCarNotesFields =
+		hasInformation || Boolean(initialMileage) || Boolean(initialStory);
 
 	const [name, setName] = useState(initialOwner?.name ?? '');
 	const [city, setCity] = useState(initialOwner?.city ?? '');
 	const [state, setState] = useState(initialOwner?.state ?? '');
 	const [country, setCountry] = useState(initialOwner?.country ?? '');
 	const [instagram, setInstagram] = useState('');
-	const [mileage, setMileage] = useState('');
-	const [story, setStory] = useState('');
+	const [mileage, setMileage] = useState(initialMileage);
+	const [story, setStory] = useState(initialStory);
 
 	const ownerEdits = useMemo(
 		() => ({
@@ -173,7 +180,7 @@ export const PackagePendingItem = ({
 			};
 		}
 
-		if (hasInformation) {
+		if (showCarNotesFields) {
 			const parsedMileage = Number(mileage.replace(/,/g, '').trim());
 			const carOverride: NonNullable<PackageApproveOverrides['car']> = {};
 
@@ -224,7 +231,7 @@ export const PackagePendingItem = ({
 			'manufacture_prefecture',
 			'vin_decode_status',
 			'vin_details',
-			...(hasInformation ? NOTES_CAR_FIELDS : []),
+			...(showCarNotesFields ? NOTES_CAR_FIELDS : []),
 		]);
 
 		for (const field of orderedCarDiffFields(pkg.car)) {
@@ -342,12 +349,14 @@ export const PackagePendingItem = ({
 							edited: Boolean(instagram.trim()),
 						}),
 			});
+		}
 
+		if (showCarNotesFields) {
 			addDiff({
 				key: 'mileage',
 				label: 'mileage',
-				oldValue: undefined,
-				newValue: mileage,
+				oldValue: pkg.car?.current?.mileage,
+				newValue: mileage || pkg.car?.proposed?.mileage,
 				...(status
 					? {}
 					: {
@@ -355,15 +364,15 @@ export const PackagePendingItem = ({
 							onEditChange: setMileage,
 							editPlaceholder: 'Mileage',
 							editType: 'text',
-							edited: Boolean(mileage.trim()),
+							edited: mileage.trim() !== initialMileage,
 						}),
 			});
 
 			addDiff({
 				key: 'story',
 				label: 'story',
-				oldValue: undefined,
-				newValue: story,
+				oldValue: pkg.car?.current?.story,
+				newValue: story || pkg.car?.proposed?.story,
 				...(status
 					? {}
 					: {
@@ -371,7 +380,7 @@ export const PackagePendingItem = ({
 							onEditChange: setStory,
 							editPlaceholder: 'Story / condition notes',
 							editType: 'textarea',
-							edited: Boolean(story.trim()),
+							edited: story.trim() !== initialStory,
 						}),
 			});
 		}

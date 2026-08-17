@@ -119,6 +119,10 @@ export const parseOwnerLinks = (
 const ownerLinksPendingValue = (instagram: string | null): string | null =>
 	instagram ? JSON.stringify({ instagram }) : null;
 
+/** owners.links is blob-json; Drizzle's serializer uses Buffer (missing in Workers). */
+const ownerLinksBlobValue = (instagram: string | null) =>
+	instagram ? sql`json(${JSON.stringify({ instagram })})` : null;
+
 export async function approvePendingOwner(db: DrizzleDb, pendingId: string) {
 	const pendingOwner = await db
 		.select()
@@ -137,9 +141,15 @@ export async function approvePendingOwner(db: DrizzleDb, pendingId: string) {
 		...ownerData
 	} = pendingOwner;
 
+	const parsedLinks = parseOwnerLinks(rawLinks);
+
 	await db.insert(Owners).values({
 		...ownerData,
-		links: parseOwnerLinks(rawLinks),
+		links: ownerLinksBlobValue(
+			parsedLinks?.instagram ?? null
+		) as unknown as {
+			instagram: string | null;
+		} | null,
 	});
 
 	await db
@@ -482,12 +492,13 @@ export async function approvePendingPackage(
 		userId = approvedOwner?.userId ?? userId;
 	} else if (overrides?.owner?.instagram !== undefined) {
 		const instagram = normalizeInstagramHandle(overrides.owner.instagram);
-		const linksJson = JSON.stringify({ instagram });
 
 		await db
 			.update(Owners)
 			.set({
-				links: instagram ? sql`json(${linksJson})` : null,
+				links: ownerLinksBlobValue(instagram) as unknown as {
+					instagram: string | null;
+				} | null,
 			})
 			.where(eq(Owners.id, pendingCarOwner.owner_id));
 
