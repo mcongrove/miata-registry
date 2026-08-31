@@ -26,6 +26,7 @@ import { CarsPending } from '../../db/schema/CarsPending';
 import { Editions } from '../../db/schema/Editions';
 import { Owners } from '../../db/schema/Owners';
 import { OwnersPending } from '../../db/schema/OwnersPending';
+import { parsePriorOwnerIntent } from '../../utils/priorOwnerIntent';
 import { withAuth } from '../middleware/auth';
 import { withModerator } from '../middleware/moderator';
 import { Bindings } from '../types';
@@ -111,15 +112,35 @@ moderationRouter.get('/carOwners', withAuth(), withModerator(), async (c) => {
 
 		const formattedChanges = await Promise.all(
 			pendingCarOwners.map(async (pending) => {
-				const [current, car] = await Promise.all([
+				const intent = parsePriorOwnerIntent(pending.information);
+				const currentDateStart =
+					intent?.action === 'update'
+						? intent.previous_date_start
+						: intent?.action === 'delete'
+							? intent.car_owner_date_start
+							: undefined;
+
+				const [current, car, owner] = await Promise.all([
 					db
 						.select()
 						.from(CarOwners)
 						.where(
-							and(
-								eq(CarOwners.car_id, pending.car_id),
-								eq(CarOwners.owner_id, pending.owner_id)
-							)
+							currentDateStart
+								? and(
+										eq(CarOwners.car_id, pending.car_id),
+										eq(
+											CarOwners.owner_id,
+											pending.owner_id
+										),
+										eq(
+											CarOwners.date_start,
+											currentDateStart
+										)
+									)
+								: and(
+										eq(CarOwners.car_id, pending.car_id),
+										eq(CarOwners.owner_id, pending.owner_id)
+									)
 						)
 						.get(),
 					db
@@ -128,6 +149,16 @@ moderationRouter.get('/carOwners', withAuth(), withModerator(), async (c) => {
 						})
 						.from(Cars)
 						.where(eq(Cars.id, pending.car_id))
+						.get(),
+					db
+						.select({
+							city: Owners.city,
+							country: Owners.country,
+							name: Owners.name,
+							state: Owners.state,
+						})
+						.from(Owners)
+						.where(eq(Owners.id, pending.owner_id))
 						.get(),
 				]);
 
@@ -139,7 +170,15 @@ moderationRouter.get('/carOwners', withAuth(), withModerator(), async (c) => {
 					created_at,
 					status,
 					car_current_owner_id: car?.current_owner_id ?? null,
-					current: current || null,
+					current: current
+						? {
+								...current,
+								city: owner?.city ?? null,
+								country: owner?.country ?? null,
+								name: owner?.name ?? null,
+								state: owner?.state ?? null,
+							}
+						: null,
 					proposed: proposedWithoutMeta,
 				};
 			})

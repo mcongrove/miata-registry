@@ -132,6 +132,7 @@ Don't overwrite `PRODUCT.md` or `DESIGN.md` without asking. If design context is
 ## Domain logic
 
 - **Moderation approval order:** owner → car → car_owner.
+- **Prior-owner queue:** `car_owners_pending.information` JSON with `kind: "prior_owner"` is an add/update/remove intent, not claim notes. Render as its own card (`PriorOwnerPendingItem`); do not package it with `cars_pending` or show Instagram/mileage/story editors. Approve/reject via `/moderation/carOwner/:id`, not `/package`.
 - **`cars.updated_date`** is set only when a **car_owner** submission is approved (initial claim or new ownership), not on field edits or car-only approvals. Backfill source: `car_owners_pending.created_at` (unix seconds → ISO).
 - **Pending `created_at` fields** in `*_pending` tables are unix timestamps (integers), not ISO strings.
 - **Registry default sort:** `updated_date` desc (newly verified first), then edition year/name/sequence.

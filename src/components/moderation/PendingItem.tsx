@@ -17,6 +17,7 @@
  */
 
 import { Children, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { Button } from '../Button';
 
@@ -29,6 +30,7 @@ export const PendingItem = ({
 	onReject,
 	ownerId,
 	status,
+	title,
 }: {
 	carId?: string;
 	children: React.ReactNode;
@@ -38,6 +40,7 @@ export const PendingItem = ({
 	onReject?: () => void;
 	ownerId?: string;
 	status?: 'approved' | 'rejected';
+	title?: string;
 }) => {
 	const hasChildren = Children.count(children) > 0;
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -67,6 +70,10 @@ export const PendingItem = ({
 		<div className="bg-white rounded-lg border border-brg-light">
 			<div className="flex items-center justify-between gap-4 py-3 px-4">
 				<div className="flex min-w-0 flex-col gap-1">
+					{title && (
+						<p className="text-sm font-medium text-brg">{title}</p>
+					)}
+
 					<h3 className="flex flex-wrap items-center gap-6">
 						{carId && (
 							<div
@@ -80,6 +87,13 @@ export const PendingItem = ({
 									Car ID
 								</span>{' '}
 								<span className="font-mono">{carId}</span>
+								<Link
+									to={`/registry/${carId}`}
+									className="ml-3 text-sm font-normal text-brg-border hover:text-brg hover:underline"
+									onClick={(event) => event.stopPropagation()}
+								>
+									View car
+								</Link>
 							</div>
 						)}
 

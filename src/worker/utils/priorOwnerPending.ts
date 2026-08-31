@@ -24,56 +24,14 @@ import {
 	isoDateFromForm,
 	type TPriorOwnerSubmitRow,
 } from '../../utils/ownershipHistory';
+import {
+	parsePriorOwnerIntent,
+	type PriorOwnerIntent,
+} from '../../utils/priorOwnerIntent';
+
+export { parsePriorOwnerIntent, type PriorOwnerIntent };
 
 type Db = ReturnType<typeof createDb>;
-
-export type PriorOwnerIntent =
-	| {
-			kind: 'prior_owner';
-			action: 'create';
-			owner: {
-				name: string;
-				city?: string | null;
-				state?: string | null;
-				country?: string | null;
-			};
-	  }
-	| {
-			kind: 'prior_owner';
-			action: 'update';
-			previous_date_start: string;
-			owner: {
-				name: string;
-				city?: string | null;
-				state?: string | null;
-				country?: string | null;
-			};
-	  }
-	| {
-			kind: 'prior_owner';
-			action: 'delete';
-			car_owner_date_start: string;
-	  };
-
-export function parsePriorOwnerIntent(
-	information: string | null | undefined
-): PriorOwnerIntent | null {
-	if (!information) {
-		return null;
-	}
-
-	try {
-		const parsed = JSON.parse(information) as PriorOwnerIntent;
-
-		if (parsed?.kind === 'prior_owner') {
-			return parsed;
-		}
-	} catch {
-		return null;
-	}
-
-	return null;
-}
 
 type ExistingPriorOwner = {
 	car_id: string;

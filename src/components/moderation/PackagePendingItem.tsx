@@ -24,6 +24,7 @@ import {
 	TOwner,
 	TOwnerPending,
 } from '../../types/Owner';
+import { parsePriorOwnerIntent } from '../../utils/priorOwnerIntent';
 import { Diff, clerkUserLink, copyableSubText, vinValidateLink } from './Diff';
 import { PendingItem } from './PendingItem';
 
@@ -123,8 +124,11 @@ export const PackagePendingItem = ({
 }) => {
 	const initialOwner = pkg.owner?.proposed;
 	const information = pkg.carOwner?.proposed?.information;
+	const priorOwnerIntent = parsePriorOwnerIntent(information);
 	const hasInformation =
-		typeof information === 'string' && information.trim().length > 0;
+		!priorOwnerIntent &&
+		typeof information === 'string' &&
+		information.trim().length > 0;
 	const initialMileage =
 		pkg.car?.proposed?.mileage != null
 			? String(pkg.car.proposed.mileage)
@@ -315,7 +319,12 @@ export const PackagePendingItem = ({
 
 	if (pkg.carOwner) {
 		for (const field of Object.keys(pkg.carOwner.proposed)) {
-			if (field === 'car_id' || field === 'owner_id' || field === 'id') {
+			if (
+				field === 'car_id' ||
+				field === 'owner_id' ||
+				field === 'id' ||
+				(field === 'information' && priorOwnerIntent)
+			) {
 				continue;
 			}
 

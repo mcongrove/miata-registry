@@ -26,6 +26,10 @@ import {
 	type TPackage,
 } from '../components/moderation/PackagePendingItem';
 import { PendingItem } from '../components/moderation/PendingItem';
+import {
+	PriorOwnerPendingItem,
+	isPriorOwnerPending,
+} from '../components/moderation/PriorOwnerPendingItem';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { TCar, TCarPending } from '../types/Car';
 import {
@@ -101,7 +105,7 @@ export const Moderation = () => {
 	>({});
 
 	const markResolved = (
-		type: 'car' | 'package' | 'photo',
+		type: 'car' | 'package' | 'photo' | 'carOwner',
 		id: string,
 		status: 'approved' | 'rejected'
 	) => {
@@ -111,20 +115,28 @@ export const Moderation = () => {
 		}));
 	};
 
+	const priorOwnerPendings = useMemo(
+		() => pendingCarOwners.filter(isPriorOwnerPending),
+		[pendingCarOwners]
+	);
+
 	const pendingPackages = useMemo<TPackage[]>(
 		() =>
-			pendingCarOwners.map((carOwner) => ({
-				car:
-					pendingCars.find(
-						(car) => car.proposed.id === carOwner.proposed.car_id
-					) ?? null,
-				carOwner,
-				owner:
-					pendingOwners.find(
-						(owner) =>
-							owner.proposed.id === carOwner.proposed.owner_id
-					) ?? null,
-			})),
+			pendingCarOwners
+				.filter((carOwner) => !isPriorOwnerPending(carOwner))
+				.map((carOwner) => ({
+					car:
+						pendingCars.find(
+							(car) =>
+								car.proposed.id === carOwner.proposed.car_id
+						) ?? null,
+					carOwner,
+					owner:
+						pendingOwners.find(
+							(owner) =>
+								owner.proposed.id === carOwner.proposed.owner_id
+						) ?? null,
+				})),
 		[pendingCarOwners, pendingCars, pendingOwners]
 	);
 
@@ -162,10 +174,17 @@ export const Moderation = () => {
 			photo,
 		}));
 
-		return [...packages, ...cars, ...photos].sort(
+		const priorOwners = priorOwnerPendings.map((carOwner) => ({
+			kind: 'priorOwner' as const,
+			id: carOwner.id,
+			createdAt: carOwner.created_at,
+			carOwner,
+		}));
+
+		return [...packages, ...cars, ...photos, ...priorOwners].sort(
 			(a, b) => b.createdAt - a.createdAt
 		);
-	}, [pendingPackages, pendingCars, pendingPhotos]);
+	}, [pendingPackages, pendingCars, pendingPhotos, priorOwnerPendings]);
 
 	useEffect(() => {
 		if (isLoaded && !user?.publicMetadata?.moderator) {
@@ -257,7 +276,7 @@ export const Moderation = () => {
 	}, [getToken]);
 
 	const handleApprove = async (
-		type: 'car' | 'package' | 'photo',
+		type: 'car' | 'package' | 'photo' | 'carOwner',
 		id: string,
 		skipEmail: boolean = false,
 		overrides?: PackageApproveOverrides
@@ -294,7 +313,7 @@ export const Moderation = () => {
 	};
 
 	const handleReject = async (
-		type: 'car' | 'package' | 'photo',
+		type: 'car' | 'package' | 'photo' | 'carOwner',
 		id: string
 	) => {
 		if (resolvedItems[`${type}:${id}`]) return;
@@ -383,6 +402,33 @@ export const Moderation = () => {
 							</p>
 						) : (
 							queueItems.map((item) => {
+								if (item.kind === 'priorOwner') {
+									return (
+										<PriorOwnerPendingItem
+											key={`prior-owner-${item.id}`}
+											carOwner={item.carOwner}
+											createdAt={item.createdAt}
+											status={
+												resolvedItems[
+													`carOwner:${item.id}`
+												]
+											}
+											onApprove={() =>
+												handleApprove(
+													'carOwner',
+													item.id
+												)
+											}
+											onReject={() =>
+												handleReject(
+													'carOwner',
+													item.id
+												)
+											}
+										/>
+									);
+								}
+
 								if (item.kind === 'package') {
 									return (
 										<PackagePendingItem
@@ -460,6 +506,7 @@ export const Moderation = () => {
 								return (
 									<PendingItem
 										key={`car-${item.id}`}
+										title="Car details"
 										carId={item.car.proposed?.id}
 										createdAt={item.car.created_at}
 										status={
