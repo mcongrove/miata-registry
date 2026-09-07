@@ -224,7 +224,8 @@ export function editionPageJsonLd(
 				description,
 				isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
 				about: {
-					'@type': 'Product',
+					// Car, not Product: GSC Product snippets require offers/review.
+					'@type': 'Car',
 					name,
 					brand: { '@type': 'Brand', name: 'Mazda' },
 					category: 'Limited edition Mazda Miata',
