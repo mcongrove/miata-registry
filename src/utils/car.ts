@@ -58,10 +58,13 @@ export const parseSequence = (
 	return Number.isFinite(sequence) && sequence > 0 ? sequence : null;
 };
 
-export const VIN_INPUT_PATTERN = '(?:[A-Z0-9]{5}-[A-Z0-9]{6}|JM[A-Z0-9]{15})';
+/** ISO 3779 VIN charset — I, O, Q omitted to avoid 1/0 confusion. */
+const VIN_CHAR = '[A-HJ-NPR-Z0-9]';
+
+export const VIN_INPUT_PATTERN = `(?:[A-Z0-9]{5}-[A-Z0-9]{6}|JM${VIN_CHAR}{15})`;
 
 export const VIN_VALIDATION_MESSAGE =
-	'Enter a 17-character VIN starting with JM, or a chassis number as XXXXX-XXXXXX.';
+	'Enter a 17-character VIN starting with JM (no I, O, or Q), or a chassis number as XXXXX-XXXXXX.';
 
 const VIN_PATTERN = new RegExp(`^${VIN_INPUT_PATTERN}$`, 'i');
 
@@ -78,7 +81,7 @@ export const isValidVin = (vin: string | null | undefined): boolean => {
 };
 
 const CHASSIS_PATTERN = /^[A-Z0-9]{5}-[A-Z0-9]{6}$/i;
-const FULL_VIN_PATTERN = /^JM[A-Z0-9]{15}$/i;
+const FULL_VIN_PATTERN = new RegExp(`^JM${VIN_CHAR}{15}$`, 'i');
 
 export const isChassisNumber = (vin: string | null | undefined): boolean => {
 	if (!vin) return false;

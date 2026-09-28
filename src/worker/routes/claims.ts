@@ -29,9 +29,11 @@ import {
 } from '../../db/schema';
 import {
 	buildVinDecodeFields,
+	isValidVin,
 	normalizeVinInput,
 	parseEditionYear,
 	parseSequence,
+	VIN_VALIDATION_MESSAGE,
 } from '../../utils/car';
 import { ownerLocationFromClaimBody } from '../../utils/location';
 import { withAuth } from '../middleware/auth';
@@ -255,7 +257,17 @@ claimsRouter.post('/new', withAuth(), async (c) => {
 		const vin =
 			typeof body.vin === 'string' && body.vin
 				? normalizeVinInput(body.vin)
-				: body.vin;
+				: '';
+
+		if (!isValidVin(vin)) {
+			return c.json(
+				{
+					error: 'Bad Request',
+					details: VIN_VALIDATION_MESSAGE,
+				},
+				400
+			);
+		}
 
 		const existingCar = await db
 			.select()

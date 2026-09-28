@@ -39,6 +39,7 @@ import {
 	getVinDetails,
 	hasVinModelYearMismatch,
 	isFullVin,
+	isValidVin,
 	isVinApiValid,
 	normalizeVinInput,
 	parseEditionYear,
@@ -279,6 +280,12 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 				const vin = normalizeVinInput(
 					String(formData.get('vin') ?? '')
 				);
+
+				if (!isValidVin(vin)) {
+					setFormError(VIN_VALIDATION_MESSAGE);
+
+					return;
+				}
 
 				if (isFullVin(vin)) {
 					if (vinApiWarning) {
