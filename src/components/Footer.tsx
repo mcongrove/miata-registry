@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom';
 import Symbol from '../assets/symbol.svg?react';
 import { AGPL_LICENSE_URL, GITHUB_REPO_URL } from '../constants/repo';
 import { useModal } from '../context/ModalContext';
+import { Icon } from './Icon';
 import { SitePulse } from './SitePulse';
 
 export const Footer = () => {
@@ -50,7 +51,7 @@ export const Footer = () => {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								<i className="fa-brands fa-instagram text-3xl" />
+								<Icon name="instagram" className="text-3xl" />
 
 								<span className="sr-only">Instagram</span>
 							</a>
@@ -61,7 +62,7 @@ export const Footer = () => {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								<i className="fa-brands fa-github text-3xl" />
+								<Icon name="github" className="text-3xl" />
 
 								<span className="sr-only">GitHub</span>
 							</a>
@@ -132,7 +133,10 @@ export const Footer = () => {
 										className="flex items-center gap-1.5 text-brg-mid hover:text-brg-light transition-colors"
 									>
 										Rarity Scores{' '}
-										<i className="fa-solid fa-crown text-sm text-yellow-300/50" />
+										<Icon
+											name="crown"
+											className="text-sm text-yellow-300/50"
+										/>
 									</Link>
 								</li>
 								<li>

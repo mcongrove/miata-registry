@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { IconName } from '../components/Icon';
 import type { TResourceKind } from '../types/Resource';
 
 /** External destination kinds (http href CTA). */
@@ -49,18 +50,18 @@ export const resourceKindLabel = (kind: TResourceKind): string => {
 	}
 };
 
-export const resourceKindIcon = (kind: TResourceKind): string => {
+export const resourceKindIcon = (kind: TResourceKind): IconName => {
 	switch (kind) {
 		case 'link':
-			return 'fa-solid fa-globe';
+			return 'globe';
 		case 'registry':
-			return 'fa-solid fa-list';
+			return 'list';
 		case 'file':
-			return 'fa-solid fa-file';
+			return 'file';
 		case 'page':
-			return 'fa-solid fa-file-lines';
+			return 'file-lines';
 		default:
-			return 'fa-solid fa-bookmark';
+			return 'bookmark';
 	}
 };
 export const formatFileBytes = (bytes?: number | null): string | null => {

@@ -28,6 +28,7 @@ import {
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { ErrorBanner } from '../components/ErrorBanner';
+import { Icon } from '../components/Icon';
 import { Field } from '../components/form/Field';
 import { Location } from '../components/form/Location';
 import { Select, SelectStyles } from '../components/form/Select';
@@ -407,7 +408,11 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 			>
 				<div className="flex flex-col items-center gap-6 py-6">
 					<div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
-						<i className="fa-solid fa-fw fa-times text-red-500 text-3xl" />
+						<Icon
+							name="xmark"
+							fixed
+							className="text-red-500 text-3xl"
+						/>
 					</div>
 
 					<div className="flex flex-col gap-2 items-center text-center">
@@ -443,7 +448,11 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 			>
 				<div className="flex flex-col items-center gap-6 pt-6">
 					<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
-						<i className="fa-solid fa-fw fa-check text-brg text-3xl" />
+						<Icon
+							name="check"
+							fixed
+							className="text-brg text-3xl"
+						/>
 					</div>
 
 					<div className="text-center">
@@ -569,8 +578,9 @@ export function Register({ isOpen, onClose, props }: RegisterProps) {
 												required
 											/>
 
-											<i
-												className="fa-solid fa-times text-brg-mid cursor-pointer"
+											<Icon
+												name="xmark"
+												className="text-brg-mid cursor-pointer"
 												onClick={() =>
 													setShowOtherInput(false)
 												}

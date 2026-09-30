@@ -18,40 +18,41 @@
 
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import { Icon } from '../Icon';
 
 const levels = [
 	{
 		description:
 			'Museum-worthy with exceptional provenance and preservation',
-		icon: 'fa-crown',
+		icon: 'crown',
 		level: 'historically-significant',
 		points: '100+ points',
 	},
 	{
 		description:
 			'Exceptionally preserved with documented limited production history',
-		icon: 'fa-trophy',
+		icon: 'trophy',
 		level: 'exceptionally-rare',
 		points: '80 – 99 points',
 	},
 	{
 		description:
 			'Well-preserved with verified limited production credentials',
-		icon: 'fa-medal',
+		icon: 'medal',
 		level: 'very-rare',
 		points: '60 – 79 points',
 	},
 	{
 		description:
 			'Notable examples with documented limited production specifications',
-		icon: 'fa-award',
+		icon: 'award',
 		level: 'rare',
 		points: '40 – 59 points',
 	},
 	{
 		description:
 			'Verified limited edition with typical features and documentation',
-		icon: 'fa-star',
+		icon: 'star',
 		level: 'limited-edition',
 		points: 'Below 40 points',
 	},
@@ -90,12 +91,9 @@ export const Levels = () => {
 							'col-span-2 md:col-span-1 justify-self-center w-1/2 md:w-full'
 					)}
 				>
-					<i
-						className={twMerge(
-							'fa-solid text-3xl',
-							level.icon,
-							iconColors[level.level]
-						)}
+					<Icon
+						name={level.icon}
+						className={twMerge('text-3xl', iconColors[level.level])}
 					/>
 
 					<div className="flex flex-col items-center gap-2 lg:gap-1">
@@ -113,7 +111,10 @@ export const Levels = () => {
 
 						<span className="inline-flex items-center gap-1 text-xs font-medium mt-1">
 							View cars
-							<i className="fa-solid fa-arrow-right text-[10px] transform group-hover:translate-x-0.5 transition-transform" />
+							<Icon
+								name="arrow-right"
+								className="text-[10px] transform group-hover:translate-x-0.5 transition-transform"
+							/>
 						</span>
 					</div>
 				</Link>

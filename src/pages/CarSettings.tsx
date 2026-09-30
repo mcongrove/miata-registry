@@ -20,6 +20,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { Icon } from '../components/Icon';
 import { CarEditForm } from '../components/car/CarEditForm';
 import { Modal } from '../components/Modal';
 import { useCarEdit, type TCarWithOwnerHistory } from '../hooks/useCarEdit';
@@ -140,7 +141,11 @@ export function CarSettings() {
 				<div className="container mx-auto max-w-3xl py-10 lg:py-14">
 					<div className="flex flex-col items-center gap-6 text-center">
 						<div className="w-16 h-16 rounded-full bg-brg/10 flex items-center justify-center">
-							<i className="fa-solid fa-fw fa-check text-brg text-3xl" />
+							<Icon
+								name="check"
+								fixed
+								className="text-brg text-3xl"
+							/>
 						</div>
 
 						<div>
@@ -261,7 +266,11 @@ export function CarSettings() {
 				<div className="container mx-auto max-w-5xl py-8 lg:py-10">
 					{car.has_pending_changes && (
 						<p className="mb-8 text-sm text-brg flex items-center gap-2 border border-yellow-200 bg-yellow-50/80 rounded-lg px-4 py-3">
-							<i className="fa-solid fa-fw fa-triangle-exclamation text-yellow-600" />
+							<Icon
+								name="triangle-exclamation"
+								fixed
+								className="text-yellow-600"
+							/>
 							This car has pending changes under review. You can
 							edit again after moderation finishes.
 						</p>

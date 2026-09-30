@@ -28,6 +28,7 @@ import { useLocation } from 'react-router-dom';
 import { TOwner } from '../../types/Owner';
 import { handleApiError } from '../../utils/common';
 import { Button } from '../Button';
+import { Icon } from '../Icon';
 
 const ClerkMyCars = lazy(() =>
 	import('./ClerkMyCars').then((module) => ({
@@ -138,7 +139,11 @@ export function Clerk() {
 							<UserButton.Action
 								label="My Cars"
 								labelIcon={
-									<i className="fa-solid fa-fw fa-car text-[#616161]"></i>
+									<Icon
+										name="car"
+										fixed
+										className="text-[#616161]"
+									/>
 								}
 								open="cars"
 							/>
@@ -149,7 +154,11 @@ export function Clerk() {
 						<UserButton.UserProfilePage
 							label="Profile"
 							labelIcon={
-								<i className="fa-solid fa-fw fa-user text-[#2F3037]"></i>
+								<Icon
+									name="user"
+									fixed
+									className="text-[#2F3037]"
+								/>
 							}
 							url="profile"
 						>
@@ -178,7 +187,11 @@ export function Clerk() {
 						<UserButton.UserProfilePage
 							label="My Cars"
 							labelIcon={
-								<i className="fa-solid fa-fw fa-car text-[#2F3037]"></i>
+								<Icon
+									name="car"
+									fixed
+									className="text-[#2F3037]"
+								/>
 							}
 							url="cars"
 						>

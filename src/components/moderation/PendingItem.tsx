@@ -20,6 +20,7 @@ import { Children, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { Button } from '../Button';
+import { Icon } from '../Icon';
 
 export const PendingItem = ({
 	carId,
@@ -183,7 +184,11 @@ export const PendingItem = ({
 												}
 												className="bg-green-50 hover:bg-green-100 text-green-700 lg:px-2 lg:py-1.5 lg:text-sm rounded-none rounded-r-lg border-l border-green-200/80"
 											>
-												<i className="fa-solid fa-fw fa-chevron-down text-xs" />
+												<Icon
+													name="chevron-down"
+													fixed
+													className="text-xs"
+												/>
 											</Button>
 
 											{menuOpen && (

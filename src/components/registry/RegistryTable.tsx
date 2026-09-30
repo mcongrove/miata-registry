@@ -19,6 +19,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useModal } from '../../context/ModalContext';
+import { Icon } from '../Icon';
 import { Chip } from '../rarity/Chip';
 import { TCar } from '../../types/Car';
 import { colorMap, hasSequence } from '../../utils/car';
@@ -138,7 +139,10 @@ export const RegistryTable = ({
 									className="px-4 py-8 text-center"
 								>
 									<div className="flex flex-col items-center gap-2">
-										<i className="fa-solid fa-exclamation-triangle text-2xl text-red-500" />
+										<Icon
+											name="triangle-exclamation"
+											className="text-2xl text-red-500"
+										/>
 										<p className="text-red-700 text-sm">
 											{fetchError}
 										</p>

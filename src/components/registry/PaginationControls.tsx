@@ -17,6 +17,7 @@
  */
 
 import { twMerge } from 'tailwind-merge';
+import { Icon } from '../Icon';
 import { Select } from '../form/Select';
 
 interface PaginationControlsProps {
@@ -87,7 +88,11 @@ export const PaginationControls = ({
 					onClick={() => onPageChange(currentPage - 1)}
 					disabled={currentPage === 1}
 				>
-					<i className="fa-solid fa-fw fa-chevron-left text-brg-mid text-xs" />
+					<Icon
+						name="chevron-left"
+						fixed
+						className="text-brg-mid text-xs"
+					/>
 
 					<span className="sr-only">Previous page</span>
 				</button>
@@ -114,7 +119,11 @@ export const PaginationControls = ({
 					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage === totalPages || totalPages <= 1}
 				>
-					<i className="fa-solid fa-fw fa-chevron-right text-brg-mid text-xs" />
+					<Icon
+						name="chevron-right"
+						fixed
+						className="text-brg-mid text-xs"
+					/>
 
 					<span className="sr-only">Next page</span>
 				</button>

@@ -18,6 +18,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Icon } from '../components/Icon';
 import { usePageMeta } from '../hooks/usePageMeta';
 import type { TResource, TResourceKind } from '../types/Resource';
 import { handleApiError } from '../utils/common';
@@ -167,7 +168,10 @@ export const Resources = () => {
 								placeholder="Search resources..."
 								className="w-full pl-9 pr-3 py-2 text-[16px] md:text-sm border border-brg-light rounded-lg text-brg focus:outline-none focus:border-brg-mid"
 							/>
-							<i className="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brg-mid/60 text-sm" />
+							<Icon
+								name="magnifying-glass"
+								className="absolute left-3 top-1/2 -translate-y-1/2 text-brg-mid/60 text-sm"
+							/>
 						</div>
 
 						<select
@@ -261,7 +265,10 @@ export const Resources = () => {
 												className="px-3 py-8 text-center"
 											>
 												<div className="flex flex-col items-center gap-2">
-													<i className="fa-solid fa-exclamation-triangle text-2xl text-red-500" />
+													<Icon
+														name="triangle-exclamation"
+														className="text-2xl text-red-500"
+													/>
 													<p className="text-red-700">
 														{fetchError}
 													</p>
@@ -312,9 +319,11 @@ export const Resources = () => {
 																resource.kind
 															)}
 														>
-															<i
-																className={`${resourceKindIcon(resource.kind)} text-xs`}
-																aria-hidden
+															<Icon
+																name={resourceKindIcon(
+																	resource.kind
+																)}
+																className="text-xs"
 															/>
 															<span className="sr-only">
 																{resourceKindLabel(
@@ -330,15 +339,19 @@ export const Resources = () => {
 												<td className="px-3 py-2 align-middle text-brg-mid">
 													<span className="line-clamp-1">
 														{resource.featured ? (
-															<i
-																className="fa-solid fa-fw fa-star text-yellow-500 mr-1.5"
+															<Icon
+																name="star"
+																fixed
+																className="text-yellow-500 mr-1.5"
 																title="Featured"
 																aria-label="Featured"
 															/>
 														) : null}
 														{resource.file_key ? (
-															<i
-																className="fa-solid fa-fw fa-download text-brg-mid/40 mr-1.5"
+															<Icon
+																name="download"
+																fixed
+																className="text-brg-mid/40 mr-1.5"
 																title="Download available"
 																aria-label="Download available"
 															/>

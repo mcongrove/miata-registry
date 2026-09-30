@@ -35,6 +35,7 @@ import { twMerge } from 'tailwind-merge';
 import Symbol from '../assets/symbol.svg?react';
 import { Clerk } from '../components/account/Clerk';
 import { useModal } from '../context/ModalContext';
+import { Icon } from './Icon';
 
 const Pending = lazy(() =>
 	import('./account/Pending').then((module) => ({
@@ -90,7 +91,7 @@ const Dropdown = ({ label, items, isActive }: DropdownProps) => {
 			>
 				{label}
 
-				<i className="fa-solid fa-fw fa-chevron-down text-xs" />
+				<Icon name="chevron-down" fixed className="text-xs" />
 			</button>
 
 			{open && (
@@ -233,7 +234,10 @@ export const Header = () => {
 							label: (
 								<span className="flex items-center gap-1.5">
 									Rarity Scores{' '}
-									<i className="fa-solid fa-crown text-sm -mt-0.5 opacity-60 text-yellow-600" />
+									<Icon
+										name="crown"
+										className="text-sm -mt-0.5 opacity-60 text-yellow-600"
+									/>
 								</span>
 							),
 							to: '/rarity',

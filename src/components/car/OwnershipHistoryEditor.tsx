@@ -19,6 +19,7 @@
 import { Fragment, type ChangeEvent } from 'react';
 import { Location } from '../form/Location';
 import { TextField } from '../form/TextField';
+import { Icon } from '../Icon';
 import {
 	formatLocation,
 	normalizeLocation,
@@ -542,9 +543,10 @@ export function OwnershipHistoryEditor({
 											className="rounded p-1 text-red-800 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
 											aria-label="Remove owner"
 										>
-											<i
-												className="fa-solid fa-fw fa-xmark text-xs"
-												aria-hidden
+											<Icon
+												name="xmark"
+												fixed
+												className="text-xs"
 											/>
 										</button>
 									</div>

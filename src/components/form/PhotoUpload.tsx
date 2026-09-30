@@ -18,6 +18,7 @@
 
 import { useState } from 'react';
 import { compressCarPhoto } from '../../utils/carPhoto';
+import { Icon } from '../Icon';
 
 interface PhotoUploadProps {
 	disabled?: boolean;
@@ -98,7 +99,7 @@ export function PhotoUpload({
 			<div className="flex aspect-[3/2] w-full items-center justify-center rounded-lg border-2 border-dashed border-brg-light bg-brg-light/10 text-sm">
 				{preparing ? (
 					<p className="flex gap-2 items-center text-brg-mid">
-						<i className="fa-solid fa-spinner fa-spin" />
+						<Icon name="spinner" spin />
 						Preparing image…
 					</p>
 				) : displayError ? (
@@ -107,7 +108,7 @@ export function PhotoUpload({
 					</p>
 				) : (
 					<div className="flex flex-col gap-1 items-center justify-center text-brg-mid">
-						<i className="fa-solid fa-camera-retro text-2xl" />
+						<Icon name="camera-retro" className="text-2xl" />
 
 						<p>
 							Click or drag to upload{' '}

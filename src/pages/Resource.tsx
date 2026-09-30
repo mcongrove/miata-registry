@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { Icon } from '../components/Icon';
 import { JsonLd } from '../components/JsonLd';
 import { usePageMeta } from '../hooks/usePageMeta';
 import type { TResource } from '../types/Resource';
@@ -204,9 +205,10 @@ export const Resource = () => {
 												: 'bg-brg hover:bg-brg/90'
 										}`}
 									>
-										<i
-											className="fa-solid fa-fw fa-download mr-2"
-											aria-hidden
+										<Icon
+											name="download"
+											fixed
+											className="mr-2"
 										/>
 										Download
 										{fileSize ? ` (${fileSize})` : ''}

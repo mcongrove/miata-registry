@@ -468,12 +468,12 @@ export const Legal = () => {
 								Clerk (authentication and account management),
 								Resend (email delivery), Cloudflare (hosting,
 								database, and image storage), Google (maps,
-								location autocomplete, and fonts), Font Awesome
-								(icons), and the Internet Archive (public
-								dataset archival, described below). When You
-								look up a VIN, Your browser also sends that VIN
-								directly to the U.S. National Highway Traffic
-								Safety Administration's vehicle database.
+								location autocomplete, and fonts), and the
+								Internet Archive (public dataset archival,
+								described below). When You look up a VIN, Your
+								browser also sends that VIN directly to the U.S.
+								National Highway Traffic Safety Administration's
+								vehicle database.
 							</li>
 							<li>
 								<strong>For business transfers:</strong> We may

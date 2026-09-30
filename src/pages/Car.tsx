@@ -27,6 +27,7 @@ import {
 } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { Icon } from '../components/Icon';
 import { JsonLd } from '../components/JsonLd';
 import { Chip } from '../components/rarity/Chip';
 import { RarityScoreBreakdownTooltip } from '../components/rarity/RarityScoreBreakdownTooltip';
@@ -474,7 +475,10 @@ export const CarProfile = () => {
 		return (
 			<main className="flex-1 pt-24 lg:pt-40 pb-16">
 				<div className="container mx-auto flex flex-col items-center gap-4">
-					<i className="fa-solid fa-exclamation-triangle text-4xl text-red-500" />
+					<Icon
+						name="triangle-exclamation"
+						className="text-4xl text-red-500"
+					/>
 
 					<h1 className="text-2xl font-bold text-brg">
 						Error Loading Car
@@ -588,7 +592,11 @@ export const CarProfile = () => {
 									<>
 										{car?.has_pending_changes && (
 											<p className="hidden md:flex text-sm text-brg items-center gap-2">
-												<i className="fa-solid fa-fw fa-triangle-exclamation text-base text-yellow-500" />{' '}
+												<Icon
+													name="triangle-exclamation"
+													fixed
+													className="text-base text-yellow-500"
+												/>{' '}
 												This car has pending changes
 											</p>
 										)}
@@ -597,7 +605,11 @@ export const CarProfile = () => {
 											href={`/registry/${car.id}/settings`}
 											className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
 										>
-											<i className="fa-solid fa-fw fa-pen-to-square opacity-70" />
+											<Icon
+												name="pen-to-square"
+												fixed
+												className="opacity-70"
+											/>
 											Edit Car
 										</Button>
 									</>
@@ -620,7 +632,11 @@ export const CarProfile = () => {
 										}}
 										className="bg-white text-brg border border-brg-border/50 hover:bg-brg-light/70 hover:text-brg-dark lg:py-2 lg:px-3 lg:text-sm rounded-md gap-2"
 									>
-										<i className="fa-solid fa-fw fa-key text-yellow-500" />
+										<Icon
+											name="key"
+											fixed
+											className="text-yellow-500"
+										/>
 										Claim this Car
 									</Button>
 								)}
@@ -638,7 +654,10 @@ export const CarProfile = () => {
 										className="ml-auto lg:ml-0"
 									>
 										<Button className="size-9 flex items-center justify-center rounded-md lg:p-2 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white">
-											<i className="fa-brands fa-instagram text-2xl" />
+											<Icon
+												name="instagram"
+												className="text-2xl"
+											/>
 										</Button>
 									</Link>
 								)}
@@ -929,7 +948,11 @@ export const CarProfile = () => {
 										</div>
 									)}
 
-									<i className="fa-solid fa-fw fa-location-dot text-2xl text-brg-mid" />
+									<Icon
+										name="location-dot"
+										fixed
+										className="text-2xl text-brg-mid"
+									/>
 								</div>
 							) : (
 								<div className="p-4 flex items-center justify-between">

@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { formatLocation } from '../utils/location';
+import { Icon } from './Icon';
 
 interface CreditProps {
 	className?: string;
@@ -196,7 +197,7 @@ export const Credit = ({
 					CREDIT_HEIGHT
 				)}
 			>
-				<i className="fa-solid fa-car"></i>
+				<Icon name="car" />
 			</div>
 
 			{direction === 'right' && (

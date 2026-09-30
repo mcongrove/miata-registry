@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { Icon } from '../components/Icon';
 import { Tooltip } from '../components/Tooltip';
 import { Card } from '../components/edition/Card';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -83,7 +84,10 @@ export const Editions = () => {
 							</>
 						}
 					>
-						<i className="fa-solid fa-circle-info text-lg text-brg-mid cursor-help" />
+						<Icon
+							name="circle-info"
+							className="text-lg text-brg-mid cursor-help"
+						/>
 					</Tooltip>
 				</h1>
 

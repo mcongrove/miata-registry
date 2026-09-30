@@ -19,6 +19,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { Icon } from '../components/Icon';
 import { Credit } from '../components/Credit';
 import { JsonLd } from '../components/JsonLd';
 import {
@@ -281,9 +282,11 @@ export const Edition = () => {
 															resource.kind
 														)}
 													>
-														<i
-															className={`${resourceKindIcon(resource.kind)} text-xs`}
-															aria-hidden
+														<Icon
+															name={resourceKindIcon(
+																resource.kind
+															)}
+															className="text-xs"
 														/>
 														<span className="sr-only">
 															{resourceKindLabel(

@@ -18,6 +18,7 @@
 
 import { useEffect, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { Icon } from './Icon';
 
 interface ErrorBannerProps {
 	className?: string;
@@ -51,11 +52,12 @@ export function ErrorBanner({ className, error, onDismiss }: ErrorBannerProps) {
 				<span>{error}</span>
 
 				{onDismiss && (
-					<i
-						className="fa-solid fa-times text-red-700 hover:text-red-800 cursor-pointer"
+					<Icon
+						name="xmark"
+						className="text-red-700 hover:text-red-800 cursor-pointer"
 						onClick={onDismiss}
 						aria-label="Dismiss error"
-					></i>
+					/>
 				)}
 			</div>
 		</div>

@@ -23,6 +23,7 @@ import { formatRarityLevel, RARITY_LEVELS } from '../../utils/car';
 import { getCountryDisplayName } from '../../utils/location';
 import { Select } from '../form/Select';
 import { TextField } from '../form/TextField';
+import { Icon } from '../Icon';
 import { FilterHeader } from './FilterHeader';
 
 const getCountries = async () => {
@@ -283,7 +284,7 @@ export const FilterSidebar = ({
 								onClick={onClose}
 								className="text-brg-mid hover:text-brg"
 							>
-								<i className="fa-solid fa-times"></i>
+								<Icon name="xmark" />
 							</button>
 						</div>
 					</div>
