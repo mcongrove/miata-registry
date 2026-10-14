@@ -29,10 +29,11 @@ import { Diff, clerkUserLink, copyableSubText, vinValidateLink } from './Diff';
 import { PendingItem } from './PendingItem';
 
 const OWNER_DIFF_FIELD_ORDER = ['name', 'city', 'state', 'country'] as const;
-const CAR_DIFF_FIELD_ORDER = ['vin', 'edition_id'] as const;
+const CAR_DIFF_FIELD_ORDER = ['vin', 'edition_id', 'current_owner_id'] as const;
 const PACKAGE_DIFF_PRIORITY = [
 	'vin',
 	'edition_id',
+	'current_owner_id',
 	'name',
 	'city',
 	'state',
@@ -229,7 +230,6 @@ export const PackagePendingItem = ({
 
 	if (pkg.car) {
 		const packageHiddenCarFields = new Set([
-			'current_owner_id',
 			'manufacture_city',
 			'manufacture_date',
 			'manufacture_prefecture',

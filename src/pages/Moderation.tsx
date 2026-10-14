@@ -40,7 +40,7 @@ import {
 } from '../types/Owner';
 import { handleApiError } from '../utils/common';
 
-const CAR_DIFF_FIELD_ORDER = ['vin', 'edition_id'] as const;
+const CAR_DIFF_FIELD_ORDER = ['vin', 'edition_id', 'current_owner_id'] as const;
 
 const sortByFieldOrder = (keys: string[], order: readonly string[]) => {
 	const priority = new Map(order.map((field, index) => [field, index]));
